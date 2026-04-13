@@ -2,7 +2,9 @@
 
 I built this because I was tired of copy-pasting the same grading feedback and check-in emails over and over. If you teach any kind of online or cyber course where you send the same progress reminders every nine weeks and type the same grading comments 50 times a day, this might help you too.
 
-It's one HTML file. No login, no database, no monthly fee. Open it in your browser and go. Works on desktop and on your phone.
+It's one HTML file. No monthly fee. Cloud sync with Google sign-in so my overrides and year setup follow me to every device automatically. Works on desktop and on my phone.
+
+**Live at:** https://percycodesios.github.io/CyberGrader.io/
 
 ---
 
@@ -20,15 +22,34 @@ When I set the term to **4th Nine Weeks**, the check-in templates automatically 
 
 ---
 
+## Cloud sync (Firebase)
+
+This is the part I'm most proud of. I sign in once with my Google account and everything follows me.
+
+- Click **Sign In** in the top bar
+- Pick Google (one tap with my school account) or use email/password
+- "Synced ✓" indicator turns green in the top bar
+- Every edit I make — grading overrides, email overrides, announcement edits, year setup dates — auto-saves to the cloud in the background
+- Open the site on my laptop, phone, or school Chromebook → sign in → all my data pulls down automatically within a second
+- Sign out anytime and my data stays on that device but stops syncing
+
+**Privacy:** The Firestore security rules lock my data to my user ID only. No one — not other users, not anyone who finds the repo — can read or write my data unless they're signed in as me. It's as tight as it gets for a client-side app.
+
+**If I lose internet:** The tool falls back to localStorage and keeps working. When I'm online again, the next save syncs everything back up. Nothing ever breaks.
+
+**Manual backup (still available):** Export / Import JSON buttons are still in the sidebar if I want a local file backup I can email to myself or drop in Drive.
+
+---
+
 ## The stuff that makes it actually usable
 
 - **Today's date** is in the top right and updates every day on its own
-- **Edit any template**, click Save Override, your edit is saved on that device
+- **Edit any template**, click Save Override, your edit is saved locally AND synced to the cloud (if signed in)
 - **Reset** button goes back to the original locked wording if I mess something up
-- **Export / Import** JSON so I can move my saved edits and year setup between my desktop and phone
 - **4th nine weeks templates** switch automatically when I set the term — no separate email types to pick
 - **Mobile-friendly** — tabs stack, buttons go full width, everything still works with one thumb
 - **No internet required** once the page loads — I can work on it during an FID day without panicking if WiFi flakes out
+- **Sync status visible in the top bar** — I always know if my changes made it to the cloud
 
 ---
 
@@ -42,94 +63,49 @@ I use GitHub Pages because it's free and my file is just one HTML file.
 4. Go to Settings → Pages
 5. Source: "Deploy from a branch" → Branch: `main`, folder: `/ (root)` → Save
 6. Wait about a minute
-7. Your site is live at `https://[your-username].github.io/cybergrader/`
+7. Your site is live at `https://[your-username].github.io/[repo-name]/`
 8. Bookmark it on desktop. Add it to your iPhone home screen so it feels like an app.
 
 Zero cost. To update it later, just replace `index.html` in the repo. GitHub Pages redeploys automatically in about a minute.
 
-If you ever want a custom domain like `cybergrader.io`, that's about $10/year for the domain name through a registrar like Porkbun or Namecheap. Pages still hosts free.
+---
+
+## How Firebase is set up
+
+Already done — but for reference if I ever need to rebuild:
+
+- **Project:** cybergrader-v2
+- **Auth methods enabled:** Email/Password, Google sign-in
+- **Firestore:** production mode, us-east1 region
+- **Security rules:** users can only read/write their own `/users/{uid}/...` paths
+- **Authorized domains:** `percycodesios.github.io` added so OAuth redirects work
+- **Plan:** Spark (free). Firebase hard-stops at free tier limits — no credit card, no surprise charges
+
+The `firebaseConfig` block is embedded in the `index.html` file itself. The API key is safe to be public — it's not a secret, the security rules are what protect the data.
 
 ---
 
-## Syncing between devices (right now)
+## Updating the tool
 
-For now it's manual:
+Whenever I get a new version of `index.html`:
 
-- On Device A: click Export → save the JSON file somewhere (email it to yourself, drop it in Drive, AirDrop it)
-- On Device B: click Import → pick the file
-- All your overrides and year setup merge in
+1. Go to my GitHub repo
+2. Click the existing `index.html`
+3. Click the pencil icon (edit)
+4. Select all, delete, paste the new code
+5. Scroll down, click "Commit changes"
+6. Wait ~60 seconds — live site updates automatically
 
-Each browser keeps its own copy until you sync. This works fine for me because I mostly use my school laptop and my phone.
+**My data survives updates** because it lives in Firestore and localStorage, not in the HTML file. The HTML file is just the app engine.
 
----
-
-## What I need to set up Firebase for real cloud sync
-
-I already have a Firebase/Google account but haven't wired this up yet. When I'm ready, here's exactly what I need to send to Alex to get real login + cloud sync working so my overrides follow me everywhere automatically:
-
-### Step-by-step
-
-1. Go to https://console.firebase.google.com
-2. Click **Add project** (or **Create a project**)
-3. Project name: `cybergrader` → Continue
-4. **Disable Google Analytics** — I don't need it, just turn off the toggle → Create project
-5. Wait for it to finish, click Continue
-
-### Enable login
-6. Left sidebar → **Build → Authentication** → Get started
-7. **Sign-in method** tab → click **Email/Password** → toggle Enable → Save
-8. (Optional) Also enable **Google** sign-in if I want one-tap login with my Google account
-
-### Create the database
-9. Left sidebar → **Build → Firestore Database** → Create database
-10. Start in **production mode** → Next
-11. Location: `us-east1` (closest to PA) → Enable
-12. After it creates, click the **Rules** tab and paste this exact text:
-    ```
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /users/{userId}/{document=**} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
-        }
-      }
-    }
-    ```
-    → Publish
-
-    This locks it down so only I can see my own data. No one else can touch it.
-
-### Register a web app
-13. Click the **gear icon** top-left → Project settings
-14. Scroll down to **Your apps** → click the **`</>`** (web) icon
-15. App nickname: `cybergrader-web`
-16. **Don't** check "Also set up Firebase Hosting" — I'm using GitHub Pages
-17. Click **Register app**
-18. Firebase shows a code block with `firebaseConfig` in it. It looks like this:
-    ```js
-    const firebaseConfig = {
-      apiKey: "AIza...",
-      authDomain: "cybergrader-xxxxx.firebaseapp.com",
-      projectId: "cybergrader-xxxxx",
-      storageBucket: "cybergrader-xxxxx.firebasestorage.app",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abc123def456"
-    };
-    ```
-
-### Send that block to Alex
-19. Copy the **entire `firebaseConfig` block** (all 6 lines inside the braces)
-20. Paste it in my next message
-21. Alex will wire up a Sign In button, auto-sync on save, and auto-load on sign-in
-
-**Note on security:** that `apiKey` looks scary but it is **not a secret**. Firebase web API keys are public by design — the security rules I pasted above are what actually protect my data. It's safe to commit the config to GitHub.
+**Pro move:** before any big update, click Export in the sidebar and save the JSON as a local backup. That's my insurance policy.
 
 ---
 
 ## Items still open
 
 - **Welcome Third / Fourth Nine Weeks grading wording** — I haven't given Alex the wording for these yet, so only 1st and 2nd are in the First Assignment dropdown. When I send the wording, they'll get added.
-- I'll probably keep tweaking email copy as I use this more. That's what the Edit / Save Override buttons are for.
+- I'll probably keep tweaking email copy as I use this more. That's what the Edit / Save Override buttons are for, and now every edit auto-syncs to every device.
 
 ---
 
