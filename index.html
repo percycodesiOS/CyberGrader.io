@@ -122,6 +122,51 @@
   .lib-row{display:flex;gap:8px;align-items:center;margin-top:8px}
   .ys-section{margin-bottom:18px}
   .ys-section h3{margin:0 0 10px;font-size:.95rem;color:var(--cyan)}
+  .auth-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .auth-status{font-size:.8rem;color:var(--muted);font-weight:700}
+  .auth-status .signed{color:var(--green)}
+  .auth-status .syncing{color:var(--orange)}
+  .btn-auth{
+    background:linear-gradient(180deg, rgba(0,183,255,.28), rgba(81,217,255,.18));
+    color:#fff;border:1px solid rgba(81,217,255,.38);padding:9px 13px;border-radius:10px;
+    font:inherit;font-weight:800;cursor:pointer;font-size:.82rem;
+  }
+  .btn-auth:hover{filter:brightness(1.1)}
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;
+  }
+  .modal-overlay.active{display:flex}
+  .modal{
+    background:linear-gradient(180deg, rgba(13,17,23,.98), rgba(10,14,20,.98));
+    border:1px solid var(--border-strong);border-radius:18px;padding:24px;max-width:420px;width:100%;
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+  }
+  .modal h2{margin:0 0 6px;color:var(--text);font-size:1.3rem}
+  .modal p{margin:0 0 16px;color:var(--muted);font-size:.88rem}
+  .modal .divider-or{
+    display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:.78rem;
+  }
+  .modal .divider-or::before,.modal .divider-or::after{
+    content:"";flex:1;height:1px;background:rgba(81,217,255,.2);
+  }
+  .btn-google{
+    width:100%;background:#fff;color:#1a1a1a;border:none;padding:13px;border-radius:12px;
+    font:inherit;font-weight:800;cursor:pointer;font-size:.95rem;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .btn-google:hover{background:#f3f3f3}
+  .modal-close{
+    background:transparent;border:1px solid var(--border);color:var(--muted);
+    padding:10px;border-radius:10px;font:inherit;cursor:pointer;margin-top:12px;width:100%;
+  }
+  .modal input[type="email"],.modal input[type="password"]{
+    width:100%;border:1px solid rgba(81,217,255,.16);
+    background:linear-gradient(180deg, rgba(11,18,32,1), rgba(8,13,24,1));
+    color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;margin-bottom:10px;
+    color-scheme:dark;
+  }
+  .modal-error{color:var(--red);font-size:.82rem;min-height:1em;margin-top:6px}
   @media (max-width:1040px){.main-grid{grid-template-columns:1fr}}
   @media (max-width:680px){
     body{padding:10px}
@@ -143,11 +188,36 @@
       <h1 class="brand">CyberGrader<span class="dot">.io</span></h1>
       <p class="tagline">Locked grading, email generator, and SV Portal library</p>
     </div>
+    <div class="auth-bar">
+      <span class="auth-status" id="authStatus">Not signed in</span>
+      <button class="btn-auth" id="signInBtn" type="button">Sign In</button>
+      <button class="btn-auth hidden" id="signOutBtn" type="button">Sign Out</button>
+    </div>
     <div class="date-pill">
       <span class="lbl">Today</span>
       <span id="todayDate">—</span>
     </div>
   </header>
+
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <h2>Sign in to CyberGrader</h2>
+      <p>Your overrides and year setup will sync across every device you sign in on.</p>
+      <button class="btn-google" id="googleSignInBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider-or">or use email</div>
+      <input type="email" id="authEmail" placeholder="Email" autocomplete="email" />
+      <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" />
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" id="emailSignInBtn" type="button" style="flex:1">Sign In</button>
+        <button class="btn btn-ghost" id="emailSignUpBtn" type="button" style="flex:1">Create Account</button>
+      </div>
+      <div class="modal-error" id="authError"></div>
+      <button class="modal-close" id="authCloseBtn" type="button">Cancel</button>
+    </div>
+  </div>
 
   <main class="main-grid">
 
@@ -449,8 +519,37 @@
   <footer class="footer">Created by percycodes</footer>
 </div>
 
-<script>
+<script type="module">
 "use strict";
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut,
+  GoogleAuthProvider, signInWithPopup,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDVdCTWtOQx2M3MpCWmy5HeV4wKq11o9P0",
+  authDomain: "cybergrader-v2.firebaseapp.com",
+  databaseURL: "https://cybergrader-v2-default-rtdb.firebaseio.com",
+  projectId: "cybergrader-v2",
+  storageBucket: "cybergrader-v2.firebasestorage.app",
+  messagingSenderId: "873872825666",
+  appId: "1:873872825666:web:0a05a838b768e9fbaf7cdb"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const fbAuth = getAuth(fbApp);
+const fbDb = getFirestore(fbApp);
+let currentUser = null;
+
 const $ = (id) => document.getElementById(id);
 
 /* ============================================================
@@ -1252,6 +1351,146 @@ function activateTab(btn){
 }
 
 /* ============================================================
+   CLOUD SYNC
+   ============================================================ */
+let cloudSaveTimer = null;
+let isCloudLoading = false;
+
+function setAuthStatus(text, cls){
+  const el = $("authStatus");
+  el.innerHTML = cls ? `<span class="${cls}">${text}</span>` : text;
+}
+
+async function loadFromCloud(uid){
+  isCloudLoading = true;
+  setAuthStatus("Loading…", "syncing");
+  try {
+    const ref = doc(fbDb, "users", uid, "data", "app");
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.grade) { gradeOverrides = data.grade; saveJSON(KEYS.grade, gradeOverrides); }
+      if (data.email) { emailOverrides = data.email; saveJSON(KEYS.email, emailOverrides); }
+      if (data.lib)   { libOverrides   = data.lib;   saveJSON(KEYS.lib,   libOverrides); }
+      if (data.year)  { yearSetup      = data.year;  saveJSON(KEYS.year,  yearSetup); loadYearSetupFields(); }
+      renderGrade(); renderEmail(); renderLibrary();
+      setAuthStatus(`Synced ✓ (${currentUser.email || "Google"})`, "signed");
+    } else {
+      // First time this user has signed in — push local data up
+      await saveToCloud(true);
+      setAuthStatus(`Synced ✓ (${currentUser.email || "Google"})`, "signed");
+    }
+  } catch (e) {
+    console.error("Cloud load failed:", e);
+    setAuthStatus("Sync failed — using local", "syncing");
+  }
+  isCloudLoading = false;
+}
+
+async function saveToCloud(immediate = false){
+  if (!currentUser || isCloudLoading) return;
+  const doSave = async () => {
+    try {
+      setAuthStatus("Syncing…", "syncing");
+      const ref = doc(fbDb, "users", currentUser.uid, "data", "app");
+      await setDoc(ref, {
+        grade: gradeOverrides,
+        email: emailOverrides,
+        lib:   libOverrides,
+        year:  yearSetup,
+        updated: new Date().toISOString()
+      }, { merge: true });
+      setAuthStatus(`Synced ✓ (${currentUser.email || "Google"})`, "signed");
+    } catch (e) {
+      console.error("Cloud save failed:", e);
+      setAuthStatus("Sync failed", "syncing");
+    }
+  };
+  if (immediate) { await doSave(); return; }
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(doSave, 600);
+}
+
+/* ============================================================
+   AUTH UI
+   ============================================================ */
+function openAuthModal(){ $("authModal").classList.add("active"); $("authError").textContent = ""; }
+function closeAuthModal(){ $("authModal").classList.remove("active"); }
+
+function mapAuthError(code){
+  const map = {
+    "auth/invalid-email": "That email doesn't look right.",
+    "auth/user-not-found": "No account with that email. Click Create Account.",
+    "auth/wrong-password": "Wrong password. Try again.",
+    "auth/invalid-credential": "Email or password is incorrect.",
+    "auth/email-already-in-use": "That email already has an account. Click Sign In.",
+    "auth/weak-password": "Password needs to be at least 6 characters.",
+    "auth/popup-blocked": "Popup blocked. Allow popups for this site and try again.",
+    "auth/popup-closed-by-user": "Sign-in cancelled.",
+    "auth/network-request-failed": "No internet. Check your connection."
+  };
+  return map[code] || "Sign-in failed. Try again.";
+}
+
+onAuthStateChanged(fbAuth, async (user) => {
+  currentUser = user;
+  if (user) {
+    $("signInBtn").classList.add("hidden");
+    $("signOutBtn").classList.remove("hidden");
+    closeAuthModal();
+    await loadFromCloud(user.uid);
+  } else {
+    $("signInBtn").classList.remove("hidden");
+    $("signOutBtn").classList.add("hidden");
+    setAuthStatus("Not signed in");
+  }
+});
+
+$("signInBtn").addEventListener("click", openAuthModal);
+$("authCloseBtn").addEventListener("click", closeAuthModal);
+$("authModal").addEventListener("click", (e) => { if (e.target === $("authModal")) closeAuthModal(); });
+
+$("googleSignInBtn").addEventListener("click", async () => {
+  $("authError").textContent = "";
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(fbAuth, provider);
+  } catch (e) {
+    $("authError").textContent = mapAuthError(e.code);
+  }
+});
+
+$("emailSignInBtn").addEventListener("click", async () => {
+  $("authError").textContent = "";
+  const email = $("authEmail").value.trim();
+  const pw = $("authPassword").value;
+  if (!email || !pw) { $("authError").textContent = "Enter email and password."; return; }
+  try {
+    await signInWithEmailAndPassword(fbAuth, email, pw);
+  } catch (e) {
+    $("authError").textContent = mapAuthError(e.code);
+  }
+});
+
+$("emailSignUpBtn").addEventListener("click", async () => {
+  $("authError").textContent = "";
+  const email = $("authEmail").value.trim();
+  const pw = $("authPassword").value;
+  if (!email || !pw) { $("authError").textContent = "Enter email and password."; return; }
+  if (pw.length < 6) { $("authError").textContent = "Password needs to be at least 6 characters."; return; }
+  try {
+    await createUserWithEmailAndPassword(fbAuth, email, pw);
+  } catch (e) {
+    $("authError").textContent = mapAuthError(e.code);
+  }
+});
+
+$("signOutBtn").addEventListener("click", async () => {
+  if (!confirm("Sign out? Your data stays on this device.")) return;
+  await signOut(fbAuth);
+});
+
+/* ============================================================
    INIT
    ============================================================ */
 setOptions($("workType"), Object.keys(GRADING));
@@ -1277,6 +1516,7 @@ $("saveGradeBtn").addEventListener("click", () => {
   saveJSON(KEYS.grade, gradeOverrides);
   setEditable($("gradeOutput"), $("editGradeBtn"), false);
   $("gradeStatus").textContent = "Override saved on this device.";
+  saveToCloud();
 });
 $("resetGradeBtn").addEventListener("click", () => {
   delete gradeOverrides[gradeKey()];
@@ -1284,6 +1524,7 @@ $("resetGradeBtn").addEventListener("click", () => {
   setEditable($("gradeOutput"), $("editGradeBtn"), false);
   renderGrade();
   $("gradeStatus").textContent = "Reset to locked wording.";
+  saveToCloud();
 });
 
 /* ----- EMAIL ----- */
@@ -1310,6 +1551,7 @@ $("saveEmailBtn").addEventListener("click", () => {
   saveJSON(KEYS.email, emailOverrides);
   setEditable($("emailOutput"), $("editEmailBtn"), false);
   $("emailStatus").textContent = "Override saved on this device.";
+  saveToCloud();
 });
 $("resetEmailBtn").addEventListener("click", () => {
   delete emailOverrides[emailKey()];
@@ -1317,6 +1559,7 @@ $("resetEmailBtn").addEventListener("click", () => {
   setEditable($("emailOutput"), $("editEmailBtn"), false);
   renderEmail();
   $("emailStatus").textContent = "Reset to template.";
+  saveToCloud();
 });
 $("copyEmailBtn").addEventListener("click", () => copyText($("emailOutput").value.trim(), $("emailStatus"), $("copyEmailBtn")));
 
@@ -1328,6 +1571,7 @@ $("libAnnounceField").addEventListener("input", () => {
   const k = libKey();
   libOverrides[k] = $("libAnnounceField").value;
   saveJSON(KEYS.lib, libOverrides);
+  saveToCloud();
 });
 $("copyLibName").addEventListener("click",     () => copyText($("libNameField").value.trim(),     $("libStatus"), $("copyLibName")));
 $("copyLibDetail").addEventListener("click",   () => copyText($("libDetailField").value.trim(),   $("libStatus"), $("copyLibDetail")));
@@ -1338,6 +1582,7 @@ $("resetLibAnnounce").addEventListener("click", () => {
   saveJSON(KEYS.lib, libOverrides);
   renderLibrary();
   $("libStatus").textContent = "Announcement reset to default.";
+  saveToCloud();
 });
 
 /* ----- YEAR SETUP ----- */
@@ -1345,11 +1590,13 @@ YS_FIELDS.forEach(id => $(id).addEventListener("change", () => {
   saveYearSetupFields();
   renderEmail();
   $("yearStatus").textContent = "Saved automatically.";
+  saveToCloud();
 }));
 $("saveYearBtn").addEventListener("click", () => {
   saveYearSetupFields();
   renderEmail();
   $("yearStatus").textContent = "Year saved. All emails will now auto-fill deadlines.";
+  saveToCloud();
 });
 $("clearYearBtn").addEventListener("click", () => {
   if (!confirm("Clear all Year Setup dates? This cannot be undone.")) return;
@@ -1358,6 +1605,7 @@ $("clearYearBtn").addEventListener("click", () => {
   YS_FIELDS.forEach(f => { $(f).value = ""; });
   renderEmail();
   $("yearStatus").textContent = "Year cleared.";
+  saveToCloud();
 });
 
 /* ----- SYNC ----- */
