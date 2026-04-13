@@ -64,12 +64,12 @@
   .card h3{margin:0 0 8px;font-size:.9rem;color:var(--text)}
   .card p,.card li{margin:0;color:var(--muted);line-height:1.5;font-size:.85rem}
   .card ul{margin:0;padding-left:16px;display:grid;gap:6px}
-  .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
   .tab-btn{
     border:1px solid var(--border);
     background:linear-gradient(180deg, rgba(16,24,36,.95), rgba(10,16,27,.95));
-    color:var(--muted);padding:13px 10px;border-radius:12px;font-weight:850;cursor:pointer;
-    transition:.15s ease;font-size:.92rem;
+    color:var(--muted);padding:12px 8px;border-radius:12px;font-weight:850;cursor:pointer;
+    transition:.15s ease;font-size:.85rem;
   }
   .tab-btn:hover,.tab-btn:focus-visible{color:var(--text);border-color:var(--border-strong);outline:none}
   .tab-btn.active{color:#fff;border-color:rgba(81,217,255,.5);box-shadow:0 0 18px rgba(0,183,255,.12)}
@@ -80,12 +80,13 @@
   .field.full{grid-column:1 / -1}
   .field.hidden{display:none}
   label{font-size:.74rem;color:var(--muted);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
-  select,input[type="text"],textarea{
+  select,input[type="text"],input[type="date"],textarea{
     width:100%;border:1px solid rgba(81,217,255,.16);
     background:linear-gradient(180deg, rgba(11,18,32,1), rgba(8,13,24,1));
     color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;transition:.15s ease;
+    color-scheme: dark;
   }
-  select:focus,input[type="text"]:focus,textarea:focus{
+  select:focus,input[type="text"]:focus,input[type="date"]:focus,textarea:focus{
     outline:none;border-color:rgba(81,217,255,.5);box-shadow:0 0 0 3px rgba(81,217,255,.1);
   }
   select option{background:#0c1220;color:#eef7ff}
@@ -114,10 +115,13 @@
   .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(81,217,255,.2),transparent);margin:4px 0}
   .pillrow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
   .pill{padding:6px 11px;border-radius:999px;border:1px solid rgba(81,217,255,.18);background:rgba(81,217,255,.07);color:var(--muted);font-size:.74rem}
+  .pill.warn{border-color:rgba(255,159,67,.3);background:rgba(255,159,67,.08);color:#ffbc78}
   .sync-row{display:flex;gap:8px;flex-wrap:wrap}
   .sync-row .btn{flex:1;min-width:0}
   input[type="file"]{display:none}
   .lib-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .ys-section{margin-bottom:18px}
+  .ys-section h3{margin:0 0 10px;font-size:.95rem;color:var(--cyan)}
   @media (max-width:1040px){.main-grid{grid-template-columns:1fr}}
   @media (max-width:680px){
     body{padding:10px}
@@ -126,7 +130,7 @@
     .form-grid{grid-template-columns:1fr}
     .toolbar-left,.toolbar-right{width:100%}
     .toolbar-left .btn,.toolbar-right .btn{flex:1;min-width:0}
-    .tabs{grid-template-columns:1fr}
+    .tabs{grid-template-columns:1fr 1fr}
     .lib-row{flex-direction:column;align-items:stretch}
   }
 </style>
@@ -152,8 +156,8 @@
         <h2 class="panel-title">How to Use</h2>
         <div class="card">
           <ul>
-            <li>Pick the tab you need: Grading, Email, or Library.</li>
-            <li>Click Copy. Paste into the destination.</li>
+            <li>Set up the year once in <strong>Year Setup</strong>. All deadlines auto-fill after that.</li>
+            <li>Pick the tab you need. Click Copy. Paste into the destination.</li>
             <li>Edit lets you change wording. Save Override locks your edit on this device.</li>
             <li>Reset returns to the original locked wording.</li>
           </ul>
@@ -161,12 +165,12 @@
 
         <h2 class="panel-title">4th Nine Weeks</h2>
         <div class="card">
-          <p>When Term is set to <strong>Fourth Nine Weeks</strong>, the email generator automatically switches the check-in templates to the dual-deadline format that lists both Grades 7–11 and Senior deadlines in the same message.</p>
+          <p>Set Term to <strong>Fourth Nine Weeks</strong> and the check-in templates switch to the dual-deadline format with both Grades 7–11 and Senior deadlines.</p>
         </div>
 
         <h2 class="panel-title">Sync Across Devices</h2>
         <div class="card">
-          <p style="margin-bottom:10px">Move your saved overrides between devices.</p>
+          <p style="margin-bottom:10px">Export your saved overrides and year setup, then import on another device.</p>
           <div class="sync-row">
             <button class="btn btn-ghost" id="exportBtn" type="button">Export</button>
             <button class="btn btn-ghost" id="importBtn" type="button">Import</button>
@@ -183,7 +187,6 @@
             <li>25% / 50% / 75% progress reminders</li>
             <li>Next nine weeks loaded notice</li>
             <li>Spring break / final week reminders</li>
-            <li>End-of-year closeout</li>
           </ul>
         </div>
       </div>
@@ -193,9 +196,10 @@
       <div class="panel-inner">
 
         <div class="tabs" role="tablist">
-          <button class="tab-btn active" data-tab="gradingTab" role="tab" aria-selected="true">Grading Output</button>
-          <button class="tab-btn" data-tab="emailTab" role="tab" aria-selected="false">Email Generator</button>
-          <button class="tab-btn" data-tab="libraryTab" role="tab" aria-selected="false">SV Portal Library</button>
+          <button class="tab-btn active" data-tab="gradingTab" role="tab" aria-selected="true">Grading</button>
+          <button class="tab-btn" data-tab="emailTab" role="tab" aria-selected="false">Email</button>
+          <button class="tab-btn" data-tab="libraryTab" role="tab" aria-selected="false">Library</button>
+          <button class="tab-btn" data-tab="yearTab" role="tab" aria-selected="false">Year Setup</button>
         </div>
         <div class="tab-help" id="tabHelp">Locked grading wording. Pick Work Type and Output Type, then copy.</div>
 
@@ -235,8 +239,8 @@
         <div class="tab-panel" id="emailTab" role="tabpanel">
           <div class="pillrow">
             <span class="pill">Pick email type first</span>
-            <span class="pill">4th nine weeks auto-switches templates</span>
-            <span class="pill">One Copy = subject + body together</span>
+            <span class="pill">Deadlines auto-fill from Year Setup</span>
+            <span class="pill">4th 9 weeks auto-switches templates</span>
           </div>
 
           <div class="form-grid">
@@ -280,17 +284,17 @@
 
             <div class="field hidden" id="deadlineField">
               <label for="deadline">Deadline</label>
-              <input type="text" id="deadline" placeholder="e.g. Monday, June 2 at 11:59 p.m." />
+              <input type="text" id="deadline" placeholder="Auto-fills from Year Setup" />
             </div>
 
             <div class="field hidden" id="seniorDeadlineField">
               <label for="seniorDeadline">Senior Deadline</label>
-              <input type="text" id="seniorDeadline" placeholder="e.g. May 19, 2026 @ 11:59 PM" />
+              <input type="text" id="seniorDeadline" placeholder="Auto-fills from Year Setup" />
             </div>
 
             <div class="field hidden" id="generalDeadlineField">
               <label for="generalDeadline">Grades 7–11 Deadline</label>
-              <input type="text" id="generalDeadline" placeholder="e.g. May 30, 2026 @ 11:59 PM" />
+              <input type="text" id="generalDeadline" placeholder="Auto-fills from Year Setup" />
             </div>
           </div>
 
@@ -310,14 +314,14 @@
             </div>
           </div>
           <div class="status" id="emailStatus"></div>
-          <div class="hint">Output starts with the subject line, then a blank line, then the body. Paste into your email body, then cut the subject line up to the SUBJECT field.</div>
+          <div class="hint">Output starts with the subject line, then a blank line, then the body. Paste the body into your email, cut the subject line up to the SUBJECT field.</div>
         </div>
 
         <!-- ============== LIBRARY TAB ============== -->
         <div class="tab-panel" id="libraryTab" role="tabpanel">
           <div class="pillrow">
-            <span class="pill">All your reusable SV Portal text in one place</span>
-            <span class="pill">Grade items give you Name + Detail separately</span>
+            <span class="pill">Reusable SV Portal text in one place</span>
+            <span class="pill">Grade items give Name + Detail separately</span>
           </div>
 
           <div class="form-grid">
@@ -371,10 +375,70 @@
                 <button class="btn btn-primary" id="copyLibAnnounce" type="button">Copy</button>
               </div>
             </div>
-            <div class="hint">Announcement text is editable. Replace bracketed placeholders before copying.</div>
+            <div class="hint">Replace bracketed placeholders before copying. Edits auto-save on this device.</div>
           </div>
 
           <div class="status" id="libStatus"></div>
+        </div>
+
+        <!-- ============== YEAR SETUP TAB ============== -->
+        <div class="tab-panel" id="yearTab" role="tabpanel">
+          <div class="pillrow">
+            <span class="pill">Set these once at the start of the year</span>
+            <span class="pill">Every email auto-fills from here</span>
+            <span class="pill">Use "Set as Default Year" to save permanently</span>
+          </div>
+
+          <div class="ys-section">
+            <h3>1st Nine Weeks</h3>
+            <div class="form-grid">
+              <div class="field"><label for="ys1start">Start Date</label><input type="date" id="ys1start" /></div>
+              <div class="field"><label for="ys1end">End Date</label><input type="date" id="ys1end" /></div>
+            </div>
+          </div>
+
+          <div class="ys-section">
+            <h3>2nd Nine Weeks</h3>
+            <div class="form-grid">
+              <div class="field"><label for="ys2start">Start Date</label><input type="date" id="ys2start" /></div>
+              <div class="field"><label for="ys2end">End Date</label><input type="date" id="ys2end" /></div>
+            </div>
+          </div>
+
+          <div class="ys-section">
+            <h3>3rd Nine Weeks</h3>
+            <div class="form-grid">
+              <div class="field"><label for="ys3start">Start Date</label><input type="date" id="ys3start" /></div>
+              <div class="field"><label for="ys3end">End Date</label><input type="date" id="ys3end" /></div>
+            </div>
+          </div>
+
+          <div class="ys-section">
+            <h3>4th Nine Weeks — Seniors (12th grade)</h3>
+            <div class="form-grid">
+              <div class="field"><label for="ys4seniorstart">Senior Start</label><input type="date" id="ys4seniorstart" /></div>
+              <div class="field"><label for="ys4seniorend">Senior End</label><input type="date" id="ys4seniorend" /></div>
+            </div>
+          </div>
+
+          <div class="ys-section">
+            <h3>4th Nine Weeks — Grades 7–11</h3>
+            <div class="form-grid">
+              <div class="field"><label for="ys4generalstart">Grades 7–11 Start</label><input type="date" id="ys4generalstart" /></div>
+              <div class="field"><label for="ys4generalend">Grades 7–11 End</label><input type="date" id="ys4generalend" /></div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button class="btn btn-reset" id="clearYearBtn" type="button">Clear All</button>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-save" id="saveYearBtn" type="button">Save Year</button>
+            </div>
+          </div>
+          <div class="status" id="yearStatus"></div>
+          <div class="hint">Dates save automatically as you type. Click Save Year to confirm, or Clear All to start over.</div>
         </div>
 
       </div>
@@ -393,10 +457,11 @@ const $ = (id) => document.getElementById(id);
    STORAGE
    ============================================================ */
 const KEYS = {
-  grade:  "cybergrader_grade_overrides_v4",
-  email:  "cybergrader_email_overrides_v4",
-  lib:    "cybergrader_lib_overrides_v4",
-  last:   "cybergrader_last_values_v4"
+  grade: "cybergrader_grade_overrides_v5",
+  email: "cybergrader_email_overrides_v5",
+  lib:   "cybergrader_lib_overrides_v5",
+  year:  "cybergrader_year_setup_v5",
+  last:  "cybergrader_last_values_v5"
 };
 const loadJSON = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch { return {}; } };
 const saveJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v));
@@ -404,14 +469,23 @@ const saveJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 let gradeOverrides = loadJSON(KEYS.grade);
 let emailOverrides = loadJSON(KEYS.email);
 let libOverrides   = loadJSON(KEYS.lib);
+let yearSetup      = loadJSON(KEYS.year);
 
 /* ============================================================
-   DATE — auto updates daily from device clock
+   DATE HELPERS
    ============================================================ */
 const today = new Date();
 const shortDate = new Intl.DateTimeFormat("en-US").format(today);
 const longDate  = today.toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
 $("todayDate").textContent = longDate;
+
+// Format "2026-05-19" → "May 19 at 11:59 p.m."
+function fmtDate(iso){
+  if (!iso) return "";
+  const [y,m,d] = iso.split("-").map(Number);
+  const date = new Date(y, m-1, d);
+  return date.toLocaleDateString("en-US", { month:"long", day:"numeric" }) + " at 11:59 p.m.";
+}
 
 /* ============================================================
    LOCKED GRADING — verbatim from grading_wording.txt
@@ -463,7 +537,7 @@ const AUDIENCE_BY_TYPE = {
 };
 
 const TERM_NAME = { first:"first nine weeks", second:"second nine weeks", third:"third nine weeks", fourth:"fourth nine weeks" };
-const NEXT_TERM = { first:"second nine weeks", second:"third nine weeks", third:"fourth nine weeks", fourth:"next grading period" };
+const NEXT_TERM_NAME = { first:"second nine weeks", second:"third nine weeks", third:"fourth nine weeks", fourth:"next grading period" };
 
 function greet(audience, name){
   if (audience === "Single Student") return `${(name||"").trim() || "[Student Name]"},`;
@@ -497,12 +571,12 @@ function buildEmail(){
   const generalDl = $("generalDeadline").value.trim();
   const G = greet(audience, name);
   const termN = TERM_NAME[term];
-  const nextN = NEXT_TERM[term];
+  const nextN = NEXT_TERM_NAME[term];
   const courseLine = course ? `${course} ` : "";
   const scopeWord  = scope === "semester" ? "semester" : (scope === "yearlong" ? "year" : "nine weeks");
   const isFourth = term === "fourth";
 
-  /* ---------- 4TH NINE WEEKS SPECIAL VARIANTS ---------- */
+  /* ---------- 4TH NINE WEEKS CHECK-INS (DUAL DEADLINES) ---------- */
   if (isFourth && ["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type)) {
     const dual = dualDeadlineBlock(seniorDl, generalDl);
 
@@ -516,11 +590,11 @@ As of today, we’ve officially reached the 75% mark in the 4th 9 weeks. That me
 
 Make sure you’re following your assignment calendar, submitting work regularly, and staying in communication if you need any help or have any questions/concerns.
 
-***Important Reminder: There are no extensions for the fourth and final nine weeks. Missing the final deadline will significantly impact your grade, so let’s try to avoid that. Listed below is when the coursework is due (pay close attention to grades 7-11 and 12th grade dues dates as they are different)!
+***Important Reminder: There are no extensions for the fourth and final nine weeks. Missing the final deadline will significantly impact your grade, so let’s try to avoid that. Listed below is when the coursework is due (pay close attention to Grades 7–11 and 12th grade due dates as they are different)!
 
 ${dual}
 
-If you’re in grades 7–11 and want to finish early, you’re welcome to follow the senior schedule—just let me know so I can support you.
+If you’re in Grades 7–11 and want to finish early, you’re welcome to follow the senior schedule—just let me know so I can support you.
 
 We’re so close to summer break so please keep pushing through and reach out with any questions!
 
@@ -534,13 +608,13 @@ Mr. Macek`
         body:
 `Hello Students!
 
-We’ve officially reached the 25% mark of the 4th nine weeks. This is the time to make sure you’re actively working in your cyber course and keeping pace with the assignment calendar. The fourth nine weeks moves fast and there are no extensions, so getting an early lead really helps.
+We’ve officially reached the 25% mark of the 4th 9 weeks. This is the time to make sure you’re actively working in your cyber course and keeping pace with the assignment calendar. The fourth nine weeks moves fast and there are no extensions, so getting an early lead really helps.
 
-***Important Reminder: There are no extensions for the fourth and final nine weeks. Listed below are the coursework deadlines (pay close attention because grades 7-11 and 12th grade due dates are different)!
+***Important Reminder: There are no extensions for the fourth and final nine weeks. Listed below are the coursework deadlines (pay close attention to Grades 7–11 and 12th grade due dates as they are different)!
 
 ${dual}
 
-If you’re in grades 7–11 and want to finish early, you’re welcome to follow the senior schedule—just let me know so I can support you.
+If you’re in Grades 7–11 and want to finish early, you’re welcome to follow the senior schedule—just let me know so I can support you.
 
 If you have any questions or need help getting going, reach out. I’m here to help.
 
@@ -553,13 +627,13 @@ Mr. Macek`
         body:
 `Hello Students!
 
-We are officially halfway through the 4th nine weeks. This is an important checkpoint, and the effort you put in right now will have a meaningful impact on your final grade. Consistency at this stage makes a huge difference, and even a little progress each day adds up quickly.
+We are officially halfway through the 4th 9 weeks. This is an important checkpoint, and the effort you put in right now will have a meaningful impact on your final grade. Consistency at this stage makes a huge difference, and even a little progress each day adds up quickly.
 
-***Important Reminder: There are no extensions for the fourth and final nine weeks. Listed below are the coursework deadlines (pay close attention because grades 7-11 and 12th grade due dates are different)!
+***Important Reminder: There are no extensions for the fourth and final nine weeks. Listed below are the coursework deadlines (pay close attention to Grades 7–11 and 12th grade due dates as they are different)!
 
 ${dual}
 
-If you’re in grades 7–11 and want to finish early, you’re welcome to follow the senior schedule—just let me know so I can support you.
+If you’re in Grades 7–11 and want to finish early, you’re welcome to follow the senior schedule—just let me know so I can support you.
 
 If you have questions, get stuck, or need guidance on where to focus next, reach out at any time. I’m here to help you succeed.
 
@@ -572,9 +646,9 @@ Mr. Macek`
         body:
 `Hello Students!
 
-Can you believe it? We’re now in the final week of the 4th nine weeks. This is your last stretch — time to wrap everything up and show what you’ve accomplished this quarter.
+Can you believe it? We’re now in the final week of the 4th 9 weeks. This is your last stretch — time to wrap everything up and show what you’ve accomplished this quarter.
 
-***Important Reminder: There are no extensions for the fourth and final nine weeks. Listed below are the final coursework deadlines (pay close attention because grades 7-11 and 12th grade due dates are different)!
+***Important Reminder: There are no extensions for the fourth and final nine weeks. Listed below are the final coursework deadlines (pay close attention to Grades 7–11 and 12th grade due dates as they are different)!
 
 ${dual}
 
@@ -584,6 +658,130 @@ You got this!!!
 Mr. Macek`
       };
     }
+  }
+
+  /* ---------- STANDARD CHECK-INS (1st / 2nd / 3rd) ---------- */
+  if (["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type)) {
+    if (type === "25% Check-In") {
+      return {
+        subject: "25% Check-In – Cyber Course",
+        body:
+`${G}
+
+We’ve officially reached the 25% mark of the ${termN}. This is a good time to check your progress and make sure you’re keeping pace with the assignment calendar.
+
+If you’re on track, keep that momentum going. If you’ve fallen behind, don’t panic — just reach out so we can make a plan.
+
+The deadline for this grading period is ${deadline}. I highly recommend working steadily to complete your course before that date.
+
+If you have any questions or need help, reach out. I’m here to help.
+
+Mr. Macek`
+      };
+    }
+    if (type === "50% Check-In") {
+      return {
+        subject: "50% Check-In – Cyber Course",
+        body:
+`${G}
+
+We are officially halfway through the ${termN}. This is an important checkpoint, and the effort you put in right now will have a meaningful impact on your overall grade.
+
+Consistency at this stage makes a huge difference, and even a little progress each day adds up quickly.
+
+The deadline for this grading period is ${deadline}. Keep working steadily and you’ll be in great shape.
+
+If you have questions, get stuck, or need guidance on where to focus next, reach out at any time. I’m here to help you succeed.
+
+Mr. Macek`
+      };
+    }
+    if (type === "75% Check-In") {
+      return {
+        subject: "75% Check-In – Cyber Course",
+        body:
+`${G}
+
+As of today, we’ve officially reached the 75% mark of the ${termN}. I’ve finished grading all submitted work, and your grades are current and up to date in the gradebook.
+
+Make sure you’re following your assignment calendar, submitting work regularly, and staying in communication if you need any help or have any questions/concerns.
+
+The deadline for this grading period is ${deadline}. I highly recommend completing all required work before that date.
+
+Looking ahead, the ${nextN} will be loaded a few days before the current one ends so you can move right into the next part.
+
+Reach out with any questions!
+
+Mr. Macek`
+      };
+    }
+    if (type === "Final Week Reminder") {
+      return {
+        subject: "Final Week – Cyber Coursework Deadline",
+        body:
+`${G}
+
+We’re now in the final week of the ${termN}. Time to wrap everything up and show what you’ve accomplished this quarter.
+
+All cyber assignments are due by ${deadline}.
+
+If you’re not near the finish line yet, don’t panic — but don’t wait. Power through those last few lessons and reach out if you’re stuck. If you’re on track or ahead, keep that momentum going. The effort you put in now will pay off with a strong finish.
+
+You got this!
+
+Mr. Macek`
+      };
+    }
+  }
+
+  /* ---------- NEXT NINE WEEKS LOADED ---------- */
+  if (type === "Next Nine Weeks Loaded") {
+    // 3rd → 4th (verbatim from user, with auto-filled deadlines)
+    if (term === "third") {
+      const s = seniorDl || "[Senior deadline]";
+      const g = generalDl || "[Grades 7–11 deadline]";
+      return {
+        subject: "Your 4th Nine Weeks Course Is Now Loaded",
+        body:
+`Hi everyone,
+
+As we wrap up the cyber portion of the course, I’ll be grading throughout today and over the weekend, with everything finalized by Monday morning.
+
+If you still have one or two tasks left, now is the time to get them completed. Leaving them blank will significantly impact your overall grade, so it’s worth finishing what you can.
+
+Your fourth nine-week courses are now loaded. Please note the following deadlines:
+Seniors: ${s}
+Grades 7–11: ${g}
+
+Seniors: there are *no extensions* in the fourth nine weeks, as this directly determines your graduation status. Plan accordingly and make sure everything is submitted on time (I would complete early as a suggestion).
+
+If you notice any discrepancies or if something doesn’t look right, please let me know.
+
+Students in Grades 7–11: If you want to, you are allowed to complete your cyber course(s) early! Not required just a suggestion to set up an organized and complete end to the school year!
+
+Good luck, finish strong - you’ve got this!
+
+Mr. Macek`
+      };
+    }
+    // 1st → 2nd, 2nd → 3rd
+    return {
+      subject: `Your ${nextN} Course Is Now Loaded`,
+      body:
+`Hi everyone,
+
+As we wrap up the cyber portion of the course, I’ll be grading throughout today and over the weekend, with everything finalized by Monday morning.
+
+If you still have one or two tasks left, now is the time to get them completed. Leaving them blank will significantly impact your overall grade, so it’s worth finishing what you can.
+
+Your ${nextN} course is now loaded. The deadline for the next grading period is ${deadline}.
+
+If you notice any discrepancies or if something doesn’t look right, please let me know.
+
+Good luck, finish strong - you’ve got this!
+
+Mr. Macek`
+    };
   }
 
   /* ---------- STANDARD TEMPLATES ---------- */
@@ -635,97 +833,6 @@ Thanks,
 
 Mr. Macek`
       };
-
-    case "25% Check-In":
-      return {
-        subject: "Cyber Progress Check-In",
-        body:
-`${G}
-
-We are now at roughly the 25% mark of the ${termN}. This is a good time to check your progress and make sure you are on pace with the assignment calendar.
-
-If you are behind, don’t panic—just reach out so we can make a plan. If you are on track, keep that momentum going.
-
-${deadline !== "[deadline]" ? `The current deadline is ${deadline}.\n\n` : ""}Thanks,
-
-Mr. Macek`
-      };
-
-    case "50% Check-In":
-      return {
-        subject: "Cyber Check-In!",
-        body:
-`${G}
-
-We are now at roughly 50% of the way through the ${termN}. This is an important checkpoint, and the effort you put in right now will have a meaningful impact on your overall grade and progress.
-
-Consistency at this stage makes a huge difference, and even a little progress each day adds up quickly.
-
-Please remember that you are not on your own. If you have questions, get stuck, or need guidance on where to focus next, reach out at any time. I’m always here to help you succeed.
-
-${deadline !== "[deadline]" ? `Current deadline: ${deadline}.\n\n` : ""}Thank you,
-
-Mr. Macek`
-      };
-
-    case "75% Check-In":
-      return {
-        subject: "Cyber Progress Check-In",
-        body:
-`${G}
-
-As of today, we are at the 75% completion mark for the ${termN}. I have finished grading all submitted work, and all grades are current and up to date in the gradebook. If you have any questions or concerns about your progress, please contact me.
-
-The end date for the grading period is ${deadline}. I highly recommend that you continue working on your course and complete all required work before that date.
-
-Remember, asking a question online is just as important as raising your hand in class. If you are unsure about something or need help, please reach out. I’m here to help you succeed!
-
-Looking ahead, the ${nextN} will be loaded a few days before the current one ends.
-
-Thanks,
-
-Mr. Macek`
-      };
-
-    case "Final Week Reminder":
-      return {
-        subject: "Final Week - Cyber Coursework Deadline",
-        body:
-`${G}
-
-Can you believe it? We’re now at the 90% mark of the ${termN}, which means the end is just one week away.
-
-All cyber assignments are due by ${deadline}. That gives you one final week to wrap everything up and show what you’ve accomplished this quarter.
-
-If you’re not near the 90% mark yet or haven’t started, don’t panic—but don’t wait. Power through those last few lessons, and don’t hesitate to reach out if you’re stuck. I’m here to support you all the way to the finish line.
-
-If you’re on track or ahead—amazing work! Keep that momentum going. The effort you put in now will pay off with a strong finish and a stress-free summer. You’ve come so far—dig deep, stay focused, and make this final week count.
-
-You got this!
-
-Mr. Macek`
-      };
-
-    case "Next Nine Weeks Loaded": {
-      const dual = (seniorDl || generalDl) ? `\n\n${dualDeadlineBlock(seniorDl, generalDl)}` : "";
-      return {
-        subject: "Next Nine Weeks Loaded",
-        body:
-`${G}
-
-As we wrap up the cyber portion of the course, I’ll be grading throughout today and over the weekend, with everything finalized by Monday morning.
-
-If you still have one or two tasks left, now is the time to get them completed. Leaving them blank will significantly impact your overall grade, so it’s worth finishing what you can.
-
-Your ${nextN} courses are now loaded.${dual}
-${term === "third" ? "\nSeniors: there are no extensions in the fourth nine weeks, as this directly determines your graduation status. Plan accordingly and make sure everything is submitted on time.\n" : ""}
-If you notice any discrepancies or if something doesn’t look right, please let me know.
-
-Good luck, finish strong - you’ve got this!
-
-Mr. Macek`
-      };
-    }
 
     case "Welcome to Next Nine Weeks":
       return {
@@ -919,6 +1026,52 @@ function setEditable(textarea, btn, on){
 }
 
 /* ============================================================
+   YEAR SETUP
+   ============================================================ */
+const YS_FIELDS = ["ys1start","ys1end","ys2start","ys2end","ys3start","ys3end","ys4seniorstart","ys4seniorend","ys4generalstart","ys4generalend"];
+
+function loadYearSetupFields(){
+  YS_FIELDS.forEach(f => { if (yearSetup[f]) $(f).value = yearSetup[f]; });
+}
+function saveYearSetupFields(){
+  const obj = {};
+  YS_FIELDS.forEach(f => { obj[f] = $(f).value; });
+  yearSetup = obj;
+  saveJSON(KEYS.year, yearSetup);
+}
+
+function autoFillDeadlines(){
+  const type = $("emailType").value;
+  const term = $("term").value;
+  const isCheckIn = ["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
+
+  // Single-deadline check-ins for 1st/2nd/3rd
+  if (isCheckIn && term !== "fourth") {
+    const key = {first:"ys1end", second:"ys2end", third:"ys3end"}[term];
+    $("deadline").value = fmtDate(yearSetup[key]);
+  }
+
+  // Dual-deadline check-ins for 4th
+  if (isCheckIn && term === "fourth") {
+    $("seniorDeadline").value  = fmtDate(yearSetup.ys4seniorend);
+    $("generalDeadline").value = fmtDate(yearSetup.ys4generalend);
+  }
+
+  // Next Nine Weeks Loaded
+  if (type === "Next Nine Weeks Loaded") {
+    if (term === "third") {
+      // Loading the 4th: use 4th nine weeks dates
+      $("seniorDeadline").value  = fmtDate(yearSetup.ys4seniorend);
+      $("generalDeadline").value = fmtDate(yearSetup.ys4generalend);
+    } else if (term === "first") {
+      $("deadline").value = fmtDate(yearSetup.ys2end);
+    } else if (term === "second") {
+      $("deadline").value = fmtDate(yearSetup.ys3end);
+    }
+  }
+}
+
+/* ============================================================
    GRADING TAB
    ============================================================ */
 function gradeKey(){ return `${$("workType").value}||${$("outputType").value}`; }
@@ -932,7 +1085,6 @@ function refreshGradeOutputTypes(){
   renderGrade();
 }
 function renderGrade(){
-  // Never overwrite if user is actively editing
   if (!$("gradeOutput").readOnly) return;
   $("gradeOutput").value = gradeOverrides[gradeKey()] || defaultGradeText();
 }
@@ -943,9 +1095,8 @@ function renderGrade(){
 function emailKey(){
   return [$("emailType").value, $("audience").value, $("term").value, $("courseScope").value].join("||");
 }
-function combinedEmail(subject, body){
-  return `Subject: ${subject}\n\n${body}`;
-}
+function combinedEmail(subject, body){ return `Subject: ${subject}\n\n${body}`; }
+
 function populateAudiences(){
   const type = $("emailType").value;
   const list = AUDIENCE_BY_TYPE[type] || ["All Students"];
@@ -953,19 +1104,20 @@ function populateAudiences(){
   setOptions($("audience"), list);
   $("audience").value = list.includes(prev) ? prev : list[0];
 }
+
 function adjustEmailFields(){
-  const type   = $("emailType").value;
-  const aud    = $("audience").value;
-  const term   = $("term").value;
+  const type  = $("emailType").value;
+  const aud   = $("audience").value;
+  const term  = $("term").value;
   const isFourth = term === "fourth";
   const isCheckIn = ["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
 
-  const showSingle    = aud === "Single Student";
-  const showCourseNm  = type === "Welcome Email";
-  const showScope     = type === "Welcome Email";
-  const showTerm      = !["Welcome Email","Single Student Start Reminder"].includes(type);
-  const showSingleDl  = isCheckIn && !isFourth;
-  const showDualDl    = (isCheckIn && isFourth) || type === "Next Nine Weeks Loaded";
+  const showSingle   = aud === "Single Student";
+  const showCourseNm = type === "Welcome Email";
+  const showScope    = type === "Welcome Email";
+  const showTerm     = !["Welcome Email","Single Student Start Reminder"].includes(type);
+  const showSingleDl = (isCheckIn && !isFourth) || (type === "Next Nine Weeks Loaded" && term !== "third");
+  const showDualDl   = (isCheckIn && isFourth) || (type === "Next Nine Weeks Loaded" && term === "third");
 
   $("studentNameField").classList.toggle("hidden", !showSingle);
   $("courseNameField").classList.toggle("hidden", !showCourseNm);
@@ -975,9 +1127,10 @@ function adjustEmailFields(){
   $("seniorDeadlineField").classList.toggle("hidden", !showDualDl);
   $("generalDeadlineField").classList.toggle("hidden", !showDualDl);
 }
+
 function renderEmail(){
   adjustEmailFields();
-  // Never overwrite if user is actively editing
+  autoFillDeadlines();
   if (!$("emailOutput").readOnly) return;
   const tpl = buildEmail();
   const saved = emailOverrides[emailKey()];
@@ -1028,7 +1181,7 @@ function renderLibrary(){
 /* ============================================================
    LAST VALUES
    ============================================================ */
-const LAST_FIELDS = ["emailType","audience","term","courseScope","studentName","courseName","deadline","seniorDeadline","generalDeadline","workType","outputType","libCategory","libItem","libTerm"];
+const LAST_FIELDS = ["emailType","audience","term","courseScope","studentName","courseName","workType","outputType","libCategory","libItem","libTerm"];
 function saveLast(){
   const p = {};
   LAST_FIELDS.forEach(id => { if ($(id)) p[id] = $(id).value; });
@@ -1044,8 +1197,8 @@ function restoreLast(){
    ============================================================ */
 function doExport(){
   const payload = {
-    app: "cybergrader", version: 4, exported: new Date().toISOString(),
-    grade: gradeOverrides, email: emailOverrides, lib: libOverrides
+    app: "cybergrader", version: 5, exported: new Date().toISOString(),
+    grade: gradeOverrides, email: emailOverrides, lib: libOverrides, year: yearSetup
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type:"application/json" });
   const url = URL.createObjectURL(blob);
@@ -1066,6 +1219,7 @@ function doImport(file){
       if (data.grade) { gradeOverrides = { ...gradeOverrides, ...data.grade }; saveJSON(KEYS.grade, gradeOverrides); }
       if (data.email) { emailOverrides = { ...emailOverrides, ...data.email }; saveJSON(KEYS.email, emailOverrides); }
       if (data.lib)   { libOverrides   = { ...libOverrides,   ...data.lib   }; saveJSON(KEYS.lib,   libOverrides); }
+      if (data.year)  { yearSetup      = { ...yearSetup,      ...data.year  }; saveJSON(KEYS.year,  yearSetup); loadYearSetupFields(); }
       renderGrade(); renderEmail(); renderLibrary();
       $("syncStatus").textContent = "Import complete. Overrides merged.";
       $("syncStatus").classList.remove("err");
@@ -1090,8 +1244,9 @@ function activateTab(btn){
   $(btn.dataset.tab).classList.add("active");
   const help = {
     gradingTab: "Locked grading wording. Pick Work Type and Output Type, then copy.",
-    emailTab:   "Pick the email type first. The form narrows down based on your choices.",
-    libraryTab: "All your reusable SV Portal text in one place."
+    emailTab:   "Pick the email type first. Deadlines auto-fill from Year Setup.",
+    libraryTab: "All your reusable SV Portal text in one place.",
+    yearTab:    "Set your nine weeks dates once. Every email auto-fills from here."
   };
   $("tabHelp").textContent = help[btn.dataset.tab];
 }
@@ -1103,6 +1258,7 @@ setOptions($("workType"), Object.keys(GRADING));
 setOptions($("emailType"), EMAIL_TYPES);
 populateLibCategories();
 populateLibItems();
+loadYearSetupFields();
 restoreLast();
 populateAudiences();
 refreshGradeOutputTypes();
@@ -1136,7 +1292,16 @@ $("resetGradeBtn").addEventListener("click", () => {
   renderEmail(); saveLast();
 }));
 $("audience").addEventListener("change", () => { renderEmail(); saveLast(); });
-["studentName","courseName","deadline","seniorDeadline","generalDeadline"].forEach(id => $(id).addEventListener("input", () => { renderEmail(); saveLast(); }));
+["studentName","courseName"].forEach(id => $(id).addEventListener("input", () => { renderEmail(); saveLast(); }));
+// Manual deadline overrides — don't re-autofill, just re-render
+["deadline","seniorDeadline","generalDeadline"].forEach(id => $(id).addEventListener("input", () => {
+  if (!$("emailOutput").readOnly) return; // don't clobber user's in-progress edit
+  const tpl = buildEmail();
+  const saved = emailOverrides[emailKey()];
+  const subject = saved?.subject ?? tpl.subject;
+  const body    = saved?.body    ?? tpl.body;
+  $("emailOutput").value = combinedEmail(subject, body);
+}));
 
 $("editEmailBtn").addEventListener("click", () => setEditable($("emailOutput"), $("editEmailBtn"), $("emailOutput").readOnly));
 $("saveEmailBtn").addEventListener("click", () => {
@@ -1173,6 +1338,26 @@ $("resetLibAnnounce").addEventListener("click", () => {
   saveJSON(KEYS.lib, libOverrides);
   renderLibrary();
   $("libStatus").textContent = "Announcement reset to default.";
+});
+
+/* ----- YEAR SETUP ----- */
+YS_FIELDS.forEach(id => $(id).addEventListener("change", () => {
+  saveYearSetupFields();
+  renderEmail();
+  $("yearStatus").textContent = "Saved automatically.";
+}));
+$("saveYearBtn").addEventListener("click", () => {
+  saveYearSetupFields();
+  renderEmail();
+  $("yearStatus").textContent = "Year saved. All emails will now auto-fill deadlines.";
+});
+$("clearYearBtn").addEventListener("click", () => {
+  if (!confirm("Clear all Year Setup dates? This cannot be undone.")) return;
+  yearSetup = {};
+  saveJSON(KEYS.year, yearSetup);
+  YS_FIELDS.forEach(f => { $(f).value = ""; });
+  renderEmail();
+  $("yearStatus").textContent = "Year cleared.";
 });
 
 /* ----- SYNC ----- */

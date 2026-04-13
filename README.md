@@ -1,151 +1,136 @@
 # CyberGrader.io
 
-A single-file grading and email tool for Mr. Macek's cyber/tech ed courses.
-Built to live as one `index.html` so it can be hosted free on GitHub Pages.
+I built this because I was tired of copy-pasting the same grading feedback and check-in emails over and over. If you teach any kind of online or cyber course where you send the same progress reminders every nine weeks and type the same grading comments 50 times a day, this might help you too.
+
+It's one HTML file. No login, no database, no monthly fee. Open it in your browser and go. Works on desktop and on your phone.
 
 ---
 
-## What's in the box
+## What it does
 
-**Three tabs:**
-1. **Grading Output** — locked grading wording (verbatim from `grading_wording.txt`)
-2. **Email Generator** — bulk and single-student emails, auto-switches templates for 4th nine weeks
-3. **SV Portal Library** — reusable grade setup names/details and class announcements
+**Grading tab** — My locked grading feedback. I pick the type of work (First Assignment, Assignment, or Project) and the scenario (Perfect, Partial Credit, Missing Work, etc). The exact wording I use shows up in the box. I click Copy. I paste it into my gradebook. Done. No retyping, no "close enough" variations.
 
-**Features:**
-- Today's date in the top right (auto-updates daily from device clock)
-- Local override system: edit any text, save it on the device, reset back to original
-- Export / Import for cross-device sync (JSON file)
-- Dark UI, mobile-friendly
-- No backend, no dependencies, no build step
+**Email tab** — All my check-in emails: welcome letter, early check-in, 25%/50%/75% progress reminders, final week, next nine weeks loaded, welcome to the next nine weeks, and spring break. I pick the email type, it fills in based on the term I'm in. The output comes out with `Subject: ...` on top, a blank line, then the body. I paste the body into my email, then grab the subject line for the subject field.
+
+When I set the term to **4th Nine Weeks**, the check-in templates automatically switch to the dual-deadline version that lists both Grades 7–11 and Senior deadlines — because that's the one time of year they're different and I send one email to all my classes instead of separating by grade level.
+
+**Library tab** — All the reusable SV Portal text I need every nine weeks in one place. Weekly Progress Update name and detail. Final Nine Weeks Grade name and detail. Start of Year class announcement. Remote Instruction Day (FID) announcement. Each one has its own copy button so I can grab just the assignment name, just the detail, or the whole announcement.
+
+**Year Setup tab** — The thing that makes this actually save time. I enter all my nine weeks start and end dates once at the beginning of the year, including the separate 4th nine weeks dates for Seniors vs Grades 7–11. From that point on, every email auto-fills with the correct deadline based on the term I pick. No more typing "Monday, June 2 at 11:59 p.m." into every single email.
 
 ---
 
-## How to host on GitHub Pages (free, no payment)
+## The stuff that makes it actually usable
 
-1. **Create a new repo** on GitHub. Name it `cybergrader` (or whatever you want).
-2. **Upload `index.html`** to the root of the repo. Either drag-drop in the browser or `git push`.
-3. **Enable Pages**:
-   - Repo → Settings → Pages
-   - Source: "Deploy from a branch"
-   - Branch: `main`, folder: `/ (root)`
-   - Save
-4. Wait ~1 minute. Your site is live at:
-   `https://[your-username].github.io/cybergrader/`
-5. **Bookmark it** on desktop and iPhone home screen.
-
-That's it. Free forever. No credit card.
-
-**Optional:** if you want a custom domain like `cybergrader.io`, that costs ~$10/year for the domain registration only — Pages still hosts free. Add a `CNAME` file in the repo with the domain name and point your domain's DNS at GitHub.
+- **Today's date** is in the top right and updates every day on its own
+- **Edit any template**, click Save Override, your edit is saved on that device
+- **Reset** button goes back to the original locked wording if I mess something up
+- **Export / Import** JSON so I can move my saved edits and year setup between my desktop and phone
+- **4th nine weeks templates** switch automatically when I set the term — no separate email types to pick
+- **Mobile-friendly** — tabs stack, buttons go full width, everything still works with one thumb
+- **No internet required** once the page loads — I can work on it during an FID day without panicking if WiFi flakes out
 
 ---
 
-## Updating the file
+## How I host it (free forever)
 
-Anytime you want changes (new email templates, wording fixes, new library items), just replace `index.html` in the repo. GitHub Pages redeploys automatically in about a minute.
+I use GitHub Pages because it's free and my file is just one HTML file.
+
+1. Make a GitHub account if you don't have one (free)
+2. Create a new repo called `cybergrader` (or whatever you want)
+3. Upload `index.html` to the root of the repo
+4. Go to Settings → Pages
+5. Source: "Deploy from a branch" → Branch: `main`, folder: `/ (root)` → Save
+6. Wait about a minute
+7. Your site is live at `https://[your-username].github.io/cybergrader/`
+8. Bookmark it on desktop. Add it to your iPhone home screen so it feels like an app.
+
+Zero cost. To update it later, just replace `index.html` in the repo. GitHub Pages redeploys automatically in about a minute.
+
+If you ever want a custom domain like `cybergrader.io`, that's about $10/year for the domain name through a registrar like Porkbun or Namecheap. Pages still hosts free.
 
 ---
 
-## Cross-device sync (current state)
+## Syncing between devices (right now)
 
-Right now, sync is **manual** via Export / Import:
-- On Device A: click Export → save the JSON file
-- Email/AirDrop/Drive it to Device B
+For now it's manual:
+
+- On Device A: click Export → save the JSON file somewhere (email it to yourself, drop it in Drive, AirDrop it)
 - On Device B: click Import → pick the file
-- Your overrides merge in
+- All your overrides and year setup merge in
 
-Storage is `localStorage` per browser, so each browser/device has its own copy until you sync.
-
----
-
-## Next phase: Firebase Auth (real cloud sync with login)
-
-You said you have a Firebase account. Here's exactly what's needed to add real sync with login. **Only do this if you actually want it** — the manual export/import covers basic needs and adds zero complexity.
-
-### What Firebase will give you
-- Sign in once with email/password or Google
-- Your overrides auto-save to the cloud
-- Open CyberGrader on any device → sign in → everything is there
-- Free tier easily covers a single-user use case (1 GB storage, 50K reads/day, 20K writes/day — you'll use a fraction of that)
-
-### Setup steps (one-time, ~10 minutes)
-1. Go to https://console.firebase.google.com/
-2. **Create a new project** → name it `cybergrader` → disable Google Analytics (you don't need it)
-3. **Enable Authentication**:
-   - Build → Authentication → Get started
-   - Sign-in method → enable **Email/Password** (and optionally **Google**)
-4. **Create Firestore Database**:
-   - Build → Firestore Database → Create database
-   - Start in **production mode**, region: `us-east1` (closest to PA)
-5. **Set security rules** (paste this in Firestore → Rules):
-   ```
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /users/{userId}/{document=**} {
-         allow read, write: if request.auth != null && request.auth.uid == userId;
-       }
-     }
-   }
-   ```
-   This means: only the signed-in user can read/write their own data. No one else can touch it.
-6. **Register a web app**:
-   - Project Overview → click the `</>` icon
-   - App nickname: `cybergrader-web`
-   - Don't enable Hosting (we use GitHub Pages)
-   - Copy the `firebaseConfig` block it gives you — looks like this:
-     ```js
-     const firebaseConfig = {
-       apiKey: "AIza...",
-       authDomain: "cybergrader.firebaseapp.com",
-       projectId: "cybergrader",
-       storageBucket: "cybergrader.firebasestorage.app",
-       messagingSenderId: "...",
-       appId: "..."
-     };
-     ```
-7. **Send me that `firebaseConfig` block.** I'll wire it into the next version of `index.html` along with:
-   - A "Sign In" button in the top bar
-   - Auto-sync of overrides on save
-   - Auto-load of overrides on sign-in
-   - A small "synced ✓" indicator
-
-The API key is **not a secret** — it's safe to commit to GitHub. The security rules are what protect your data.
+Each browser keeps its own copy until you sync. This works fine for me because I mostly use my school laptop and my phone.
 
 ---
 
-## Naming
+## What I need to set up Firebase for real cloud sync
 
-Honestly, **CyberGrader is the right name.** It's specific, memorable, and tells you what it does. I'd keep it.
+I already have a Firebase/Google account but haven't wired this up yet. When I'm ready, here's exactly what I need to send to Alex to get real login + cloud sync working so my overrides follow me everywhere automatically:
 
-If you ever want alternatives that came up: GradeVault, TeachFlow, ClassDeck. None of them are better — keep CyberGrader.
+### Step-by-step
+
+1. Go to https://console.firebase.google.com
+2. Click **Add project** (or **Create a project**)
+3. Project name: `cybergrader` → Continue
+4. **Disable Google Analytics** — I don't need it, just turn off the toggle → Create project
+5. Wait for it to finish, click Continue
+
+### Enable login
+6. Left sidebar → **Build → Authentication** → Get started
+7. **Sign-in method** tab → click **Email/Password** → toggle Enable → Save
+8. (Optional) Also enable **Google** sign-in if I want one-tap login with my Google account
+
+### Create the database
+9. Left sidebar → **Build → Firestore Database** → Create database
+10. Start in **production mode** → Next
+11. Location: `us-east1` (closest to PA) → Enable
+12. After it creates, click the **Rules** tab and paste this exact text:
+    ```
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /users/{userId}/{document=**} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+    ```
+    → Publish
+
+    This locks it down so only I can see my own data. No one else can touch it.
+
+### Register a web app
+13. Click the **gear icon** top-left → Project settings
+14. Scroll down to **Your apps** → click the **`</>`** (web) icon
+15. App nickname: `cybergrader-web`
+16. **Don't** check "Also set up Firebase Hosting" — I'm using GitHub Pages
+17. Click **Register app**
+18. Firebase shows a code block with `firebaseConfig` in it. It looks like this:
+    ```js
+    const firebaseConfig = {
+      apiKey: "AIza...",
+      authDomain: "cybergrader-xxxxx.firebaseapp.com",
+      projectId: "cybergrader-xxxxx",
+      storageBucket: "cybergrader-xxxxx.firebasestorage.app",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abc123def456"
+    };
+    ```
+
+### Send that block to Alex
+19. Copy the **entire `firebaseConfig` block** (all 6 lines inside the braces)
+20. Paste it in my next message
+21. Alex will wire up a Sign In button, auto-sync on save, and auto-load on sign-in
+
+**Note on security:** that `apiKey` looks scary but it is **not a secret**. Firebase web API keys are public by design — the security rules I pasted above are what actually protect my data. It's safe to commit the config to GitHub.
 
 ---
 
-## Items still pending your approval
+## Items still open
 
-These are flagged in the rebuild because they're either typos in source material or templates I derived from your patterns:
-
-1. **4th nine weeks 25%, 50%, Final Week templates** — I only had your verbatim example for the 75% Check-In. The others (25%, 50%, Final Week) I wrote following the same structure: dual-deadline block, "no extensions" warning, "you can finish on senior schedule if you want" line. Sign off on these or rewrite and I'll lock them in.
-
-2. **75% template typos preserved verbatim**: "we've", "let's", "dues dates" (should be "due dates"), and the em-dash style. I kept everything exact. Want them fixed? Tell me and I'll fix.
-
-3. **Start of Year Welcome announcement**: I changed `[Microsoft TEAM for your Edgenuity course]` → `[Microsoft TEAM for your course]` because the rest of the announcement says "Carnegie Learning (not Edgenuity)". The "Edgenuity" reference was a leftover and contradicted itself. Also made the join code a `[TEAM CODE]` placeholder since it varies by class. Both flagged here so you can tell me if you want them reverted.
-
-4. **Welcome Third / Fourth Nine Weeks grading wording** — still not in your locked source file. The dropdown only shows First and Second until you give me wording for Third and Fourth.
+- **Welcome Third / Fourth Nine Weeks grading wording** — I haven't given Alex the wording for these yet, so only 1st and 2nd are in the First Assignment dropdown. When I send the wording, they'll get added.
+- I'll probably keep tweaking email copy as I use this more. That's what the Edit / Save Override buttons are for.
 
 ---
 
-## Bug fixes from previous build
-
-1. **Edit/Save Override was broken**: when you edited and saved, then changed any field, the render function force-overwrote your text. Also, while in edit mode, any input event clobbered what you typed. Both fixed by checking `readOnly` state before any write to the textarea, and locking the textarea back to read-only after Save.
-
-2. **Copy buttons failing**: the Clipboard API needs a secure context (https) and proper focus. Added `document.execCommand("copy")` fallback that works on `file://`, GitHub Pages, and anywhere else.
-
-3. **Three confusing copy buttons** → **one Copy button**: output is now `Subject: X\n\nbody` combined. Paste into your email body, then cut the subject line up to the SUBJECT field. Matches your email screenshot workflow.
-
-4. **Form auto-narrowing**: scope/term/deadline fields now hide when the email type doesn't need them. Welcome Email shows scope + course name. Check-ins show term + deadline. 4th nine weeks check-ins show dual deadlines. No more clutter.
-
-5. **Removed dead "Welcome Third/Fourth Nine Weeks" grading options** that had no source wording.
-
-6. **Removed senior-specific email types** since your distribution lists are by class, not grade level. The 4th nine weeks variants of the regular check-ins handle both deadlines in one message — that matches your actual workflow.
+Created by percycodes.
