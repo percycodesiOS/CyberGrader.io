@@ -80,7 +80,7 @@
     .senior-highlight{color:var(--pink);font-weight:700}
 
     /* TABS */
-    .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin-bottom:10px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:10px}
     .tab-btn{
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(16,24,36,.95), rgba(10,16,27,.95));
@@ -90,7 +90,6 @@
     .tab-btn:hover,.tab-btn:focus-visible{color:var(--text);border-color:var(--border-strong);outline:none;transform:translateY(-1px)}
     .tab-btn.active.grade-tab{color:#fff;border-color:rgba(81,217,255,.42);box-shadow:inset 0 0 0 1px rgba(81,217,255,.08),0 0 18px rgba(0,183,255,.10)}
     .tab-btn.active.email-tab{color:#fff;border-color:rgba(255,159,67,.42);box-shadow:inset 0 0 0 1px rgba(255,159,67,.08),0 0 18px rgba(255,159,67,.10)}
-    .tab-btn.active.library-tab{color:#fff;border-color:rgba(125,255,181,.42);box-shadow:inset 0 0 0 1px rgba(125,255,181,.08),0 0 18px rgba(125,255,181,.10)}
     .tab-help{color:var(--muted);font-size:.84rem;margin-bottom:16px}
     .tab-panel{display:none}.tab-panel.active{display:block}
 
@@ -201,7 +200,7 @@
     </div>
     <div class="topbar-right">
       <div class="date-pill" id="todayDate">Today</div>
-      <div class="date-pill" id="modeStatus" title="This version runs fully on your device using localStorage.">Local Mode</div>
+      <button class="signin-btn" id="signInBtn" onclick="handleSignIn()">Sign In</button>
     </div>
   </header>
 
@@ -265,7 +264,6 @@
         <div class="tabs" role="tablist" aria-label="CyberGrader sections">
           <button class="tab-btn grade-tab active" data-tab="gradingTab" role="tab" aria-selected="true">Grading Output</button>
           <button class="tab-btn email-tab" data-tab="emailTab" role="tab" aria-selected="false">Email Generator</button>
-          <button class="tab-btn library-tab" data-tab="libraryTab" role="tab" aria-selected="false">Library</button>
         </div>
         <div class="tab-help" id="tabHelp">Select Work Type and Output Type to generate your feedback. Use Edit Output to customize, then Copy Output when ready.</div>
 
@@ -297,7 +295,7 @@
               <textarea id="gradeOutput" readonly spellcheck="true"></textarea>
               <div class="textarea-icons">
                 <button class="icon-btn" id="gradeMicBtn" title="Voice Input" type="button">🎙</button>
-                <button class="icon-btn" id="gradeAIBtn" title="AI Reword (disabled in this build)" type="button">✨</button>
+                <button class="icon-btn" id="gradeAIBtn" title="AI Reword" type="button">✨</button>
               </div>
             </div>
           </div>
@@ -420,59 +418,6 @@
             <button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject</button>
             <button class="ghost-btn" id="copyCombinedBtn" type="button">Copy Combined</button>
             <button class="copy-btn" style="flex:1" id="copyBodyBtn" type="button">Copy Body</button>
-          </div>
-
-        <!-- LIBRARY TAB -->
-        <div class="tab-panel" id="libraryTab" role="tabpanel">
-          <div class="pillrow">
-            <span class="pill">Reusable portal text</span>
-            <span class="pill">Copy just what you need</span>
-            <span class="pill">Local backup tools</span>
-          </div>
-
-          <div class="section-card">
-            <h3>Weekly Overall Grade Update</h3>
-            <div class="field full">
-              <label for="weeklyName">Assignment Name</label>
-              <textarea id="weeklyName" readonly rows="2">Weekly Overall Grade Update</textarea>
-            </div>
-            <div class="field full" style="margin-top:10px">
-              <label for="weeklyDetail">Assignment Detail</label>
-              <textarea id="weeklyDetail" readonly rows="4">This grade reflects the student's current weekly progress for the grading period and is updated weekly. Individual assignment and project grades are available in Microsoft Teams and/or Carnegie Learning platform(s).</textarea>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-              <button class="ghost-btn" id="copyWeeklyNameBtn" type="button">Copy Name</button>
-              <button class="copy-btn" style="flex:1" id="copyWeeklyDetailBtn" type="button">Copy Detail</button>
-            </div>
-          </div>
-
-          <div class="section-card">
-            <h3>Final Overall Grade</h3>
-            <div class="field full">
-              <label for="finalName">Assignment Name</label>
-              <textarea id="finalName" readonly rows="2">Final Overall Grade</textarea>
-            </div>
-            <div class="field full" style="margin-top:10px">
-              <label for="finalDetail">Assignment Detail</label>
-              <textarea id="finalDetail" readonly rows="5">This grade reflects the student's overall average for the nine-week grading period. Individual assignment and project grades can be viewed in Microsoft Teams and/or Carnegie Learning platform(s).</textarea>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-              <button class="ghost-btn" id="copyFinalNameBtn" type="button">Copy Name</button>
-              <button class="copy-btn" style="flex:1" id="copyFinalDetailBtn" type="button">Copy Detail</button>
-            </div>
-          </div>
-
-          <div class="section-card">
-            <h3>Backup / Restore</h3>
-            <p style="margin-bottom:12px">This version saves your overrides on this device. Export a JSON backup before big edits or before replacing the live file.</p>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button class="ghost-btn" id="exportJsonBtn" type="button">Export Backup</button>
-              <label class="ghost-btn" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">
-                Import Backup
-                <input id="importJsonInput" type="file" accept="application/json" style="display:none" />
-              </label>
-            </div>
-            <div class="copy-status" id="libraryStatus" style="margin-top:10px"></div>
           </div>
         </div>
 
@@ -710,8 +655,44 @@ $("gradeMicBtn").addEventListener("click",()=>{
 
 // ── AI REWORD ──
 async function aiReword(textareaId,statusId,iconBtn){
-  $(statusId).textContent = "AI Reword is disabled in this build. Use ChatGPT beside the app for rewrites.";
-  setTimeout(()=>$(statusId).textContent="",3000);
+  const textarea=$(textareaId);
+  const originalText=textarea.value.trim();
+  if(!originalText){$(statusId).textContent="Nothing to reword.";return;}
+  const wasReadonly=textarea.readOnly;
+  textarea.readOnly=false;
+  iconBtn.classList.add("loading");
+  iconBtn.textContent="⏳";
+  $(statusId).textContent="Rewording...";
+  try{
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        messages:[{
+          role:"user",
+          content:`You are helping a teacher named Mr. Macek who teaches Technology Education and Programming cyber courses. Reword the following student feedback comment so it sounds natural and human — like an experienced teacher wrote it, not AI. Keep the same meaning, keep it concise, and do not start with "I hope you are doing well." Return only the reworded text, nothing else:\n\n${originalText}`
+        }]
+      })
+    });
+    const data=await resp.json();
+    const rewrote=data?.content?.find(b=>b.type==="text")?.text?.trim();
+    if(rewrote){
+      textarea.value=rewrote;
+      $(statusId).textContent="Reworded successfully.";
+      if(textareaId==="gradeOutput"){gradeEditMode=true;updateEditToggleAppearance();}
+    }else{
+      $(statusId).textContent="AI returned empty response.";
+    }
+  }catch(err){
+    $(statusId).textContent="AI reword failed — check your connection.";
+  }finally{
+    iconBtn.classList.remove("loading");
+    iconBtn.textContent=textareaId==="gradeOutput"?"✨":"✨";
+    if(wasReadonly&&textareaId!=="gradeOutput")textarea.readOnly=true;
+    setTimeout(()=>$(statusId).textContent="",3000);
+  }
 }
 
 $("gradeAIBtn").addEventListener("click",()=>aiReword("gradeOutput","gradeStatus",$("gradeAIBtn")));
@@ -882,9 +863,9 @@ function activateTab(tabBtn){
     :"Start with email type — the tool will narrow the rest of the flow automatically.";
 }
 
-// ── LOCAL MODE STATUS ──
-function setModeStatus(){
-  $("modeStatus").textContent = "Local Mode";
+// ── SIGN IN (placeholder — wire to auth provider when ready) ──
+function handleSignIn(){
+  alert("Sign-in coming soon. This will connect to your school account.");
 }
 
 // ── EMAIL BUTTON WIRING ──
@@ -938,56 +919,6 @@ $("emailBodyOutput").addEventListener("input",updateCombined);
 
 document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click",()=>activateTab(btn)));
 
-$("copyWeeklyNameBtn").addEventListener("click",()=>copyText($("weeklyName").value.trim(),$("libraryStatus"),$("copyWeeklyNameBtn")));
-$("copyWeeklyDetailBtn").addEventListener("click",()=>copyText($("weeklyDetail").value.trim(),$("libraryStatus"),$("copyWeeklyDetailBtn")));
-$("copyFinalNameBtn").addEventListener("click",()=>copyText($("finalName").value.trim(),$("libraryStatus"),$("copyFinalNameBtn")));
-$("copyFinalDetailBtn").addEventListener("click",()=>copyText($("finalDetail").value.trim(),$("libraryStatus"),$("copyFinalDetailBtn")));
-
-$("exportJsonBtn").addEventListener("click",()=>{
-  const payload = {
-    gradeOverrides,
-    emailOverrides,
-    lastValues: loadJSON(STORAGE_KEYS.lastValues),
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "cybergrader-backup.json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  $("libraryStatus").textContent = "Backup exported.";
-  setTimeout(()=>$("libraryStatus").textContent="",2000);
-});
-
-$("importJsonInput").addEventListener("change", async (event)=>{
-  const file = event.target.files?.[0];
-  if(!file) return;
-  try{
-    const text = await file.text();
-    const data = JSON.parse(text);
-    gradeOverrides = data.gradeOverrides || {};
-    emailOverrides = data.emailOverrides || {};
-    saveJSON(STORAGE_KEYS.gradeOverrides, gradeOverrides);
-    saveJSON(STORAGE_KEYS.emailOverrides, emailOverrides);
-    if(data.lastValues) saveJSON(STORAGE_KEYS.lastValues, data.lastValues);
-    restoreLastValues();
-    populateGradeLevels();
-    updateGradeTypes();
-    updateEmailOutput(true);
-    maybeAdjustFields();
-    $("libraryStatus").textContent = "Backup imported.";
-  }catch(err){
-    $("libraryStatus").textContent = "Import failed. Check the backup file.";
-  }finally{
-    event.target.value = "";
-    setTimeout(()=>$("libraryStatus").textContent="",2500);
-  }
-});
-
 // ── INIT ──
 setSelectOptions($("workType"),Object.keys(gradeConfig));
 setSelectOptions($("emailType"),emailTypes);
@@ -996,7 +927,6 @@ populateGradeLevels();
 updateGradeTypes();
 updateEmailOutput(true);
 maybeAdjustFields();
-setModeStatus();
 activateTab(document.querySelector('.tab-btn.grade-tab'));
 </script>
 </body>
