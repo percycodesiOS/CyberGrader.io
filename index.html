@@ -196,9 +196,11 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
-      <h1 class="brand">CyberGrader<span class="dot">.io</span></h1>
+      <img src="website_logo_cybergrader_sized_280_20.png" alt="CyberGrader.io" style="height:48px;width:auto;display:block" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
+      <h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
     </div>
     <div class="topbar-right">
+      <img src="percycodes_48_48.png" alt="PercyCodes" style="height:40px;width:40px;border-radius:10px;display:block" onerror="this.style.display='none'">
       <div class="date-pill" id="todayDate">Today</div>
       <button class="signin-btn" id="signInBtn" onclick="handleSignIn()">Sign In</button>
     </div>
@@ -295,7 +297,7 @@
               <textarea id="gradeOutput" readonly spellcheck="true"></textarea>
               <div class="textarea-icons">
                 <button class="icon-btn" id="gradeMicBtn" title="Voice Input" type="button">🎙</button>
-                <button class="icon-btn" id="gradeAIBtn" title="AI Reword" type="button">✨</button>
+                <button class="icon-btn" id="gradeAIBtn" title="Generate Variation" type="button">🔀</button>
               </div>
             </div>
           </div>
@@ -393,7 +395,7 @@
             </div>
             <div class="toolbar-right">
               <button class="ghost-btn" id="emailMicBtn" type="button">🎙 Voice</button>
-              <button class="ghost-btn" id="emailAIBtn" type="button">✨ AI Reword</button>
+              <button class="ghost-btn" id="emailAIBtn" type="button">🔀 Generate Variation</button>
             </div>
           </div>
 
@@ -581,12 +583,12 @@ function updateEditToggleAppearance(){
 
 $("editGradeToggle").addEventListener("click",()=>{
   if(!gradeEditMode){
-    // Enter edit mode
     gradeEditMode=true;
     updateEditToggleAppearance();
     $("gradeOutput").focus();
   }else{
-    // Save and exit
+    // Refresh shortDate before saving so saved output reflects today
+    shortDate=new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
     gradeOverrides[getGradeKey()]=$("gradeOutput").value.trim();
     saveJSON(STORAGE_KEYS.gradeOverrides,gradeOverrides);
     gradeEditMode=false;
@@ -617,6 +619,7 @@ $("workType").addEventListener("change",updateGradeTypes);
 $("outputType").addEventListener("change",()=>updateGradeOutput(true));
 
 $("resetGradeBtn").addEventListener("click",()=>{
+  if(!confirm("Reset this template? Any custom edits you saved will be permanently deleted."))return;
   delete gradeOverrides[getGradeKey()];
   saveJSON(STORAGE_KEYS.gradeOverrides,gradeOverrides);
   gradeEditMode=false;
@@ -653,53 +656,54 @@ $("gradeMicBtn").addEventListener("click",()=>{
   startDictation("gradeOutput","gradeStatus");
 });
 
-// ── AI REWORD ──
-async function aiReword(textareaId,statusId,iconBtn){
-  const textarea=$(textareaId);
-  const originalText=textarea.value.trim();
-  if(!originalText){$(statusId).textContent="Nothing to reword.";return;}
-  const wasReadonly=textarea.readOnly;
-  textarea.readOnly=false;
-  iconBtn.classList.add("loading");
-  iconBtn.textContent="⏳";
-  $(statusId).textContent="Rewording...";
-  try{
-    const resp=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        messages:[{
-          role:"user",
-          content:`You are helping a teacher named Mr. Macek who teaches Technology Education and Programming cyber courses. Reword the following student feedback comment so it sounds natural and human — like an experienced teacher wrote it, not AI. Keep the same meaning, keep it concise, and do not start with "I hope you are doing well." Return only the reworded text, nothing else:\n\n${originalText}`
-        }]
-      })
-    });
-    const data=await resp.json();
-    const rewrote=data?.content?.find(b=>b.type==="text")?.text?.trim();
-    if(rewrote){
-      textarea.value=rewrote;
-      $(statusId).textContent="Reworded successfully.";
-      if(textareaId==="gradeOutput"){gradeEditMode=true;updateEditToggleAppearance();}
-    }else{
-      $(statusId).textContent="AI returned empty response.";
+// ── GENERATE VARIATION ──
+function generateVariation(textareaId, statusId, iconBtn) {
+  const textarea = $(textareaId);
+  const key = textareaId === "gradeOutput" ? getGradeKey() : getEmailKey();
+  // Get all possible templates for this key and pick a different one
+  if (textareaId === "gradeOutput") {
+    const current = textarea.value.trim();
+    const defaults = getDefaultGradeText();
+    // Simple variation: if showing default, show override or vice versa
+    // For now rotate through any saved override vs default
+    const override = gradeOverrides[key];
+    if (override && textarea.value.trim() === override) {
+      textarea.value = defaults;
+    } else {
+      textarea.value = override || defaults;
     }
-  }catch(err){
-    $(statusId).textContent="AI reword failed — check your connection.";
-  }finally{
-    iconBtn.classList.remove("loading");
-    iconBtn.textContent=textareaId==="gradeOutput"?"✨":"✨";
-    if(wasReadonly&&textareaId!=="gradeOutput")textarea.readOnly=true;
-    setTimeout(()=>$(statusId).textContent="",3000);
+    $(statusId).textContent = "Variation loaded.";
+    setTimeout(() => $(statusId).textContent = "", 2000);
   }
 }
 
-$("gradeAIBtn").addEventListener("click",()=>aiReword("gradeOutput","gradeStatus",$("gradeAIBtn")));
-$("emailAIBtn").addEventListener("click",()=>aiReword("emailBodyOutput","emailStatus",$("emailAIBtn")));
+$("gradeAIBtn").addEventListener("click", () => {
+  if (!gradeEditMode) { gradeEditMode = true; updateEditToggleAppearance(); }
+  generateVariation("gradeOutput", "gradeStatus", $("gradeAIBtn"));
+});
 $("emailMicBtn").addEventListener("click",()=>{
   if($("emailBodyOutput").readOnly)setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),true);
   startDictation("emailBodyOutput","emailStatus");
+});
+
+$("emailAIBtn").addEventListener("click",()=>{
+  const key=getEmailKey();
+  const override=emailOverrides[key];
+  const tpl=buildEmailTemplate();
+  if(override&&$("emailBodyOutput").value.trim()===override.body){
+    $("emailBodyOutput").value=tpl.body;
+    $("emailSubjectOutput").value=tpl.subject;
+  }else if(override){
+    $("emailBodyOutput").value=override.body;
+    $("emailSubjectOutput").value=override.subject;
+  }else{
+    $("emailStatus").textContent="No saved variation — edit and save one first.";
+    setTimeout(()=>$("emailStatus").textContent="",2500);
+    return;
+  }
+  updateCombined();
+  $("emailStatus").textContent="Variation loaded.";
+  setTimeout(()=>$("emailStatus").textContent="",2000);
 });
 
 // ── UTILS ──
@@ -887,6 +891,7 @@ $("saveEmailBtn").addEventListener("click",()=>{
 });
 
 $("resetEmailBtn").addEventListener("click",()=>{
+  if(!confirm("Reset this email template? Any custom edits you saved will be permanently deleted."))return;
   delete emailOverrides[getEmailKey()];
   saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
   setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),false);
