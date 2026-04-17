@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -59,6 +58,22 @@ color:#fff;font-weight:800;font-size:.94rem;cursor:pointer;transition:.18s ease;
 font-family:inherit
 }
 .signin-btn:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.55);background:linear-gradient(180deg, rgba(0,183,255,.28), rgba(81,217,255,.18))}
+.user-chip{
+display:flex;align-items:center;gap:10px;
+padding:8px 14px 8px 8px;border-radius:999px;
+border:1px solid rgba(81,217,255,.35);
+background:linear-gradient(180deg, rgba(0,183,255,.14), rgba(81,217,255,.08));
+cursor:pointer;transition:.18s ease;font-family:inherit;color:#fff;font-weight:700;font-size:.9rem
+}
+.user-chip:hover{border-color:rgba(81,217,255,.55)}
+.user-chip .avatar{
+width:30px;height:30px;border-radius:50%;
+background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+color:#02131f;display:flex;align-items:center;justify-content:center;
+font-weight:900;font-size:.85rem;flex-shrink:0
+}
+.user-chip .signout-x{opacity:.6;margin-left:4px;font-size:.85rem}
+.user-chip:hover .signout-x{opacity:1;color:var(--red)}
 /* LAYOUT */
 .main-grid{display:grid;grid-template-columns:370px minmax(0,1fr);gap:16px;align-items:start}
 .panel{
@@ -96,12 +111,12 @@ transition:.18s ease;font-family:inherit;font-size:1rem
 .field.full{grid-column:1 / -1}
 .field.hidden{display:none}
 label{font-size:.84rem;color:var(--muted);font-weight:800;letter-spacing:.02em}
-select,input[type="text"],textarea{
+select,input[type="text"],input[type="email"],input[type="password"],textarea{
 width:100%;border:1px solid rgba(81,217,255,.16);
 background:linear-gradient(180deg, rgba(11,18,32,1), rgba(8,13,24,1));
 color:var(--text);border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease
 }
-select:focus,input[type="text"]:focus,textarea:focus{
+select:focus,input:focus,textarea:focus{
 outline:none;border-color:rgba(81,217,255,.45);box-shadow:0 0 0 4px rgba(81,217,255,.08)
 }
 select option{background:#0c1220;color:#eef7ff}
@@ -145,25 +160,36 @@ transform:translateY(-1px);outline:none
 .copy-bottom{width:100%;margin-top:10px}
 .copy-status{font-size:.85rem;color:var(--green);min-height:1.1em;margin-top:6px}
 /* FOOTER / MISC */
-.footer{text-align:center;color:var(--muted);font-style:italic;font-size:.9rem;padding:8px 0 2px}
+.footer{text-align:center;color:var(--muted);font-size:.9rem;padding:18px 0 6px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.footer .percy-img{
+height:56px;width:56px;display:block;
+background:transparent;border:0;border-radius:0;
+filter:drop-shadow(0 0 10px rgba(81,217,255,.25))
+}
+.footer .created-by{
+font-style:italic;color:var(--muted);font-size:.88rem;letter-spacing:.02em
+}
+.footer .created-by .brand-name{color:var(--cyan);font-weight:800;font-style:normal;letter-spacing:.04em}
 .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(81,217,255,.2), transparent);margin:6px 0 4px}
 .subgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .hint{font-size:.82rem;color:var(--muted);margin-top:4px}
 .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .pill{padding:8px 12px;border-radius:999px;border:1px solid rgba(81,217,255,.18);background:rgba(81,217,255,.07);color:var(--muted);font-size:.82rem}
-/* MODAL */
+/* MODAL (generic) */
 .modal-overlay{
 display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;
-align-items:center;justify-content:center;backdrop-filter:blur(4px)
+align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px
 }
 .modal-overlay.open{display:flex}
 .modal{
 background:linear-gradient(180deg,#0d1521,#08101c);
 border:1px solid rgba(255,159,67,.35);border-radius:20px;
-padding:28px 32px;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.6);
+padding:28px 32px;max-width:460px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);
 position:relative
 }
+.modal.auth{border-color:rgba(81,217,255,.35);max-width:420px}
 .modal h2{margin:0 0 12px;font-size:1.1rem;color:var(--orange)}
+.modal.auth h2{color:var(--cyan);font-size:1.25rem}
 .modal p{color:var(--muted);line-height:1.6;font-size:.95rem;margin:0 0 20px}
 .modal-close{
 background:linear-gradient(180deg,rgba(0,183,255,.25),rgba(81,217,255,.15));
@@ -171,12 +197,47 @@ border:1px solid rgba(81,217,255,.35);color:#fff;border-radius:12px;
 padding:11px 24px;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
 }
 .modal-close:hover{transform:translateY(-1px)}
+.modal-x{
+position:absolute;top:12px;right:14px;background:transparent;border:0;color:var(--muted);
+font-size:1.4rem;cursor:pointer;padding:4px 10px;border-radius:8px
+}
+.modal-x:hover{color:var(--text);background:rgba(255,255,255,.05)}
+/* AUTH MODAL */
+.auth-form{display:grid;gap:12px}
+.auth-form .field{gap:6px}
+.google-btn{
+display:flex;align-items:center;justify-content:center;gap:10px;
+padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);
+background:#fff;color:#1f1f1f;font:inherit;font-weight:700;cursor:pointer;transition:.15s ease
+}
+.google-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,255,255,.1)}
+.google-btn svg{width:18px;height:18px;flex-shrink:0}
+.auth-divider{
+display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem;margin:4px 0
+}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:rgba(81,217,255,.18)}
+.auth-submit{
+padding:12px;border-radius:12px;border:1px solid rgba(81,217,255,.35);
+background:linear-gradient(180deg, rgba(0,183,255,.3), rgba(81,217,255,.2));
+color:#fff;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
+}
+.auth-submit:hover{transform:translateY(-1px)}
+.auth-toggle{
+background:transparent;border:0;color:var(--cyan);font:inherit;font-size:.88rem;
+cursor:pointer;text-align:center;padding:4px;text-decoration:underline
+}
+.auth-error{
+color:var(--red);font-size:.85rem;min-height:1em;text-align:center;
+background:rgba(255,125,125,.08);border:1px solid rgba(255,125,125,.2);
+border-radius:10px;padding:8px;display:none
+}
+.auth-error.show{display:block}
 @media (max-width:1040px){.main-grid{grid-template-columns:1fr}.subgrid{grid-template-columns:1fr 1fr}}
 @media (max-width:760px){
 body{padding:12px}
 .topbar{flex-direction:column;align-items:flex-start}
 .topbar-right{width:100%}
-.date-pill,.signin-btn{flex:1;text-align:center}
+.date-pill,.signin-btn,.user-chip{flex:1;text-align:center;justify-content:center}
 .form-grid,.subgrid,.tabs{grid-template-columns:1fr}
 .copy-btn,.ghost-btn,.global-save-btn,.reset-btn{width:100%}
 }
@@ -187,12 +248,17 @@ body{padding:12px}
 <!-- TOPBAR -->
 <header class="topbar">
 <div class="topbar-left">
-<img src="website_logo_cybergrader_sized_280_20.png?v=3" alt="CyberGrader.io" style="height:46px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(81,217,255,.3))" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
+<img src="cybergrader-280x80.png?v=4" alt="CyberGrader.io" style="height:56px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(81,217,255,.3))" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
 <h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
 </div>
 <div class="topbar-right">
 <div class="date-pill" id="todayDate">Today</div>
-<button class="signin-btn" id="signInBtn" onclick="handleSignIn()">Sign In</button>
+<button class="signin-btn" id="signInBtn" type="button">Sign In</button>
+<button class="user-chip" id="userChip" type="button" style="display:none" title="Click to sign out">
+<span class="avatar" id="userAvatar">?</span>
+<span id="userName">User</span>
+<span class="signout-x">✕</span>
+</button>
 </div>
 </header>
 
@@ -248,7 +314,6 @@ body{padding:12px}
 </aside>
 
 <!-- MAIN PANEL -->
-
 <section class="panel">
 <div class="panel-inner">
 <div class="tabs" role="tablist" aria-label="CyberGrader sections">
@@ -258,7 +323,6 @@ body{padding:12px}
 <div class="tab-help" id="tabHelp">Select Work Type and Output Type to generate your feedback. Use Edit Output to customize, then Copy Output when ready.</div>
 
 <!-- GRADING TAB -->
-
 <div class="tab-panel active" id="gradingTab" role="tabpanel">
 <div class="form-grid">
 <div class="field">
@@ -271,16 +335,12 @@ body{padding:12px}
 </div>
 </div>
 
-<!-- TOOLBAR: Edit/Save + Reset only -->
-
 <div class="toolbar">
 <div class="toolbar-left">
 <button class="edit-btn" id="editGradeToggle" type="button">Edit Output</button>
 <button class="reset-btn" id="resetGradeBtn" type="button">Reset Template</button>
 </div>
 </div>
-
-<!-- TEXTAREA with Voice + AI Reword icons -->
 
 <div class="field full">
 <label for="gradeOutput">Generated Output</label>
@@ -295,14 +355,10 @@ body{padding:12px}
 
 <div class="copy-status" id="gradeStatus"></div>
 
-<!-- COPY OUTPUT at the very bottom -->
-
 <button class="copy-btn copy-bottom" id="copyGradeBtn" type="button">Copy Output</button>
-
 </div>
 
 <!-- EMAIL TAB -->
-
 <div class="tab-panel" id="emailTab" role="tabpanel">
 <div class="pillrow">
 <span class="pill">Choose email type first</span>
@@ -328,7 +384,7 @@ body{padding:12px}
 <option value="fourth">Fourth Nine Weeks</option>
 </select>
 </div>
-<div class="field" id="courseScopeField">
+<div class="field hidden" id="courseScopeField">
 <label for="courseScope">Course Scope</label>
 <select id="courseScope">
 <option value="nineweeks">Nine Weeks Course</option>
@@ -420,21 +476,90 @@ body{padding:12px}
 
 <div class="divider"></div>
 <footer class="footer">
-<div>Created by percycodes</div>
-<img src="percycodes_48_48.png?v=3" alt="PercyCodes" style="height:72px;width:72px;border-radius:16px;display:inline-block;margin-top:12px;mix-blend-mode:screen;opacity:.9" onerror="this.style.display='none'">
-<div style="margin-top:8px;color:rgba(81,217,255,.5);font-size:.8rem;font-weight:700;letter-spacing:.08em">PERCYCODES</div>
+<img src="percy-48.png?v=4" alt="Percy Codes" class="percy-img" onerror="this.style.display='none'">
+<div class="created-by">Created by <span class="brand-name">PERCYCODES</span></div>
 </footer>
 </div>
 
 <!-- PORTAL REMINDER MODAL -->
-
 <div class="modal-overlay" id="portalModal">
 <div class="modal">
+<button class="modal-x" onclick="document.getElementById('portalModal').classList.remove('open')" aria-label="Close">✕</button>
 <h2>⚠ Portal Grading Reminder</h2>
 <p>After you enter final grades using <strong>Final Overall Grade</strong>, make sure you <strong>delete the Weekly Overall Grade Update</strong> assignment from the gradebook. Leaving both will confuse students and parents.</p>
 <button class="modal-close" onclick="document.getElementById('portalModal').classList.remove('open')">Got It</button>
 </div>
 </div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+<div class="modal auth">
+<button class="modal-x" id="authModalClose" aria-label="Close">✕</button>
+<h2 id="authTitle">Sign In</h2>
+<p id="authSubtitle" style="margin-bottom:16px">Welcome back. Sign in to save preferences across devices.</p>
+
+<div class="auth-form">
+<button class="google-btn" id="googleSignInBtn" type="button">
+<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Continue with Google
+</button>
+
+<div class="auth-divider">or</div>
+
+<div class="field">
+<label for="authEmail">Email</label>
+<input type="email" id="authEmail" autocomplete="email" />
+</div>
+<div class="field">
+<label for="authPassword">Password</label>
+<input type="password" id="authPassword" autocomplete="current-password" />
+</div>
+
+<div class="auth-error" id="authError"></div>
+
+<button class="auth-submit" id="authSubmitBtn" type="button">Sign In</button>
+
+<button class="auth-toggle" id="authToggleBtn" type="button">Need an account? Create one</button>
+<button class="auth-toggle" id="authForgotBtn" type="button" style="font-size:.8rem">Forgot password?</button>
+</div>
+</div>
+</div>
+
+<!-- Firebase (modular v10, loaded from CDN) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  GoogleAuthProvider, signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDVdCTWtOQx2M3MpCWmy5HeV4wKq11o9P0",
+  authDomain: "cybergrader-v2.firebaseapp.com",
+  databaseURL: "https://cybergrader-v2-default-rtdb.firebaseio.com",
+  projectId: "cybergrader-v2",
+  storageBucket: "cybergrader-v2.firebasestorage.app",
+  messagingSenderId: "873872825666",
+  appId: "1:873872825666:web:0a05a838b768e9fbaf7cdb"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+// Expose to window so the non-module script below can call these
+window.cgAuth = {
+  auth, signOut,
+  signInWithEmailAndPassword: (e,p) => signInWithEmailAndPassword(auth,e,p),
+  createUserWithEmailAndPassword: (e,p) => createUserWithEmailAndPassword(auth,e,p),
+  sendPasswordResetEmail: (e) => sendPasswordResetEmail(auth,e),
+  signInWithGoogle: () => signInWithPopup(auth, googleProvider),
+  onAuthStateChanged: (cb) => onAuthStateChanged(auth, cb)
+};
+window.dispatchEvent(new Event('cgAuthReady'));
+</script>
 
 <script>
 const $ = (id) => document.getElementById(id);
@@ -444,7 +569,7 @@ emailOverrides: "cybergrader_email_overrides_v3",
 lastValues: "cybergrader_last_values_v3"
 };
 
-// ── GRADE CONFIG (order: First Assignment, Assignment, Project, Portal Information) ──
+// ── GRADE CONFIG ──
 const gradeConfig = {
 "FIRST ASSIGNMENT": [
 "Welcome First Nine Weeks",
@@ -457,7 +582,12 @@ const gradeConfig = {
 "PORTAL INFORMATION": ["Weekly Overall Grade", "Final Overall Grade", "End of Grading Period Reminder"]
 };
 
-// ── TEMPLATES — pulled verbatim from grading_wording.txt ──
+// ── DATE (let, not const — we reassign on save) ──
+let today = new Date();
+let shortDate = new Intl.DateTimeFormat('en-US').format(today);
+let longDate = today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// ── TEMPLATES ──
 const defaultGradeTemplates = {
 "FIRST ASSIGNMENT||Welcome First Nine Weeks": (d) =>
 `Graded ${d} - Welcome to the class, I reviewed your first assignment and you are starting strong, your work was clear and showed real effort, keep this energy going because it is a great way to kick off the semester, as always, I'm here if you have any questions.`,
@@ -487,11 +617,21 @@ const defaultGradeTemplates = {
 `END OF GRADING PERIOD CHECKLIST\n\n1. Confirm all student grades are finalized in Carnegie Learning / Teams.\n2. Enter Final Overall Grade in the SV Portal gradebook.\n3. Delete the Weekly Overall Grade Update assignment.\n4. Load the next nine weeks course (if applicable) a few days before the current period ends.`
 };
 
-const emailTypes = [
+// ── EMAIL TYPES (all possible) ──
+const allEmailTypes = [
 "Welcome Letter","Early Check-In","Zero Grade Clarification","25% Check-In","50% Check-In","75% Check-In",
-"Next Nine Weeks Loaded","Semester / Part Change","Spring Break Reminder",
+"Next Nine Weeks Loaded","Semester / Part Change","Upcoming Break Example",
 "Final Week Reminder","Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"
 ];
+
+// Types that are hidden when term === "fourth"
+const HIDE_ON_FOURTH = new Set(["Next Nine Weeks Loaded","Semester / Part Change"]);
+// Types that only appear on 2nd/3rd/4th (new-period welcomes)
+const ONLY_AFTER_FIRST = new Set(["Semester / Part Change"]);
+// Types where Term dropdown is hidden (always fourth)
+const TERM_LOCKED_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"]);
+// Types where Course Scope matters
+const COURSE_SCOPE_TYPES = new Set(["Welcome Letter","Semester / Part Change"]);
 
 const gradeLevelsByType = {
 "Welcome Letter":["All Students","Single Student"],
@@ -502,23 +642,19 @@ const gradeLevelsByType = {
 "75% Check-In":["All Students","Single Student"],
 "Next Nine Weeks Loaded":["All Students","Single Student"],
 "Semester / Part Change":["All Students","Single Student"],
-"Spring Break Reminder":["All Students"],
+"Upcoming Break Example":["All Students"],
 "Final Week Reminder":["All Students"],
 "Senior Final Reminder":["Seniors"],
 "End of Year Grades 7–11":["Grades 7–11"],
 "End of Year Grade 12":["Seniors"]
 };
 
-// ── DATE ──
-const today = new Date();
-const shortDate = new Intl.DateTimeFormat('en-US').format(today);
-const longDate = today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 $("todayDate").textContent = longDate;
 $("currentDateField").value = shortDate;
 
 let gradeOverrides = loadJSON(STORAGE_KEYS.gradeOverrides);
 let emailOverrides = loadJSON(STORAGE_KEYS.emailOverrides);
-let gradeEditMode = false; // false = readonly, true = editing
+let gradeEditMode = false;
 
 function loadJSON(key){try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return {}}}
 function saveJSON(key,value){localStorage.setItem(key,JSON.stringify(value))}
@@ -548,8 +684,10 @@ return"Hi Students,";
 }
 
 function setSelectOptions(select,values){
+const current = select.value;
 select.innerHTML="";
 values.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;select.appendChild(o)});
+if(values.includes(current)) select.value = current;
 }
 
 function getGradeKey(){return`${$("workType").value}||${$("outputType").value}`}
@@ -561,7 +699,7 @@ const fn=defaultGradeTemplates[key];
 return fn?fn(shortDate):`Graded ${shortDate} - Feedback not available for this combination.`;
 }
 
-// ── GRADE EDIT/SAVE TOGGLE ──
+// ── GRADE EDIT/SAVE ──
 function updateEditToggleAppearance(){
 const btn=$("editGradeToggle");
 if(gradeEditMode){
@@ -581,8 +719,7 @@ gradeEditMode=true;
 updateEditToggleAppearance();
 $("gradeOutput").focus();
 }else{
-// Refresh shortDate before saving so saved output reflects today
-shortDate=new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+shortDate = new Intl.DateTimeFormat('en-US').format(new Date());
 gradeOverrides[getGradeKey()]=$("gradeOutput").value.trim();
 saveJSON(STORAGE_KEYS.gradeOverrides,gradeOverrides);
 gradeEditMode=false;
@@ -602,7 +739,6 @@ if(!$("gradeOutput").readOnly&&!force)return;
 const key=getGradeKey();
 $("gradeOutput").value=gradeOverrides[key]||getDefaultGradeText();
 
-// Show portal modal when relevant output is selected
 const wt=$("workType").value;
 const ot=$("outputType").value;
 if(wt==="PORTAL INFORMATION"&&(ot==="Final Overall Grade"||ot==="End of Grading Period Reminder")){
@@ -650,31 +786,23 @@ if(!gradeEditMode){gradeEditMode=true;updateEditToggleAppearance();}
 startDictation("gradeOutput","gradeStatus");
 });
 
-// ── GENERATE VARIATION ──
-function generateVariation(textareaId, statusId, iconBtn) {
+// ── VARIATION ──
+function generateVariation(textareaId, statusId){
 const textarea = $(textareaId);
-const key = textareaId === "gradeOutput" ? getGradeKey() : getEmailKey();
-
-// Get all possible templates for this key and pick a different one
-if (textareaId === "gradeOutput") {
-const current = textarea.value.trim();
+const key = getGradeKey();
+if(textareaId === "gradeOutput"){
 const defaults = getDefaultGradeText();
-// Simple variation: if showing default, show override or vice versa
-// For now rotate through any saved override vs default
 const override = gradeOverrides[key];
-if (override && textarea.value.trim() === override) {
-textarea.value = defaults;
-} else {
-textarea.value = override || defaults;
-}
+if(override && textarea.value.trim() === override){ textarea.value = defaults; }
+else { textarea.value = override || defaults; }
 $(statusId).textContent = "Variation loaded.";
-setTimeout(() => $(statusId).textContent = "", 2000);
+setTimeout(()=>$(statusId).textContent="",2000);
 }
 }
 
 $("gradeAIBtn").addEventListener("click", () => {
-if (!gradeEditMode) { gradeEditMode = true; updateEditToggleAppearance(); }
-generateVariation("gradeOutput", "gradeStatus", $("gradeAIBtn"));
+if(!gradeEditMode){ gradeEditMode = true; updateEditToggleAppearance(); }
+generateVariation("gradeOutput", "gradeStatus");
 });
 
 $("emailMicBtn").addEventListener("click",()=>{
@@ -702,7 +830,6 @@ $("emailStatus").textContent="Variation loaded.";
 setTimeout(()=>$("emailStatus").textContent="",2000);
 });
 
-// ── UTILS ──
 function cleanSingleLine(text){return text.replace(/\s+/g," ").trim()}
 async function copyText(text,statusEl,button){
 try{
@@ -716,7 +843,7 @@ statusEl.textContent="Copy failed — select text manually.";
 }
 }
 
-// ── EMAIL TAB ──
+// ── EMAIL EDIT ──
 function setEmailEditable(textarea,button,editable){
 textarea.readOnly=!editable;
 button.classList.toggle("saving",editable);
@@ -737,6 +864,20 @@ if(type.includes("Final Week"))return"90%";
 return $("progressValue").value.trim();
 }
 
+function populateEmailTypes(){
+const currentTerm = $("term").value;
+let types = allEmailTypes.slice();
+if(currentTerm === "fourth"){
+types = types.filter(t => !HIDE_ON_FOURTH.has(t));
+}
+if(currentTerm === "first"){
+types = types.filter(t => !ONLY_AFTER_FIRST.has(t));
+}
+const current = $("emailType").value;
+setSelectOptions($("emailType"), types);
+if(!types.includes(current)) $("emailType").value = types[0];
+}
+
 function maybeAdjustFields(){
 const type=$("emailType").value;
 const showProgress=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
@@ -744,6 +885,17 @@ const showRefDate=["25% Check-In","50% Check-In","75% Check-In"].includes(type);
 const showSingle=$("gradeLevel").value==="Single Student";
 const showDeadline=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"].includes(type);
 const showDual=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Next Nine Weeks Loaded"].includes(type)&&$("term").value==="fourth"&&$("gradeLevel").value==="All Students";
+
+// Hide Term for locked-fourth types
+if(TERM_LOCKED_FOURTH.has(type)){
+$("termField").classList.add("hidden");
+$("term").value = "fourth";
+}else{
+$("termField").classList.remove("hidden");
+}
+
+// Course Scope only for Welcome Letter and Semester / Part Change
+$("courseScopeField").classList.toggle("hidden", !COURSE_SCOPE_TYPES.has(type));
 
 $("progressField").classList.toggle("hidden",!showProgress);
 $("referenceDateField").classList.toggle("hidden",!showRefDate);
@@ -814,13 +966,13 @@ body:`${greet}\n\nAs of today (${refDate}), we are at the ${progress} completion
 };
 case"Next Nine Weeks Loaded":return{
 subject:"Next Nine Weeks Added to Your Account",
-body:`${greet}\n\nYour ${nextName} has now been added to your account. Please do not feel like you need to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n${term==="third"||term==="fourth"?dual+"\n\n":""}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`
+body:`${greet}\n\nYour ${nextName} has now been added to your account. Please do not feel like you need to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n${term==="third"?dual+"\n\n":""}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`
 };
 case"Semester / Part Change":return{
 subject:scope==="semester"?"Welcome to Part 2 of Your Course":`Welcome to the ${nextName}`,
 body:`${greet}\n\nWelcome to ${scope==="semester"?"the second part of your course":"the "+nextName}! I wanted to let you know that I have graded your first assignment, whether it involved uploading the course syllabus, sharing prior knowledge, or answering the content question. All grades have been updated.\n\nAs we enter this grading period, don't hesitate to contact me if you have any questions. You always have the option to complete your cyber course early, but late submissions are not accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`
 };
-case"Spring Break Reminder":return{
+case"Upcoming Break Example":return{
 subject:"Enjoy Your Break!!!",
 body:`${greet}\n\nI hope you all enjoy your break — you've earned it! I did want to mention that if you choose to work on any days while we're off, the assignment calendar will allow you to get ahead in the course.\n\nIf you find yourself with some free time, it's a great opportunity to make progress.\n\nOther than that, enjoy the break. Looking forward to working with you all for the rest of the ${termName}.\n\nAs always, don't hesitate to reach out if you have any questions.\n\nThanks,\n\nMr. Macek`
 };
@@ -871,12 +1023,130 @@ $("tabHelp").textContent=tabBtn.dataset.tab==="gradingTab"
 :"Start with email type — the tool will narrow the rest of the flow automatically.";
 }
 
-// ── SIGN IN (placeholder — wire to auth provider when ready) ──
-function handleSignIn(){
-alert("Sign-in coming soon. This will connect to your school account.");
+// ── AUTH UI ──
+let authMode = "signin"; // "signin" | "signup"
+
+function openAuthModal(){
+$("authError").classList.remove("show");
+$("authError").textContent = "";
+$("authModal").classList.add("open");
+}
+function closeAuthModal(){ $("authModal").classList.remove("open"); }
+
+function setAuthMode(mode){
+authMode = mode;
+if(mode === "signup"){
+$("authTitle").textContent = "Create Account";
+$("authSubtitle").textContent = "Sign up to save preferences across devices.";
+$("authSubmitBtn").textContent = "Create Account";
+$("authToggleBtn").textContent = "Have an account? Sign in";
+}else{
+$("authTitle").textContent = "Sign In";
+$("authSubtitle").textContent = "Welcome back. Sign in to save preferences across devices.";
+$("authSubmitBtn").textContent = "Sign In";
+$("authToggleBtn").textContent = "Need an account? Create one";
+}
 }
 
-// ── EMAIL BUTTON WIRING ──
+function showAuthError(msg){
+$("authError").textContent = msg;
+$("authError").classList.add("show");
+}
+
+function renderSignedIn(user){
+const name = user.displayName || user.email?.split("@")[0] || "User";
+const initial = (name[0] || "?").toUpperCase();
+$("userName").textContent = name;
+$("userAvatar").textContent = initial;
+$("signInBtn").style.display = "none";
+$("userChip").style.display = "flex";
+}
+function renderSignedOut(){
+$("signInBtn").style.display = "";
+$("userChip").style.display = "none";
+}
+
+function friendlyAuthError(code){
+const map = {
+"auth/invalid-email":"That email doesn't look right.",
+"auth/user-not-found":"No account found with that email.",
+"auth/wrong-password":"Wrong password. Try again or reset it.",
+"auth/invalid-credential":"Email or password is incorrect.",
+"auth/email-already-in-use":"That email is already registered. Try signing in.",
+"auth/weak-password":"Password must be at least 6 characters.",
+"auth/popup-closed-by-user":"Sign-in window was closed.",
+"auth/network-request-failed":"Network error. Check your connection.",
+"auth/too-many-requests":"Too many attempts. Wait a moment and try again."
+};
+return map[code] || "Something went wrong. Try again.";
+}
+
+function wireAuth(){
+const { auth, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithGoogle, onAuthStateChanged } = window.cgAuth;
+
+onAuthStateChanged((user) => {
+if(user) renderSignedIn(user);
+else renderSignedOut();
+});
+
+$("signInBtn").addEventListener("click", openAuthModal);
+$("authModalClose").addEventListener("click", closeAuthModal);
+
+$("userChip").addEventListener("click", async () => {
+if(!confirm("Sign out?")) return;
+try{ await signOut(auth); }catch(e){ console.error(e); }
+});
+
+$("googleSignInBtn").addEventListener("click", async () => {
+try{
+await signInWithGoogle();
+closeAuthModal();
+}catch(e){
+showAuthError(friendlyAuthError(e.code));
+}
+});
+
+$("authSubmitBtn").addEventListener("click", async () => {
+const email = $("authEmail").value.trim();
+const pw = $("authPassword").value;
+if(!email || !pw){ showAuthError("Enter email and password."); return; }
+try{
+if(authMode === "signup") await createUserWithEmailAndPassword(email, pw);
+else await signInWithEmailAndPassword(email, pw);
+closeAuthModal();
+$("authEmail").value = "";
+$("authPassword").value = "";
+}catch(e){
+showAuthError(friendlyAuthError(e.code));
+}
+});
+
+$("authToggleBtn").addEventListener("click", () => {
+setAuthMode(authMode === "signin" ? "signup" : "signin");
+$("authError").classList.remove("show");
+});
+
+$("authForgotBtn").addEventListener("click", async () => {
+const email = $("authEmail").value.trim();
+if(!email){ showAuthError("Enter your email first, then click Forgot password."); return; }
+try{
+await sendPasswordResetEmail(email);
+showAuthError("Password reset email sent. Check your inbox.");
+$("authError").style.color = "var(--green)";
+}catch(e){
+showAuthError(friendlyAuthError(e.code));
+}
+});
+
+$("authPassword").addEventListener("keydown", (e) => {
+if(e.key === "Enter") $("authSubmitBtn").click();
+});
+}
+
+if(window.cgAuth) wireAuth();
+else window.addEventListener("cgAuthReady", wireAuth, { once: true });
+
+// ── EMAIL WIRING ──
 $("editSubjectToggle").addEventListener("click",()=>setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),$("emailSubjectOutput").readOnly));
 $("editBodyToggle").addEventListener("click",()=>setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),$("emailBodyOutput").readOnly));
 
@@ -886,7 +1156,6 @@ subject:$("emailSubjectOutput").value.trim(),
 body:$("emailBodyOutput").value.trim()
 };
 saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
-// Lock textareas back to readonly after global save
 setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),false);
 setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),false);
 updateCombined();
@@ -909,13 +1178,21 @@ $("copySubjectBtn").addEventListener("click",()=>copyText(cleanSingleLine($("ema
 $("copyBodyBtn").addEventListener("click",()=>copyText($("emailBodyOutput").value.trim(),$("emailStatus"),$("copyBodyBtn")));
 $("copyCombinedBtn").addEventListener("click",()=>{updateCombined();copyText($("emailCombinedOutput").value.trim(),$("emailStatus"),$("copyCombinedBtn"))});
 
-["emailType","term","courseScope"].forEach(id=>$(id).addEventListener("change",()=>{
+// Term changes repopulate email types (fourth hides some)
+$("term").addEventListener("change", () => {
+populateEmailTypes();
+populateGradeLevels();
+updateEmailOutput(true);
+saveLastValues();
+});
+
+["emailType","courseScope"].forEach(id=>$(id).addEventListener("change",()=>{
 if(id==="emailType")populateGradeLevels();
 updateEmailOutput(true);
 saveLastValues();
 }));
 
-["gradeLevel","studentName","courseName","progressValue","currentDateField","deadlineField","seniorDeadline","generalDeadline"].forEach(id=>$(id).addEventListener("input",()=>{
+["studentName","courseName","progressValue","currentDateField","deadlineField","seniorDeadline","generalDeadline"].forEach(id=>$(id).addEventListener("input",()=>{
 updateEmailOutput(true);
 saveLastValues();
 }));
@@ -931,9 +1208,14 @@ $("emailBodyOutput").addEventListener("input",updateCombined);
 
 document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click",()=>activateTab(btn)));
 
+// Close modals on overlay click (but not inner content)
+document.querySelectorAll(".modal-overlay").forEach(overlay=>{
+overlay.addEventListener("click",(e)=>{ if(e.target===overlay) overlay.classList.remove("open"); });
+});
+
 // ── INIT ──
 setSelectOptions($("workType"),Object.keys(gradeConfig));
-setSelectOptions($("emailType"),emailTypes);
+populateEmailTypes();
 restoreLastValues();
 populateGradeLevels();
 updateGradeTypes();
@@ -941,6 +1223,5 @@ updateEmailOutput(true);
 maybeAdjustFields();
 activateTab(document.querySelector('.tab-btn.grade-tab'));
 </script>
-
 </body>
 </html>
