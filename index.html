@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -20,7 +19,7 @@
 --orange:#ff9f43;
 --green:#7dffb5;
 --red:#ff7d7d;
---pink:#ff6eb4;
+--pink:#ff4ec9;
 --shadow:0 18px 48px rgba(0,0,0,.38);
 --radius:18px;
 }
@@ -35,33 +34,35 @@ color:var(--text);
 font-family:'Segoe UI',system-ui,sans-serif;
 }
 body{padding:18px}
+body:has(#landingScreen[style*="flex"]){padding:0}
 .app{max-width:1540px;margin:0 auto;display:grid;gap:16px}
 
 /* TOPBAR */
 .topbar{
-display:flex;justify-content:space-between;align-items:center;gap:16px;
-padding:22px 26px;border:1px solid var(–border);border-radius:22px;
-background:rgba(10,15,23,.88);box-shadow:var(–shadow);backdrop-filter:blur(12px)
+display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
+padding:22px 26px;border:1px solid var(--border);border-radius:22px;
+background:rgba(10,15,23,.88);box-shadow:var(--shadow);backdrop-filter:blur(12px)
 }
-.topbar-left{display:flex;align-items:center;gap:20px}
-.topbar-logo{height:170px;width:auto;display:block;filter:drop-shadow(0 0 14px rgba(81,217,255,.35))}
+.topbar-left{display:flex;align-items:center;justify-content:flex-start;gap:20px}
+.topbar-center{display:flex;align-items:center;justify-content:center}
+.topbar-logo{height:170px;width:auto;display:block;filter:drop-shadow(0 0 14px rgba(81,217,255,.35));max-width:100%}
 .brand{margin:0;font-size:clamp(2.5rem,5vw,4.2rem);font-weight:900;letter-spacing:.02em}
-.brand .dot{color:var(–cyan)}
-.topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand .dot{color:var(--cyan)}
+.topbar-right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap}
 .topbar-stack{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .date-pill{
 white-space:nowrap;padding:10px 18px;border-radius:14px;
-border:1px solid var(–border-strong);
+border:1px solid var(--border-strong);
 background:linear-gradient(180deg, rgba(17,24,38,.95), rgba(11,18,32,.92));
-color:var(–text);font-weight:800;font-size:.96rem;
+color:var(--text);font-weight:800;font-size:.96rem;
 display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2
 }
 .date-pill .date-label{
 font-size:.68rem;letter-spacing:.18em;font-weight:900;
-color:var(–cyan);
+color:var(--cyan);
 text-shadow:0 0 8px rgba(81,217,255,.7),0 0 16px rgba(81,217,255,.35)
 }
-.date-pill .date-value{font-weight:800;color:var(–text);font-size:.96rem}
+.date-pill .date-value{font-weight:800;color:var(--text);font-size:.96rem}
 .howto-btn,.signin-btn{
 padding:11px 20px;border-radius:14px;border:1px solid rgba(81,217,255,.35);
 background:linear-gradient(180deg, rgba(0,183,255,.18), rgba(81,217,255,.10));
@@ -80,7 +81,7 @@ cursor:pointer;transition:.18s ease;font-family:inherit;color:#fff;font-weight:7
 .user-chip:hover{border-color:rgba(81,217,255,.55)}
 .user-chip .avatar{
 width:32px;height:32px;border-radius:50%;
-background:linear-gradient(135deg,var(–cyan),var(–cyan2));
+background:linear-gradient(135deg,var(--cyan),var(--cyan2));
 color:#02131f;display:flex;align-items:center;justify-content:center;
 font-weight:900;font-size:.88rem;flex-shrink:0
 }
@@ -93,26 +94,32 @@ display:none;flex-direction:column;padding:6px;z-index:50
 }
 .user-menu.open{display:flex}
 .user-menu button{
-background:transparent;border:0;color:var(–text);
+background:transparent;border:0;color:var(--text);
 padding:10px 14px;text-align:left;font:inherit;font-size:.9rem;
 border-radius:8px;cursor:pointer;transition:.15s ease
 }
 .user-menu button:hover{background:rgba(81,217,255,.1)}
-.user-menu button.danger{color:var(–red)}
+.user-menu button.danger{color:var(--red)}
 .user-menu button.danger:hover{background:rgba(255,125,125,.08)}
 
 /* LAYOUT */
 .main-grid{display:grid;grid-template-columns:370px minmax(0,1fr);gap:16px;align-items:start}
 .panel{
 background:linear-gradient(180deg, rgba(13,17,23,.97), rgba(10,14,20,.97));
-border:1px solid var(–border);border-radius:var(–radius);box-shadow:var(–shadow);overflow:hidden
+border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
 }
 .panel-inner{padding:20px}
 .panel-title{
-margin:0 0 14px;font-size:1.15rem;font-weight:900;letter-spacing:.05em;
+margin:0 0 14px;font-size:1.2rem;font-weight:900;letter-spacing:.06em;
 color:#fff;text-transform:uppercase;text-align:center;
-text-shadow:0 0 16px rgba(81,217,255,.7),0 0 32px rgba(81,217,255,.35),0 0 48px rgba(0,183,255,.2);
-padding-bottom:10px;border-bottom:2px solid rgba(81,217,255,.3)
+text-shadow:0 0 18px rgba(81,217,255,.85),0 0 36px rgba(81,217,255,.45),0 0 56px rgba(0,183,255,.25);
+padding-bottom:12px;border-bottom:2px solid rgba(81,217,255,.4);
+position:relative
+}
+.panel-title::after{
+content:"";position:absolute;bottom:-2px;left:25%;right:25%;height:2px;
+background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+box-shadow:0 0 8px var(--cyan)
 }
 .stack{display:grid;gap:16px}
 .section-card{
@@ -122,30 +129,30 @@ box-shadow:inset 0 0 0 1px rgba(81,217,255,.04)
 }
 .section-card:last-child{margin-bottom:0}
 .section-card h3{margin:0 0 10px;font-size:.98rem}
-.section-card p,.section-card li{margin:0;color:var(–muted);line-height:1.6;font-size:.92rem}
+.section-card p,.section-card li{margin:0;color:var(--muted);line-height:1.6;font-size:.92rem}
 .section-card ul{margin:0;padding-left:18px;display:grid;gap:8px}
-.senior-highlight{color:var(–pink);font-weight:700}
+.senior-highlight{color:var(--pink);font-weight:700}
 .general-highlight{color:#7dffb5;font-weight:700}
-.notes-heading{color:var(–cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 10px rgba(81,217,255,.3)}
+.notes-heading{color:var(--cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 10px rgba(81,217,255,.3)}
 .notes-card{border:1px solid rgba(81,217,255,.28);box-shadow:0 0 0 1px rgba(81,217,255,.04),0 4px 16px rgba(0,0,0,.25)}
 .no-extensions{
 margin-top:12px;padding:10px 14px;border-radius:10px;text-align:center;
 background:rgba(255,110,180,.10);border:1px solid rgba(255,110,180,.38);
-color:var(–pink);font-weight:900;letter-spacing:.08em;font-size:.92rem;
+color:var(--pink);font-weight:900;letter-spacing:.08em;font-size:.92rem;
 text-shadow:0 0 10px rgba(255,110,180,.4)
 }
 /* BLOCK SELECTOR (3 big blocks instead of tabs) */
 .block-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .block-btn{
-border:1px solid var(–border);padding:20px 16px;border-radius:16px;cursor:pointer;
-background:linear-gradient(180deg, rgba(16,24,36,.95), rgba(10,16,27,.95));
-color:var(–muted);font-family:inherit;transition:.2s ease;
+border:1px solid var(--border-strong);padding:20px 16px;border-radius:16px;cursor:pointer;
+background:linear-gradient(180deg, rgba(20,30,46,.95), rgba(14,22,37,.95));
+color:var(--text);font-family:inherit;transition:.2s ease;
 display:flex;flex-direction:column;align-items:center;gap:8px
 }
-.block-btn:hover{transform:translateY(-2px);border-color:var(–border-strong);color:var(–text)}
+.block-btn:hover{transform:translateY(-2px);border-color:rgba(81,217,255,.55);color:#fff}
 .block-btn .icon{font-size:1.8rem}
-.block-btn .title{font-weight:900;font-size:1rem;letter-spacing:.02em}
-.block-btn .desc{font-size:.8rem;color:var(–muted);text-align:center;line-height:1.4}
+.block-btn .title{font-weight:900;font-size:1rem;letter-spacing:.02em;color:#fff}
+.block-btn .desc{font-size:.8rem;color:#b8c6db;text-align:center;line-height:1.4}
 .block-btn.active{
 color:#fff;
 background:linear-gradient(180deg, rgba(0,183,255,.22), rgba(81,217,255,.10));
@@ -160,30 +167,33 @@ box-shadow:0 0 20px rgba(0,183,255,.2),inset 0 0 0 1px rgba(81,217,255,.15)
 .field{display:grid;gap:8px}
 .field.full{grid-column:1 / -1}
 .field.hidden{display:none}
-label{font-size:.84rem;color:var(–muted);font-weight:800;letter-spacing:.02em}
-select,input[type=“text”],input[type=“email”],input[type=“password”],input[type=“date”],textarea{
-width:100%;border:1px solid rgba(81,217,255,.16);
+label{font-size:.84rem;color:var(--muted);font-weight:800;letter-spacing:.02em}
+select,input[type="text"],input[type="email"],input[type="password"],input[type="date"],textarea{
+width:100%;border:1px solid rgba(81,217,255,.22);
 background:linear-gradient(180deg, rgba(11,18,32,1), rgba(8,13,24,1));
-color:var(–text) !important;border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease;
--webkit-appearance:none;-moz-appearance:none;appearance:none
+color:#edf6ff !important;border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease;
+-webkit-appearance:none;-moz-appearance:none;appearance:none;
+-webkit-text-fill-color:#edf6ff
 }
 select{
-background-image:url(“data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2351d9ff'><path d='M7 10l5 5 5-5z'/></svg>”);
-background-repeat:no-repeat;background-position:right 12px center;padding-right:40px
+background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2351d9ff'><path d='M7 10l5 5 5-5z'/></svg>");
+background-repeat:no-repeat;background-position:right 12px center;padding-right:40px;
+color:#edf6ff !important;font-weight:600
 }
+textarea[readonly]{color:#edf6ff !important;-webkit-text-fill-color:#edf6ff;opacity:1}
 select:focus,input:focus,textarea:focus{
 outline:none;border-color:rgba(81,217,255,.45);box-shadow:0 0 0 4px rgba(81,217,255,.08)
 }
 select option{background:#0c1220;color:#eef7ff}
 textarea{min-height:170px;resize:vertical;line-height:1.5}
 textarea:not([readonly]){border-color:rgba(255,159,67,.4);box-shadow:0 0 0 3px rgba(255,159,67,.07)}
-input[type=“date”]{color-scheme:dark}
+input[type="date"]{color-scheme:dark}
 
 .textarea-wrap{position:relative}
 .textarea-icons{position:absolute;bottom:10px;right:10px;display:flex;gap:6px;z-index:2}
 .icon-btn{
 width:32px;height:32px;border-radius:9px;border:1px solid rgba(81,217,255,.22);
-background:rgba(10,18,30,.85);color:var(–cyan);cursor:pointer;
+background:rgba(10,18,30,.85);color:var(--cyan);cursor:pointer;
 display:flex;align-items:center;justify-content:center;
 font-size:1rem;transition:.15s ease;backdrop-filter:blur(4px);font-family:inherit
 }
@@ -195,9 +205,9 @@ font-size:1rem;transition:.15s ease;backdrop-filter:blur(4px);font-family:inheri
 .edit-btn,.ghost-btn,.global-save-btn,.reset-btn{
 border:none;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;cursor:pointer;transition:.18s ease;font-size:.88rem
 }
-.edit-btn{background:transparent;color:var(–cyan);border:1px solid rgba(81,217,255,.35)}
+.edit-btn{background:rgba(81,217,255,.12);color:#9de8ff;border:1px solid rgba(81,217,255,.45);font-weight:900}
 .edit-btn.saving{background:rgba(125,255,181,.16);color:#baffd3;border:1px solid rgba(125,255,181,.4)}
-.ghost-btn{background:rgba(81,217,255,.08);color:var(–text);border:1px solid rgba(81,217,255,.18)}
+.ghost-btn{background:rgba(81,217,255,.08);color:var(--text);border:1px solid rgba(81,217,255,.18)}
 .global-save-btn{background:rgba(125,255,181,.12);color:#baffd3;border:1px solid rgba(125,255,181,.25)}
 .reset-btn{background:rgba(255,125,125,.12);color:#ffc0c0;border:1px solid rgba(255,125,125,.22)}
 .edit-btn:hover,.ghost-btn:hover,.global-save-btn:hover,.reset-btn:hover{transform:translateY(-1px)}
@@ -206,7 +216,7 @@ border:none;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;cu
 .copy-btn{
 border:0;border-radius:14px;padding:18px 24px;font:inherit;font-weight:900;cursor:pointer;
 font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;
-background:linear-gradient(180deg, var(–cyan2), var(–cyan));
+background:linear-gradient(180deg, var(--cyan2), var(--cyan));
 color:#02131f;border:1px solid rgba(81,217,255,.6);
 box-shadow:0 8px 22px rgba(0,183,255,.25),0 0 0 1px rgba(255,255,255,.08) inset;
 transition:.18s ease;width:100%;margin-top:14px
@@ -214,7 +224,7 @@ transition:.18s ease;width:100%;margin-top:14px
 .copy-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,183,255,.35),0 0 0 1px rgba(255,255,255,.12) inset}
 .copy-btn.copied{background:linear-gradient(180deg,#5ae89a,#7dffb5)}
 
-.copy-status{font-size:.85rem;color:var(–green);min-height:1.1em;margin-top:6px}
+.copy-status{font-size:.85rem;color:var(--green);min-height:1.1em;margin-top:6px}
 
 /* FOOTER */
 .footer{
@@ -222,15 +232,15 @@ text-align:center;padding:24px 0 12px;
 display:flex;flex-direction:column;align-items:center;gap:14px
 }
 .footer .percy-img{
-height:96px;width:96px;display:block;background:transparent;border:0;border-radius:0;
-filter:drop-shadow(0 0 14px rgba(81,217,255,.3))
+height:140px;width:140px;display:block;background:transparent;border:0;border-radius:0;
+filter:drop-shadow(0 0 18px rgba(81,217,255,.35))
 }
-.footer .created-by{font-style:italic;color:var(–muted);font-size:.9rem}
-.footer .created-by .brand-name{color:var(–cyan);font-weight:900;font-style:normal;letter-spacing:.06em}
+.footer .created-by{font-style:italic;color:var(--muted);font-size:.9rem}
+.footer .created-by .brand-name{color:var(--cyan);font-weight:900;font-style:normal;letter-spacing:.06em}
 
 .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(81,217,255,.2), transparent);margin:10px 0}
 .subgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
-.hint{font-size:.82rem;color:var(–muted);margin-top:4px}
+.hint{font-size:.82rem;color:var(--muted);margin-top:4px}
 
 /* DEADLINE CALLOUTS — prominent glow */
 .deadline-callouts{
@@ -242,9 +252,9 @@ background:rgba(10,18,30,.5);border:1px solid rgba(81,217,255,.15)
 .deadline-field{display:grid;gap:6px}
 .deadline-field label{font-weight:900;letter-spacing:.03em;font-size:.82rem}
 .deadline-field input{font-weight:700}
-.deadline-field.senior label{color:var(–pink);text-shadow:0 0 10px rgba(255,110,180,.4)}
+.deadline-field.senior label{color:var(--pink);text-shadow:0 0 10px rgba(255,110,180,.4)}
 .deadline-field.senior input{border-color:rgba(255,110,180,.35);box-shadow:0 0 0 3px rgba(255,110,180,.06)}
-.deadline-field.general label{color:var(–cyan);text-shadow:0 0 10px rgba(81,217,255,.4)}
+.deadline-field.general label{color:var(--cyan);text-shadow:0 0 10px rgba(81,217,255,.4)}
 .deadline-field.general input{border-color:rgba(81,217,255,.35);box-shadow:0 0 0 3px rgba(81,217,255,.06)}
 
 /* AUDIENCE TOGGLE */
@@ -255,7 +265,7 @@ margin-bottom:14px
 }
 .audience-btn{
 padding:10px;border-radius:9px;border:0;background:transparent;
-color:var(–muted);font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
+color:var(--muted);font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
 }
 .audience-btn.active{
 background:linear-gradient(180deg, rgba(0,183,255,.22), rgba(81,217,255,.10));
@@ -276,8 +286,8 @@ position:relative;max-height:90vh;overflow-y:auto
 }
 .modal.narrow{max-width:420px}
 .modal.wide{max-width:640px}
-.modal h2{margin:0 0 8px;font-size:1.3rem;color:var(–cyan)}
-.modal p{color:var(–muted);line-height:1.6;font-size:.95rem;margin:0 0 16px}
+.modal h2{margin:0 0 8px;font-size:1.3rem;color:var(--cyan)}
+.modal p{color:var(--muted);line-height:1.6;font-size:.95rem;margin:0 0 16px}
 .modal-close{
 background:linear-gradient(180deg,rgba(0,183,255,.28),rgba(81,217,255,.18));
 border:1px solid rgba(81,217,255,.4);color:#fff;border-radius:12px;
@@ -285,10 +295,10 @@ padding:12px 24px;font:inherit;font-weight:800;cursor:pointer;transition:.15s ea
 }
 .modal-close:hover{transform:translateY(-1px)}
 .modal-x{
-position:absolute;top:12px;right:14px;background:transparent;border:0;color:var(–muted);
+position:absolute;top:12px;right:14px;background:transparent;border:0;color:var(--muted);
 font-size:1.4rem;cursor:pointer;padding:4px 10px;border-radius:8px
 }
-.modal-x:hover{color:var(–text);background:rgba(255,255,255,.05)}
+.modal-x:hover{color:var(--text);background:rgba(255,255,255,.05)}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
 
 /* AUTH MODAL */
@@ -300,8 +310,8 @@ background:#fff;color:#1f1f1f;font:inherit;font-weight:700;cursor:pointer;transi
 }
 .google-btn:hover{transform:translateY(-1px)}
 .google-btn svg{width:18px;height:18px;flex-shrink:0}
-.auth-divider{display:flex;align-items:center;gap:10px;color:var(–muted);font-size:.8rem;margin:4px 0}
-.auth-divider::before,.auth-divider::after{content:””;flex:1;height:1px;background:rgba(81,217,255,.18)}
+.auth-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem;margin:4px 0}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:rgba(81,217,255,.18)}
 .auth-submit{
 padding:12px;border-radius:12px;border:1px solid rgba(81,217,255,.4);
 background:linear-gradient(180deg, rgba(0,183,255,.3), rgba(81,217,255,.2));
@@ -309,11 +319,11 @@ color:#fff;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
 }
 .auth-submit:hover{transform:translateY(-1px)}
 .auth-toggle{
-background:transparent;border:0;color:var(–cyan);font:inherit;font-size:.88rem;
+background:transparent;border:0;color:var(--cyan);font:inherit;font-size:.88rem;
 cursor:pointer;text-align:center;padding:4px;text-decoration:underline
 }
 .auth-error{
-color:var(–red);font-size:.85rem;min-height:1em;text-align:center;
+color:var(--red);font-size:.85rem;min-height:1em;text-align:center;
 background:rgba(255,125,125,.08);border:1px solid rgba(255,125,125,.2);
 border-radius:10px;padding:8px;display:none
 }
@@ -321,27 +331,36 @@ border-radius:10px;padding:8px;display:none
 
 /* SCHOOL YEAR SETUP */
 .sy-row{display:grid;grid-template-columns:140px 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px}
-.sy-row label{font-weight:800;color:var(–cyan);font-size:.88rem}
-.sy-row.senior label{color:var(–pink)}
+.sy-row label{font-weight:800;color:var(--cyan);font-size:.88rem}
+.sy-row.senior label{color:var(--pink)}
 .sy-row.senior input{border-color:rgba(255,110,180,.35)}
 .sy-row.general label{color:#7dffb5}
 .sy-row.general input{border-color:rgba(125,255,181,.35)}
 .sy-section-title{
 margin:16px 0 8px;font-size:.85rem;font-weight:900;letter-spacing:.05em;
-text-transform:uppercase;color:var(–muted)
+text-transform:uppercase;color:var(--muted)
 }
 
 /* LANDING (signed-out) */
 .landing{
-min-height:calc(100vh - 36px);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px
+min-height:100vh;width:100%;
+display:flex;align-items:center;justify-content:center;
+text-align:center;padding:20px;margin:0
 }
-.landing-inner{max-width:580px}
-.landing img{height:220px;width:auto;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(81,217,255,.4))}
-.landing h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 12px;letter-spacing:.02em}
-.landing p{color:var(–muted);font-size:1.05rem;line-height:1.6;margin:0 0 28px}
+.landing-inner{max-width:580px;width:100%;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:18px}
+.landing img{height:220px;width:auto;max-width:100%;filter:drop-shadow(0 0 20px rgba(81,217,255,.4))}
+.landing p{color:var(--muted);font-size:1.05rem;line-height:1.6;margin:0}
 .landing .signin-btn{padding:16px 32px;font-size:1.05rem}
 
 /* RESPONSIVE */
+/* iPad landscape and smaller desktops */
+@media (max-width:1200px){
+.topbar{grid-template-columns:1fr}
+.topbar-left,.topbar-center,.topbar-right{justify-content:center}
+.topbar-logo{height:130px}
+.topbar-left,.topbar-right{order:2}
+.topbar-center{order:1}
+}
 @media (max-width:1040px){
 .main-grid{grid-template-columns:1fr}
 .subgrid{grid-template-columns:1fr 1fr}
@@ -349,47 +368,44 @@ min-height:calc(100vh - 36px);display:flex;align-items:center;justify-content:ce
 }
 @media (max-width:760px){
 body{padding:12px}
-.topbar{flex-direction:column;align-items:flex-start}
-.topbar-right{width:100%}
+.topbar{gap:12px}
 .topbar-logo{height:100px}
-.date-pill,.howto-btn,.signin-btn,.user-chip{flex:1;text-align:center;justify-content:center}
+.date-pill,.howto-btn,.signin-btn,.user-chip{text-align:center;justify-content:center}
+.topbar-stack{align-items:stretch}
 .form-grid,.subgrid{grid-template-columns:1fr}
 .deadline-callouts{grid-template-columns:1fr}
 .copy-btn,.ghost-btn,.global-save-btn,.reset-btn{width:100%}
 .sy-row{grid-template-columns:1fr;gap:6px}
 }
 </style>
-
 </head>
 <body>
 
 <!-- LANDING (signed-out) -->
-
 <div id="landingScreen" class="landing" style="display:none">
 <div class="landing-inner">
-<img src="cybergrader-280x80.png?v=5" alt="CyberGrader.io" onerror="this.style.display='none'">
-<h1>Welcome to CyberGrader<span style="color:var(--cyan)">.io</span></h1>
+<img src="cybergrader-280x80.png?v=6" alt="CyberGrader.io" onerror="this.style.display='none'">
 <p>A workflow tool for cyber teachers. Sign in to generate consistent student feedback and emails across all your devices.</p>
 <button class="signin-btn" id="landingSignInBtn">Sign In to Continue</button>
 </div>
 </div>
 
 <!-- APP (signed-in) -->
-
 <div class="app" id="appRoot" style="display:none">
 
 <!-- TOPBAR -->
-
 <header class="topbar">
 <div class="topbar-left">
-<img src="cybergrader-280x80.png?v=5" alt="CyberGrader.io" class="topbar-logo" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
-<h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
-</div>
-<div class="topbar-right">
 <div class="date-pill" id="todayDate" title="Click to edit school year dates" style="cursor:pointer">
 <span class="date-label">TODAY'S DATE</span>
 <span class="date-value" id="dateValue">—</span>
 </div>
+</div>
+<div class="topbar-center">
+<img src="cybergrader-280x80.png?v=6" alt="CyberGrader.io" class="topbar-logo" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
+<h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
+</div>
+<div class="topbar-right">
 <div class="topbar-stack">
 <div class="user-chip-wrap">
 <button class="user-chip" id="userChip" type="button">
@@ -430,16 +446,16 @@ body{padding:12px}
 </aside>
 
 <!-- MAIN PANEL -->
-
 <section class="panel">
 <div class="panel-inner">
+
+<h2 class="panel-title" style="margin-bottom:18px">Choose Your Workflow</h2>
 
 <div style="background:rgba(81,217,255,.08);border:1px solid rgba(81,217,255,.20);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:var(--text);font-size:.95rem;line-height:1.5;text-align:center;font-weight:700">
 Choose a block below to select pre-generated feedback or emails. Once you pick a block, narrow down the type you're looking for.
 </div>
 
 <!-- THREE-BLOCK SELECTOR -->
-
 <div class="block-selector">
 <button class="block-btn active" data-block="feedbackBlock" type="button">
 <span class="icon">📝</span>
@@ -459,7 +475,6 @@ Choose a block below to select pre-generated feedback or emails. Once you pick a
 </div>
 
 <!-- FEEDBACK BLOCK -->
-
 <div class="block-panel active" id="feedbackBlock">
 <div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
 Pick an assignment type and nine weeks — you'll see pre-generated feedback you can customize further.
@@ -485,21 +500,15 @@ Pick an assignment type and nine weeks — you'll see pre-generated feedback you
 
 <div class="field full">
 <label for="gradeOutput">Generated Output</label>
-<div class="textarea-wrap">
 <textarea id="gradeOutput" readonly spellcheck="true"></textarea>
-<div class="textarea-icons">
-<button class="icon-btn" id="gradeMicBtn" title="Voice Input" type="button">🎙</button>
-<button class="icon-btn" id="gradeAIBtn" title="Generate Variation" type="button">🔀</button>
-</div>
-</div>
 </div>
 
 <div class="copy-status" id="gradeStatus"></div>
+<button class="ghost-btn" id="gradeAIBtn" type="button" style="width:100%;padding:14px;margin-bottom:10px;font-size:.95rem">🔀 Generate Variation</button>
 <button class="copy-btn" id="copyGradeBtn" type="button">Copy Output</button>
 </div>
 
 <!-- EMAIL BLOCK -->
-
 <div class="block-panel" id="emailBlock">
 <div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
 Pick the current term first — the tool filters email options accordingly. Use the audience toggle to switch between a single student and your whole class.
@@ -598,7 +607,6 @@ Pick the current term first — the tool filters email options accordingly. Use 
 </div>
 
 <!-- PORTAL BLOCK -->
-
 <div class="block-panel" id="portalBlock">
 <div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
 Pick the assignment placeholder you need to set up in the SV Portal gradebook. Copy the name and detail into the portal fields.
@@ -643,7 +651,6 @@ Pick the assignment placeholder you need to set up in the SV Portal gradebook. C
 </div>
 
 <!-- AUTH MODAL -->
-
 <div class="modal-overlay" id="authModal">
 <div class="modal narrow">
 <button class="modal-x" id="authModalClose" aria-label="Close">✕</button>
@@ -666,7 +673,6 @@ Continue with Google
 </div>
 
 <!-- SCHOOL YEAR SETUP MODAL -->
-
 <div class="modal-overlay" id="schoolYearModal">
 <div class="modal wide">
 <h2>School Year Setup</h2>
@@ -718,7 +724,6 @@ Continue with Google
 </div>
 
 <!-- SP PORTAL REMINDER MODAL -->
-
 <div class="modal-overlay" id="portalReminderModal">
 <div class="modal">
 <button class="modal-x" id="portalReminderClose" aria-label="Close">✕</button>
@@ -730,8 +735,25 @@ Continue with Google
 </div>
 </div>
 
-<!-- HOW TO USE MODAL -->
+<!-- END OF GRADING PERIOD CHECKLIST MODAL -->
+<div class="modal-overlay" id="checklistModal">
+<div class="modal wide">
+<button class="modal-x" id="checklistClose" aria-label="Close">✕</button>
+<h2 style="color:var(--cyan)">📋 End of Grading Period Checklist</h2>
+<p>Work through these steps in order at the end of each grading period:</p>
+<ol style="color:var(--text);line-height:1.8;padding-left:24px;margin:0 0 16px">
+<li>Confirm all student grades are finalized in Carnegie Learning and Teams.</li>
+<li>Enter the <strong>Final Overall Grade</strong> in the SV Portal gradebook.</li>
+<li><strong style="color:var(--pink)">Delete the Weekly Overall Grade Update</strong> assignment from the gradebook.</li>
+<li>Load the next nine weeks course (if applicable) a few days before the current period ends.</li>
+</ol>
+<div class="modal-actions">
+<button class="modal-close" id="checklistGotIt">Got It</button>
+</div>
+</div>
+</div>
 
+<!-- HOW TO USE MODAL -->
 <div class="modal-overlay" id="howtoModal">
 <div class="modal wide">
 <button class="modal-x" id="howtoClose" aria-label="Close">✕</button>
@@ -747,7 +769,6 @@ Continue with Google
 </div>
 
 <!-- Firebase (modular v10) -->
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -844,13 +865,82 @@ const defaultPortalTemplates = {
 "checklist": () => `END OF GRADING PERIOD CHECKLIST\n\n1. Confirm all student grades are finalized in Carnegie Learning / Teams.\n2. Enter Final Overall Grade in the SV Portal gradebook.\n3. Delete the Weekly Overall Grade Update assignment.\n4. Load the next nine weeks course (if applicable) a few days before the current period ends.`
 };
 
+// Real alternate phrasings per feedback template - in Kenny's voice (friendly, forgiving, cool teacher)
+const gradeVariationTemplates = {
+"FIRST ASSIGNMENT||Welcome First Nine Weeks": [
+(d) => `Graded ${d} - Welcome to the class, I reviewed your first assignment and you are starting strong, your work was clear and showed real effort, keep this energy going because it is a great way to kick off the school year, as always, I'm here if you have any questions.`,
+(d) => `Graded ${d} - Great first impression, your work shows you took the time to actually read through the lesson and think about your answers, that's exactly the right mindset heading into the school year, reach out anytime you need help.`,
+(d) => `Graded ${d} - Nice work on your very first assignment, you clearly put in effort and it shows, keep that same approach going and you'll have a great year, I'm always here if something doesn't make sense.`
+],
+"FIRST ASSIGNMENT||Welcome Second Nine Weeks": [
+(d) => `Graded ${d} - Great job in completing your first assignment, please do everything you can to follow the assignment calendar and keep up this quality of work, you will do a great job this nine weeks, as always, I'm here if you have any questions.`,
+(d) => `Graded ${d} - Strong start to the second nine weeks, your work looks good and shows you're ready to keep the momentum going, stick with the assignment calendar and you'll be in great shape, message me anytime.`,
+(d) => `Graded ${d} - Nice work getting the second nine weeks rolling, your first assignment was solid, keep following the pacing calendar and you'll have a great grading period, reach out if anything comes up.`
+],
+"FIRST ASSIGNMENT||Welcome Third Nine Weeks": [
+(d) => `Graded ${d} - Great job in completing your first assignment for this marking period, please continue to follow the assignment calendar and maintain this quality of work, as always, I'm here if you have any questions.`,
+(d) => `Graded ${d} - Solid start to the third nine weeks, your work is on track, keep using the assignment calendar to stay on pace and you'll be in good shape, let me know if anything gets unclear.`,
+(d) => `Graded ${d} - Welcome back for the third nine weeks, your first assignment looks good, stay consistent with the pacing calendar and reach out anytime you have a question.`
+],
+"FIRST ASSIGNMENT||Welcome Fourth Nine Weeks": [
+(d) => `Graded ${d} - Great job completing your first assignment for the fourth nine weeks, let's finish the year strong, please follow the assignment calendar closely and reach out if you need anything, as always, I'm here if you have any questions.`,
+(d) => `Graded ${d} - Nice start to the fourth nine weeks, this is the home stretch so stay focused on the assignment calendar and keep your work quality up, reach out if you run into anything.`,
+(d) => `Graded ${d} - Solid work getting the final nine weeks started, the end of the year will be here fast, stick with the pacing and message me if anything gets in your way.`
+],
+"ASSIGNMENT||Perfect": [
+(d) => `Graded ${d} - You clearly understood the lesson and took your time, keep up this positive effort.`,
+(d) => `Graded ${d} - Great work, your answers show you actually read the lesson and thought about what you were writing, keep it up.`,
+(d) => `Graded ${d} - Solid assignment, you nailed every part, exactly the kind of effort that builds a strong grade over time.`
+],
+"ASSIGNMENT||Partial Credit": [
+(d) => `Graded ${d} - I reviewed all of your responses and gave you credit anywhere possible, please make sure you are thoroughly reading each question and responding with the correct answer, specifically the answer that is directly from the lesson, if you have any questions or would like to reattempt, please feel free to reach out.`,
+(d) => `Graded ${d} - I went through your responses and gave credit wherever I could, some of the answers didn't match what the lesson was asking for, slow down and pull answers directly from the lesson itself, reach out if you want to retry it.`,
+(d) => `Graded ${d} - Got you partial credit on this one, the main thing is making sure each answer lines up with what the lesson actually covered, happy to reset it if you want another shot, just message me.`
+],
+"ASSIGNMENT||Assignment Resubmit": [
+(d) => `Graded ${d} - This assignment was submitted blank or without enough completed work to grade fairly, please message me so I can reset it and explain the assignment so that you have a better understanding.`,
+(d) => `Graded ${d} - There wasn't enough completed work here for me to grade it fairly, no problem, just send me a message and I'll reset it and walk you through what the assignment is asking for.`,
+(d) => `Graded ${d} - This one came in blank or mostly empty, reach out and I'll reset it so you can give it a real attempt, we'll talk through anything that's unclear.`
+],
+"PROJECT||Perfect": [
+(d) => `Graded ${d} - Excellent work, project turned out great, was well organized and exceeded all expectations.`,
+(d) => `Graded ${d} - Great project, clear organization and real detail, you put in the work and it shows in the final result.`,
+(d) => `Graded ${d} - Nice job on this project, you exceeded what was asked for, this is exactly what a top-tier project looks like.`
+],
+"PROJECT||Good Overall Project": [
+(d) => `Graded ${d} - Good work overall, please make sure you are giving every assignment your absolute best effort and add as much creativity and detail as you can, that is what gets you to a perfect score.`,
+(d) => `Graded ${d} - Solid project, the pieces are all there, push a little harder on creativity and detail next time and you'll hit a perfect score.`,
+(d) => `Graded ${d} - Good effort overall, the fundamentals are there, what separates a good project from a great one is the extra detail and creative touches, keep that in mind going forward.`
+],
+"PROJECT||Missing Work": [
+(d) => `Graded ${d} - Your file is missing, please contact me so I can help you get back on track and possibly explain the assignment in a way that you understand, your grade will remain a zero until I hear from you, remember, I am here to help you succeed.`,
+(d) => `Graded ${d} - I don't see your file uploaded for this one, reach out and we'll figure out what happened, grade stays a zero until we get it submitted but I'm here to help you get it done.`,
+(d) => `Graded ${d} - Nothing came through for this project, message me and I'll help you get back on track, the zero is temporary, I just need to hear from you.`
+]
+};
+
+function getGradeVariations(key){
+const list = gradeVariationTemplates[key];
+if(!list) return [getDefaultGradeText()];
+const d = new Intl.DateTimeFormat('en-US').format(new Date());
+return list.map(fn => fn(d));
+}
+
 const allEmailTypes = [
 "Welcome Letter","Early Check-In","Zero Grade Clarification","25% Check-In","50% Check-In","75% Check-In",
 "Next Nine Weeks Loaded","Semester / Part Change","Upcoming Break Example",
 "Final Week Reminder","Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"
 ];
+// Types only available in certain terms
+// Early season types (welcome, early check-in, zero grade) = available all terms
+// Mid-progress types (25%, 50%, 75%) = available all terms
+// End-of-term types only make sense near end of period
 const HIDE_ON_FOURTH = new Set(["Next Nine Weeks Loaded","Semester / Part Change"]);
+// Types only available in 2nd, 3rd, 4th (not first)
 const ONLY_AFTER_FIRST = new Set(["Semester / Part Change"]);
+// End-of-year and senior-final types ONLY appear in fourth nine weeks
+const ONLY_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"]);
+// Break reminder and final week reminder can appear in any term where it makes sense, but we'll allow them all terms (teacher discretion)
 const TERM_LOCKED_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"]);
 
 const gradeLevelsByType = {
@@ -997,6 +1087,9 @@ updatePortalOutput(true);
 if($("portalType").value==="final"){
 $("portalReminderModal").classList.add("open");
 }
+if($("portalType").value==="checklist"){
+$("checklistModal").classList.add("open");
+}
 });
 $("resetPortalBtn").addEventListener("click",()=>{
 if(!confirm("Reset this template?"))return;
@@ -1017,13 +1110,16 @@ recog.onresult=(e)=>{const text=e.results[0][0].transcript;const t=$(targetId);c
 recog.onerror=()=>{$(statusId).textContent="Voice input failed.";};
 recog.start();
 }
-$("gradeMicBtn").addEventListener("click",()=>{if(!gradeEditMode){gradeEditMode=true;updateGradeToggle();}startDictation("gradeOutput","gradeStatus");});
+// Variation rotation state — cycles through real alternate phrasings per key
+const gradeVariationIndex = {};
+
 $("gradeAIBtn").addEventListener("click",()=>{
-if(!gradeEditMode){gradeEditMode=true;updateGradeToggle();}
-const key=getGradeKey();const defaults=getDefaultGradeText();const override=gradeOverrides[key];
-if(override&&$("gradeOutput").value.trim()===override){$("gradeOutput").value=defaults;}
-else{$("gradeOutput").value=override||defaults;}
-$("gradeStatus").textContent="Variation loaded.";setTimeout(()=>$("gradeStatus").textContent="",2000);
+const key=getGradeKey();
+const variations = getGradeVariations(key);
+gradeVariationIndex[key] = ((gradeVariationIndex[key] ?? -1) + 1) % variations.length;
+$("gradeOutput").value = variations[gradeVariationIndex[key]];
+$("gradeStatus").textContent=`Variation ${gradeVariationIndex[key]+1} of ${variations.length}.`;
+setTimeout(()=>$("gradeStatus").textContent="",2500);
 });
 $("emailMicBtn").addEventListener("click",()=>{if($("emailBodyOutput").readOnly)setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),true);startDictation("emailBodyOutput","emailStatus");});
 $("emailAIBtn").addEventListener("click",()=>{
@@ -1062,6 +1158,7 @@ function populateEmailTypes(){
 const t=$("term").value;let types=allEmailTypes.slice();
 if(t==="fourth")types=types.filter(x=>!HIDE_ON_FOURTH.has(x));
 if(t==="first")types=types.filter(x=>!ONLY_AFTER_FIRST.has(x));
+if(t!=="fourth")types=types.filter(x=>!ONLY_FOURTH.has(x));
 const current=$("emailType").value;
 setSelectOptions($("emailType"),types);
 if(!types.includes(current))$("emailType").value=types[0];
@@ -1296,6 +1393,8 @@ $("howtoClose").addEventListener("click",()=>$("howtoModal").classList.remove("o
 $("howtoGotIt").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
 $("portalReminderClose").addEventListener("click",()=>$("portalReminderModal").classList.remove("open"));
 $("portalReminderGotIt").addEventListener("click",()=>$("portalReminderModal").classList.remove("open"));
+$("checklistClose").addEventListener("click",()=>$("checklistModal").classList.remove("open"));
+$("checklistGotIt").addEventListener("click",()=>$("checklistModal").classList.remove("open"));
 document.querySelectorAll(".modal-overlay").forEach(overlay=>{
 overlay.addEventListener("click",(e)=>{if(e.target===overlay && overlay.id!=="schoolYearModal") overlay.classList.remove("open");});
 });
@@ -1309,6 +1408,5 @@ updateEmailOutput(true);
 updatePortalOutput(true);
 maybeAdjustFields();
 </script>
-
 </body>
 </html>
