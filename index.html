@@ -50,11 +50,18 @@ background:rgba(10,15,23,.88);box-shadow:var(–shadow);backdrop-filter:blur(12p
 .topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .topbar-stack{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .date-pill{
-white-space:nowrap;padding:12px 16px;border-radius:14px;
+white-space:nowrap;padding:10px 18px;border-radius:14px;
 border:1px solid var(–border-strong);
 background:linear-gradient(180deg, rgba(17,24,38,.95), rgba(11,18,32,.92));
-color:var(–cyan);font-weight:800;font-size:.94rem
+color:var(–text);font-weight:800;font-size:.96rem;
+display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2
 }
+.date-pill .date-label{
+font-size:.68rem;letter-spacing:.18em;font-weight:900;
+color:var(–cyan);
+text-shadow:0 0 8px rgba(81,217,255,.7),0 0 16px rgba(81,217,255,.35)
+}
+.date-pill .date-value{font-weight:800;color:var(–text);font-size:.96rem}
 .howto-btn,.signin-btn{
 padding:11px 20px;border-radius:14px;border:1px solid rgba(81,217,255,.35);
 background:linear-gradient(180deg, rgba(0,183,255,.18), rgba(81,217,255,.10));
@@ -62,8 +69,9 @@ color:#fff;font-weight:800;font-size:.94rem;cursor:pointer;transition:.18s ease;
 font-family:inherit
 }
 .howto-btn:hover,.signin-btn:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.55)}
+.user-chip-wrap{position:relative;display:inline-block}
 .user-chip{
-display:flex;align-items:center;gap:10px;position:relative;
+display:flex;align-items:center;gap:10px;
 padding:8px 14px 8px 8px;border-radius:999px;
 border:1px solid rgba(81,217,255,.35);
 background:linear-gradient(180deg, rgba(0,183,255,.14), rgba(81,217,255,.08));
@@ -118,12 +126,14 @@ box-shadow:inset 0 0 0 1px rgba(81,217,255,.04)
 .section-card ul{margin:0;padding-left:18px;display:grid;gap:8px}
 .senior-highlight{color:var(–pink);font-weight:700}
 .general-highlight{color:#7dffb5;font-weight:700}
+.notes-heading{color:var(–cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 10px rgba(81,217,255,.3)}
+.notes-card{border:1px solid rgba(81,217,255,.28);box-shadow:0 0 0 1px rgba(81,217,255,.04),0 4px 16px rgba(0,0,0,.25)}
 .no-extensions{
 margin-top:12px;padding:10px 14px;border-radius:10px;text-align:center;
-background:rgba(255,125,125,.08);border:1px solid rgba(255,125,125,.25);
-color:#ffb0b0;font-weight:900;letter-spacing:.06em;font-size:.92rem
+background:rgba(255,110,180,.10);border:1px solid rgba(255,110,180,.38);
+color:var(–pink);font-weight:900;letter-spacing:.08em;font-size:.92rem;
+text-shadow:0 0 10px rgba(255,110,180,.4)
 }
-
 /* BLOCK SELECTOR (3 big blocks instead of tabs) */
 .block-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .block-btn{
@@ -154,7 +164,12 @@ label{font-size:.84rem;color:var(–muted);font-weight:800;letter-spacing:.02em}
 select,input[type=“text”],input[type=“email”],input[type=“password”],input[type=“date”],textarea{
 width:100%;border:1px solid rgba(81,217,255,.16);
 background:linear-gradient(180deg, rgba(11,18,32,1), rgba(8,13,24,1));
-color:var(–text);border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease
+color:var(–text) !important;border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease;
+-webkit-appearance:none;-moz-appearance:none;appearance:none
+}
+select{
+background-image:url(“data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2351d9ff'><path d='M7 10l5 5 5-5z'/></svg>”);
+background-repeat:no-repeat;background-position:right 12px center;padding-right:40px
 }
 select:focus,input:focus,textarea:focus{
 outline:none;border-color:rgba(81,217,255,.45);box-shadow:0 0 0 4px rgba(81,217,255,.08)
@@ -371,16 +386,22 @@ body{padding:12px}
 <h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
 </div>
 <div class="topbar-right">
-<div class="date-pill" id="todayDate" title="Click to edit school year dates" style="cursor:pointer">Today</div>
+<div class="date-pill" id="todayDate" title="Click to edit school year dates" style="cursor:pointer">
+<span class="date-label">TODAY'S DATE</span>
+<span class="date-value" id="dateValue">—</span>
+</div>
 <div class="topbar-stack">
+<div class="user-chip-wrap">
 <button class="user-chip" id="userChip" type="button">
 <span class="avatar" id="userAvatar">?</span>
 <span id="userName">User</span>
+<span style="opacity:.55;margin-left:2px">▾</span>
+</button>
 <div class="user-menu" id="userMenu">
 <button type="button" id="editDatesBtn">Edit School Year Dates</button>
 <button type="button" class="danger" id="signOutBtn">Sign Out</button>
 </div>
-</button>
+</div>
 <button class="howto-btn" id="howtoBtn" type="button">? How to Use</button>
 </div>
 </div>
@@ -392,14 +413,14 @@ body{padding:12px}
 <div class="panel-inner stack">
 <section>
 <h2 class="panel-title">Teacher Notes</h2>
-<div class="section-card">
-<h3>Nine Weeks 1–3</h3>
+<div class="section-card notes-card">
+<h3 class="notes-heading">Nine Weeks 1–3</h3>
 <p>Same start and end date for grades 7–12. Deadlines and pacing apply equally during those grading periods.</p>
 </div>
-<div class="section-card">
-<h3>Fourth Nine Weeks — Split Deadlines</h3>
+<div class="section-card notes-card">
+<h3 class="notes-heading">Fourth Nine Weeks — Split Deadlines</h3>
 <ul>
-<li><span class="senior-highlight">Seniors: earlier deadline — typically a week or two sooner.</span></li>
+<li><span class="senior-highlight">Seniors: due date is earlier</span> — typically a week or two sooner.</li>
 <li><span class="general-highlight">Grades 7–11: typical end-of-year deadline.</span></li>
 </ul>
 <div class="no-extensions">NO EXTENSIONS FOR SENIORS</div>
@@ -848,7 +869,9 @@ const gradeLevelsByType = {
 "End of Year Grade 12":["Seniors"]
 };
 
-$("todayDate").textContent = `It is currently ${longDate}`;
+let weekday = today.toLocaleDateString('en-US',{weekday:'long'});
+let mmddyyyy = `${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}/${today.getFullYear()}`;
+$("dateValue").textContent = `${weekday}, ${mmddyyyy}`;
 $("todayDate").addEventListener("click",async ()=>{
 if(!currentUser) return;
 try{
@@ -1193,11 +1216,11 @@ $("landingSignInBtn").addEventListener("click",openAuthModal);
 $("authModalClose").addEventListener("click",closeAuthModal);
 
 $("userChip").addEventListener("click",(e)=>{
-if(e.target.closest(".user-menu")) return;
+e.stopPropagation();
 $("userMenu").classList.toggle("open");
 });
 document.addEventListener("click",(e)=>{
-if(!e.target.closest("#userChip")) $("userMenu").classList.remove("open");
+if(!e.target.closest(".user-chip-wrap")) $("userMenu").classList.remove("open");
 });
 $("signOutBtn").addEventListener("click",async ()=>{
 if(!confirm("Sign out?"))return;
