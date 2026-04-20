@@ -6,12 +6,12 @@
 <title>CyberGrader.io</title>
 <style>
 :root{
---bg:#06090f;
---panel:#0d1117;
---panel2:#111827;
---panel3:#0b1220;
---border:rgba(81,217,255,.16);
---border-strong:rgba(81,217,255,.30);
+--bg:#23262e;
+--panel:#2d313c;
+--panel2:#323642;
+--panel3:#2a2e39;
+--border:rgba(81,217,255,.22);
+--border-strong:rgba(81,217,255,.38);
 --text:#edf6ff;
 --muted:#a4b3c7;
 --cyan:#51d9ff;
@@ -27,9 +27,9 @@
 html,body{
 margin:0;padding:0;min-height:100%;
 background:
-radial-gradient(circle at top right, rgba(0,183,255,.08), transparent 28%),
-radial-gradient(circle at bottom left, rgba(81,217,255,.06), transparent 26%),
-linear-gradient(180deg,#05070a 0%, #09111a 100%);
+radial-gradient(circle at top right, rgba(0,183,255,.06), transparent 30%),
+radial-gradient(circle at bottom left, rgba(81,217,255,.04), transparent 30%),
+linear-gradient(180deg,#23262e 0%, #1e2128 100%);
 color:var(--text);
 font-family:'Segoe UI',system-ui,sans-serif;
 }
@@ -41,7 +41,7 @@ body:has(#landingScreen[style*="flex"]){padding:0}
 .topbar{
 display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
 padding:22px 26px;border:1px solid var(--border);border-radius:22px;
-background:rgba(10,15,23,.88);box-shadow:var(--shadow);backdrop-filter:blur(12px)
+background:rgba(45,49,60,.92);box-shadow:var(--shadow);backdrop-filter:blur(12px)
 }
 .topbar-left{display:flex;align-items:center;justify-content:flex-start;gap:20px}
 .topbar-center{display:flex;align-items:center;justify-content:center}
@@ -51,25 +51,32 @@ background:rgba(10,15,23,.88);box-shadow:var(--shadow);backdrop-filter:blur(12px
 .topbar-right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap}
 .topbar-stack{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .date-pill{
-white-space:nowrap;padding:10px 18px;border-radius:14px;
+white-space:nowrap;padding:12px 20px;border-radius:14px;
 border:1px solid var(--border-strong);
-background:linear-gradient(180deg, rgba(17,24,38,.95), rgba(11,18,32,.92));
+background:linear-gradient(180deg, rgba(58,62,76,.95), rgba(50,54,66,.92));
 color:var(--text);font-weight:800;font-size:.96rem;
-display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2
+display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2
 }
 .date-pill .date-label{
-font-size:.68rem;letter-spacing:.18em;font-weight:900;
+font-size:.82rem;letter-spacing:.2em;font-weight:900;
 color:var(--cyan);
-text-shadow:0 0 8px rgba(81,217,255,.7),0 0 16px rgba(81,217,255,.35)
+text-shadow:0 0 10px rgba(81,217,255,.75),0 0 20px rgba(81,217,255,.4)
 }
-.date-pill .date-value{font-weight:800;color:var(--text);font-size:.96rem}
-.howto-btn,.signin-btn{
+.date-pill .date-value{font-weight:800;color:var(--text);font-size:1.08rem;letter-spacing:.02em}
+.howto-btn{
+padding:10px 14px;border-radius:12px;border:1px solid rgba(81,217,255,.35);
+background:linear-gradient(180deg, rgba(0,183,255,.14), rgba(81,217,255,.06));
+color:#fff;font-weight:900;font-size:1.2rem;cursor:pointer;transition:.18s ease;
+font-family:inherit;line-height:1
+}
+.howto-btn:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.55);box-shadow:0 0 12px rgba(81,217,255,.25)}
+.signin-btn{
 padding:11px 20px;border-radius:14px;border:1px solid rgba(81,217,255,.35);
 background:linear-gradient(180deg, rgba(0,183,255,.18), rgba(81,217,255,.10));
 color:#fff;font-weight:800;font-size:.94rem;cursor:pointer;transition:.18s ease;
 font-family:inherit
 }
-.howto-btn:hover,.signin-btn:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.55)}
+.signin-btn:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.55)}
 .user-chip-wrap{position:relative;display:inline-block}
 .user-chip{
 display:flex;align-items:center;gap:10px;
@@ -87,7 +94,7 @@ font-weight:900;font-size:.88rem;flex-shrink:0
 }
 .user-menu{
 position:absolute;top:calc(100% + 8px);right:0;min-width:200px;
-background:linear-gradient(180deg,#0d1521,#08101c);
+background:linear-gradient(180deg,#323642,#2a2e39);
 border:1px solid rgba(81,217,255,.25);border-radius:12px;
 box-shadow:0 16px 40px rgba(0,0,0,.5);
 display:none;flex-direction:column;padding:6px;z-index:50
@@ -105,7 +112,7 @@ border-radius:8px;cursor:pointer;transition:.15s ease
 /* LAYOUT */
 .main-grid{display:grid;grid-template-columns:370px minmax(0,1fr);gap:16px;align-items:start}
 .panel{
-background:linear-gradient(180deg, rgba(13,17,23,.97), rgba(10,14,20,.97));
+background:linear-gradient(180deg, rgba(50,54,66,.95), rgba(45,49,60,.95));
 border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden
 }
 .panel-inner{padding:20px}
@@ -123,7 +130,7 @@ box-shadow:0 0 8px var(--cyan)
 }
 .stack{display:grid;gap:16px}
 .section-card{
-background:linear-gradient(180deg, rgba(14,20,31,.95), rgba(10,14,22,.95));
+background:linear-gradient(180deg, rgba(55,59,72,.95), rgba(48,52,64,.95));
 border:1px solid rgba(81,217,255,.22);border-radius:16px;padding:14px;margin-bottom:12px;
 box-shadow:inset 0 0 0 1px rgba(81,217,255,.04)
 }
@@ -145,19 +152,20 @@ text-shadow:0 0 10px rgba(255,110,180,.4)
 .block-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .block-btn{
 border:1px solid var(--border-strong);padding:20px 16px;border-radius:16px;cursor:pointer;
-background:linear-gradient(180deg, rgba(20,30,46,.95), rgba(14,22,37,.95));
+background:linear-gradient(180deg, rgba(58,62,76,.95), rgba(50,54,66,.95));
 color:var(--text);font-family:inherit;transition:.2s ease;
 display:flex;flex-direction:column;align-items:center;gap:8px
 }
 .block-btn:hover{transform:translateY(-2px);border-color:rgba(81,217,255,.55);color:#fff}
-.block-btn .icon{font-size:1.8rem}
+.block-btn .icon{font-size:1.8rem;line-height:1}
+.block-btn .icon img{height:44px;width:auto;display:block}
 .block-btn .title{font-weight:900;font-size:1rem;letter-spacing:.02em;color:#fff}
 .block-btn .desc{font-size:.8rem;color:#b8c6db;text-align:center;line-height:1.4}
 .block-btn.active{
 color:#fff;
-background:linear-gradient(180deg, rgba(0,183,255,.22), rgba(81,217,255,.10));
-border-color:rgba(81,217,255,.5);
-box-shadow:0 0 20px rgba(0,183,255,.2),inset 0 0 0 1px rgba(81,217,255,.15)
+background:linear-gradient(180deg, rgba(0,183,255,.30), rgba(81,217,255,.14));
+border-color:rgba(81,217,255,.6);
+box-shadow:0 0 22px rgba(0,183,255,.22),inset 0 0 0 1px rgba(81,217,255,.18)
 }
 .block-panel{display:none}
 .block-panel.active{display:block}
@@ -169,8 +177,8 @@ box-shadow:0 0 20px rgba(0,183,255,.2),inset 0 0 0 1px rgba(81,217,255,.15)
 .field.hidden{display:none}
 label{font-size:.84rem;color:var(--muted);font-weight:800;letter-spacing:.02em}
 select,input[type="text"],input[type="email"],input[type="password"],input[type="date"],textarea{
-width:100%;border:1px solid rgba(81,217,255,.22);
-background:linear-gradient(180deg, rgba(11,18,32,1), rgba(8,13,24,1));
+width:100%;border:1px solid rgba(81,217,255,.28);
+background:linear-gradient(180deg, rgba(35,39,48,1), rgba(30,34,42,1));
 color:#edf6ff !important;border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease;
 -webkit-appearance:none;-moz-appearance:none;appearance:none;
 -webkit-text-fill-color:#edf6ff
@@ -280,7 +288,7 @@ align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px
 }
 .modal-overlay.open{display:flex}
 .modal{
-background:linear-gradient(180deg,#0d1521,#08101c);
+background:linear-gradient(180deg,#323642,#2a2e39);
 border:1px solid rgba(81,217,255,.3);border-radius:20px;
 padding:28px 32px;max-width:500px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);
 position:relative;max-height:90vh;overflow-y:auto
@@ -385,7 +393,7 @@ body{padding:12px}
 <!-- LANDING (signed-out) -->
 <div id="landingScreen" class="landing" style="display:none">
 <div class="landing-inner">
-<img src="cybergrader-280x80.png?v=6" alt="CyberGrader.io" onerror="this.style.display='none'">
+<img src="cybergrader-logo.png?v=1" alt="CyberGrader.io" onerror="this.style.display='none'">
 <p>A workflow tool for cyber teachers. Sign in to generate consistent student feedback and emails across all your devices.</p>
 <button class="signin-btn" id="landingSignInBtn">Sign In to Continue</button>
 </div>
@@ -403,7 +411,7 @@ body{padding:12px}
 </div>
 </div>
 <div class="topbar-center">
-<img src="cybergrader-280x80.png?v=6" alt="CyberGrader.io" class="topbar-logo" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
+<img src="cybergrader-logo.png?v=1" alt="CyberGrader.io" class="topbar-logo" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
 <h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
 </div>
 <div class="topbar-right">
@@ -418,7 +426,7 @@ body{padding:12px}
 <button type="button" class="danger" id="signOutBtn">Sign Out</button>
 </div>
 </div>
-<button class="howto-btn" id="howtoBtn" type="button">? How to Use</button>
+<button class="howto-btn" id="howtoBtn" type="button" title="How to Use" aria-label="How to Use">ⓘ</button>
 </div>
 </div>
 </header>
@@ -430,11 +438,11 @@ body{padding:12px}
 <section>
 <h2 class="panel-title">Teacher Notes</h2>
 <div class="section-card notes-card">
-<h3 class="notes-heading">Nine Weeks 1–3</h3>
+<h3 class="notes-heading">Nine Weeks 1–3 Info</h3>
 <p>Same start and end date for grades 7–12. Deadlines and pacing apply equally during those grading periods.</p>
 </div>
 <div class="section-card notes-card">
-<h3 class="notes-heading">Fourth Nine Weeks — Split Deadlines</h3>
+<h3 class="notes-heading">4th Nine Weeks – Split Deadlines</h3>
 <ul>
 <li><span class="senior-highlight">Seniors: due date is earlier</span> — typically a week or two sooner.</li>
 <li><span class="general-highlight">Grades 7–11: typical end-of-year deadline.</span></li>
@@ -478,7 +486,7 @@ Choose a block below to select pre-generated feedback or emails. Once you pick a
 <span class="desc">Recurring student emails for the school year</span>
 </button>
 <button class="block-btn" data-block="portalBlock" type="button">
-<span class="icon">⚙️</span>
+<span class="icon"><img src="sv-portal-logo.png?v=1" alt="SV Portal" onerror="this.parentNode.innerHTML='⚙️'"></span>
 <span class="title">SV Portal Setup</span>
 <span class="desc">Seneca Valley gradebook placeholder setup</span>
 </button>
@@ -612,7 +620,7 @@ Pick the current term first — the tool filters email options accordingly. Use 
 <button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject</button>
 <button class="ghost-btn" id="copyCombinedBtn" type="button">Copy Combined</button>
 </div>
-<button class="copy-btn" id="copyBodyBtn" type="button">Copy Email Body</button>
+<button class="copy-btn" id="copyBodyBtn" type="button" style="padding:12px 18px;font-size:.95rem;letter-spacing:.02em;margin-top:6px">Copy Email Body</button>
 </div>
 
 <!-- PORTAL BLOCK -->
@@ -642,6 +650,15 @@ Pick the assignment placeholder you need to set up in the SV Portal gradebook. C
 <div class="field full">
 <label for="portalOutput">Generated Output</label>
 <textarea id="portalOutput" readonly spellcheck="true"></textarea>
+</div>
+
+<div id="finalGradeWarning" style="display:none;margin-top:12px;padding:14px 16px;background:rgba(255,80,80,.12);border:1.5px solid rgba(255,80,80,.45);border-radius:12px;color:#ffb0b0;font-size:.92rem;line-height:1.5;box-shadow:0 0 16px rgba(255,80,80,.12)">
+<div style="font-weight:900;color:#ff7d7d;letter-spacing:.04em;margin-bottom:6px;font-size:.95rem">⚠ BEFORE YOU PUBLISH FINAL GRADES</div>
+<ul style="margin:0;padding-left:20px;display:grid;gap:4px">
+<li><strong style="color:#fff">Delete</strong> the Weekly Overall Grade Update assignment from the gradebook.</li>
+<li><strong style="color:var(--pink)">Honors, year-long, and CHS courses</strong> require a grade in the quarterly grade section under "Enter Report Cards."</li>
+<li>Any student with a <strong style="color:#fff">"C" or lower</strong> needs comments entered in the Comments section.</li>
+</ul>
 </div>
 
 <div class="copy-status" id="portalStatus"></div>
@@ -754,6 +771,8 @@ Continue with Google
 <li>Confirm all student grades are finalized in Carnegie Learning and Teams.</li>
 <li>Enter the <strong>Final Overall Grade</strong> in the SV Portal gradebook.</li>
 <li><strong style="color:var(--pink)">Delete the Weekly Overall Grade Update</strong> assignment from the gradebook.</li>
+<li><strong style="color:var(--pink)">Honors, year-long, and CHS courses:</strong> enter a grade in the quarterly grade section under "Enter Report Cards."</li>
+<li>Any student with a <strong>"C" or lower</strong> needs comments in the Comments section.</li>
 <li>Load the next nine weeks course (if applicable) a few days before the current period ends.</li>
 </ol>
 <div class="modal-actions">
@@ -871,7 +890,7 @@ const defaultGradeTemplates = {
 const defaultPortalTemplates = {
 "weekly": () => `Assignment Name: Weekly Overall Grade Update\n\nAssignment Detail: This grade reflects the student's current weekly progress for the grading period and is updated weekly. Individual assignment and project grades are available in Microsoft Teams and/or Carnegie Learning platform(s).`,
 "final": () => `Assignment Name: Final Overall Grade\n\nAssignment Detail: This grade reflects the student's overall average for the nine-week grading period. Individual assignment and project grades can be viewed in Microsoft Teams and/or Carnegie Learning platform(s).\n\n⚠ REMINDER: After final grades are entered, delete the Weekly Overall Grade Update assignment from the gradebook.`,
-"checklist": () => `END OF GRADING PERIOD CHECKLIST\n\n1. Confirm all student grades are finalized in Carnegie Learning / Teams.\n2. Enter Final Overall Grade in the SV Portal gradebook.\n3. Delete the Weekly Overall Grade Update assignment.\n4. Load the next nine weeks course (if applicable) a few days before the current period ends.`
+"checklist": () => `END OF GRADING PERIOD CHECKLIST\n\n1. Confirm all student grades are finalized in Carnegie Learning / Teams.\n2. Enter Final Overall Grade in the SV Portal gradebook.\n3. Delete the Weekly Overall Grade Update assignment.\n4. Honors, year-long, and CHS courses: enter a grade in the quarterly grade section under "Enter Report Cards."\n5. Any student with a "C" or lower needs comments in the Comments section.\n6. Load the next nine weeks course (if applicable) a few days before the current period ends.`
 };
 
 // Real alternate phrasings per feedback template - in Kenny's voice (friendly, forgiving, cool teacher)
@@ -1062,7 +1081,7 @@ $("gradeOutput").value=gradeOverrides[key]||getDefaultGradeText();
 $("workType").addEventListener("change",updateGradeTypes);
 $("outputType").addEventListener("change",()=>updateGradeOutput(true));
 $("resetGradeBtn").addEventListener("click",()=>{
-if(!confirm("Reset this template? Any saved edits will be permanently deleted."))return;
+if(!confirm("Reset this template?\n\nOnly the currently selected feedback template will be reset. Your school year dates and other saved templates are safe."))return;
 delete gradeOverrides[getGradeKey()];saveJSON(STORAGE_KEYS.gradeOverrides,gradeOverrides);
 gradeEditMode=false;updateGradeToggle();
 $("gradeOutput").value=getDefaultGradeText();
@@ -1093,6 +1112,7 @@ $("portalOutput").value=portalOverrides[key]||getDefaultPortalText();
 }
 $("portalType").addEventListener("change",()=>{
 updatePortalOutput(true);
+$("finalGradeWarning").style.display = $("portalType").value==="final" ? "block" : "none";
 if($("portalType").value==="final"){
 $("portalReminderModal").classList.add("open");
 }
@@ -1101,7 +1121,7 @@ $("checklistModal").classList.add("open");
 }
 });
 $("resetPortalBtn").addEventListener("click",()=>{
-if(!confirm("Reset this template?"))return;
+if(!confirm("Reset this template?\n\nOnly the currently selected SV Portal template will be reset. Your school year dates and other saved templates are safe."))return;
 delete portalOverrides[getPortalKey()];saveJSON(STORAGE_KEYS.portalOverrides,portalOverrides);
 portalEditMode=false;updatePortalToggle();
 $("portalOutput").value=getDefaultPortalText();
@@ -1124,20 +1144,22 @@ const gradeVariationIndex = {};
 
 $("gradeAIBtn").addEventListener("click",()=>{
 const key=getGradeKey();
-const variations = getGradeVariations(key);
-if(variations.length < 2){
+const baseVariations = getGradeVariations(key);
+const savedOverride = gradeOverrides[key];
+// Build the full rotation: saved edit = slot 0, then base variations after
+const rotation = savedOverride ? [savedOverride, ...baseVariations] : baseVariations;
+if(rotation.length < 2){
 $("gradeStatus").textContent="Only one version available for this template.";
 setTimeout(()=>$("gradeStatus").textContent="",2500);
 return;
 }
-gradeVariationIndex[key] = ((gradeVariationIndex[key] ?? -1) + 1) % variations.length;
-// Force update even if readonly
+gradeVariationIndex[key] = ((gradeVariationIndex[key] ?? -1) + 1) % rotation.length;
 const el = $("gradeOutput");
-el.value = variations[gradeVariationIndex[key]];
-// Trigger visual refresh
+el.value = rotation[gradeVariationIndex[key]];
 el.dispatchEvent(new Event('input',{bubbles:true}));
-$("gradeStatus").textContent=`Showing variation ${gradeVariationIndex[key]+1} of ${variations.length}.`;
-setTimeout(()=>$("gradeStatus").textContent="",2500);
+const label = savedOverride && gradeVariationIndex[key] === 0 ? "your saved version" : `variation ${gradeVariationIndex[key]+1} of ${rotation.length}`;
+$("gradeStatus").textContent=`Showing ${label}.`;
+setTimeout(()=>$("gradeStatus").textContent="",2800);
 });
 $("emailAIBtn").addEventListener("click",()=>{
 const key=getEmailKey();const override=emailOverrides[key];const tpl=buildEmailTemplate();
@@ -1216,27 +1238,81 @@ let out="Please keep these final deadlines in mind:\n";
 if(s)out+=`- Seniors: ${s}\n`;if(g)out+=`- Grades 7–11: ${g}\n`;
 return out.trim();
 }
+// Formats an ISO date (YYYY-MM-DD) into "Friday, May 19 at 11:59 p.m."
+function formatDeadlineLong(iso){
+if(!iso) return "";
+try{
+const [y,m,d] = iso.split("-").map(Number);
+const dt = new Date(y, m-1, d);
+const opts = {weekday:'long', month:'long', day:'numeric'};
+return `${dt.toLocaleDateString('en-US',opts)} at 11:59 p.m.`;
+}catch(e){ return ""; }
+}
+
+// Returns the auto deadline for the current term from school year data
+function getAutoTermDeadline(term){
+if(!currentSchoolYear) return "";
+const map = {first:"q1_end", second:"q2_end", third:"q3_end", fourth:"q4_general_end"};
+return formatDeadlineLong(currentSchoolYear[map[term]]);
+}
+function getAutoSeniorDeadline(){
+if(!currentSchoolYear) return "";
+return formatDeadlineLong(currentSchoolYear.q4_senior_end);
+}
+function getAutoGeneralDeadline(){
+if(!currentSchoolYear) return "";
+return formatDeadlineLong(currentSchoolYear.q4_general_end);
+}
+
 function buildEmailTemplate(){
 const type=$("emailType").value;const level=currentAudience;const term=$("term").value;
 const studentName=$("studentName").value.trim();const courseName=$("courseName").value.trim();
-const progress=getProgressDefault();const refDate=getReferenceDate();const deadline=$("deadlineField").value.trim();
+const progress=getProgressDefault();const refDate=getReferenceDate();
+// Manual deadline input takes priority, but autofill from school year data if blank
+const manualDeadline=$("deadlineField").value.trim();
+const autoDeadline = getAutoTermDeadline(term);
+const deadline = manualDeadline || autoDeadline;
 const greet=greeting(level,studentName);const termName=normalizeTerm(term);const nextName=nextTerm(term);
-const courseText=courseName?`${courseName} `:"";const dual=buildBulkDeadlineBlock();
+const courseText=courseName?`${courseName} `:"";
+// Auto senior/general deadlines for fourth nine weeks
+const manualSr=$("seniorDeadline").value.trim();const manualGen=$("generalDeadline").value.trim();
+const srDeadline = manualSr || getAutoSeniorDeadline();
+const genDeadline = manualGen || getAutoGeneralDeadline();
+let dual = "";
+if(srDeadline || genDeadline){
+dual = "Please keep these final deadlines in mind:\n";
+if(srDeadline) dual += `- Seniors: ${srDeadline}\n`;
+if(genDeadline) dual += `- Grades 7–11: ${genDeadline}\n`;
+dual = dual.trim();
+}
 
 switch(type){
 case"Welcome Letter":return{subject:courseName?`Welcome to ${courseName}`:"Welcome to Your Cyber Course",body:`${greet}\n\nWelcome to your ${courseText}cyber course! My name is Mr. Macek, and I'll be your teacher this grading period.\n\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus, which outlines expectations, grading policies, and how the course is structured. Take your time going through it and reach out if anything is unclear.\n\nCommunication is a big part of doing well in an online course. Check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\n\nI'm looking forward to a great nine weeks with you!\n\nGood luck!\n\nMr. Macek`};
-case"Early Check-In":return{subject:"Cyber Check-In",body:`${greet}\n\nI wanted to check in now that the add/drop period is behind us. This is a good time to make sure you are actively working in your cyber course and not letting yourself fall behind.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it is important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\nMr. Macek`};
-case"Zero Grade Clarification":return{subject:"Clarification on Zeros and the Grading Process",body:`${greet}\n\nI wanted to clarify some important points about the automatic zeros on assignments and the grading process. I have graded all coursework submitted from the beginning of the ${termName} up to today.\n\nHere are three important reminders:\n1. If you see a "0" for an assignment, there will always be an explanation.\n2. If you see a "0" with feedback, that means I have graded the assignment and included a note explaining why.\n3. If you see a "0" without an explanation, that means I have not graded it yet, so there is no need to worry.\n\nYou are always welcome to reach out if you'd like to retake an assignment, make revisions, or discuss your grade. I aim to grade all submitted work as quickly as possible, but please note that all grading is completed after school hours, so your scores will be updated as soon as possible.\n\nFeel free to reach out with any questions, concerns, or if you need assistance. I want each of you to feel supported and confident as we progress through these nine weeks.\n\nMr. Macek`};
-case"25% Check-In":return{subject:"Cyber Progress Check-In",body:`${greet}\n\nAs of today, ${refDate}, you should be approximately ${progress} complete with your cyber coursework for the ${termName}. If you are not at or near that mark, please reach out so we can make a plan.\n\nIf something is unclear or you are stuck, communication is key — I'm here to help.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}.\n\n`:""}Mr. Macek`};
-case"50% Check-In":return{subject:"Cyber Check-In!",body:`${greet}\n\nWe are now at roughly ${progress} of the way through the ${termName}. This is an important checkpoint — the effort you put in right now will have a meaningful impact on your overall grade.\n\nConsistency at this stage makes a big difference. If you have questions or need guidance on where to focus next, reach out at any time.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`Current deadline: ${deadline}.\n\n`:""}Thank you,\n\nMr. Macek`};
-case"75% Check-In":return{subject:"75% Completion Mark — Cyber Courses",body:`${greet}\n\nAs of today (${refDate}), we are at the ${progress} completion mark for the ${termName}. I have finished grading all submitted work and all grades are current.\n\n${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}. I highly recommend completing all required work before that date.\n\n`:""}Remember, asking a question online is just as important as raising your hand in class. If you are unsure about something, please reach out.\n\nLooking ahead, the ${nextName} will be loaded a few days before this period ends.\n\n${term==="fourth"&&dual?dual+"\n\n":""}Thanks,\n\nMr. Macek`};
-case"Next Nine Weeks Loaded":return{subject:"Next Nine Weeks Added to Your Account",body:`${greet}\n\nYour ${nextName} has now been added to your account. Please do not feel like you need to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n${term==="third"?dual+"\n\n":""}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`};
-case"Semester / Part Change":return{subject:`Welcome to the ${nextName}`,body:`${greet}\n\nWelcome to the ${nextName}! I wanted to let you know that I have graded your first assignment, whether it involved uploading the course syllabus, sharing prior knowledge, or answering the content question. All grades have been updated.\n\nAs we enter this grading period, don't hesitate to contact me if you have any questions. You always have the option to complete your cyber course early, but late submissions are not accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`};
-case"Upcoming Break Example":return{subject:"Enjoy Your Break!!!",body:`${greet}\n\nI hope you all enjoy your break — you've earned it! I did want to mention that if you choose to work on any days while we're off, the assignment calendar will allow you to get ahead in the course.\n\nIf you find yourself with some free time, it's a great opportunity to make progress.\n\nOther than that, enjoy the break. Looking forward to working with you all for the rest of the ${termName}.\n\nAs always, don't hesitate to reach out if you have any questions.\n\nThanks,\n\nMr. Macek`};
-case"Final Week Reminder":return{subject:"Final Reminder: Coursework Deadline Approaching",body:`${greet}\n\nCan you believe it? We are now at the ${progress} mark of the ${termName} — the end is right around the corner.\n\n${term==="fourth"&&dual?dual+"\n\n":deadline?`All cyber assignments are due by ${deadline}.\n\n`:""}If you are not near that mark or have not started, do not panic — but do not wait. Power through those last few lessons and reach out if you are stuck.\n\nIf you are on track or ahead, keep that momentum going. The effort you put in now will pay off.\n\nYou've got this!\n\nMr. Macek`};
-case"Senior Final Reminder":return{subject:"*SENIORS ONLY* Final Reminder: Coursework Due Soon",body:`Hi Seniors,\n\nThis is a final reminder that all of your cyber coursework must be completed and submitted by ${deadline||"[deadline]"}.\n\nPlease ensure you are checking your course progress, wrapping up any incomplete assignments, and reaching out if you need help. After the deadline, no additional submissions will be accepted.\n\nLet's finish strong!\n\nMr. Macek`};
-case"End of Year Grades 7–11":return{subject:"Final Reminder: End-of-Year Cyber Coursework Due",body:`Hi Students,\n\nAs we wrap up the year, this is a reminder that all cyber coursework for students in grades 7–11 must be completed and submitted by ${deadline||"[deadline]"}.\n\nPlease check your course progress, wrap up any incomplete assignments, and submit everything before the deadline. If you have questions or need help, please reach out.\n\nHave a great summer!\n\nMr. Macek`};
-case"End of Year Grade 12":return{subject:"*SENIORS ONLY* Final Reminder: All Coursework Due",body:`Hi Seniors,\n\nAs we wrap up the year, this is a final reminder that all of your cyber coursework must be completed and submitted by ${deadline||"[deadline]"}.\n\nPlease check your course progress, finish any incomplete assignments, and reach out if you need help. After the deadline, no additional submissions will be accepted.\n\nCongratulations and best of luck.\n\nMr. Macek`};
+
+case"Early Check-In":return{subject:"Cyber Check-In",body:`${greet}\n\nI wanted to check in now that we've completed the first week of the ${termName}. This is a good time to make sure you're actively working in your cyber course and not letting yourself fall behind — I always recommend being ahead of the assignment calendar, but staying on target at a minimum is the key to success.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it's important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\nMr. Macek`};
+
+case"Zero Grade Clarification":return{subject:"Clarification on Zeros and the Grading Process",body:`${greet}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the ${termName} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want each of you supported this nine weeks.\n\nThanks,\n\nMr. Macek`};
+
+case"25% Check-In":return{subject:"Cyber Progress Check-In — 25% Mark",body:`${greet}\n\nAs of ${refDate}, you should be about ${progress} done with your cyber coursework for the ${termName}. If you're not at or near that mark, don't panic — just reach out so we can make a plan early. Getting on pace now is way easier than trying to catch up later.\n\nIf something is unclear or you're stuck, communication is key — I'm here to help.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}.\n\n`:""}Mr. Macek`};
+
+case"50% Check-In":return{subject:"Cyber Check-In — Halfway Point",body:`${greet}\n\nWe're halfway through the ${termName} — about ${progress} of the way in. This is the checkpoint where effort really starts to show up in your grade. The next few weeks matter more than the first few did.\n\nIf you're behind, let's fix it now — there's still plenty of runway. If you're on pace, keep that consistency up. Questions or stuck? Reach out any time.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`Current deadline: ${deadline}.\n\n`:""}Thanks,\n\nMr. Macek`};
+
+case"75% Check-In":return{subject:"75% Completion Mark — Cyber Courses",body:`${greet}\n\nAs of ${refDate}, we're at the ${progress} mark of the ${termName} — home stretch. All submitted work has been graded and your grades are current.\n\nThis is finish-strong time. The work you put in over these last few weeks will decide what your final grade looks like.\n\n${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}. I strongly recommend wrapping everything up before then.\n\n`:""}Looking ahead, the ${nextName} will be loaded a few days before this period ends.\n\n${term==="fourth"&&dual?dual+"\n\n":""}Asking a question online is just as important as raising your hand in class — reach out if anything is unclear.\n\nThanks,\n\nMr. Macek`};
+
+case"Next Nine Weeks Loaded":return{subject:"Next Nine Weeks Added to Your Account",body:`${greet}\n\nYour ${nextName} has now been added to your account. No pressure to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n${term==="third"?dual+"\n\n":""}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`};
+
+case"Semester / Part Change":return{subject:`Welcome to the ${nextName}`,body:`${greet}\n\nWelcome to the ${nextName}! I wanted to let you know I've graded your first assignment — whether it was the syllabus upload, prior knowledge, or the content question. All grades are updated.\n\nAs we head into this grading period, reach out anytime with questions. You always have the option to complete your cyber course early, but late submissions aren't accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`};
+
+case"Upcoming Break Example":return{subject:"Enjoy Your Break!!!",body:`${greet}\n\nI hope you all enjoy your break — you've earned it! Quick note: if you choose to work on any days while we're off, the assignment calendar will let you get ahead in the course.\n\nIf you find yourself with some free time, it's a great chance to make progress.\n\nOtherwise, enjoy the break. Looking forward to working with you all for the rest of the ${termName}.\n\nAs always, reach out if you have any questions.\n\nThanks,\n\nMr. Macek`};
+
+case"Final Week Reminder":return{subject:"Final Reminder: Coursework Deadline Approaching",body:`${greet}\n\nCan you believe it? We're at the ${progress} mark of the ${termName} — the end is right around the corner.\n\n${term==="fourth"&&dual?dual+"\n\n":deadline?`All cyber assignments are due by ${deadline}.\n\n`:""}If you're not near that mark or haven't started, don't panic — but don't wait either. Power through those last few lessons and reach out if you're stuck.\n\nIf you're on track or ahead, keep that momentum. The effort now will pay off.\n\nYou've got this!\n\nMr. Macek`};
+
+case"Senior Final Reminder":return{subject:"Seniors — Final Reminder on Coursework",body:`Hi Seniors,\n\nThis is it — your final reminder that all cyber coursework needs to be submitted by ${deadline||"[deadline]"}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\nMr. Macek`};
+
+case"End of Year Grades 7–11":return{subject:"End-of-Year Reminder: Cyber Coursework Due",body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by ${deadline||"[deadline]"}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\nMr. Macek`};
+
+case"End of Year Grade 12":return{subject:"Seniors — End-of-Year Reminder",body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by ${deadline||"[deadline]"}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far — best of luck with whatever comes next.\n\nMr. Macek`};
+
 default:return{subject:"Cyber Update",body:`${greet}\n\nCourse update.\n\nMr. Macek`};
 }
 }
@@ -1314,11 +1390,17 @@ if(!iso) return "—";
 const [y,m,d] = iso.split("-");
 return `${m}/${d}/${y.slice(2)}`;
 }
+// Global school year data - set once loaded from Firestore, used by email templates for autofill
+let currentSchoolYear = null;
+
 function renderSchoolYearCard(sy){
+currentSchoolYear = sy || null;
 if(!sy){
 $("schoolYearDisplay").innerHTML = `<div style="color:var(--muted);text-align:center;padding:8px 0">No dates set yet.</div>`;
 return;
 }
+// Refresh email output so autofill deadlines populate
+if(typeof updateEmailOutput === "function"){ try{ updateEmailOutput(true); }catch(e){} }
 const rows = [
 {label:"1st Nine Weeks", start:sy.q1_start, end:sy.q1_end, color:"var(--cyan)"},
 {label:"2nd Nine Weeks", start:sy.q2_start, end:sy.q2_end, color:"var(--cyan)"},
@@ -1424,7 +1506,7 @@ setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),false);
 $("emailStatus").textContent="Saved globally on this device.";setTimeout(()=>$("emailStatus").textContent="",2000);
 });
 $("resetEmailBtn").addEventListener("click",()=>{
-if(!confirm("Reset this email template?"))return;
+if(!confirm("Reset this email template?\n\nOnly the currently selected email template will be reset. Your school year dates and other saved templates are safe."))return;
 delete emailOverrides[getEmailKey()];saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
 setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),false);
 setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),false);
