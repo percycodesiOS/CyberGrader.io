@@ -1163,9 +1163,18 @@ setTimeout(()=>$("gradeStatus").textContent="",2800);
 });
 $("emailAIBtn").addEventListener("click",()=>{
 const key=getEmailKey();const override=emailOverrides[key];const tpl=buildEmailTemplate();
-if(override&&$("emailBodyOutput").value.trim()===override.body){$("emailBodyOutput").value=tpl.body;$("emailSubjectOutput").value=tpl.subject;}
-else if(override){$("emailBodyOutput").value=override.body;$("emailSubjectOutput").value=override.subject;}
-else{$("emailStatus").textContent="No saved variation — edit and save one first.";setTimeout(()=>$("emailStatus").textContent="",2500);return;}
+const currentBody = $("emailBodyOutput").value.trim();
+const savedResolved = override ? resolveTokens(override.body) : null;
+const defaultResolved = resolveTokens(tpl.body);
+if(override && currentBody === savedResolved){
+$("emailBodyOutput").value = defaultResolved;
+$("emailSubjectOutput").value = resolveTokens(tpl.subject);
+}else if(override){
+$("emailBodyOutput").value = savedResolved;
+$("emailSubjectOutput").value = resolveTokens(override.subject);
+}else{
+$("emailStatus").textContent="No saved variation — edit and save one first.";setTimeout(()=>$("emailStatus").textContent="",2500);return;
+}
 $("emailStatus").textContent="Variation loaded.";setTimeout(()=>$("emailStatus").textContent="",2000);
 });
 
@@ -1238,12 +1247,84 @@ let out="Please keep these final deadlines in mind:\n";
 if(s)out+=`- Seniors: ${s}\n`;if(g)out+=`- Grades 7–11: ${g}\n`;
 return out.trim();
 }
+// Token resolver: replaces {{placeholders}} with current live values.
+// This runs both on default templates and on saved user customizations, so
+// even if you save an edited template, the dates stay fresh when school year
+// dates change.
+function resolveTokens(text){
+if(!text) return text;
+const type=$("emailType").value;
+const level=currentAudience;
+const term=$("term").value;
+const studentName=$("studentName").value.trim();
+const courseName=$("courseName").value.trim();
+const progress=getProgressDefault();
+const refDate=getReferenceDate();
+const manualDeadline=$("deadlineField").value.trim();
+const autoDeadline = getAutoTermDeadline(term);
+const deadline = manualDeadline || autoDeadline || "[deadline]";
+const manualSr=$("seniorDeadline").value.trim();
+const manualGen=$("generalDeadline").value.trim();
+const srDeadline = manualSr || getAutoSeniorDeadline() || "[senior deadline]";
+const genDeadline = manualGen || getAutoGeneralDeadline() || "[grades 7-11 deadline]";
+const termName=normalizeTerm(term);
+const nextName=nextTerm(term);
+const courseText=courseName?`${courseName} `:"";
+const greet=greeting(level,studentName);
+
+// Dual deadline block - pre-built so user edits can reference it as a token
+let dual = "";
+const hasSr = manualSr || getAutoSeniorDeadline();
+const hasGen = manualGen || getAutoGeneralDeadline();
+if(hasSr || hasGen){
+dual = "Please keep these final deadlines in mind:\n";
+if(hasSr) dual += `- Seniors: ${srDeadline}\n`;
+if(hasGen) dual += `- Grades 7–11: ${genDeadline}\n`;
+dual = dual.trim();
+}
+
+// Conditional dual block: shows only in fourth term with All Students audience
+const dualBlock = (term==="fourth" && level==="All Students" && dual) ? dual + "\n\n" : "";
+
+const tokens = {
+"{{greet}}": greet,
+"{{term}}": termName,
+"{{next_term}}": nextName,
+"{{course}}": courseText,
+"{{course_name}}": courseName || "your cyber course",
+"{{student_name}}": studentName || "Student",
+"{{ref_date}}": refDate,
+"{{progress}}": progress,
+"{{deadline}}": deadline,
+"{{senior_deadline}}": srDeadline,
+"{{general_deadline}}": genDeadline,
+"{{dual_deadlines}}": dualBlock,
+"{{deadline_line_if_not_fourth}}": (term!=="fourth" && deadline && deadline!=="[deadline]") ? `The end date for this grading period is ${deadline}.\n\n` : "",
+"{{deadline_due_by_line}}": (deadline && deadline!=="[deadline]") ? `All cyber assignments are due by ${deadline}.\n\n` : "",
+"{{deadline_current_line}}": (term!=="fourth" && deadline && deadline!=="[deadline]") ? `Current deadline: ${deadline}.\n\n` : "",
+"{{deadline_75_line}}": (term!=="fourth" && deadline && deadline!=="[deadline]") ? `The end date for this grading period is ${deadline}. I strongly recommend wrapping everything up before then.\n\n` : "",
+"{{next_term_loaded_line}}": term==="third" ? dualBlock : ""
+};
+
+let result = text;
+for(const [tok, val] of Object.entries(tokens)){
+result = result.split(tok).join(val);
+}
+return result;
+}
+
 // Formats an ISO date (YYYY-MM-DD) into "Friday, May 19 at 11:59 p.m."
 function formatDeadlineLong(iso){
-if(!iso) return "";
+if(!iso || typeof iso !== 'string' || !iso.includes('-')) return "";
 try{
-const [y,m,d] = iso.split("-").map(Number);
-const dt = new Date(y, m-1, d);
+const parts = iso.split("-");
+if(parts.length !== 3) return "";
+const y = parseInt(parts[0],10);
+const m = parseInt(parts[1],10);
+const d = parseInt(parts[2],10);
+if(isNaN(y)||isNaN(m)||isNaN(d)) return "";
+// Build date in local timezone, noon to avoid DST edge cases
+const dt = new Date(y, m-1, d, 12, 0, 0);
 const opts = {weekday:'long', month:'long', day:'numeric'};
 return `${dt.toLocaleDateString('en-US',opts)} at 11:59 p.m.`;
 }catch(e){ return ""; }
@@ -1265,62 +1346,88 @@ return formatDeadlineLong(currentSchoolYear.q4_general_end);
 }
 
 function buildEmailTemplate(){
-const type=$("emailType").value;const level=currentAudience;const term=$("term").value;
-const studentName=$("studentName").value.trim();const courseName=$("courseName").value.trim();
-const progress=getProgressDefault();const refDate=getReferenceDate();
-// Manual deadline input takes priority, but autofill from school year data if blank
-const manualDeadline=$("deadlineField").value.trim();
-const autoDeadline = getAutoTermDeadline(term);
-const deadline = manualDeadline || autoDeadline;
-const greet=greeting(level,studentName);const termName=normalizeTerm(term);const nextName=nextTerm(term);
-const courseText=courseName?`${courseName} `:"";
-// Auto senior/general deadlines for fourth nine weeks
-const manualSr=$("seniorDeadline").value.trim();const manualGen=$("generalDeadline").value.trim();
-const srDeadline = manualSr || getAutoSeniorDeadline();
-const genDeadline = manualGen || getAutoGeneralDeadline();
-let dual = "";
-if(srDeadline || genDeadline){
-dual = "Please keep these final deadlines in mind:\n";
-if(srDeadline) dual += `- Seniors: ${srDeadline}\n`;
-if(genDeadline) dual += `- Grades 7–11: ${genDeadline}\n`;
-dual = dual.trim();
-}
+const type=$("emailType").value;
+const courseName=$("courseName").value.trim();
 
 switch(type){
-case"Welcome Letter":return{subject:courseName?`Welcome to ${courseName}`:"Welcome to Your Cyber Course",body:`${greet}\n\nWelcome to your ${courseText}cyber course! My name is Mr. Macek, and I'll be your teacher this grading period.\n\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus, which outlines expectations, grading policies, and how the course is structured. Take your time going through it and reach out if anything is unclear.\n\nCommunication is a big part of doing well in an online course. Check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\n\nI'm looking forward to a great nine weeks with you!\n\nGood luck!\n\nMr. Macek`};
+case"Welcome Letter":return{
+subject:courseName?`Welcome to ${courseName}`:"Welcome to Your Cyber Course",
+body:`{{greet}}\n\nWelcome to your {{course}}cyber course! My name is Mr. Macek, and I'll be your teacher this grading period.\n\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus, which outlines expectations, grading policies, and how the course is structured. Take your time going through it and reach out if anything is unclear.\n\nCommunication is a big part of doing well in an online course. Check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\n\nI'm looking forward to a great nine weeks with you!\n\nGood luck!\n\nMr. Macek`
+};
 
-case"Early Check-In":return{subject:"Cyber Check-In",body:`${greet}\n\nI wanted to check in now that we've completed the first week of the ${termName}. This is a good time to make sure you're actively working in your cyber course and not letting yourself fall behind — I always recommend being ahead of the assignment calendar, but staying on target at a minimum is the key to success.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it's important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\nMr. Macek`};
+case"Early Check-In":return{
+subject:"Cyber Check-In",
+body:`{{greet}}\n\nI wanted to check in now that we've completed the first week of the {{term}}. This is a good time to make sure you're actively working in your cyber course and not letting yourself fall behind — I always recommend being ahead of the assignment calendar, but staying on target at a minimum is the key to success.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it's important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\nMr. Macek`
+};
 
-case"Zero Grade Clarification":return{subject:"Clarification on Zeros and the Grading Process",body:`${greet}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the ${termName} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want each of you supported this nine weeks.\n\nThanks,\n\nMr. Macek`};
+case"Zero Grade Clarification":return{
+subject:"Clarification on Zeros and the Grading Process",
+body:`{{greet}}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the {{term}} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want each of you supported this nine weeks.\n\nThanks,\n\nMr. Macek`
+};
 
-case"25% Check-In":return{subject:"Cyber Progress Check-In — 25% Mark",body:`${greet}\n\nAs of ${refDate}, you should be about ${progress} done with your cyber coursework for the ${termName}. If you're not at or near that mark, don't panic — just reach out so we can make a plan early. Getting on pace now is way easier than trying to catch up later.\n\nIf something is unclear or you're stuck, communication is key — I'm here to help.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}.\n\n`:""}Mr. Macek`};
+case"25% Check-In":return{
+subject:"Cyber Progress Check-In — 25% Mark",
+body:`{{greet}}\n\nAs of {{ref_date}}, you should be about {{progress}} done with your cyber coursework for the {{term}}. If you're not at or near that mark, don't panic — just reach out so we can make a plan early. Getting on pace now is way easier than trying to catch up later.\n\nIf something is unclear or you're stuck, communication is key — I'm here to help.\n\n{{dual_deadlines}}{{deadline_line_if_not_fourth}}Mr. Macek`
+};
 
-case"50% Check-In":return{subject:"Cyber Check-In — Halfway Point",body:`${greet}\n\nWe're halfway through the ${termName} — about ${progress} of the way in. This is the checkpoint where effort really starts to show up in your grade. The next few weeks matter more than the first few did.\n\nIf you're behind, let's fix it now — there's still plenty of runway. If you're on pace, keep that consistency up. Questions or stuck? Reach out any time.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`Current deadline: ${deadline}.\n\n`:""}Thanks,\n\nMr. Macek`};
+case"50% Check-In":return{
+subject:"Cyber Check-In — Halfway Point",
+body:`{{greet}}\n\nWe're halfway through the {{term}} — about {{progress}} of the way in. This is the checkpoint where effort really starts to show up in your grade. The next few weeks matter more than the first few did.\n\nIf you're behind, let's fix it now — there's still plenty of runway. If you're on pace, keep that consistency up. Questions or stuck? Reach out any time.\n\n{{dual_deadlines}}{{deadline_current_line}}Thanks,\n\nMr. Macek`
+};
 
-case"75% Check-In":return{subject:"75% Completion Mark — Cyber Courses",body:`${greet}\n\nAs of ${refDate}, we're at the ${progress} mark of the ${termName} — home stretch. All submitted work has been graded and your grades are current.\n\nThis is finish-strong time. The work you put in over these last few weeks will decide what your final grade looks like.\n\n${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}. I strongly recommend wrapping everything up before then.\n\n`:""}Looking ahead, the ${nextName} will be loaded a few days before this period ends.\n\n${term==="fourth"&&dual?dual+"\n\n":""}Asking a question online is just as important as raising your hand in class — reach out if anything is unclear.\n\nThanks,\n\nMr. Macek`};
+case"75% Check-In":return{
+subject:"75% Completion Mark — Cyber Courses",
+body:`{{greet}}\n\nAs of {{ref_date}}, we're at the {{progress}} mark of the {{term}} — home stretch. All submitted work has been graded and your grades are current.\n\nThis is finish-strong time. The work you put in over these last few weeks will decide what your final grade looks like.\n\n{{deadline_75_line}}Looking ahead, the {{next_term}} will be loaded a few days before this period ends.\n\n{{dual_deadlines}}Asking a question online is just as important as raising your hand in class — reach out if anything is unclear.\n\nThanks,\n\nMr. Macek`
+};
 
-case"Next Nine Weeks Loaded":return{subject:"Next Nine Weeks Added to Your Account",body:`${greet}\n\nYour ${nextName} has now been added to your account. No pressure to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n${term==="third"?dual+"\n\n":""}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`};
+case"Next Nine Weeks Loaded":return{
+subject:"Next Nine Weeks Added to Your Account",
+body:`{{greet}}\n\nYour {{next_term}} has now been added to your account. No pressure to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n{{next_term_loaded_line}}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`
+};
 
-case"Semester / Part Change":return{subject:`Welcome to the ${nextName}`,body:`${greet}\n\nWelcome to the ${nextName}! I wanted to let you know I've graded your first assignment — whether it was the syllabus upload, prior knowledge, or the content question. All grades are updated.\n\nAs we head into this grading period, reach out anytime with questions. You always have the option to complete your cyber course early, but late submissions aren't accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`};
+case"Semester / Part Change":return{
+subject:`Welcome to the {{next_term}}`,
+body:`{{greet}}\n\nWelcome to the {{next_term}}! I wanted to let you know I've graded your first assignment — whether it was the syllabus upload, prior knowledge, or the content question. All grades are updated.\n\nAs we head into this grading period, reach out anytime with questions. You always have the option to complete your cyber course early, but late submissions aren't accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`
+};
 
-case"Upcoming Break Example":return{subject:"Enjoy Your Break!!!",body:`${greet}\n\nI hope you all enjoy your break — you've earned it! Quick note: if you choose to work on any days while we're off, the assignment calendar will let you get ahead in the course.\n\nIf you find yourself with some free time, it's a great chance to make progress.\n\nOtherwise, enjoy the break. Looking forward to working with you all for the rest of the ${termName}.\n\nAs always, reach out if you have any questions.\n\nThanks,\n\nMr. Macek`};
+case"Upcoming Break Example":return{
+subject:"Enjoy Your Break!!!",
+body:`{{greet}}\n\nI hope you all enjoy your break — you've earned it! Quick note: if you choose to work on any days while we're off, the assignment calendar will let you get ahead in the course.\n\nIf you find yourself with some free time, it's a great chance to make progress.\n\nOtherwise, enjoy the break. Looking forward to working with you all for the rest of the {{term}}.\n\nAs always, reach out if you have any questions.\n\nThanks,\n\nMr. Macek`
+};
 
-case"Final Week Reminder":return{subject:"Final Reminder: Coursework Deadline Approaching",body:`${greet}\n\nCan you believe it? We're at the ${progress} mark of the ${termName} — the end is right around the corner.\n\n${term==="fourth"&&dual?dual+"\n\n":deadline?`All cyber assignments are due by ${deadline}.\n\n`:""}If you're not near that mark or haven't started, don't panic — but don't wait either. Power through those last few lessons and reach out if you're stuck.\n\nIf you're on track or ahead, keep that momentum. The effort now will pay off.\n\nYou've got this!\n\nMr. Macek`};
+case"Final Week Reminder":return{
+subject:"Final Reminder: Coursework Deadline Approaching",
+body:`{{greet}}\n\nCan you believe it? We're at the {{progress}} mark of the {{term}} — the end is right around the corner.\n\n{{dual_deadlines}}{{deadline_due_by_line}}If you're not near that mark or haven't started, don't panic — but don't wait either. Power through those last few lessons and reach out if you're stuck.\n\nIf you're on track or ahead, keep that momentum. The effort now will pay off.\n\nYou've got this!\n\nMr. Macek`
+};
 
-case"Senior Final Reminder":return{subject:"Seniors — Final Reminder on Coursework",body:`Hi Seniors,\n\nThis is it — your final reminder that all cyber coursework needs to be submitted by ${deadline||"[deadline]"}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\nMr. Macek`};
+case"Senior Final Reminder":return{
+subject:"Seniors — Final Reminder on Coursework",
+body:`Hi Seniors,\n\nThis is it — your final reminder that all cyber coursework needs to be submitted by {{senior_deadline}}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\nMr. Macek`
+};
 
-case"End of Year Grades 7–11":return{subject:"End-of-Year Reminder: Cyber Coursework Due",body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by ${deadline||"[deadline]"}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\nMr. Macek`};
+case"End of Year Grades 7–11":return{
+subject:"End-of-Year Reminder: Cyber Coursework Due",
+body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by {{general_deadline}}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\nMr. Macek`
+};
 
-case"End of Year Grade 12":return{subject:"Seniors — End-of-Year Reminder",body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by ${deadline||"[deadline]"}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far — best of luck with whatever comes next.\n\nMr. Macek`};
+case"End of Year Grade 12":return{
+subject:"Seniors — End-of-Year Reminder",
+body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by {{senior_deadline}}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far — best of luck with whatever comes next.\n\nMr. Macek`
+};
 
-default:return{subject:"Cyber Update",body:`${greet}\n\nCourse update.\n\nMr. Macek`};
+default:return{subject:"Cyber Update",body:`{{greet}}\n\nCourse update.\n\nMr. Macek`};
 }
 }
 function updateEmailOutput(force=false){
 maybeAdjustFields();
 const key=getEmailKey();const tpl=buildEmailTemplate();const saved=emailOverrides[key];
-if($("emailSubjectOutput").readOnly||force)$("emailSubjectOutput").value=saved?.subject||tpl.subject;
-if($("emailBodyOutput").readOnly||force)$("emailBodyOutput").value=saved?.body||tpl.body;
+// Run both saved overrides and default templates through the token resolver.
+// This means saved customizations stay preserved as wording, but their dates
+// auto-update whenever you change school year dates or the current term.
+const subjectSource = saved?.subject ?? tpl.subject;
+const bodySource = saved?.body ?? tpl.body;
+if($("emailSubjectOutput").readOnly||force)$("emailSubjectOutput").value = resolveTokens(subjectSource);
+if($("emailBodyOutput").readOnly||force)$("emailBodyOutput").value = resolveTokens(bodySource);
 }
 
 // ── BLOCK SWITCHER ──
@@ -1498,13 +1605,60 @@ else window.addEventListener("cgAuthReady",wireAuth,{once:true});
 // ── EMAIL WIRING ──
 $("editSubjectToggle").addEventListener("click",()=>setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),$("emailSubjectOutput").readOnly));
 $("editBodyToggle").addEventListener("click",()=>setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),$("emailBodyOutput").readOnly));
+// Reverses resolveTokens: when user saves an edited email, convert any live
+// values (dates, term names, progress %) back to {{tokens}} so the saved
+// version stays fresh when school year dates or term change later.
+function tokenizeOnSave(text){
+if(!text) return text;
+const term=$("term").value;
+const studentName=$("studentName").value.trim();
+const courseName=$("courseName").value.trim();
+const progress=getProgressDefault();
+const refDate=getReferenceDate();
+const manualDeadline=$("deadlineField").value.trim();
+const autoDeadline = getAutoTermDeadline(term);
+const deadline = manualDeadline || autoDeadline;
+const manualSr=$("seniorDeadline").value.trim();
+const manualGen=$("generalDeadline").value.trim();
+const srDeadline = manualSr || getAutoSeniorDeadline();
+const genDeadline = manualGen || getAutoGeneralDeadline();
+const termName=normalizeTerm(term);
+const nextName=nextTerm(term);
+
+let result = text;
+// IMPORTANT: Replace longer/more specific values first to avoid partial overwrites.
+// e.g. senior deadline before general, specific dates before term names.
+if(srDeadline && srDeadline !== "[senior deadline]"){
+result = result.split(srDeadline).join("{{senior_deadline}}");
+}
+if(genDeadline && genDeadline !== "[grades 7-11 deadline]" && genDeadline !== srDeadline){
+result = result.split(genDeadline).join("{{general_deadline}}");
+}
+if(deadline && deadline !== "[deadline]" && deadline !== srDeadline && deadline !== genDeadline){
+result = result.split(deadline).join("{{deadline}}");
+}
+if(progress) result = result.split(progress).join("{{progress}}");
+if(refDate) result = result.split(refDate).join("{{ref_date}}");
+// Term names last (they contain common words)
+if(nextName && nextName !== "next grading period") result = result.split(nextName).join("{{next_term}}");
+if(termName && termName !== "current grading period") result = result.split(termName).join("{{term}}");
+return result;
+}
+
 $("saveEmailBtn").addEventListener("click",()=>{
-emailOverrides[getEmailKey()]={subject:$("emailSubjectOutput").value.trim(),body:$("emailBodyOutput").value.trim()};
+emailOverrides[getEmailKey()]={
+subject:tokenizeOnSave($("emailSubjectOutput").value.trim()),
+body:tokenizeOnSave($("emailBodyOutput").value.trim())
+};
 saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
 setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),false);
 setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),false);
-$("emailStatus").textContent="Saved globally on this device.";setTimeout(()=>$("emailStatus").textContent="",2000);
+// Re-render so tokens resolve with fresh values
+updateEmailOutput(true);
+$("emailStatus").textContent="Saved globally on this device. Dates will stay fresh.";setTimeout(()=>$("emailStatus").textContent="",2800);
 });
+// Remove old duplicate saveEmailBtn listener (the following will be our original that we kept accidentally)
+(function removeDuplicate(){})();
 $("resetEmailBtn").addEventListener("click",()=>{
 if(!confirm("Reset this email template?\n\nOnly the currently selected email template will be reset. Your school year dates and other saved templates are safe."))return;
 delete emailOverrides[getEmailKey()];saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
