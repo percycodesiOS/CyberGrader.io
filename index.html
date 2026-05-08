@@ -1,40 +1,9 @@
 <!DOCTYPE html>
-<html>
-<head>
-<style>
-  body { font-family: Inter, sans-serif; background: #06090f; color: #edf6ff; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; gap: 16px; }
-  .card { background: #0d1117; border: 1px solid rgba(81,217,255,.2); border-radius: 18px; padding: 32px 40px; text-align: center; max-width: 420px; }
-  h2 { margin: 0 0 8px; color: #51d9ff; font-size: 1.3rem; }
-  p { color: #a4b3c7; font-size: .9rem; margin: 0 0 24px; line-height: 1.6; }
-  .changes { background: rgba(81,217,255,.06); border: 1px solid rgba(81,217,255,.12); border-radius: 12px; padding: 14px 18px; text-align: left; margin-bottom: 24px; font-size: .85rem; color: #a4b3c7; line-height: 1.7; }
-  .changes strong { color: #7dffb5; }
-  button { background: linear-gradient(180deg, rgba(0,183,255,.28), rgba(81,217,255,.2)); color: #fff; border: 1px solid rgba(81,217,255,.34); border-radius: 12px; padding: 14px 28px; font-size: 1rem; font-weight: 800; cursor: pointer; width: 100%; transition: .18s; }
-  button:hover { transform: translateY(-1px); }
-  .note { font-size: .8rem; color: #a4b3c7; margin-top: 12px; }
-</style>
-</head>
-<body>
-<div class="card">
-  <h2>CyberGrader.io — Fixed</h2>
-  <p>Two bugs patched. Ready to replace your index.html in GitHub.</p>
-  <div class="changes">
-    <strong>Fix 1 — Save revert bug:</strong><br>
-    Saves now stick. The output only reloads when you actually change the Work Type or Output Type dropdown — not just because something else triggered a refresh. Also always re-reads from localStorage so multiple saves in a session all work.<br><br>
-    <strong>Fix 2 — Duplicate button ID:</strong><br>
-    Removed the extra Copy Output button that was below the textarea. That duplicate ID was causing the copy wiring to only connect to one of them.
-  </div>
-  <button onclick="downloadFile()">Download index.html</button>
-  <div class="note">Replace the file in your GitHub repo and it's live.</div>
-</div>
-
-<script>
-function downloadFile() {
-  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CyberGrader.io<\/title>
+  <title>CyberGrader.io</title>
   <style>
     :root{
       --bg:#06090f;
@@ -156,204 +125,204 @@ function downloadFile() {
       .form-grid,.subgrid,.tabs{grid-template-columns:1fr}
       .copy-btn,.ghost-btn,.save-btn,.reset-btn,.mic-btn{width:100%}
     }
-  <\/style>
-<\/head>
+  </style>
+</head>
 <body>
   <div class="app">
     <header class="topbar">
       <div>
-        <h1 class="brand">CyberGrader<span class="dot">.io<\/span><\/h1>
-      <\/div>
-      <div class="date-pill" id="todayDate">Today<\/div>
-    <\/header>
+        <h1 class="brand">CyberGrader<span class="dot">.io</span></h1>
+      </div>
+      <div class="date-pill" id="todayDate">Today</div>
+    </header>
     <main class="main-grid">
       <aside class="panel">
         <div class="panel-inner stack">
           <section>
-            <h2 class="panel-title">How to Use<\/h2>
+            <h2 class="panel-title">How to Use</h2>
             <div class="section-card">
               <ul>
-                <li>Grading Output is for student feedback.<\/li>
-                <li>Email Generator is for recurring, consistent student communication.<\/li>
-                <li>Copy first, then make only the smallest custom edit needed.<\/li>
-                <li>Use Save Override only when you want your wording saved on this device.<\/li>
-              <\/ul>
-            <\/div>
-          <\/section>
+                <li>Grading Output is for student feedback.</li>
+                <li>Email Generator is for recurring, consistent student communication.</li>
+                <li>Copy first, then make only the smallest custom edit needed.</li>
+                <li>Use Save Override only when you want your wording saved on this device.</li>
+              </ul>
+            </div>
+          </section>
           <section>
-            <h2 class="panel-title">Communication Flow<\/h2>
+            <h2 class="panel-title">Communication Flow</h2>
             <div class="section-card">
-              <h3>Consistent communication<\/h3>
+              <h3>Consistent communication</h3>
               <ul>
-                <li>Welcome email at course start.<\/li>
-                <li>Early check-in after add/drop settles.<\/li>
-                <li>25%, 50%, and 75% progress reminders.<\/li>
-                <li>Next nine weeks / next part loaded notice before rollover.<\/li>
-                <li>Semester or end-of-year closeout based on course structure.<\/li>
-              <\/ul>
-            <\/div>
-          <\/section>
+                <li>Welcome email at course start.</li>
+                <li>Early check-in after add/drop settles.</li>
+                <li>25%, 50%, and 75% progress reminders.</li>
+                <li>Next nine weeks / next part loaded notice before rollover.</li>
+                <li>Semester or end-of-year closeout based on course structure.</li>
+              </ul>
+            </div>
+          </section>
           <section>
-            <h2 class="panel-title">SV Portal Final / Weekly Grade Setup<\/h2>
+            <h2 class="panel-title">SV Portal Final / Weekly Grade Setup</h2>
             <div class="section-card">
               <ul>
-                <li>Prior to the start of each nine-week grading period, use the following to set up a weekly grade reminder.<\/li>
-                <li>At the end of each grading period, you will add the final grade placeholder, enter grades, then delete the weekly grade update.<\/li>
-              <\/ul>
-            <\/div>
+                <li>Prior to the start of each nine-week grading period, use the following to set up a weekly grade reminder.</li>
+                <li>At the end of each grading period, you will add the final grade placeholder, enter grades, then delete the weekly grade update.</li>
+              </ul>
+            </div>
             <div class="section-card">
-              <h3>Weekly Overall Grade Update<\/h3>
-              <p><strong>Assignment Name:<\/strong> Weekly Overall Grade Update<\/p>
-              <p><strong>Assignment Detail:<\/strong> This grade will be updated weekly to serve as the student's current overall grade for the course. Individual assignment grades are located on CL / Microsoft Teams.<\/p>
-            <\/div>
+              <h3>Weekly Overall Grade Update</h3>
+              <p><strong>Assignment Name:</strong> Weekly Overall Grade Update</p>
+              <p><strong>Assignment Detail:</strong> This grade will be updated weekly to serve as the student's current overall grade for the course. Individual assignment grades are located on CL / Microsoft Teams.</p>
+            </div>
             <div class="section-card">
-              <h3>Final Overall Grade<\/h3>
-              <p><strong>Assignment Name:<\/strong> Final Overall Grade<\/p>
-              <p><strong>Assignment Detail:<\/strong> Student's final grade for this nine-week grading period. Individual assignment scores can be found in student's profile / gradebook in Microsoft Teams / CL.<\/p>
-            <\/div>
-          <\/section>
-        <\/div>
-      <\/aside>
+              <h3>Final Overall Grade</h3>
+              <p><strong>Assignment Name:</strong> Final Overall Grade</p>
+              <p><strong>Assignment Detail:</strong> Student's final grade for this nine-week grading period. Individual assignment scores can be found in student's profile / gradebook in Microsoft Teams / CL.</p>
+            </div>
+          </section>
+        </div>
+      </aside>
       <section class="panel">
         <div class="panel-inner">
           <div class="tabs" role="tablist" aria-label="CyberGrader sections">
-            <button class="tab-btn grade-tab active" data-tab="gradingTab" role="tab" aria-selected="true">Grading Output<\/button>
-            <button class="tab-btn email-tab" data-tab="emailTab" role="tab" aria-selected="false">Email Generator<\/button>
-          <\/div>
-          <div class="tab-help" id="tabHelp">Use this section to generate and optionally save your regular student feedback comments.<\/div>
+            <button class="tab-btn grade-tab active" data-tab="gradingTab" role="tab" aria-selected="true">Grading Output</button>
+            <button class="tab-btn email-tab" data-tab="emailTab" role="tab" aria-selected="false">Email Generator</button>
+          </div>
+          <div class="tab-help" id="tabHelp">Use this section to generate and optionally save your regular student feedback comments.</div>
           <div class="tab-panel active" id="gradingTab" role="tabpanel">
             <div class="form-grid">
               <div class="field">
-                <label for="workType">Work Type<\/label>
-                <select id="workType"><\/select>
-              <\/div>
+                <label for="workType">Work Type</label>
+                <select id="workType"></select>
+              </div>
               <div class="field">
-                <label for="outputType">Output Type<\/label>
-                <select id="outputType"><\/select>
-              <\/div>
-            <\/div>
+                <label for="outputType">Output Type</label>
+                <select id="outputType"></select>
+              </div>
+            </div>
             <div class="toolbar">
               <div class="toolbar-left">
-                <button class="toggle-btn" id="editGradeToggle" type="button" aria-pressed="false">Edit Output<\/button>
-                <button class="save-btn" id="saveGradeBtn" type="button">Save Override<\/button>
-                <button class="reset-btn" id="resetGradeBtn" type="button">Reset Template<\/button>
-                <button class="mic-btn" id="gradeMicBtn" type="button">Voice Input<\/button>
-              <\/div>
+                <button class="toggle-btn" id="editGradeToggle" type="button" aria-pressed="false">Edit Output</button>
+                <button class="save-btn" id="saveGradeBtn" type="button">Save Override</button>
+                <button class="reset-btn" id="resetGradeBtn" type="button">Reset Template</button>
+                <button class="mic-btn" id="gradeMicBtn" type="button">Voice Input</button>
+              </div>
               <div class="toolbar-right">
-                <button class="copy-btn" id="copyGradeBtn" type="button">Copy Output<\/button>
-              <\/div>
-            <\/div>
+                <button class="copy-btn" id="copyGradeBtn" type="button">Copy Output</button>
+              </div>
+            </div>
             <div class="field full">
-              <label for="gradeOutput">Generated Output<\/label>
-              <textarea id="gradeOutput" readonly spellcheck="true"><\/textarea>
-            <\/div>
-            <div class="copy-status" id="gradeStatus"><\/div>
-            <div class="hint">Edits only become permanent on this device if you click Save Override.<\/div>
-          <\/div>
+              <label for="gradeOutput">Generated Output</label>
+              <textarea id="gradeOutput" readonly spellcheck="true"></textarea>
+            </div>
+            <div class="copy-status" id="gradeStatus"></div>
+            <div class="hint">Edits only become permanent on this device if you click Save Override.</div>
+          </div>
           <div class="tab-panel" id="emailTab" role="tabpanel">
             <div class="pillrow">
-              <span class="pill">Tip: choose an email type first<\/span>
-              <span class="pill">Use All Students for your normal bulk workflow<\/span>
-              <span class="pill">Only Single Student uses the student name field<\/span>
-            <\/div>
+              <span class="pill">Tip: choose an email type first</span>
+              <span class="pill">Use All Students for your normal bulk workflow</span>
+              <span class="pill">Only Single Student uses the student name field</span>
+            </div>
             <div class="form-grid">
               <div class="field">
-                <label for="emailType">Email Type<\/label>
-                <select id="emailType"><\/select>
-              <\/div>
+                <label for="emailType">Email Type</label>
+                <select id="emailType"></select>
+              </div>
               <div class="field">
-                <label for="gradeLevel">Grade Level / Audience<\/label>
-                <select id="gradeLevel"><\/select>
-              <\/div>
+                <label for="gradeLevel">Grade Level / Audience</label>
+                <select id="gradeLevel"></select>
+              </div>
               <div class="field" id="termField">
-                <label for="term">Current Term<\/label>
+                <label for="term">Current Term</label>
                 <select id="term">
-                  <option value="first">First Nine Weeks<\/option>
-                  <option value="second">Second Nine Weeks<\/option>
-                  <option value="third">Third Nine Weeks<\/option>
-                  <option value="fourth">Fourth Nine Weeks<\/option>
-                <\/select>
-              <\/div>
+                  <option value="first">First Nine Weeks</option>
+                  <option value="second">Second Nine Weeks</option>
+                  <option value="third">Third Nine Weeks</option>
+                  <option value="fourth">Fourth Nine Weeks</option>
+                </select>
+              </div>
               <div class="field" id="courseScopeField">
-                <label for="courseScope">Course Scope<\/label>
+                <label for="courseScope">Course Scope</label>
                 <select id="courseScope">
-                  <option value="nineweeks">Nine Weeks Course<\/option>
-                  <option value="semester">Semester Course<\/option>
-                  <option value="yearlong">Year-Long Course<\/option>
-                <\/select>
-              <\/div>
+                  <option value="nineweeks">Nine Weeks Course</option>
+                  <option value="semester">Semester Course</option>
+                  <option value="yearlong">Year-Long Course</option>
+                </select>
+              </div>
               <div class="field hidden" id="studentNameField">
-                <label for="studentName">Student Name<\/label>
-                <input type="text" id="studentName" placeholder="Use only for single-student emails" \/>
-              <\/div>
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" placeholder="Use only for single-student emails" />
+              </div>
               <div class="field">
-                <label for="courseName">Course Name<\/label>
-                <input type="text" id="courseName" placeholder="Optional course name" \/>
-              <\/div>
-            <\/div>
+                <label for="courseName">Course Name</label>
+                <input type="text" id="courseName" placeholder="Optional course name" />
+              </div>
+            </div>
             <div class="subgrid">
               <div class="field" id="progressField">
-                <label for="progressValue">Progress Target<\/label>
-                <input type="text" id="progressValue" value="25%" \/>
-              <\/div>
+                <label for="progressValue">Progress Target</label>
+                <input type="text" id="progressValue" value="25%" />
+              </div>
               <div class="field" id="referenceDateField">
-                <label for="currentDateField">Reference Date<\/label>
-                <input type="text" id="currentDateField" \/>
-              <\/div>
+                <label for="currentDateField">Reference Date</label>
+                <input type="text" id="currentDateField" />
+              </div>
               <div class="field" id="deadlineFieldWrap">
-                <label for="deadlineField">Deadline / End Date<\/label>
-                <input type="text" id="deadlineField" placeholder="Example: Thursday, March 19 at 11:59 p.m." \/>
-              <\/div>
-            <\/div>
+                <label for="deadlineField">Deadline / End Date</label>
+                <input type="text" id="deadlineField" placeholder="Example: Thursday, March 19 at 11:59 p.m." />
+              </div>
+            </div>
             <div class="subgrid" id="dualDeadlineWrap">
               <div class="field">
-                <label for="seniorDeadline">Senior Deadline<\/label>
-                <input type="text" id="seniorDeadline" placeholder="Example: Monday, May 19 at 11:59 p.m." \/>
-              <\/div>
+                <label for="seniorDeadline">Senior Deadline</label>
+                <input type="text" id="seniorDeadline" placeholder="Example: Monday, May 19 at 11:59 p.m." />
+              </div>
               <div class="field">
-                <label for="generalDeadline">Grades 7\\u201311 Deadline<\/label>
-                <input type="text" id="generalDeadline" placeholder="Example: Monday, June 2 at 11:59 p.m." \/>
-              <\/div>
+                <label for="generalDeadline">Grades 7\u201311 Deadline</label>
+                <input type="text" id="generalDeadline" placeholder="Example: Monday, June 2 at 11:59 p.m." />
+              </div>
               <div class="field">
-                <label>\\u00a0<\/label>
-                <div class="hint">Use these for 4th nine weeks bulk reminders.<\/div>
-              <\/div>
-            <\/div>
+                <label>\u00a0</label>
+                <div class="hint">Use these for 4th nine weeks bulk reminders.</div>
+              </div>
+            </div>
             <div class="toolbar">
               <div class="toolbar-left">
-                <button class="toggle-btn" id="editSubjectToggle" type="button" aria-pressed="false">Edit Subject<\/button>
-                <button class="toggle-btn" id="editBodyToggle" type="button" aria-pressed="false">Edit Body<\/button>
-                <button class="save-btn" id="saveEmailBtn" type="button">Save Override<\/button>
-                <button class="reset-btn" id="resetEmailBtn" type="button">Reset Template<\/button>
-                <button class="mic-btn" id="emailMicBtn" type="button">Voice Input<\/button>
-              <\/div>
+                <button class="toggle-btn" id="editSubjectToggle" type="button" aria-pressed="false">Edit Subject</button>
+                <button class="toggle-btn" id="editBodyToggle" type="button" aria-pressed="false">Edit Body</button>
+                <button class="save-btn" id="saveEmailBtn" type="button">Save Override</button>
+                <button class="reset-btn" id="resetEmailBtn" type="button">Reset Template</button>
+                <button class="mic-btn" id="emailMicBtn" type="button">Voice Input</button>
+              </div>
               <div class="toolbar-right">
-                <button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject<\/button>
-                <button class="copy-btn" id="copyBodyBtn" type="button">Copy Body<\/button>
-                <button class="ghost-btn" id="copyCombinedBtn" type="button">Copy Combined<\/button>
-              <\/div>
-            <\/div>
+                <button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject</button>
+                <button class="copy-btn" id="copyBodyBtn" type="button">Copy Body</button>
+                <button class="ghost-btn" id="copyCombinedBtn" type="button">Copy Combined</button>
+              </div>
+            </div>
             <div class="field full">
-              <label for="emailSubjectOutput">Email Subject<\/label>
-              <textarea id="emailSubjectOutput" readonly rows="2" spellcheck="true"><\/textarea>
-            <\/div>
+              <label for="emailSubjectOutput">Email Subject</label>
+              <textarea id="emailSubjectOutput" readonly rows="2" spellcheck="true"></textarea>
+            </div>
             <div class="field full">
-              <label for="emailBodyOutput">Email Body<\/label>
-              <textarea id="emailBodyOutput" readonly spellcheck="true"><\/textarea>
-            <\/div>
+              <label for="emailBodyOutput">Email Body</label>
+              <textarea id="emailBodyOutput" readonly spellcheck="true"></textarea>
+            </div>
             <div class="field full">
-              <label for="emailCombinedOutput">Combined Output<\/label>
-              <textarea id="emailCombinedOutput" readonly spellcheck="true"><\/textarea>
-            <\/div>
-            <div class="copy-status" id="emailStatus"><\/div>
-            <div class="hint">Email overrides save only on this device and browser using local storage.<\/div>
-          <\/div>
-        <\/div>
-      <\/section>
-    <\/main>
-    <div class="divider"><\/div>
-    <footer class="footer">Created by percycodes<\/footer>
-  <\/div>
+              <label for="emailCombinedOutput">Combined Output</label>
+              <textarea id="emailCombinedOutput" readonly spellcheck="true"></textarea>
+            </div>
+            <div class="copy-status" id="emailStatus"></div>
+            <div class="hint">Email overrides save only on this device and browser using local storage.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="divider"></div>
+    <footer class="footer">Created by percycodes</footer>
+  </div>
 <script>
 const $ = (id) => document.getElementById(id);
 const STORAGE_KEYS = {
@@ -367,25 +336,25 @@ const gradeConfig = {
   "PROJECT": ["Perfect","Good","Missing Work"]
 };
 const defaultGradeTemplates = {
-  "FIRST ASSIGNMENT||Welcome First Nine Weeks": (d) => \`Graded \${d} - Welcome to our class. Great job completing the first assignment. Please let me know if you have any questions as you work throughout the course.\`,
-  "FIRST ASSIGNMENT||Welcome Second Nine Weeks": (d) => \`Graded \${d} - Welcome to the second nine weeks. Great job completing the first assignment for this marking period. Please let me know if you have any questions as you work throughout the course.\`,
-  "FIRST ASSIGNMENT||Welcome Third Nine Weeks": (d) => \`Graded \${d} - Welcome to the third nine weeks. Great job completing the first assignment for this marking period. Please let me know if you have any questions as you work throughout the course.\`,
-  "FIRST ASSIGNMENT||Welcome Fourth Nine Weeks": (d) => \`Graded \${d} - Welcome to the fourth nine weeks. Great job completing the first assignment for this marking period. Please let me know if you have any questions as you work throughout the course.\`,
-  "ASSIGNMENT||Perfect": (d) => \`Graded \${d} - Great work. This assignment was completed correctly and full credit has been earned. Please let me know if you have any questions.\`,
-  "ASSIGNMENT||Partial Credit": (d) => \`Graded \${d} - Partial credit was given for anywhere I saw your connection being made. Please let me know if you have any questions and I will be happy to explain further.\`,
-  "ASSIGNMENT||Assignment Resubmit": (d) => \`Graded \${d} - Please let me know if you would like to go over this assignment, as I want to help you understand what you missed. Please reply to this email letting me know if this is something you want to do, otherwise the grade will remain the same.\`,
-  "PROJECT||Perfect": (d) => \`Graded \${d} - Great work on this project. It was completed successfully and earned full credit. Please let me know if you have any questions.\`,
-  "PROJECT||Good": (d) => \`Graded \${d} - Good work on this project. I saw solid effort and progress throughout your submission. Please let me know if you have any questions.\`,
-  "PROJECT||Missing Work": (d) => \`Graded \${d} - This project is missing required parts. Please let me know if you would like to go over what is missing so I can help you understand what still needs to be completed.\`
+  "FIRST ASSIGNMENT||Welcome First Nine Weeks": (d) => `Graded ${d} - Welcome to our class. Great job completing the first assignment. Please let me know if you have any questions as you work throughout the course.`,
+  "FIRST ASSIGNMENT||Welcome Second Nine Weeks": (d) => `Graded ${d} - Welcome to the second nine weeks. Great job completing the first assignment for this marking period. Please let me know if you have any questions as you work throughout the course.`,
+  "FIRST ASSIGNMENT||Welcome Third Nine Weeks": (d) => `Graded ${d} - Welcome to the third nine weeks. Great job completing the first assignment for this marking period. Please let me know if you have any questions as you work throughout the course.`,
+  "FIRST ASSIGNMENT||Welcome Fourth Nine Weeks": (d) => `Graded ${d} - Welcome to the fourth nine weeks. Great job completing the first assignment for this marking period. Please let me know if you have any questions as you work throughout the course.`,
+  "ASSIGNMENT||Perfect": (d) => `Graded ${d} - Great work. This assignment was completed correctly and full credit has been earned. Please let me know if you have any questions.`,
+  "ASSIGNMENT||Partial Credit": (d) => `Graded ${d} - Partial credit was given for anywhere I saw your connection being made. Please let me know if you have any questions and I will be happy to explain further.`,
+  "ASSIGNMENT||Assignment Resubmit": (d) => `Graded ${d} - Please let me know if you would like to go over this assignment, as I want to help you understand what you missed. Please reply to this email letting me know if this is something you want to do, otherwise the grade will remain the same.`,
+  "PROJECT||Perfect": (d) => `Graded ${d} - Great work on this project. It was completed successfully and earned full credit. Please let me know if you have any questions.`,
+  "PROJECT||Good": (d) => `Graded ${d} - Good work on this project. I saw solid effort and progress throughout your submission. Please let me know if you have any questions.`,
+  "PROJECT||Missing Work": (d) => `Graded ${d} - This project is missing required parts. Please let me know if you would like to go over what is missing so I can help you understand what still needs to be completed.`
 };
-const emailTypes = ["Welcome Letter","Early Check-In","25% Check-In","50% Check-In","75% Check-In","Next Nine Weeks Loaded","Semester / Part Change","Spring Break Reminder","Final Week Reminder","Senior Final Reminder","End of Year Grades 7\\u201311","End of Year Grade 12"];
+const emailTypes = ["Welcome Letter","Early Check-In","25% Check-In","50% Check-In","75% Check-In","Next Nine Weeks Loaded","Semester / Part Change","Spring Break Reminder","Final Week Reminder","Senior Final Reminder","End of Year Grades 7\u201311","End of Year Grade 12"];
 const gradeLevelsByType = {
   "Welcome Letter":["All Students","Single Student"],"Early Check-In":["All Students","Single Student"],
   "25% Check-In":["All Students","Single Student"],"50% Check-In":["All Students","Single Student"],
   "75% Check-In":["All Students","Single Student"],"Next Nine Weeks Loaded":["All Students","Single Student"],
   "Semester / Part Change":["All Students","Single Student"],"Spring Break Reminder":["All Students"],
   "Final Week Reminder":["All Students"],"Senior Final Reminder":["Seniors"],
-  "End of Year Grades 7\\u201311":["Grades 7\\u201311"],"End of Year Grade 12":["Seniors"]
+  "End of Year Grades 7\u201311":["Grades 7\u201311"],"End of Year Grade 12":["Seniors"]
 };
 const today = new Date();
 const shortDate = new Intl.DateTimeFormat('en-US').format(today);
@@ -404,11 +373,11 @@ function saveLastValues(){
 function restoreLastValues(){const vals=loadJSON(STORAGE_KEYS.lastValues);Object.keys(vals).forEach(key=>{if($(key))$(key).value=vals[key]});}
 function normalizeTerm(term){return{first:"first nine weeks",second:"second nine weeks",third:"third nine weeks",fourth:"fourth nine weeks"}[term]||"current grading period"}
 function nextTerm(term){return{first:"second nine weeks",second:"third nine weeks",third:"fourth nine weeks",fourth:"next grading period"}[term]||"next grading period"}
-function greeting(level,name){if(level==="Seniors")return"Hi Seniors,";if(level==="Single Student")return\`\${name?.trim()||"Student"},\`;return"Hi Students,"}
+function greeting(level,name){if(level==="Seniors")return"Hi Seniors,";if(level==="Single Student")return`${name?.trim()||"Student"},`;return"Hi Students,"}
 function setSelectOptions(select,values){select.innerHTML="";values.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;select.appendChild(o)})}
-function getGradeKey(){return\`\${$("workType").value}||\${$("outputType").value}\`}
+function getGradeKey(){return`${$("workType").value}||${$("outputType").value}`}
 function getEmailKey(){return[$("emailType").value,$("gradeLevel").value,$("term").value,$("courseScope").value].join("||")}
-function getDefaultGradeText(){const key=getGradeKey();return(defaultGradeTemplates[key]?defaultGradeTemplates[key](shortDate):\`Graded \${shortDate} - Feedback not available.\`)}
+function getDefaultGradeText(){const key=getGradeKey();return(defaultGradeTemplates[key]?defaultGradeTemplates[key](shortDate):`Graded ${shortDate} - Feedback not available.`)}
 function updateGradeTypes(){setSelectOptions($("outputType"),gradeConfig[$("workType").value]||[]);updateGradeOutput(true)}
 function updateGradeOutput(force=false){
   const key=getGradeKey();
@@ -419,7 +388,7 @@ function updateGradeOutput(force=false){
   $("gradeOutput").value=gradeOverrides[key]||getDefaultGradeText();
 }
 function setEditable(textarea,button,editable){textarea.readOnly=!editable;button.classList.toggle("active",editable);button.setAttribute("aria-pressed",editable?"true":"false");if(editable)textarea.focus()}
-function cleanSingleLine(text){return text.replace(/\\s+/g," ").trim()}
+function cleanSingleLine(text){return text.replace(/\s+/g," ").trim()}
 async function copyText(text,statusEl,button){try{await navigator.clipboard.writeText(text);const old=button.textContent;button.textContent="Copied";statusEl.textContent="Copied to clipboard.";setTimeout(()=>{button.textContent=old;statusEl.textContent=""},1400)}catch{statusEl.textContent="Copy failed. Select the text manually and copy."}}
 function getReferenceDate(){return $("currentDateField").value.trim()||shortDate}
 function getProgressDefault(){const type=$("emailType").value;if(type.includes("25%"))return"25%";if(type.includes("50%"))return"50%";if(type.includes("75%"))return"75%";if(type.includes("Final Week"))return"90%";return $("progressValue").value.trim()}
@@ -428,7 +397,7 @@ function maybeAdjustFields(){
   const showProgress=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
   const showReferenceDate=["25% Check-In","50% Check-In","75% Check-In"].includes(type);
   const showSingle=$("gradeLevel").value==="Single Student";
-  const showSingleDeadline=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Senior Final Reminder","End of Year Grades 7\\u201311","End of Year Grade 12"].includes(type);
+  const showSingleDeadline=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Senior Final Reminder","End of Year Grades 7\u201311","End of Year Grade 12"].includes(type);
   const showDualDeadline=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Next Nine Weeks Loaded"].includes(type)&&$("term").value==="fourth"&&$("gradeLevel").value==="All Students";
   $("progressField").classList.toggle("hidden",!showProgress);
   $("referenceDateField").classList.toggle("hidden",!showReferenceDate);
@@ -437,30 +406,30 @@ function maybeAdjustFields(){
   $("dualDeadlineWrap").classList.toggle("hidden",!showDualDeadline);
 }
 function populateGradeLevels(){const type=$("emailType").value;const current=$("gradeLevel").value;setSelectOptions($("gradeLevel"),gradeLevelsByType[type]||["All Students"]);const options=[...$("gradeLevel").options].map(o=>o.value);$("gradeLevel").value=options.includes(current)?current:options[0]}
-function buildBulkDeadlineBlock(){const s=$("seniorDeadline").value.trim();const g=$("generalDeadline").value.trim();if(!s&&!g)return"";let out="Please also keep these final deadlines in mind:\\n";if(s)out+=\`- Seniors: \${s}\\n\`;if(g)out+=\`- Grades 7\\u201311: \${g}\\n\`;return out.trim()}
+function buildBulkDeadlineBlock(){const s=$("seniorDeadline").value.trim();const g=$("generalDeadline").value.trim();if(!s&&!g)return"";let out="Please also keep these final deadlines in mind:\n";if(s)out+=`- Seniors: ${s}\n`;if(g)out+=`- Grades 7\u201311: ${g}\n`;return out.trim()}
 function buildEmailTemplate(){
   const type=$("emailType").value,level=$("gradeLevel").value,term=$("term").value,scope=$("courseScope").value;
   const studentName=$("studentName").value.trim(),courseName=$("courseName").value.trim();
   const progress=getProgressDefault(),refDate=getReferenceDate(),deadline=$("deadlineField").value.trim();
   const greet=greeting(level,studentName),termName=normalizeTerm(term),nextName=nextTerm(term);
-  const courseText=courseName?\`\${courseName} \`:"",dual=buildBulkDeadlineBlock();
+  const courseText=courseName?`${courseName} `:"",dual=buildBulkDeadlineBlock();
   switch(type){
-    case "Welcome Letter":return{subject:courseName?\`Welcome to \${courseName}\`:"Welcome to Your Cyber Course",body:\`\${greet}\\n\\nWelcome to your \${courseText}cyber course! My name is Mr. Macek, and I'll be your teacher this \${scope==="semester"?"semester":"grading period"}.\\n\\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus. The syllabus outlines expectations, grading policies, and how the course is structured, so please take your time going through it and reach out if anything is unclear.\\n\\nCommunication is a big part of doing well in an online course. Please check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\\n\\nI'm excited to get started and look forward to a great \${scope==="semester"?"semester":"nine weeks"} with you!\\n\\nGood luck!\\n\\nMr. Macek\`};
-    case "Early Check-In":return{subject:"Cyber Check-In",body:\`\${greet}\\n\\nI wanted to check in now that the add/drop period is behind us. This is a good time to make sure you are actively working in your cyber course and not letting yourself fall behind.\\n\\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it is important to stay on pace from the start. If something is unclear or you need help getting going, reach out to me. I'm here to help.\\n\\nThanks,\\n\\nMr. Macek\`};
-    case "25% Check-In":return{subject:"Cyber Progress Check-In",body:\`\${greet}\\n\\nAs of today, \${refDate}, you should be approximately \${progress} complete with your cyber coursework for the \${termName}. If you are not at or near that mark, please reach out to me so we can make a plan.\\n\\nIf something is unclear or you are stuck, I'm here to help \\u2014 but communication is key.\\n\\n\${term==="fourth"&&dual?dual+"\\n\\n":""}\${deadline&&term!=="fourth"?\`Please remember the end date for this grading period is \${deadline}.\\n\\n\`:""}Mr. Macek\`};
-    case "50% Check-In":return{subject:"Cyber Check-In!",body:\`\${greet}\\n\\nWe are now at roughly \${progress} of the way through the \${termName}. This is an important checkpoint, and the effort you put in right now will have a meaningful impact on your overall grade and progress.\\n\\nConsistency at this stage makes a big difference. If you have questions, get stuck, or need guidance on where to focus next, reach out at any time. I'm always here to help you succeed.\\n\\n\${term==="fourth"&&dual?dual+"\\n\\n":""}\${deadline&&term!=="fourth"?\`Please remember the current deadline: \${deadline}.\\n\\n\`:""}Thank you,\\n\\nMr. Macek\`};
-    case "75% Check-In":return{subject:"75% Completion Mark - Cyber Courses",body:\`\${greet}\\n\\nAs of today (\${refDate}), we are at the \${progress} completion mark for the \${termName}. I have finished grading all submitted work, and all grades are current and up to date.\\n\\n\${deadline&&term!=="fourth"?\`The end date for this grading period is \${deadline}. I highly recommend that you continue working on your course and complete all required work before that date.\\n\\n\`:""}Remember, asking a question online is just as important as raising your hand in class. If you are unsure about something or need help, please reach out.\\n\\nLooking ahead, the \${nextName} will be loaded a few days before this grading period ends so you can move right into the next part.\\n\\n\${term==="fourth"&&dual?dual+"\\n\\n":""}Thanks,\\n\\nMr. Macek\`};
-    case "Next Nine Weeks Loaded":return{subject:"Next Nine Weeks Added to Your Account",body:\`\${greet}\\n\\nYour \${nextName} has now been added to your account. Please do not be alarmed or feel like you need to start working on it right now.\\n\\nWe load courses early to make sure that if you are complete with the current part, you can move right into the next one without delay.\\n\\n\${term==="third"||term==="fourth"?dual+"\\n\\n":""}If anything looks off or you notice a discrepancy, let me know.\\n\\nMr. Macek\`};
-    case "Semester / Part Change":return{subject:scope==="semester"?"Welcome to Part 2 of Your Course":\`Welcome to the \${nextName}\`,body:\`\${greet}\\n\\nWelcome to \${scope==="semester"?"the second part of your course":"the "+nextName}! I wanted to let you know that I have graded your first assignment, whether it involved uploading the course syllabus, sharing your prior knowledge, or answering the content question. All grades have been updated.\\n\\nAs we enter this grading period, please don't hesitate to contact me immediately if you have any questions or encounter any issues. You always have the option to complete your cyber course early, but late submissions are not accepted, so it is important to stay ahead of the assignment calendar.\\n\\nGood luck this marking period!\\n\\nMr. Macek\`};
-    case "Spring Break Reminder":return{subject:"Enjoy Your Break!!!",body:\`\${greet}\\n\\nI hope you all enjoy your break \\u2014 you've earned it! I did want to mention that if you choose to work on any days while we're off, the assignment calendar will actually allow you to get ahead in the course.\\n\\nIf you find yourself with some free time, it is a great opportunity to make progress and stay ahead.\\n\\nOther than that, enjoy your break. I'm looking forward to working with you all for the rest of the \${termName}.\\n\\nAs always, don't hesitate to reach out if you have any questions.\\n\\nThanks,\\n\\nMr. Macek\`};
-    case "Final Week Reminder":return{subject:"Final Reminder: Coursework Deadline Approaching",body:\`\${greet}\\n\\nCan you believe it? We are now at the \${progress} mark of the \${termName}, which means the end is just about here.\\n\\n\${term==="fourth"&&dual?dual+"\\n\\n":deadline?\`All cyber assignments are due by \${deadline}.\\n\\n\`:""}If you are not near that mark yet or have not started, do not panic \\u2014 but do not wait. Power through those last few lessons, and don't hesitate to reach out if you are stuck. I'm here to support you.\\n\\nIf you are on track or ahead, keep that momentum going. The effort you put in now will pay off with a strong finish.\\n\\nYou've got this!\\n\\nMr. Macek\`};
-    case "Senior Final Reminder":return{subject:"*SENIORS ONLY* Final Reminder: Coursework Due Soon",body:\`Hi Seniors,\\n\\nThis is a final reminder that all of your cyber coursework must be completed and submitted by \${deadline||"[deadline]"}.\\n\\nPlease ensure you are checking your course progress, wrapping up any incomplete assignments, and reaching out if you need help. After the deadline, no additional submissions will be accepted.\\n\\nLet's finish strong!\\n\\nMr. Macek\`};
-    case "End of Year Grades 7\\u201311":return{subject:"Final Reminder: End-of-Year Cyber Coursework Due",body:\`Hi Students,\\n\\nAs we wrap up the year, this is a reminder that all cyber coursework for students in grades 7\\u201311 must be completed and submitted by \${deadline||"[deadline]"}.\\n\\nPlease make sure you are checking your course progress, wrapping up any incomplete assignments, and submitting everything before the deadline. If you have questions or need help, please reach out.\\n\\nHave a great summer!\\n\\nMr. Macek\`};
-    case "End of Year Grade 12":return{subject:"*SENIORS ONLY* Final Reminder: All Coursework Due",body:\`Hi Seniors,\\n\\nAs we wrap up the year, this is a final reminder that all of your cyber coursework must be completed and submitted by \${deadline||"[deadline]"}.\\n\\nPlease ensure you are checking your course progress, finishing incomplete assignments, and reaching out if you need help. After the deadline, no additional submissions will be accepted.\\n\\nCongratulations and best of luck.\\n\\nMr. Macek\`};
-    default:return{subject:"Cyber Update",body:\`\${greet}\\n\\nCourse update ready.\\n\\nMr. Macek\`};
+    case "Welcome Letter":return{subject:courseName?`Welcome to ${courseName}`:"Welcome to Your Cyber Course",body:`${greet}\n\nWelcome to your ${courseText}cyber course! My name is Mr. Macek, and I'll be your teacher this ${scope==="semester"?"semester":"grading period"}.\n\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus. The syllabus outlines expectations, grading policies, and how the course is structured, so please take your time going through it and reach out if anything is unclear.\n\nCommunication is a big part of doing well in an online course. Please check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\n\nI'm excited to get started and look forward to a great ${scope==="semester"?"semester":"nine weeks"} with you!\n\nGood luck!\n\nMr. Macek`};
+    case "Early Check-In":return{subject:"Cyber Check-In",body:`${greet}\n\nI wanted to check in now that the add/drop period is behind us. This is a good time to make sure you are actively working in your cyber course and not letting yourself fall behind.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it is important to stay on pace from the start. If something is unclear or you need help getting going, reach out to me. I'm here to help.\n\nThanks,\n\nMr. Macek`};
+    case "25% Check-In":return{subject:"Cyber Progress Check-In",body:`${greet}\n\nAs of today, ${refDate}, you should be approximately ${progress} complete with your cyber coursework for the ${termName}. If you are not at or near that mark, please reach out to me so we can make a plan.\n\nIf something is unclear or you are stuck, I'm here to help \u2014 but communication is key.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`Please remember the end date for this grading period is ${deadline}.\n\n`:""}Mr. Macek`};
+    case "50% Check-In":return{subject:"Cyber Check-In!",body:`${greet}\n\nWe are now at roughly ${progress} of the way through the ${termName}. This is an important checkpoint, and the effort you put in right now will have a meaningful impact on your overall grade and progress.\n\nConsistency at this stage makes a big difference. If you have questions, get stuck, or need guidance on where to focus next, reach out at any time. I'm always here to help you succeed.\n\n${term==="fourth"&&dual?dual+"\n\n":""}${deadline&&term!=="fourth"?`Please remember the current deadline: ${deadline}.\n\n`:""}Thank you,\n\nMr. Macek`};
+    case "75% Check-In":return{subject:"75% Completion Mark - Cyber Courses",body:`${greet}\n\nAs of today (${refDate}), we are at the ${progress} completion mark for the ${termName}. I have finished grading all submitted work, and all grades are current and up to date.\n\n${deadline&&term!=="fourth"?`The end date for this grading period is ${deadline}. I highly recommend that you continue working on your course and complete all required work before that date.\n\n`:""}Remember, asking a question online is just as important as raising your hand in class. If you are unsure about something or need help, please reach out.\n\nLooking ahead, the ${nextName} will be loaded a few days before this grading period ends so you can move right into the next part.\n\n${term==="fourth"&&dual?dual+"\n\n":""}Thanks,\n\nMr. Macek`};
+    case "Next Nine Weeks Loaded":return{subject:"Next Nine Weeks Added to Your Account",body:`${greet}\n\nYour ${nextName} has now been added to your account. Please do not be alarmed or feel like you need to start working on it right now.\n\nWe load courses early to make sure that if you are complete with the current part, you can move right into the next one without delay.\n\n${term==="third"||term==="fourth"?dual+"\n\n":""}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`};
+    case "Semester / Part Change":return{subject:scope==="semester"?"Welcome to Part 2 of Your Course":`Welcome to the ${nextName}`,body:`${greet}\n\nWelcome to ${scope==="semester"?"the second part of your course":"the "+nextName}! I wanted to let you know that I have graded your first assignment, whether it involved uploading the course syllabus, sharing your prior knowledge, or answering the content question. All grades have been updated.\n\nAs we enter this grading period, please don't hesitate to contact me immediately if you have any questions or encounter any issues. You always have the option to complete your cyber course early, but late submissions are not accepted, so it is important to stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`};
+    case "Spring Break Reminder":return{subject:"Enjoy Your Break!!!",body:`${greet}\n\nI hope you all enjoy your break \u2014 you've earned it! I did want to mention that if you choose to work on any days while we're off, the assignment calendar will actually allow you to get ahead in the course.\n\nIf you find yourself with some free time, it is a great opportunity to make progress and stay ahead.\n\nOther than that, enjoy your break. I'm looking forward to working with you all for the rest of the ${termName}.\n\nAs always, don't hesitate to reach out if you have any questions.\n\nThanks,\n\nMr. Macek`};
+    case "Final Week Reminder":return{subject:"Final Reminder: Coursework Deadline Approaching",body:`${greet}\n\nCan you believe it? We are now at the ${progress} mark of the ${termName}, which means the end is just about here.\n\n${term==="fourth"&&dual?dual+"\n\n":deadline?`All cyber assignments are due by ${deadline}.\n\n`:""}If you are not near that mark yet or have not started, do not panic \u2014 but do not wait. Power through those last few lessons, and don't hesitate to reach out if you are stuck. I'm here to support you.\n\nIf you are on track or ahead, keep that momentum going. The effort you put in now will pay off with a strong finish.\n\nYou've got this!\n\nMr. Macek`};
+    case "Senior Final Reminder":return{subject:"*SENIORS ONLY* Final Reminder: Coursework Due Soon",body:`Hi Seniors,\n\nThis is a final reminder that all of your cyber coursework must be completed and submitted by ${deadline||"[deadline]"}.\n\nPlease ensure you are checking your course progress, wrapping up any incomplete assignments, and reaching out if you need help. After the deadline, no additional submissions will be accepted.\n\nLet's finish strong!\n\nMr. Macek`};
+    case "End of Year Grades 7\u201311":return{subject:"Final Reminder: End-of-Year Cyber Coursework Due",body:`Hi Students,\n\nAs we wrap up the year, this is a reminder that all cyber coursework for students in grades 7\u201311 must be completed and submitted by ${deadline||"[deadline]"}.\n\nPlease make sure you are checking your course progress, wrapping up any incomplete assignments, and submitting everything before the deadline. If you have questions or need help, please reach out.\n\nHave a great summer!\n\nMr. Macek`};
+    case "End of Year Grade 12":return{subject:"*SENIORS ONLY* Final Reminder: All Coursework Due",body:`Hi Seniors,\n\nAs we wrap up the year, this is a final reminder that all of your cyber coursework must be completed and submitted by ${deadline||"[deadline]"}.\n\nPlease ensure you are checking your course progress, finishing incomplete assignments, and reaching out if you need help. After the deadline, no additional submissions will be accepted.\n\nCongratulations and best of luck.\n\nMr. Macek`};
+    default:return{subject:"Cyber Update",body:`${greet}\n\nCourse update ready.\n\nMr. Macek`};
   }
 }
-function updateCombined(){$("emailCombinedOutput").value=\`Subject: \${$("emailSubjectOutput").value}\\n\\n\${$("emailBodyOutput").value}\`}
+function updateCombined(){$("emailCombinedOutput").value=`Subject: ${$("emailSubjectOutput").value}\n\n${$("emailBodyOutput").value}`}
 function updateEmailOutput(force=false){
   maybeAdjustFields();
   const key=getEmailKey(),tpl=buildEmailTemplate(),saved=emailOverrides[key];
@@ -508,18 +477,6 @@ $("emailMicBtn").addEventListener("click",()=>{if($("emailBodyOutput").readOnly)
 $("emailSubjectOutput").addEventListener("input",updateCombined);
 $("emailBodyOutput").addEventListener("input",updateCombined);
 activateTab(document.querySelector('.tab-btn.grade-tab'));
-<\/script>
-<\/body>
-<\/html>`;
-
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'index.html';
-  a.click();
-  URL.revokeObjectURL(url);
-}
 </script>
 </body>
 </html>
