@@ -356,10 +356,55 @@ min-height:100vh;width:100%;
 display:flex;align-items:center;justify-content:center;
 text-align:center;padding:20px;margin:0
 }
-.landing-inner{max-width:580px;width:100%;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:18px}
-.landing img{height:220px;width:auto;max-width:100%;filter:drop-shadow(0 0 20px rgba(81,217,255,.4))}
-.landing p{color:var(--muted);font-size:1.05rem;line-height:1.6;margin:0}
-.landing .signin-btn{padding:16px 32px;font-size:1.05rem}
+.landing-inner{
+  max-width:560px;width:100%;margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  padding:36px 32px 32px;
+  background:linear-gradient(180deg, rgba(50,54,66,.85), rgba(38,42,52,.85));
+  border:1px solid rgba(81,217,255,.22);
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(81,217,255,.06) inset;
+  backdrop-filter:blur(8px);
+}
+.landing img{height:140px;width:auto;max-width:100%;filter:drop-shadow(0 0 24px rgba(81,217,255,.55)) drop-shadow(0 0 48px rgba(184,69,255,.25));margin-bottom:4px}
+.landing h1{margin:0;font-size:1.55rem;font-weight:900;letter-spacing:.01em;color:var(--text);line-height:1.2}
+.landing .lede{color:var(--muted);font-size:1rem;line-height:1.55;margin:0;max-width:440px}
+.landing .reasons{
+  width:100%;display:flex;flex-direction:column;gap:10px;margin:6px 0 4px;text-align:left;
+}
+.landing .reason{
+  display:flex;align-items:flex-start;gap:12px;padding:10px 14px;
+  background:rgba(10,18,30,.4);border:1px solid rgba(81,217,255,.14);border-radius:12px;
+  font-size:.92rem;line-height:1.45;color:#cdd9ea;
+}
+.landing .reason .ico{font-size:1.1rem;flex:0 0 auto;line-height:1.4}
+.landing .reason strong{color:var(--cyan);font-weight:800;letter-spacing:.01em}
+.landing .cta-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:100%;margin-top:6px}
+.landing .cta-row > button{flex:1 1 200px;max-width:240px}
+.landing-primary{
+  padding:14px 26px;border-radius:14px;border:1px solid rgba(127,230,255,.85);
+  background:linear-gradient(180deg,#7fe6ff,#00b7ff);color:#001624;
+  font-weight:900;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;
+  box-shadow:0 8px 22px rgba(0,183,255,.35), inset 0 0 0 1px rgba(255,255,255,.2);
+  text-shadow:0 1px 0 rgba(255,255,255,.3);cursor:pointer;font-family:inherit;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.landing-primary:hover{transform:translateY(-2px);background:linear-gradient(180deg,#aef0ff,#22c8ff);box-shadow:0 12px 30px rgba(0,183,255,.5), inset 0 0 0 1px rgba(255,255,255,.3)}
+.landing-secondary{
+  padding:14px 26px;border-radius:14px;border:1px solid rgba(81,217,255,.45);
+  background:rgba(81,217,255,.10);color:#cdf2ff;
+  font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer;font-family:inherit;
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.landing-secondary:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.7);background:rgba(81,217,255,.18)}
+.landing .fineprint{font-size:.78rem;color:rgba(180,200,220,.6);margin-top:4px;letter-spacing:.01em}
+.landing .badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(81,217,255,.12);border:1px solid rgba(81,217,255,.35);
+  color:#9de8ff;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:-4px;
+}
 
 /* RESPONSIVE */
 /* iPad landscape and smaller desktops */
@@ -393,9 +438,22 @@ body{padding:12px}
 <!-- LANDING (signed-out) -->
 <div id="landingScreen" class="landing" style="display:none">
 <div class="landing-inner">
+<span class="badge">✨ Free during beta</span>
 <img src="cybergrader-logo.png?v=1" alt="CyberGrader.io" onerror="this.style.display='none'">
-<p>A workflow tool for cyber teachers. Sign in to generate consistent student feedback and emails across all your devices.</p>
-<button class="signin-btn" id="landingSignInBtn">Sign In to Continue</button>
+<h1>Built for cyber teachers.</h1>
+<p class="lede">Pre-written feedback, recurring student emails, and gradebook placeholder text — all auto-filled with today's date and your school year deadlines.</p>
+
+<div class="reasons">
+<div class="reason"><span class="ico">☁️</span><span><strong>Sync everywhere.</strong> Your school year, edits, and saved templates follow you to every device.</span></div>
+<div class="reason"><span class="ico">🔒</span><span><strong>Your data stays yours.</strong> Locked to your account — no shared classroom, no leaked rosters.</span></div>
+<div class="reason"><span class="ico">📝</span><span><strong>Edits saved globally.</strong> Tweak a template once and every device sees it next time you sign in.</span></div>
+</div>
+
+<div class="cta-row">
+<button class="landing-primary" id="landingSignUpBtn">Create Free Account</button>
+<button class="landing-secondary" id="landingSignInBtn">I already have an account</button>
+</div>
+<p class="fineprint">An account is required — no anonymous access. Takes about 15 seconds with Google.</p>
 </div>
 </div>
 
@@ -486,9 +544,9 @@ Choose a block below to select pre-generated feedback or emails. Once you pick a
 <span class="desc">Recurring student emails for the school year</span>
 </button>
 <button class="block-btn" data-block="portalBlock" type="button">
-<span class="icon"><img src="sv-portal-logo.png?v=1" alt="SV Portal" onerror="this.parentNode.innerHTML='⚙️'"></span>
-<span class="title">SV Portal Setup</span>
-<span class="desc">Seneca Valley gradebook placeholder setup</span>
+<span class="icon"><img src="sv-portal-logo.png?v=1" alt="" onerror="this.parentNode.innerHTML='⚙️'"></span>
+<span class="title">Gradebook Setup</span>
+<span class="desc">Gradebook placeholder text + checklist</span>
 </button>
 </div>
 
@@ -626,7 +684,7 @@ Pick the current term first — the tool filters email options accordingly. Use 
 <!-- PORTAL BLOCK -->
 <div class="block-panel" id="portalBlock">
 <div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
-Pick the assignment placeholder you need to set up in the SV Portal gradebook. Copy the name and detail into the portal fields.
+Pick the assignment placeholder you need to set up in your gradebook. Copy the name and detail into the gradebook fields.
 </div>
 
 <div class="form-grid">
@@ -681,7 +739,7 @@ Pick the assignment placeholder you need to set up in the SV Portal gradebook. C
 <div class="modal narrow">
 <button class="modal-x" id="authModalClose" aria-label="Close">✕</button>
 <h2 id="authTitle">Sign In</h2>
-<p id="authSubtitle">Welcome back. Sign in to save preferences across devices.</p>
+<p id="authSubtitle">An account is required. Sign in or create one to save your setup across devices.</p>
 <div class="auth-form">
 <button class="google-btn" id="googleSignInBtn" type="button">
 <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -753,7 +811,7 @@ Continue with Google
 <div class="modal-overlay" id="portalReminderModal">
 <div class="modal">
 <button class="modal-x" id="portalReminderClose" aria-label="Close">✕</button>
-<h2 style="color:var(--orange)">⚠ SV Portal Reminder</h2>
+<h2 style="color:var(--orange)">⚠ Gradebook Reminder</h2>
 <p>Always <strong>enter the Weekly Overall Grade Update first</strong>, then work on individual assignments. When final grades are entered using <strong>Final Overall Grade</strong>, <strong>delete the Weekly Overall Grade Update</strong> from the gradebook before publishing.</p>
 <div class="modal-actions">
 <button class="modal-close" id="portalReminderGotIt">Got It</button>
@@ -769,7 +827,7 @@ Continue with Google
 <p>Work through these steps in order at the end of each grading period:</p>
 <ol style="color:var(--text);line-height:1.8;padding-left:24px;margin:0 0 16px">
 <li>Confirm all student grades are finalized in Carnegie Learning and Teams.</li>
-<li>Enter the <strong>Final Overall Grade</strong> in the SV Portal gradebook.</li>
+<li>Enter the <strong>Final Overall Grade</strong> in your gradebook.</li>
 <li><strong style="color:var(--pink)">Delete the Weekly Overall Grade Update</strong> assignment from the gradebook.</li>
 <li><strong style="color:var(--pink)">Honors, year-long, and CHS courses:</strong> enter a grade in the quarterly grade section under "Enter Report Cards."</li>
 <li>Any student with a <strong>"C" or lower</strong> needs comments in the Comments section.</li>
@@ -789,7 +847,7 @@ Continue with Google
 <p><strong>Three workflows, one tool.</strong> Each of the three blocks up top handles a different job.</p>
 <div class="section-card"><h3>📝 Teacher Feedback</h3><p>Pick an assignment type and output type. You'll get pre-generated feedback with today's date already filled in. Customize if you need to. Copy. Paste into the gradebook.</p></div>
 <div class="section-card"><h3>✉️ Email Generator</h3><p>Pick the term first, then the email type. The tool only shows options that make sense for that term. Toggle between All Students and Single Student. Fill in deadlines or progress as needed. Copy and send.</p></div>
-<div class="section-card"><h3>⚙️ SV Portal Setup</h3><p>Pick which Seneca Valley gradebook placeholder you're setting up. Copy the name and detail. A reminder pops up when you select Final Overall Grade to make sure you delete the weekly placeholder before publishing finals.</p></div>
+<div class="section-card"><h3>⚙️ Gradebook Setup</h3><p>Pick which gradebook placeholder you're setting up. Copy the name and detail. A reminder pops up when you select Final Overall Grade to make sure you delete the weekly placeholder before publishing finals.</p></div>
 <p style="margin-top:16px"><strong>Edit Output → Save</strong> locks in your custom wording globally. <strong>Reset Template</strong> restores the original. <strong>Generate Variation</strong> toggles between the default and your saved version.</p>
 <p style="margin-top:12px;padding:12px 14px;background:rgba(255,215,0,.10);border:1px solid rgba(255,215,0,.35);border-radius:10px;color:#ffe066;font-weight:700;font-size:.92rem">💡 School year dates are set once at sign in and sync across devices. Edit them anytime from the user menu top right.</p>
 <div class="modal-actions"><button class="modal-close" id="howtoGotIt">Got It</button></div>
@@ -803,7 +861,8 @@ import {
   getAuth, onAuthStateChanged, signOut,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-  GoogleAuthProvider, signInWithPopup
+  GoogleAuthProvider, signInWithPopup,
+  setPersistence, browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc
@@ -823,6 +882,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
+
+// Force users to re-authenticate when the browser/tab closes.
+// Without this, Firebase persists auth in IndexedDB and silently
+// signs returning users back in — which lets the app appear to
+// "bypass" the sign-in screen on a fresh visit.
+setPersistence(auth, browserSessionPersistence).catch(err => {
+  console.error("Failed to set session persistence:", err);
+});
 
 window.cgAuth = {
   auth, db,
@@ -890,7 +957,7 @@ const defaultGradeTemplates = {
 const defaultPortalTemplates = {
 "weekly": () => `Assignment Name: Weekly Overall Grade Update\n\nAssignment Detail: This grade reflects the student's current weekly progress for the grading period and is updated weekly. Individual assignment and project grades are available in Microsoft Teams and/or Carnegie Learning platform(s).`,
 "final": () => `Assignment Name: Final Overall Grade\n\nAssignment Detail: This grade reflects the student's overall average for the nine-week grading period. Individual assignment and project grades can be viewed in Microsoft Teams and/or Carnegie Learning platform(s).\n\n⚠ REMINDER: After final grades are entered, delete the Weekly Overall Grade Update assignment from the gradebook.`,
-"checklist": () => `END OF GRADING PERIOD CHECKLIST\n\n1. Confirm all student grades are finalized in Carnegie Learning / Teams.\n2. Enter Final Overall Grade in the SV Portal gradebook.\n3. Delete the Weekly Overall Grade Update assignment.\n4. Honors, year-long, and CHS courses: enter a grade in the quarterly grade section under "Enter Report Cards."\n5. Any student with a "C" or lower needs comments in the Comments section.\n6. Load the next nine weeks course (if applicable) a few days before the current period ends.`
+"checklist": () => `END OF GRADING PERIOD CHECKLIST\n\n1. Confirm all student grades are finalized in Carnegie Learning / Teams.\n2. Enter Final Overall Grade in your gradebook.\n3. Delete the Weekly Overall Grade Update assignment.\n4. Honors, year-long, and CHS courses: enter a grade in the quarterly grade section under "Enter Report Cards."\n5. Any student with a "C" or lower needs comments in the Comments section.\n6. Load the next nine weeks course (if applicable) a few days before the current period ends.`
 };
 
 // Real alternate phrasings per feedback template - in Kenny's voice (friendly, forgiving, cool teacher)
@@ -1121,7 +1188,7 @@ $("checklistModal").classList.add("open");
 }
 });
 $("resetPortalBtn").addEventListener("click",()=>{
-if(!confirm("Reset this template?\n\nOnly the currently selected SV Portal template will be reset. Your school year dates and other saved templates are safe."))return;
+if(!confirm("Reset this template?\n\nOnly the currently selected Gradebook Setup template will be reset. Your school year dates and other saved templates are safe."))return;
 delete portalOverrides[getPortalKey()];saveJSON(STORAGE_KEYS.portalOverrides,portalOverrides);
 portalEditMode=false;updatePortalToggle();
 $("portalOutput").value=getDefaultPortalText();
@@ -1451,8 +1518,8 @@ function openAuthModal(){$("authError").classList.remove("show");$("authError").
 function closeAuthModal(){$("authModal").classList.remove("open");}
 function setAuthMode(mode){
 authMode=mode;
-if(mode==="signup"){$("authTitle").textContent="Create Account";$("authSubtitle").textContent="Sign up to save preferences across devices.";$("authSubmitBtn").textContent="Create Account";$("authToggleBtn").textContent="Have an account? Sign in";}
-else{$("authTitle").textContent="Sign In";$("authSubtitle").textContent="Welcome back. Sign in to save preferences across devices.";$("authSubmitBtn").textContent="Sign In";$("authToggleBtn").textContent="Need an account? Create one";}
+if(mode==="signup"){$("authTitle").textContent="Create Account";$("authSubtitle").textContent="Create your free account. Your setup will sync across all your devices.";$("authSubmitBtn").textContent="Create Account";$("authToggleBtn").textContent="Have an account? Sign in";}
+else{$("authTitle").textContent="Sign In";$("authSubtitle").textContent="An account is required. Sign in or create one to save your setup across devices.";$("authSubmitBtn").textContent="Sign In";$("authToggleBtn").textContent="Need an account? Create one";}
 }
 function showAuthError(msg){$("authError").textContent=msg;$("authError").classList.add("show");}
 function friendlyAuthError(code){
@@ -1552,7 +1619,9 @@ showLanding();
 }
 });
 
-$("landingSignInBtn").addEventListener("click",openAuthModal);
+$("landingSignInBtn").addEventListener("click",()=>{setAuthMode("signin");openAuthModal();});
+const signUpBtn=$("landingSignUpBtn");
+if(signUpBtn) signUpBtn.addEventListener("click",()=>{setAuthMode("signup");openAuthModal();});
 $("authModalClose").addEventListener("click",closeAuthModal);
 
 $("userChip").addEventListener("click",(e)=>{

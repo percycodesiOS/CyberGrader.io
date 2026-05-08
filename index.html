@@ -305,9 +305,12 @@ img{max-width:100%;display:block}
 /* Tier 1 — Primary */
 .btn-primary{padding:14px 22px;border-radius:14px;font-weight:900;font-size:1rem;
   letter-spacing:.04em;text-transform:uppercase;
-  background:var(--pc-bg-button);color:#02131f;border-color:rgba(81,217,255,.6);
-  box-shadow:var(--pc-shadow-button)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--pc-shadow-button-hover)}
+  background:linear-gradient(180deg,#7fe6ff,#00b7ff);color:#001624;border-color:rgba(127,230,255,.85);
+  box-shadow:0 8px 22px rgba(0,183,255,.35), inset 0 0 0 1px rgba(255,255,255,.2);
+  text-shadow:0 1px 0 rgba(255,255,255,.3)}
+.btn-primary:hover{transform:translateY(-2px);
+  background:linear-gradient(180deg,#aef0ff,#22c8ff);
+  box-shadow:0 12px 30px rgba(0,183,255,.5), inset 0 0 0 1px rgba(255,255,255,.3)}
 /* Tier 2 — Secondary */
 .btn-secondary{background:rgba(81,217,255,.10);color:#cdf2ff;border-color:rgba(81,217,255,.45)}
 .btn-secondary:hover{background:rgba(81,217,255,.16);border-color:rgba(81,217,255,.65)}
@@ -385,9 +388,16 @@ img{max-width:100%;display:block}
 .price{margin:0 auto;max-width:560px;padding:42px 38px;border-radius:24px;text-align:center;
   border:1.5px solid var(--pc-border-strong);background:var(--pc-bg-panel);
   box-shadow:0 36px 80px rgba(0,0,0,.45)}
+.price .beta-badge{display:inline-block;margin-bottom:18px;padding:8px 14px;border-radius:999px;
+  background:rgba(81,217,255,.10);border:1px solid rgba(81,217,255,.35);color:var(--pc-cyan);
+  font-size:.78rem;font-weight:800;letter-spacing:.04em}
 .price .tag{font-family:var(--pc-font-display);font-size:4.2rem;font-weight:800;color:#fff;line-height:1;
-  text-shadow:var(--pc-glow-cyan);margin-bottom:8px}
+  text-shadow:var(--pc-glow-cyan);margin-bottom:6px}
 .price .tag small{font-size:1rem;color:var(--pc-cyan);font-weight:800;letter-spacing:.22em;display:block;margin-bottom:6px;text-shadow:0 0 10px rgba(81,217,255,.4)}
+.price .tag .per{font-family:var(--pc-font-sans);font-size:1.2rem;color:var(--pc-fg-2);font-weight:600;letter-spacing:0;text-shadow:none}
+.price .alt{color:var(--pc-fg-2);font-size:1rem;margin-bottom:6px}
+.price .alt strong{color:#fff;font-weight:800}
+.price .fineprint{margin-top:14px;color:var(--pc-fg-2);font-size:.82rem;font-style:italic}
 .price ul{list-style:none;margin:24px 0;padding:0;display:grid;gap:10px;text-align:left}
 .price li{display:flex;align-items:center;gap:10px;color:var(--pc-fg-2);font-size:.98rem}
 .price li::before{content:"✓";color:var(--pc-green);font-weight:900;font-size:1.1rem;
@@ -425,7 +435,7 @@ img{max-width:100%;display:block}
     <div class="nav__cta">
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
-      <a href="./app.html" class="btn btn-primary">Sign In</a>
+      <a href="app.html" class="btn btn-primary">Sign In</a>
     </div>
   </nav>
 </header>
@@ -434,14 +444,14 @@ img{max-width:100%;display:block}
   <section class="hero wrap">
     <div class="eyebrow">Built by a cyber teacher · for cyber teachers</div>
     <h1>Stop copy-pasting the same feedback <span class="accent">50 times a day.</span></h1>
-    <p class="lede">CyberGrader.io is the workflow tool for cyber teachers. Pre-written feedback, recurring student emails, and Seneca Valley gradebook placeholders — all auto-filled with today's date and your school year deadlines. Pick. Copy. Paste. Done.</p>
+    <p class="lede">CyberGrader.io is the workflow tool for cyber teachers. Pre-written feedback, recurring student emails, and gradebook placeholder text — all auto-filled with today's date and your school year deadlines. Pick. Copy. Paste. Done.</p>
     <div class="hero__cta">
-      <a href="./app.html" class="btn btn-primary">Get Started Free</a>
+      <a href="app.html" class="btn btn-primary">Start Grading Faster</a>
       <a href="#features" class="btn btn-secondary">See How It Works</a>
     </div>
     <div class="hero__meta">
       <span>🔐 <strong>Google sign-in.</strong> Syncs across devices.</span>
-      <span>💸 <strong>Free forever.</strong> No credit card.</span>
+      <span>🚀 <strong>Free during beta.</strong> Lock in early pricing.</span>
       <span>📱 <strong>Works everywhere.</strong> Desktop, tablet, phone.</span>
     </div>
 
@@ -464,8 +474,8 @@ img{max-width:100%;display:block}
         </div>
         <div class="block">
           <div class="icon"><img src="assets/sv-portal-logo.png" alt=""></div>
-          <div class="title">SV Portal Setup</div>
-          <div class="sub">Gradebook placeholder text</div>
+          <div class="title">Gradebook Setup</div>
+          <div class="sub">Placeholder text + checklist</div>
         </div>
       </div>
     </div>
@@ -498,8 +508,8 @@ img{max-width:100%;display:block}
       </div>
       <div class="feat">
         <div class="glyph">⚙️</div>
-        <h3>SV Portal Setup</h3>
-        <p>One-tap copy for every Seneca Valley gradebook placeholder you set up each grading period.</p>
+        <h3>Gradebook Setup</h3>
+        <p>One-tap copy for every gradebook placeholder you set up each grading period.</p>
         <ul>
           <li>Weekly Overall Grade Update</li>
           <li>Final Overall Grade (with publish reminders)</li>
@@ -534,19 +544,23 @@ img{max-width:100%;display:block}
   </section>
 
   <section class="section center wrap" id="pricing">
-    <h2>Free Forever.</h2>
-    <p class="lede">No monthly fee. No credit card. No surprise charges. One HTML file hosted on GitHub Pages, with Firebase sync on a free-tier plan that hard-stops at the limits.</p>
+    <h2>Simple pricing.</h2>
+    <p class="lede">One plan. Everything unlocked. Built by a teacher who knows exactly how much you can spend on yet another subscription.</p>
 
     <div class="price">
-      <div class="tag"><small>FREE FOREVER</small>$0</div>
+      <div class="beta-badge">🚀 Free during beta · Lock in this price when paid launches</div>
+      <div class="tag"><small>PRO TEACHER</small>$4.99<span class="per">/month</span></div>
+      <div class="alt">or <strong>$39/year</strong> — save $20</div>
       <ul>
-        <li>Unlimited templates and edits</li>
-        <li>Cloud sync across all your devices</li>
+        <li>All three workflows (Feedback, Email, Gradebook Setup)</li>
+        <li>Voice-matched feedback variations</li>
+        <li>Cloud sync across desktop, tablet, and phone</li>
         <li>Google sign-in with school account</li>
-        <li>Privacy: your data is locked to your UID</li>
-        <li>Updates auto-deploy when source updates</li>
+        <li>Edit and save your own templates globally</li>
+        <li>All future updates included</li>
       </ul>
-      <a href="./app.html" class="btn btn-primary" style="width:100%;justify-content:center">Get Started</a>
+      <a href="app.html" class="btn btn-primary" style="width:100%;justify-content:center">Start Free Beta</a>
+      <p class="fineprint">No credit card during beta. Cancel anytime once paid plan launches.</p>
     </div>
   </section>
 </main>

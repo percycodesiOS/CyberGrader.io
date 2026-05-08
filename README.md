@@ -2,7 +2,7 @@
 
 A purpose-built workflow tool for cyber teachers — so you stop copy-pasting the same grading feedback and check-in emails 50 times a day.
 
-One HTML file. No monthly fee. Google sign-in syncs your setup and customizations to every device automatically. Works on desktop, tablet, and phone.
+Two HTML files. Account required. Your setup syncs to every device automatically. Works on desktop, tablet, and phone.
 
 **Live at:** https://percycodesios.github.io/CyberGrader.io/
 
@@ -28,8 +28,8 @@ Pick the term first. The tool filters the email list to only the types that make
 
 **Split 4th Nine Weeks deadlines** auto-populate from your school year dates: pink senior deadline, cyan-green Grades 7–11 deadline. Side by side, impossible to confuse.
 
-### ⚙️ SV Portal Setup
-One-tap access to every Seneca Valley gradebook placeholder text you need:
+### ⚙️ Gradebook Setup
+One-tap access to every gradebook placeholder text you need:
 
 - Weekly Overall Grade Update (name + detail)
 - Final Overall Grade (with a red warning box before you publish — delete the weekly placeholder, check honors/CHS quarterly grades, add comments for C-or-lower students)
@@ -48,23 +48,40 @@ Edit anytime from the user profile or by tapping the date pill.
 
 ---
 
-## Cloud Sync (Firebase)
+## Account Required
 
-Sign in once. Everything follows you.
+CyberGrader.io is a personal workflow tool — your edits, saved templates, and school year dates belong to *you*, locked to your account. There is no anonymous mode and no shared classroom view.
 
-1. Click **Sign In** on the welcome screen
-2. Choose **Google** (one tap with your school account) or email/password
-3. First sign-in triggers the School Year Setup modal
-4. Every template edit, customization, and date change auto-saves to Firestore
-5. Open the site on any device, sign in, your data pulls down automatically
+1. Visit the site → marketing landing page loads
+2. Click **Create Free Account** (or **Sign In** if you already have one)
+3. Choose **Google** (one tap with your school account) or email/password
+4. First sign-in triggers the School Year Setup modal
+5. Every template edit, customization, and date change auto-saves to Firestore
+6. Open the site on any device, sign in, your data pulls down automatically
 
-**Sign out anytime.** Your data stays safe in the cloud until you sign back in.
+### Session persistence
+
+Your sign-in is **session-scoped** — when you close the browser tab or window, you're signed out. Open the site again? You'll need to sign in. This is intentional: shared classroom computers, faculty workstations, and the rare "I lent my laptop to a sub" moment all stay protected.
+
+If you want to *stay* signed in on a personal device, just leave the tab open. Pinning it works great.
+
+### Sign out anytime
+
+User chip → **Sign Out**. Your data stays safe in Firestore until you sign back in.
 
 ---
 
 ## Privacy
 
-Firestore security rules lock every user's data to their own Firebase UID. No one — not other users, not anyone who stumbles on the repo — can read or write your data unless they're signed in as you. The API key embedded in `index.html` is not a secret; security lives in the Firestore rules and the restricted referrer list on the Google API key itself.
+Firestore security rules lock every user's data to their own Firebase UID. No one — not other users, not anyone who stumbles on the repo — can read or write your data unless they're signed in as you. The API key embedded in `app.html` is not a secret; security lives in the Firestore rules and the restricted referrer list on the Google API key itself.
+
+---
+
+## Pricing
+
+**Free during beta.** No credit card. No monthly fee. Use the entire tool while the beta runs.
+
+When the paid plan launches, **early-beta accounts lock in $4.99/month or $39/year** — the lowest tier the tool will ever offer. You'll see a notice in-app before any billing change happens, with plenty of warning.
 
 ---
 
@@ -82,13 +99,26 @@ Firestore security rules lock every user's data to their own Firebase UID. No on
 
 ---
 
-## Hosting (Free Forever)
+## Repo Layout
 
-GitHub Pages. Free. One HTML file, two image files.
+| File | Purpose |
+|---|---|
+| `index.html` | Marketing landing page — what visitors see first. Links to `app.html` for sign-in. |
+| `app.html` | The actual tool. Auth-gated. Loads Firebase, renders the workflow UI. |
+| `cybergrader-logo.png` | Brand wordmark. Used in both files. |
+| `percy-logo.png` | Footer mark (the dog). |
+| `sv-portal-logo.png` | Gradebook Setup workflow icon. (Filename predates the rename — kept for cache stability.) |
+| `assets/` | Mirror of the three PNGs above, referenced by `index.html`. |
+
+---
+
+## Hosting (GitHub Pages — Free)
+
+GitHub Pages serves the whole site for free, auto-deploys on every commit. Setup:
 
 1. Create a GitHub account if you don't have one
 2. Create a new repo (name it whatever you want — e.g. `cybergrader`)
-3. Upload `index.html`, `cybergrader-logo.png`, `percy-logo.png`, and `sv-portal-logo.png` to the root
+3. Upload all the files from this repo to the root
 4. Go to **Settings → Pages**
 5. Source: **Deploy from a branch** → Branch: `main`, folder: `/ (root)` → Save
 6. Wait about a minute
@@ -106,22 +136,23 @@ Already configured — documented here in case a rebuild is ever needed.
 |---|---|
 | Project | `cybergrader-v2` |
 | Auth methods | Email/Password, Google sign-in |
+| Auth persistence | `browserSessionPersistence` — auto-signs-out when browser closes |
 | Firestore | Production mode, `us-east1` |
 | Security rules | Users read/write only their own `/users/{uid}/...` paths |
 | Authorized domains | `percycodesios.github.io`, `localhost` |
 | API key restrictions | HTTP referrers: percycodesios.github.io, cybergrader-v2.firebaseapp.com, cybergrader-v2.web.app |
 | Plan | Spark (free) — hard-stops at free-tier limits, no credit card, no surprise charges |
 
-The `firebaseConfig` block is embedded directly in `index.html`. The API key is safe to be public — it's not a secret. The Firestore security rules + HTTP referrer restrictions are what protect the data.
+The `firebaseConfig` block is embedded directly in `app.html`. The API key is safe to be public — it's not a secret. The Firestore security rules + HTTP referrer restrictions are what protect the data.
 
 ---
 
 ## How to Update the Tool
 
-When you get a new `index.html`:
+When you get a new `app.html` (or `index.html`):
 
 1. Go to your GitHub repo
-2. Click the existing `index.html`
+2. Click the file you're replacing
 3. Click the pencil icon (Edit)
 4. Select all → delete → paste the new code
 5. Click **Commit changes**
@@ -135,7 +166,7 @@ Your data survives every update — it lives in Firestore, not in the HTML file.
 ## Tech Stack
 
 - **Frontend:** Vanilla HTML/CSS/JS — no build step, no framework, no dependencies to break
-- **Auth:** Firebase Auth (modular v10 SDK via CDN)
+- **Auth:** Firebase Auth (modular v10 SDK via CDN), session-scoped persistence
 - **Database:** Cloud Firestore (user preferences + school year dates)
 - **Hosting:** GitHub Pages (free, auto-deploys on commit)
 - **Images:** Transparent PNGs, cache-busted via `?v=` query strings
