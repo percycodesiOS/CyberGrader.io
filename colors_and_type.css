@@ -1,0 +1,271 @@
+/* PercyCodes / CyberGrader.io Design Tokens
+ * Pulled from cyberGrader/index.html (single source of truth).
+ * Two layers: low-level vars (colors, type, spacing, radii, shadows)
+ * and semantic helpers (.h1, .panel-title, .copy-btn, etc).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap');
+
+:root {
+  /* ── Colors ─────────────────────────────────────────────── */
+  --pc-bg:           #23262e;     /* body top */
+  --pc-bg-2:         #1e2128;     /* body bottom */
+  --pc-panel:        #2d313c;
+  --pc-panel-2:      #323642;
+  --pc-panel-3:      #2a2e39;
+
+  --pc-fg-1:         #edf6ff;     /* primary text */
+  --pc-fg-2:         #a4b3c7;     /* muted */
+  --pc-fg-3:         #b8c6db;     /* desc text on block buttons */
+
+  --pc-cyan:         #51d9ff;     /* primary accent */
+  --pc-cyan-2:       #00b7ff;     /* deeper cyan */
+  --pc-pink:         #ff4ec9;     /* SENIOR-only */
+  --pc-green:        #7dffb5;     /* Grades 7–11 / success */
+  --pc-red:          #ff7d7d;     /* destructive / warning */
+  --pc-orange:       #ff9f43;     /* edit-mode active */
+
+  --pc-border:        rgba(81,217,255,.22);
+  --pc-border-strong: rgba(81,217,255,.38);
+  --pc-border-active: rgba(81,217,255,.55);
+  --pc-focus-ring:    rgba(81,217,255,.08);
+
+  /* PercyCodes brand-mark accents (logo only — do not use in chrome) */
+  --pc-mark-magenta: #e9258a;
+  --pc-mark-yellow:  #ffd23f;
+  --pc-mark-sky:     #52d8ff;
+
+  /* ── Type ───────────────────────────────────────────────── */
+  --pc-font-sans:    'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --pc-font-display: 'Sora', 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  --pc-fs-display: clamp(2.5rem, 5vw, 4.2rem);
+  --pc-fs-h1: 1.3rem;
+  --pc-fs-h2: 1.2rem;
+  --pc-fs-h3: 1rem;
+  --pc-fs-body: 0.95rem;
+  --pc-fs-body-sm: 0.9rem;
+  --pc-fs-label: 0.84rem;
+  --pc-fs-hint: 0.82rem;
+
+  --pc-fw-regular: 600;
+  --pc-fw-bold: 700;
+  --pc-fw-heavy: 800;
+  --pc-fw-black: 900;
+
+  --pc-tracking-wide:    .04em;
+  --pc-tracking-wider:   .06em;
+  --pc-tracking-extreme: .20em;
+
+  /* ── Spacing (4px base) ─────────────────────────────────── */
+  --pc-s-1: 4px;
+  --pc-s-2: 8px;
+  --pc-s-3: 12px;
+  --pc-s-4: 16px;
+  --pc-s-5: 20px;
+  --pc-s-6: 26px;
+  --pc-s-7: 32px;
+
+  /* ── Radii ──────────────────────────────────────────────── */
+  --pc-r-sm: 9px;
+  --pc-r-md: 12px;
+  --pc-r-lg: 14px;
+  --pc-r-xl: 16px;
+  --pc-r-2xl: 18px;
+  --pc-r-3xl: 22px;
+  --pc-r-pill: 999px;
+
+  /* ── Shadows / glow ─────────────────────────────────────── */
+  --pc-shadow-panel: 0 18px 48px rgba(0,0,0,.38);
+  --pc-shadow-card-inset: inset 0 0 0 1px rgba(81,217,255,.04);
+  --pc-shadow-button: 0 8px 22px rgba(0,183,255,.25), inset 0 0 0 1px rgba(255,255,255,.08);
+  --pc-shadow-button-hover: 0 12px 28px rgba(0,183,255,.35), inset 0 0 0 1px rgba(255,255,255,.12);
+  --pc-glow-cyan: 0 0 18px rgba(81,217,255,.85), 0 0 36px rgba(81,217,255,.45), 0 0 56px rgba(0,183,255,.25);
+  --pc-glow-pink: 0 0 18px rgba(255,78,201,.5), 0 0 36px rgba(255,78,201,.25);
+  --pc-drop-cyan: drop-shadow(0 0 14px rgba(81,217,255,.35));
+  --pc-drop-pink: drop-shadow(0 0 18px rgba(255,78,201,.25));
+
+  /* ── Backgrounds ────────────────────────────────────────── */
+  --pc-bg-app:
+    radial-gradient(circle at top right, rgba(0,183,255,.06), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(81,217,255,.04), transparent 30%),
+    linear-gradient(180deg, #23262e 0%, #1e2128 100%);
+  --pc-bg-panel:    linear-gradient(180deg, rgba(50,54,66,.95), rgba(45,49,60,.95));
+  --pc-bg-card:     linear-gradient(180deg, rgba(55,59,72,.95), rgba(48,52,64,.95));
+  --pc-bg-input:    linear-gradient(180deg, rgba(35,39,48,1), rgba(30,34,42,1));
+  --pc-bg-button:   linear-gradient(180deg, var(--pc-cyan-2), var(--pc-cyan));
+  --pc-bg-cyan-soft: linear-gradient(180deg, rgba(0,183,255,.18), rgba(81,217,255,.10));
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  --pc-ease: .18s ease;
+  --pc-ease-fast: .15s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Base
+ * ───────────────────────────────────────────────────────────── */
+.pc-root,
+body.pc {
+  background: var(--pc-bg-app);
+  color: var(--pc-fg-1);
+  font-family: var(--pc-font-sans);
+  font-size: var(--pc-fs-body);
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Type — semantic helpers
+ * ───────────────────────────────────────────────────────────── */
+.pc-display {
+  font-family: var(--pc-font-display);
+  font-size: var(--pc-fs-display);
+  font-weight: var(--pc-fw-black);
+  letter-spacing: .02em;
+  color: var(--pc-fg-1);
+  line-height: 1;
+}
+
+.pc-panel-title { font-family: var(--pc-font-display); }
+.pc-display .dot { color: var(--pc-cyan); }
+
+.pc-panel-title {
+  font-size: var(--pc-fs-h2);
+  font-weight: var(--pc-fw-black);
+  letter-spacing: var(--pc-tracking-wider);
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: var(--pc-glow-cyan);
+}
+
+.pc-h3 {
+  font-size: var(--pc-fs-h3);
+  font-weight: var(--pc-fw-heavy);
+}
+
+.pc-eyebrow {
+  font-size: var(--pc-fs-hint);
+  font-weight: var(--pc-fw-black);
+  letter-spacing: var(--pc-tracking-extreme);
+  color: var(--pc-cyan);
+  text-shadow: 0 0 10px rgba(81,217,255,.75), 0 0 20px rgba(81,217,255,.4);
+  text-transform: uppercase;
+}
+
+.pc-body { font-size: var(--pc-fs-body); line-height: 1.6; }
+.pc-muted { color: var(--pc-fg-2); }
+.pc-label {
+  font-size: var(--pc-fs-label);
+  color: var(--pc-fg-2);
+  font-weight: var(--pc-fw-heavy);
+  letter-spacing: .02em;
+}
+
+.pc-senior   { color: var(--pc-pink);  font-weight: var(--pc-fw-bold); }
+.pc-general  { color: var(--pc-green); font-weight: var(--pc-fw-bold); }
+
+/* ─────────────────────────────────────────────────────────────
+ * Surfaces
+ * ───────────────────────────────────────────────────────────── */
+.pc-panel {
+  background: var(--pc-bg-panel);
+  border: 1px solid var(--pc-border);
+  border-radius: var(--pc-r-2xl);
+  box-shadow: var(--pc-shadow-panel);
+}
+
+.pc-card {
+  background: var(--pc-bg-card);
+  border: 1px solid var(--pc-border);
+  border-radius: var(--pc-r-xl);
+  box-shadow: var(--pc-shadow-card-inset);
+  padding: var(--pc-s-4);
+}
+
+.pc-pill {
+  background: linear-gradient(180deg, rgba(58,62,76,.95), rgba(50,54,66,.92));
+  border: 1px solid var(--pc-border-strong);
+  border-radius: var(--pc-r-lg);
+  padding: 12px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--pc-fg-1);
+  font-weight: var(--pc-fw-heavy);
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Controls
+ * ───────────────────────────────────────────────────────────── */
+.pc-input,
+.pc-select,
+.pc-textarea {
+  width: 100%;
+  border: 1px solid rgba(81,217,255,.28);
+  background: var(--pc-bg-input);
+  color: var(--pc-fg-1);
+  border-radius: var(--pc-r-lg);
+  padding: 13px 14px;
+  font: inherit;
+  transition: var(--pc-ease);
+}
+.pc-input:focus,
+.pc-select:focus,
+.pc-textarea:focus {
+  outline: none;
+  border-color: rgba(81,217,255,.45);
+  box-shadow: 0 0 0 4px var(--pc-focus-ring);
+}
+
+.pc-btn {
+  border: 0;
+  border-radius: var(--pc-r-md);
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: var(--pc-fw-heavy);
+  cursor: pointer;
+  transition: var(--pc-ease);
+}
+.pc-btn:hover { transform: translateY(-1px); }
+
+.pc-btn-primary {
+  border-radius: var(--pc-r-lg);
+  padding: 18px 24px;
+  font-size: 1.05rem;
+  font-weight: var(--pc-fw-black);
+  letter-spacing: var(--pc-tracking-wide);
+  text-transform: uppercase;
+  background: var(--pc-bg-button);
+  color: #02131f;
+  border: 1px solid rgba(81,217,255,.6);
+  box-shadow: var(--pc-shadow-button);
+}
+.pc-btn-primary:hover { transform: translateY(-2px); box-shadow: var(--pc-shadow-button-hover); }
+
+.pc-btn-edit  { background: rgba(81,217,255,.12); color: #9de8ff; border: 1px solid rgba(81,217,255,.45); font-weight: var(--pc-fw-black); }
+.pc-btn-ghost { background: rgba(81,217,255,.08); color: var(--pc-fg-1); border: 1px solid rgba(81,217,255,.18); }
+.pc-btn-save  { background: rgba(125,255,181,.12); color: #baffd3; border: 1px solid rgba(125,255,181,.25); }
+.pc-btn-reset { background: rgba(255,125,125,.12); color: #ffc0c0; border: 1px solid rgba(255,125,125,.22); }
+
+/* ─────────────────────────────────────────────────────────────
+ * Senior / general semantic blocks
+ * ───────────────────────────────────────────────────────────── */
+.pc-callout-senior {
+  background: rgba(255,110,180,.10);
+  border: 1px solid rgba(255,110,180,.38);
+  color: var(--pc-pink);
+  font-weight: var(--pc-fw-black);
+  letter-spacing: var(--pc-tracking-wider);
+  text-shadow: 0 0 10px rgba(255,110,180,.4);
+  border-radius: var(--pc-r-md);
+  padding: 10px 14px;
+  text-align: center;
+}
+.pc-callout-general {
+  background: rgba(125,255,181,.10);
+  border: 1px solid rgba(125,255,181,.38);
+  color: var(--pc-green);
+  font-weight: var(--pc-fw-black);
+  border-radius: var(--pc-r-md);
+  padding: 10px 14px;
+  text-align: center;
+}
