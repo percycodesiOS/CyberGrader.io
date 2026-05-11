@@ -439,7 +439,7 @@ body{padding:12px}
 <div id="landingScreen" class="landing" style="display:none">
 <div class="landing-inner">
 <span class="badge">✨ Free during beta</span>
-<img src="cybergrader-logo.png?v=1" alt="CyberGrader.io" onerror="this.style.display='none'">
+<img src="assets/cybergrader-logo.png?v=1" alt="CyberGrader.io" onerror="this.style.display='none'">
 <h1>Built for cyber teachers.</h1>
 <p class="lede">Pre-written feedback, recurring student emails, and gradebook placeholder text — all auto-filled with today's date and your school year deadlines.</p>
 
@@ -469,7 +469,7 @@ body{padding:12px}
 </div>
 </div>
 <div class="topbar-center">
-<img src="cybergrader-logo.png?v=1" alt="CyberGrader.io" class="topbar-logo" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
+<img src="assets/cybergrader-logo.png?v=1" alt="CyberGrader.io" class="topbar-logo" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'">
 <h1 class="brand" id="brandFallback" style="display:none">CyberGrader<span class="dot">.io</span></h1>
 </div>
 <div class="topbar-right">
@@ -544,7 +544,7 @@ Choose a block below to select pre-generated feedback or emails. Once you pick a
 <span class="desc">Recurring student emails for the school year</span>
 </button>
 <button class="block-btn" data-block="portalBlock" type="button">
-<span class="icon"><img src="sv-portal-logo.png?v=1" alt="" onerror="this.parentNode.innerHTML='⚙️'"></span>
+<span class="icon"><img src="assets/sv-portal-logo.png?v=1" alt="" onerror="this.parentNode.innerHTML='⚙️'"></span>
 <span class="title">Gradebook Setup</span>
 <span class="desc">Gradebook placeholder text + checklist</span>
 </button>
@@ -729,7 +729,7 @@ Pick the assignment placeholder you need to set up in your gradebook. Copy the n
 
 <div class="divider"></div>
 <footer class="footer">
-<img src="percy-logo.png?v=8" alt="Percy Codes" class="percy-img" onerror="this.style.display='none'">
+<img src="assets/percy-logo.png?v=8" alt="Percy Codes" class="percy-img" onerror="this.style.display='none'">
 <div class="created-by">Created by <span class="brand-name">PERCYCODES</span></div>
 </footer>
 </div>
@@ -1419,70 +1419,70 @@ const courseName=$("courseName").value.trim();
 switch(type){
 case"Welcome Letter":return{
 subject:courseName?`Welcome to ${courseName}`:"Welcome to Your Cyber Course",
-body:`{{greet}}\n\nWelcome to your {{course}}cyber course! My name is Mr. Macek, and I'll be your teacher this grading period.\n\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus, which outlines expectations, grading policies, and how the course is structured. Take your time going through it and reach out if anything is unclear.\n\nCommunication is a big part of doing well in an online course. Check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\n\nI'm looking forward to a great nine weeks with you!\n\nGood luck!\n\nMr. Macek`
+body:`{{greet}}\n\nWelcome to your {{course}}cyber course! I'll be your teacher this grading period.\n\nAttached is a welcome letter with important details. Please read it carefully. One of your first assignments is to review the course syllabus, which outlines expectations, grading policies, and how the course is structured. Take your time going through it and reach out if anything is unclear.\n\nCommunication is a big part of doing well in an online course. Check in often, respond to my messages, and contact me if you run into issues. Staying connected makes cyber much easier.\n\nI'm looking forward to a great nine weeks with you!\n\nGood luck!\n\n[Your Name]`
 };
 
 case"Early Check-In":return{
 subject:"Cyber Check-In",
-body:`{{greet}}\n\nI wanted to check in now that we've completed the first week of the {{term}}. This is a good time to make sure you're actively working in your cyber course and not letting yourself fall behind — I always recommend being ahead of the assignment calendar, but staying on target at a minimum is the key to success.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it's important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\nMr. Macek`
+body:`{{greet}}\n\nI wanted to check in now that we've completed the first week of the {{term}}. This is a good time to make sure you're actively working in your cyber course and not letting yourself fall behind — I always recommend being ahead of the assignment calendar, but staying on target at a minimum is the key to success.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it's important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\n[Your Name]`
 };
 
 case"Zero Grade Clarification":return{
 subject:"Clarification on Zeros and the Grading Process",
-body:`{{greet}}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the {{term}} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want each of you supported this nine weeks.\n\nThanks,\n\nMr. Macek`
+body:`{{greet}}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the {{term}} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want each of you supported this nine weeks.\n\nThanks,\n\n[Your Name]`
 };
 
 case"25% Check-In":return{
 subject:"Cyber Progress Check-In — 25% Mark",
-body:`{{greet}}\n\nAs of {{ref_date}}, you should be about {{progress}} done with your cyber coursework for the {{term}}. If you're not at or near that mark, don't panic — just reach out so we can make a plan early. Getting on pace now is way easier than trying to catch up later.\n\nIf something is unclear or you're stuck, communication is key — I'm here to help.\n\n{{dual_deadlines}}{{deadline_line_if_not_fourth}}Mr. Macek`
+body:`{{greet}}\n\nAs of {{ref_date}}, you should be about {{progress}} done with your cyber coursework for the {{term}}. If you're not at or near that mark, don't panic — just reach out so we can make a plan early. Getting on pace now is way easier than trying to catch up later.\n\nIf something is unclear or you're stuck, communication is key — I'm here to help.\n\n{{dual_deadlines}}{{deadline_line_if_not_fourth}}[Your Name]`
 };
 
 case"50% Check-In":return{
 subject:"Cyber Check-In — Halfway Point",
-body:`{{greet}}\n\nWe're halfway through the {{term}} — about {{progress}} of the way in. This is the checkpoint where effort really starts to show up in your grade. The next few weeks matter more than the first few did.\n\nIf you're behind, let's fix it now — there's still plenty of runway. If you're on pace, keep that consistency up. Questions or stuck? Reach out any time.\n\n{{dual_deadlines}}{{deadline_current_line}}Thanks,\n\nMr. Macek`
+body:`{{greet}}\n\nWe're halfway through the {{term}} — about {{progress}} of the way in. This is the checkpoint where effort really starts to show up in your grade. The next few weeks matter more than the first few did.\n\nIf you're behind, let's fix it now — there's still plenty of runway. If you're on pace, keep that consistency up. Questions or stuck? Reach out any time.\n\n{{dual_deadlines}}{{deadline_current_line}}Thanks,\n\n[Your Name]`
 };
 
 case"75% Check-In":return{
 subject:"75% Completion Mark — Cyber Courses",
-body:`{{greet}}\n\nAs of {{ref_date}}, we're at the {{progress}} mark of the {{term}} — home stretch. All submitted work has been graded and your grades are current.\n\nThis is finish-strong time. The work you put in over these last few weeks will decide what your final grade looks like.\n\n{{deadline_75_line}}Looking ahead, the {{next_term}} will be loaded a few days before this period ends.\n\n{{dual_deadlines}}Asking a question online is just as important as raising your hand in class — reach out if anything is unclear.\n\nThanks,\n\nMr. Macek`
+body:`{{greet}}\n\nAs of {{ref_date}}, we're at the {{progress}} mark of the {{term}} — home stretch. All submitted work has been graded and your grades are current.\n\nThis is finish-strong time. The work you put in over these last few weeks will decide what your final grade looks like.\n\n{{deadline_75_line}}Looking ahead, the {{next_term}} will be loaded a few days before this period ends.\n\n{{dual_deadlines}}Asking a question online is just as important as raising your hand in class — reach out if anything is unclear.\n\nThanks,\n\n[Your Name]`
 };
 
 case"Next Nine Weeks Loaded":return{
 subject:"Next Nine Weeks Added to Your Account",
-body:`{{greet}}\n\nYour {{next_term}} has now been added to your account. No pressure to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n{{next_term_loaded_line}}If anything looks off or you notice a discrepancy, let me know.\n\nMr. Macek`
+body:`{{greet}}\n\nYour {{next_term}} has now been added to your account. No pressure to start right now — we load courses early so that if you finish the current part, you can move right into the next one without delay.\n\n{{next_term_loaded_line}}If anything looks off or you notice a discrepancy, let me know.\n\n[Your Name]`
 };
 
 case"Semester / Part Change":return{
 subject:`Welcome to the {{next_term}}`,
-body:`{{greet}}\n\nWelcome to the {{next_term}}! I wanted to let you know I've graded your first assignment — whether it was the syllabus upload, prior knowledge, or the content question. All grades are updated.\n\nAs we head into this grading period, reach out anytime with questions. You always have the option to complete your cyber course early, but late submissions aren't accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\nMr. Macek`
+body:`{{greet}}\n\nWelcome to the {{next_term}}! I wanted to let you know I've graded your first assignment — whether it was the syllabus upload, prior knowledge, or the content question. All grades are updated.\n\nAs we head into this grading period, reach out anytime with questions. You always have the option to complete your cyber course early, but late submissions aren't accepted, so stay ahead of the assignment calendar.\n\nGood luck this marking period!\n\n[Your Name]`
 };
 
 case"Upcoming Break Example":return{
 subject:"Enjoy Your Break!!!",
-body:`{{greet}}\n\nI hope you all enjoy your break — you've earned it! Quick note: if you choose to work on any days while we're off, the assignment calendar will let you get ahead in the course.\n\nIf you find yourself with some free time, it's a great chance to make progress.\n\nOtherwise, enjoy the break. Looking forward to working with you all for the rest of the {{term}}.\n\nAs always, reach out if you have any questions.\n\nThanks,\n\nMr. Macek`
+body:`{{greet}}\n\nI hope you all enjoy your break — you've earned it! Quick note: if you choose to work on any days while we're off, the assignment calendar will let you get ahead in the course.\n\nIf you find yourself with some free time, it's a great chance to make progress.\n\nOtherwise, enjoy the break. Looking forward to working with you all for the rest of the {{term}}.\n\nAs always, reach out if you have any questions.\n\nThanks,\n\n[Your Name]`
 };
 
 case"Final Week Reminder":return{
 subject:"Final Reminder: Coursework Deadline Approaching",
-body:`{{greet}}\n\nCan you believe it? We're at the {{progress}} mark of the {{term}} — the end is right around the corner.\n\n{{dual_deadlines}}{{deadline_due_by_line}}If you're not near that mark or haven't started, don't panic — but don't wait either. Power through those last few lessons and reach out if you're stuck.\n\nIf you're on track or ahead, keep that momentum. The effort now will pay off.\n\nYou've got this!\n\nMr. Macek`
+body:`{{greet}}\n\nCan you believe it? We're at the {{progress}} mark of the {{term}} — the end is right around the corner.\n\n{{dual_deadlines}}{{deadline_due_by_line}}If you're not near that mark or haven't started, don't panic — but don't wait either. Power through those last few lessons and reach out if you're stuck.\n\nIf you're on track or ahead, keep that momentum. The effort now will pay off.\n\nYou've got this!\n\n[Your Name]`
 };
 
 case"Senior Final Reminder":return{
 subject:"Seniors — Final Reminder on Coursework",
-body:`Hi Seniors,\n\nThis is it — your final reminder that all cyber coursework needs to be submitted by {{senior_deadline}}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\nMr. Macek`
+body:`Hi Seniors,\n\nThis is it — your final reminder that all cyber coursework needs to be submitted by {{senior_deadline}}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\n[Your Name]`
 };
 
 case"End of Year Grades 7–11":return{
 subject:"End-of-Year Reminder: Cyber Coursework Due",
-body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by {{general_deadline}}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\nMr. Macek`
+body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by {{general_deadline}}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\n[Your Name]`
 };
 
 case"End of Year Grade 12":return{
 subject:"Seniors — End-of-Year Reminder",
-body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by {{senior_deadline}}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far — best of luck with whatever comes next.\n\nMr. Macek`
+body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by {{senior_deadline}}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far — best of luck with whatever comes next.\n\n[Your Name]`
 };
 
-default:return{subject:"Cyber Update",body:`{{greet}}\n\nCourse update.\n\nMr. Macek`};
+default:return{subject:"Cyber Update",body:`{{greet}}\n\nCourse update.\n\n[Your Name]`};
 }
 }
 function updateEmailOutput(force=false){

@@ -13,7 +13,7 @@ Two HTML files. Account required. Your setup syncs to every device automatically
 ### 📝 Teacher Feedback
 Pick the type of work — **First Assignment**, **Assignment**, or **Project** — and the scenario (Perfect, Partial Credit, Missing Work, Welcome, etc.). Pre-written feedback appears with today's date auto-filled. Copy. Paste into the gradebook. Done.
 
-Click **Generate Variation** to cycle through three alternate phrasings of the same feedback, all in your teaching voice. Your saved custom edits become variation #1 so nothing you write ever gets wiped.
+Click **Generate Variation** to cycle through three alternate phrasings of the same feedback — written in a real teacher's voice from proven classroom feedback. Your saved custom edits become variation #1 so nothing you write ever gets wiped.
 
 ### ✉️ Email Generator
 Every recurring student email you send throughout the year — in one place:
@@ -105,10 +105,9 @@ When the paid plan launches, **early-beta accounts lock in $4.99/month or $39/ye
 |---|---|
 | `index.html` | Marketing landing page — what visitors see first. Links to `app.html` for sign-in. |
 | `app.html` | The actual tool. Auth-gated. Loads Firebase, renders the workflow UI. |
-| `cybergrader-logo.png` | Brand wordmark. Used in both files. |
-| `percy-logo.png` | Footer mark (the dog). |
-| `sv-portal-logo.png` | Gradebook Setup workflow icon. (Filename predates the rename — kept for cache stability.) |
-| `assets/` | Mirror of the three PNGs above, referenced by `index.html`. |
+| `assets/cybergrader-logo.png` | Brand wordmark. Referenced by both `index.html` and `app.html`. |
+| `assets/percy-logo.png` | Footer mark. |
+| `assets/sv-portal-logo.png` | Gradebook Setup workflow icon. (Filename predates the rename — kept for cache stability.) |
 
 ---
 
@@ -175,4 +174,4 @@ Your data survives every update — it lives in Firestore, not in the HTML file.
 
 ## Credits
 
-Built by **PercyCodes**. Named after my dog Percy.
+Built by **PercyCodes**.
