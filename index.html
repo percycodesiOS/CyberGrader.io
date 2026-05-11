@@ -292,8 +292,8 @@ img{max-width:100%;display:block}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
 .nav__logo{height:54px;filter:var(--pc-drop-cyan)}
 .nav__cta{display:flex;gap:10px;align-items:center}
-.nav a{color:var(--pc-fg-2);text-decoration:none;font-weight:700;font-size:.95rem;padding:10px 14px;border-radius:10px;transition:var(--pc-ease)}
-.nav a:hover{color:var(--pc-fg-1);background:rgba(81,217,255,.08)}
+.nav a:not(.btn){color:var(--pc-fg-2);text-decoration:none;font-weight:700;font-size:.95rem;padding:10px 14px;border-radius:10px;transition:var(--pc-ease)}
+.nav a:not(.btn):hover{color:var(--pc-fg-1);background:rgba(81,217,255,.08)}
 /* Buttons — same 5-tier DNA as the app */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
   font-family:var(--pc-font-sans);text-decoration:none;cursor:pointer;
