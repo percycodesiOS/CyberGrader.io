@@ -45,7 +45,7 @@ background:rgba(45,49,60,.92);box-shadow:var(--shadow);backdrop-filter:blur(12px
 }
 .topbar-left{display:flex;align-items:center;justify-content:flex-start;gap:20px}
 .topbar-center{display:flex;align-items:center;justify-content:center}
-.topbar-logo{height:170px;width:auto;display:block;filter:drop-shadow(0 0 14px rgba(81,217,255,.35));max-width:100%}
+.topbar-logo{height:170px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(81,217,255,.22));max-width:100%}
 .brand{margin:0;font-size:clamp(2.5rem,5vw,4.2rem);font-weight:900;letter-spacing:.02em}
 .brand .dot{color:var(--cyan)}
 .topbar-right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap}
@@ -60,7 +60,7 @@ display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2
 .date-pill .date-label{
 font-size:.82rem;letter-spacing:.2em;font-weight:900;
 color:var(--cyan);
-text-shadow:0 0 10px rgba(81,217,255,.75),0 0 20px rgba(81,217,255,.4)
+text-shadow:0 0 6px rgba(81,217,255,.5),0 0 12px rgba(81,217,255,.22)
 }
 .date-pill .date-value{font-weight:800;color:var(--text);font-size:1.08rem;letter-spacing:.02em}
 .howto-btn{
@@ -119,7 +119,7 @@ border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shad
 .panel-title{
 margin:0 0 14px;font-size:1.2rem;font-weight:900;letter-spacing:.06em;
 color:#fff;text-transform:uppercase;text-align:center;
-text-shadow:0 0 18px rgba(81,217,255,.85),0 0 36px rgba(81,217,255,.45),0 0 56px rgba(0,183,255,.25);
+text-shadow:0 0 10px rgba(81,217,255,.55),0 0 22px rgba(81,217,255,.25),0 0 32px rgba(0,183,255,.12);
 padding-bottom:12px;border-bottom:2px solid rgba(81,217,255,.4);
 position:relative
 }
@@ -140,13 +140,13 @@ box-shadow:inset 0 0 0 1px rgba(81,217,255,.04)
 .section-card ul{margin:0;padding-left:18px;display:grid;gap:8px}
 .senior-highlight{color:var(--pink);font-weight:700}
 .general-highlight{color:#7dffb5;font-weight:700}
-.notes-heading{color:var(--cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 10px rgba(81,217,255,.3)}
+.notes-heading{color:var(--cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 6px rgba(81,217,255,.18)}
 .notes-card{border:1px solid rgba(81,217,255,.28);box-shadow:0 0 0 1px rgba(81,217,255,.04),0 4px 16px rgba(0,0,0,.25)}
 .no-extensions{
 margin-top:12px;padding:10px 14px;border-radius:10px;text-align:center;
 background:rgba(255,110,180,.10);border:1px solid rgba(255,110,180,.38);
 color:var(--pink);font-weight:900;letter-spacing:.08em;font-size:.92rem;
-text-shadow:0 0 10px rgba(255,110,180,.4)
+text-shadow:0 0 6px rgba(255,110,180,.25)
 }
 /* BLOCK SELECTOR (3 big blocks instead of tabs) */
 .block-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
@@ -481,6 +481,7 @@ body{padding:12px}
 <span style="opacity:.55;margin-left:2px">▾</span>
 </button>
 <div class="user-menu" id="userMenu">
+<button type="button" id="resetAllBtn">Reset All Templates</button>
 <button type="button" class="danger" id="signOutBtn">Sign Out</button>
 </div>
 </div>
@@ -923,7 +924,7 @@ lastValues: "cybergrader_last_values_v4"
 
 const gradeConfig = {
 "FIRST ASSIGNMENT": ["Welcome First Nine Weeks","Welcome Second Nine Weeks","Welcome Third Nine Weeks","Welcome Fourth Nine Weeks"],
-"ASSIGNMENT": ["Perfect", "Partial Credit", "Assignment Resubmit"],
+"ASSIGNMENT": ["Perfect", "Partial Credit", "Fill in the Blank — Mostly Right", "Assignment Resubmit"],
 "PROJECT": ["Perfect", "Good Overall Project", "Missing Work"]
 };
 
@@ -933,25 +934,27 @@ let longDate = today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',m
 
 const defaultGradeTemplates = {
 "FIRST ASSIGNMENT||Welcome First Nine Weeks": (d) =>
-`Graded ${d} - Welcome to the class, I reviewed your first assignment and you are starting strong, your work was clear and showed real effort, keep this energy going because it is a great way to kick off the school year, as always, I'm here if you have any questions.`,
+`Graded ${d} — Welcome to the class. I reviewed your first assignment and you are off to a strong start. Your answers were clear and showed real effort. Keep that energy going; it is a great way to begin the school year. I am here if you have any questions.`,
 "FIRST ASSIGNMENT||Welcome Second Nine Weeks": (d) =>
-`Graded ${d} - Great job in completing your first assignment, please do everything you can to follow the assignment calendar and keep up this quality of work, you will do a great job this nine weeks, as always, I'm here if you have any questions.`,
+`Graded ${d} — Great job completing your first assignment of the second nine weeks. Stay on the assignment calendar and keep this quality of work up; you are set up for a strong grading period. I am here if you have any questions.`,
 "FIRST ASSIGNMENT||Welcome Third Nine Weeks": (d) =>
-`Graded ${d} - Great job in completing your first assignment for this marking period, please continue to follow the assignment calendar and maintain this quality of work, as always, I'm here if you have any questions.`,
+`Graded ${d} — Solid start to the third nine weeks. Your first assignment looks good. Stay consistent with the pacing calendar and maintain this level of effort. I am here if you have any questions.`,
 "FIRST ASSIGNMENT||Welcome Fourth Nine Weeks": (d) =>
-`Graded ${d} - Great job completing your first assignment for the fourth nine weeks, let's finish the year strong, please follow the assignment calendar closely and reach out if you need anything, as always, I'm here if you have any questions.`,
+`Graded ${d} — Great work completing your first assignment of the fourth nine weeks. Let's finish the year strong. Follow the assignment calendar closely and reach out anytime you need help. I am here if you have any questions.`,
 "ASSIGNMENT||Perfect": (d) =>
-`Graded ${d} - You clearly understood the lesson and took your time, keep up this positive effort.`,
+`Graded ${d} — Every answer was correct. You clearly read each question carefully and pulled your answers directly from the lesson. Keep up this consistent effort.`,
 "ASSIGNMENT||Partial Credit": (d) =>
-`Graded ${d} - I reviewed all of your responses and gave you credit anywhere possible, please make sure you are thoroughly reading each question and responding with the correct answer, specifically the answer that is directly from the lesson, if you have any questions or would like to reattempt, please feel free to reach out.`,
+`Graded ${d} — I reviewed your responses and gave you credit on every question I could. The ones that missed credit needed answers pulled directly from the lesson — slow down and make sure each response matches what the material covered. If you would like to retake this one, message me.`,
+"ASSIGNMENT||Fill in the Blank — Mostly Right": (d) =>
+`Graded ${d} — You had most of your fill-in answers correct. A few came in with minor spelling or wording differences from the lesson. Take a quick look at the items I marked and double-check exact terminology next time. Reach out if you would like to revisit any of them.`,
 "ASSIGNMENT||Assignment Resubmit": (d) =>
-`Graded ${d} - This assignment was submitted blank or without enough completed work to grade fairly, please message me so I can reset it and explain the assignment so that you have a better understanding.`,
+`Graded ${d} — This assignment came in blank or without enough completed work to grade fairly. Message me and I will reset it. I want to make sure you have a chance to attempt it with a clear understanding of what is being asked.`,
 "PROJECT||Perfect": (d) =>
-`Graded ${d} - Excellent work, project turned out great, was well organized and exceeded all expectations.`,
+`Graded ${d} — Excellent work. Your project was well organized, thoroughly completed, and exceeded the expectations on every part of the rubric. This is exactly what a top-tier project looks like.`,
 "PROJECT||Good Overall Project": (d) =>
-`Graded ${d} - Good work overall, please make sure you are giving every assignment your absolute best effort and add as much creativity and detail as you can, that is what gets you to a perfect score.`,
+`Graded ${d} — Good work overall. The required pieces are all here. To push this into perfect-score territory next time, focus on the details that are easy to skip — extra creativity, deeper explanation, and a clean final pass before submitting.`,
 "PROJECT||Missing Work": (d) =>
-`Graded ${d} - Your file is missing, please contact me so I can help you get back on track and possibly explain the assignment in a way that you understand, your grade will remain a zero until I hear from you, remember, I am here to help you succeed.`
+`Graded ${d} — Your file is missing on this one. Please reach out so I can help you get back on track. The grade will stay a zero until I hear from you, but it is fixable — I am here to help.`
 };
 
 const defaultPortalTemplates = {
@@ -963,54 +966,81 @@ const defaultPortalTemplates = {
 // Real alternate phrasings per feedback template — warm, forgiving, cool-teacher tone
 const gradeVariationTemplates = {
 "FIRST ASSIGNMENT||Welcome First Nine Weeks": [
-(d) => `Graded ${d} - Welcome to the class, I reviewed your first assignment and you are starting strong, your work was clear and showed real effort, keep this energy going because it is a great way to kick off the school year, as always, I'm here if you have any questions.`,
-(d) => `Graded ${d} - Great first impression, your work shows you took the time to actually read through the lesson and think about your answers, that's exactly the right mindset heading into the school year, reach out anytime you need help.`,
-(d) => `Graded ${d} - Nice work on your very first assignment, you clearly put in effort and it shows, keep that same approach going and you'll have a great year, I'm always here if something doesn't make sense.`
+(d) => `Graded ${d} — Welcome to the class. I reviewed your first assignment and you are off to a strong start. Your answers were clear and showed real effort. Keep that energy going; it is a great way to begin the school year. I am here if you have any questions.`,
+(d) => `Graded ${d} — Great first impression. Your responses show that you took the time to read through the lesson before answering, which is exactly the right mindset heading into the school year. Reach out anytime you need help.`,
+(d) => `Graded ${d} — Nice work on your very first assignment. You clearly put effort into reading each question carefully, and it shows in your score. Keep that approach going. I am always here if something does not make sense.`,
+(d) => `Graded ${d} — Strong opening to the school year. Your work was clean, complete, and showed that you engaged with the material rather than rushing. Keep this pace going.`,
+(d) => `Graded ${d} — Welcome aboard. Your first assignment landed well — accurate, thoughtful, and on time. That is the foundation we want to build on all year. Let me know anytime you need help.`
 ],
 "FIRST ASSIGNMENT||Welcome Second Nine Weeks": [
-(d) => `Graded ${d} - Great job in completing your first assignment, please do everything you can to follow the assignment calendar and keep up this quality of work, you will do a great job this nine weeks, as always, I'm here if you have any questions.`,
-(d) => `Graded ${d} - Strong start to the second nine weeks, your work looks good and shows you're ready to keep the momentum going, stick with the assignment calendar and you'll be in great shape, message me anytime.`,
-(d) => `Graded ${d} - Nice work getting the second nine weeks rolling, your first assignment was solid, keep following the pacing calendar and you'll have a great grading period, reach out if anything comes up.`
+(d) => `Graded ${d} — Great job completing your first assignment of the second nine weeks. Stay on the assignment calendar and keep this quality of work up; you are set up for a strong grading period. I am here if you have any questions.`,
+(d) => `Graded ${d} — Strong start to the second nine weeks. Your work shows you are ready to keep the momentum going. Stick with the pacing calendar and you will be in great shape. Message me anytime you need help.`,
+(d) => `Graded ${d} — Nice work getting the second nine weeks rolling. Your first assignment was solid. Keep following the pacing calendar and reach out anytime questions come up.`,
+(d) => `Graded ${d} — Solid kickoff to this grading period. Keep that consistency — staying with the pacing calendar is the easiest way to lock in a strong grade. Reach out anytime.`,
+(d) => `Graded ${d} — Good first step into the second nine weeks. Your answers were clear and showed effort. Keep this standard going through the rest of the term.`
 ],
 "FIRST ASSIGNMENT||Welcome Third Nine Weeks": [
-(d) => `Graded ${d} - Great job in completing your first assignment for this marking period, please continue to follow the assignment calendar and maintain this quality of work, as always, I'm here if you have any questions.`,
-(d) => `Graded ${d} - Solid start to the third nine weeks, your work is on track, keep using the assignment calendar to stay on pace and you'll be in good shape, let me know if anything gets unclear.`,
-(d) => `Graded ${d} - Welcome back for the third nine weeks, your first assignment looks good, stay consistent with the pacing calendar and reach out anytime you have a question.`
+(d) => `Graded ${d} — Solid start to the third nine weeks. Your first assignment looks good. Stay consistent with the pacing calendar and maintain this level of effort. I am here if you have any questions.`,
+(d) => `Graded ${d} — Strong opening to the third nine weeks. Your work is on track. Keep using the assignment calendar to stay on pace, and let me know if anything gets unclear.`,
+(d) => `Graded ${d} — Welcome back for the third nine weeks. Your first assignment looks good. Stay consistent with the pacing calendar and reach out anytime you have a question.`,
+(d) => `Graded ${d} — Good first assignment for this marking period. The quality is there — keep it up, and stay ahead of the assignment calendar so the second half of the term stays manageable.`,
+(d) => `Graded ${d} — Nice work easing into the third nine weeks. Your responses show focus and effort. Maintain this through the rest of the period and you will be in great shape.`
 ],
 "FIRST ASSIGNMENT||Welcome Fourth Nine Weeks": [
-(d) => `Graded ${d} - Great job completing your first assignment for the fourth nine weeks, let's finish the year strong, please follow the assignment calendar closely and reach out if you need anything, as always, I'm here if you have any questions.`,
-(d) => `Graded ${d} - Nice start to the fourth nine weeks, this is the home stretch so stay focused on the assignment calendar and keep your work quality up, reach out if you run into anything.`,
-(d) => `Graded ${d} - Solid work getting the final nine weeks started, the end of the year will be here fast, stick with the pacing and message me if anything gets in your way.`
+(d) => `Graded ${d} — Great work completing your first assignment of the fourth nine weeks. Let's finish the year strong. Follow the assignment calendar closely and reach out anytime you need help. I am here if you have any questions.`,
+(d) => `Graded ${d} — Nice start to the fourth nine weeks. This is the home stretch — stay focused on the assignment calendar and keep your work quality up. Reach out if you run into anything.`,
+(d) => `Graded ${d} — Solid work getting the final nine weeks started. The end of the year will be here fast. Stick with the pacing and message me anytime something gets in your way.`,
+(d) => `Graded ${d} — Good first step into the fourth nine weeks. The finish line is closer than it feels — keep the same effort and pacing going and you will land this grading period well.`,
+(d) => `Graded ${d} — Strong opening to the final nine weeks. Your work was clear and on time. Finish strong: stay with the calendar, ask questions early, and let me know if anything gets in the way.`
 ],
 "ASSIGNMENT||Perfect": [
-(d) => `Graded ${d} - You clearly understood the lesson and took your time, keep up this positive effort.`,
-(d) => `Graded ${d} - Great work, your answers show you actually read the lesson and thought about what you were writing, keep it up.`,
-(d) => `Graded ${d} - Solid assignment, you nailed every part, exactly the kind of effort that builds a strong grade over time.`
+(d) => `Graded ${d} — Every answer was correct. You clearly read each question carefully and pulled your answers directly from the lesson. Keep up this consistent effort.`,
+(d) => `Graded ${d} — A perfect score. Your responses show that you actually engaged with the material rather than guessing, and that focus is what builds a strong grade over time. Nice work.`,
+(d) => `Graded ${d} — Great job. Every question was answered correctly and your work showed real attention to detail. This is exactly the kind of effort that pays off.`,
+(d) => `Graded ${d} — Full credit. Your answers were accurate and directly tied to the lesson — that is the formula. Keep this standard going on the next one.`,
+(d) => `Graded ${d} — Outstanding. Every answer hit, which tells me you read the lesson carefully before you answered. Keep up that approach.`
 ],
 "ASSIGNMENT||Partial Credit": [
-(d) => `Graded ${d} - I reviewed all of your responses and gave you credit anywhere possible, please make sure you are thoroughly reading each question and responding with the correct answer, specifically the answer that is directly from the lesson, if you have any questions or would like to reattempt, please feel free to reach out.`,
-(d) => `Graded ${d} - I went through your responses and gave credit wherever I could, some of the answers didn't match what the lesson was asking for, slow down and pull answers directly from the lesson itself, reach out if you want to retry it.`,
-(d) => `Graded ${d} - Got you partial credit on this one, the main thing is making sure each answer lines up with what the lesson actually covered, happy to reset it if you want another shot, just message me.`
+(d) => `Graded ${d} — I reviewed your responses and gave you credit on every question I could. The ones that missed credit needed answers pulled directly from the lesson — slow down and make sure each response matches what the material covered. If you would like to retake this one, message me.`,
+(d) => `Graded ${d} — Good effort, but a few answers did not line up with what the lesson was teaching. Take another pass through the material and focus on matching each answer to the source. I am happy to reset this assignment if you would like another attempt.`,
+(d) => `Graded ${d} — You earned partial credit on this one. The key is making sure every answer ties back directly to the lesson rather than a best guess. Reach out if you want me to reopen it so you can retry.`,
+(d) => `Graded ${d} — Solid effort overall. A few of your answers needed a closer look at the lesson before responding. Slow down on the next one and pull each answer straight from the material. Message me if you want a retake.`,
+(d) => `Graded ${d} — You got partial credit here. Most of your work was on the right track — the misses came from answers that did not exactly match what the lesson laid out. Let me know if you want to walk through any of them.`
+],
+"ASSIGNMENT||Fill in the Blank — Mostly Right": [
+(d) => `Graded ${d} — You had most of your fill-in answers correct. A few came in with minor spelling or wording differences from the lesson. Take a quick look at the items I marked and double-check exact terminology next time. Reach out if you would like to revisit any of them.`,
+(d) => `Graded ${d} — Nice work — you clearly knew the material. A handful of fill-in answers came in close but not exact. The grader is strict on spelling and wording, so double-check the lesson when an answer feels almost right. Let me know if you would like to retry any.`,
+(d) => `Graded ${d} — Strong showing overall. The fill-in items that missed credit were typos or close paraphrases of what the lesson called for. Use the exact wording from the material next time and you will pick up those points. Reach out if you want to revisit any of them.`,
+(d) => `Graded ${d} — Good understanding of the content. A few fill-ins did not match the exact phrasing from the lesson, so they came back as incorrect even though the idea was right. Slow down and copy the wording from the material when you respond. Happy to reset if you want another attempt.`,
+(d) => `Graded ${d} — You had the right concept on nearly every blank. The ones that missed credit were small wording mismatches. The grader looks for the exact phrase from the lesson — keep that in mind. Message me if you want to retake any.`
 ],
 "ASSIGNMENT||Assignment Resubmit": [
-(d) => `Graded ${d} - This assignment was submitted blank or without enough completed work to grade fairly, please message me so I can reset it and explain the assignment so that you have a better understanding.`,
-(d) => `Graded ${d} - There wasn't enough completed work here for me to grade it fairly, no problem, just send me a message and I'll reset it and walk you through what the assignment is asking for.`,
-(d) => `Graded ${d} - This one came in blank or mostly empty, reach out and I'll reset it so you can give it a real attempt, we'll talk through anything that's unclear.`
+(d) => `Graded ${d} — This assignment came in blank or without enough completed work to grade fairly. Message me and I will reset it. I want to make sure you have a chance to attempt it with a clear understanding of what is being asked.`,
+(d) => `Graded ${d} — There was not enough completed work here to grade. No problem — send me a quick message and I will reset the assignment so you can give it a real attempt.`,
+(d) => `Graded ${d} — This one came in mostly empty. Reach out and I will reopen it for you. We can talk through anything that is unclear before you resubmit.`,
+(d) => `Graded ${d} — Not enough was submitted for me to grade this fairly. That is fine — reach out and I will reset it. I would rather you give it a real attempt than rush through something blank.`,
+(d) => `Graded ${d} — This came back blank. Send me a quick message and I will reopen the assignment. Once it is reset, take your time and let me know if any of the questions are unclear.`
 ],
 "PROJECT||Perfect": [
-(d) => `Graded ${d} - Excellent work, project turned out great, was well organized and exceeded all expectations.`,
-(d) => `Graded ${d} - Great project, clear organization and real detail, you put in the work and it shows in the final result.`,
-(d) => `Graded ${d} - Nice job on this project, you exceeded what was asked for, this is exactly what a top-tier project looks like.`
+(d) => `Graded ${d} — Excellent work. Your project was well organized, thoroughly completed, and exceeded the expectations on every part of the rubric. This is exactly what a top-tier project looks like.`,
+(d) => `Graded ${d} — Great project. The organization was clear, the details were thoughtful, and the effort you put in shows in every section. Keep this standard up.`,
+(d) => `Graded ${d} — A strong submission. You went beyond what was required and the quality came through. This is the kind of work that sets the bar for the rest of the class.`,
+(d) => `Graded ${d} — Outstanding project. Every rubric item was met or exceeded, and your creativity showed throughout. Excellent effort — keep this approach going on the next one.`,
+(d) => `Graded ${d} — Top-tier work here. The structure, detail, and effort all line up. This is exactly what a complete, high-quality project should look like.`
 ],
 "PROJECT||Good Overall Project": [
-(d) => `Graded ${d} - Good work overall, please make sure you are giving every assignment your absolute best effort and add as much creativity and detail as you can, that is what gets you to a perfect score.`,
-(d) => `Graded ${d} - Solid project, the pieces are all there, push a little harder on creativity and detail next time and you'll hit a perfect score.`,
-(d) => `Graded ${d} - Good effort overall, the fundamentals are there, what separates a good project from a great one is the extra detail and creative touches, keep that in mind going forward.`
+(d) => `Graded ${d} — Good work overall. The required pieces are all here. To push this into perfect-score territory next time, focus on the details that are easy to skip — extra creativity, deeper explanation, and a clean final pass before submitting.`,
+(d) => `Graded ${d} — Solid project. The structure is right and the content is there. What separates good from great is the small stuff: an extra example, a clearer transition, a stronger conclusion. Keep that in mind on the next one.`,
+(d) => `Graded ${d} — Nice effort on this project. The foundation is strong; the next step is putting more polish on the final details. You have the skills — give every section your full attention next round.`,
+(d) => `Graded ${d} — Good project. The rubric items are all addressed. Next time, slow down on the details — a little more creativity and a careful proofread are what move this from good to excellent.`,
+(d) => `Graded ${d} — Solid work. The core is here and the assignment is clearly understood. Focus on tightening the details — depth, examples, and one final review pass — and the next one will land at the top.`
 ],
 "PROJECT||Missing Work": [
-(d) => `Graded ${d} - Your file is missing, please contact me so I can help you get back on track and possibly explain the assignment in a way that you understand, your grade will remain a zero until I hear from you, remember, I am here to help you succeed.`,
-(d) => `Graded ${d} - I don't see your file uploaded for this one, reach out and we'll figure out what happened, grade stays a zero until we get it submitted but I'm here to help you get it done.`,
-(d) => `Graded ${d} - Nothing came through for this project, message me and I'll help you get back on track, the zero is temporary, I just need to hear from you.`
+(d) => `Graded ${d} — Your file is missing on this one. Please reach out so I can help you get back on track. The grade will stay a zero until I hear from you, but it is fixable — I am here to help.`,
+(d) => `Graded ${d} — I do not see your file uploaded for this project. Message me and we will figure out what happened. The zero is temporary; I just need to hear from you.`,
+(d) => `Graded ${d} — Nothing came through for this project. Reach out and I will help you get back on track. Let me know if there was an issue with the upload or if you need the assignment explained again.`,
+(d) => `Graded ${d} — No file submitted for this project. That is fixable — reach out and we will get this taken care of. The grade stays a zero until I hear from you, but I am here to help.`,
+(d) => `Graded ${d} — I am not seeing a submission on this one. Send me a quick message and we will sort it out. The zero is temporary — let me know if you need help finishing or uploading.`
 ]
 };
 
@@ -1139,11 +1169,16 @@ setTimeout(()=>$("gradeStatus").textContent="",2000);
 }
 });
 function updateGradeTypes(){setSelectOptions($("outputType"),gradeConfig[$("workType").value]||[]);updateGradeOutput(true);}
+// Normalize any saved "Graded MM/DD/YYYY" prefix to today's date.
+// Without this, a saved override carries the date it was saved with forever.
+function withTodaysDate(text){
+  return (text||"").replace(/Graded \d{1,2}\/\d{1,2}\/\d{2,4}/g, `Graded ${shortDate}`);
+}
 function updateGradeOutput(force=false){
 if(!$("gradeOutput").readOnly&&!force)return;
 shortDate = new Intl.DateTimeFormat('en-US').format(new Date());
 const key=getGradeKey();
-$("gradeOutput").value=gradeOverrides[key]||getDefaultGradeText();
+$("gradeOutput").value=withTodaysDate(gradeOverrides[key])||getDefaultGradeText();
 }
 $("workType").addEventListener("change",updateGradeTypes);
 $("outputType").addEventListener("change",()=>updateGradeOutput(true));
@@ -1212,7 +1247,7 @@ const gradeVariationIndex = {};
 $("gradeAIBtn").addEventListener("click",()=>{
 const key=getGradeKey();
 const baseVariations = getGradeVariations(key);
-const savedOverride = gradeOverrides[key];
+const savedOverride = withTodaysDate(gradeOverrides[key]);
 // Build the full rotation: saved edit = slot 0, then base variations after
 const rotation = savedOverride ? [savedOverride, ...baseVariations] : baseVariations;
 if(rotation.length < 2){
@@ -1634,6 +1669,21 @@ if(!e.target.closest(".user-chip-wrap")) $("userMenu").classList.remove("open");
 $("signOutBtn").addEventListener("click",async ()=>{
 if(!confirm("Sign out?"))return;
 try{await A.signOut();}catch(e){console.error(e);}
+});
+$("resetAllBtn").addEventListener("click",()=>{
+$("userMenu").classList.remove("open");
+if(!confirm("Reset ALL templates back to the polished defaults?\n\nThis wipes every saved edit you have made on feedback, emails, and gradebook templates on this device.\n\nThis cannot be undone."))return;
+try{
+localStorage.removeItem(STORAGE_KEYS.gradeOverrides);
+localStorage.removeItem(STORAGE_KEYS.emailOverrides);
+localStorage.removeItem(STORAGE_KEYS.portalOverrides);
+gradeOverrides={};emailOverrides={};portalOverrides={};
+updateGradeOutput(true);
+updateEmailOutput(true);
+updatePortalOutput(true);
+$("gradeStatus").textContent="All templates reset to defaults.";
+setTimeout(()=>{$("gradeStatus").textContent="";},2500);
+}catch(e){console.error("Reset all failed:",e);alert("Something went wrong resetting templates. Check the console.");}
 });
 $("editDatesBtn").addEventListener("click",async ()=>{
 $("userMenu").classList.remove("open");
