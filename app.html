@@ -4,6 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CyberGrader.io</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png?v=1">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png?v=1">
+<link rel="shortcut icon" href="assets/favicon-32.png?v=1">
 <style>
 :root{
 --bg:#23262e;
@@ -93,7 +98,7 @@ color:#02131f;display:flex;align-items:center;justify-content:center;
 font-weight:900;font-size:.88rem;flex-shrink:0
 }
 .user-menu{
-position:absolute;top:calc(100% + 8px);right:0;min-width:200px;
+position:absolute;top:calc(100% + 8px);right:0;min-width:260px;
 background:linear-gradient(180deg,#323642,#2a2e39);
 border:1px solid rgba(81,217,255,.25);border-radius:12px;
 box-shadow:0 16px 40px rgba(0,0,0,.5);
@@ -108,6 +113,14 @@ border-radius:8px;cursor:pointer;transition:.15s ease
 .user-menu button:hover{background:rgba(81,217,255,.1)}
 .user-menu button.danger{color:var(--red)}
 .user-menu button.danger:hover{background:rgba(255,125,125,.08)}
+.user-menu .menu-section{padding:10px 12px 8px;border-bottom:1px solid rgba(81,217,255,.15);margin-bottom:4px;display:grid;gap:6px}
+.user-menu .menu-section label{font-size:.7rem;font-weight:900;letter-spacing:.08em;color:var(--cyan);text-transform:uppercase}
+.user-menu .menu-section .row{display:flex;gap:6px}
+.user-menu .menu-section input{flex:1;background:rgba(10,18,30,.55);border:1px solid rgba(81,217,255,.25);color:var(--text);border-radius:7px;padding:7px 9px;font:inherit;font-size:.88rem;min-width:0}
+.user-menu .menu-section input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 2px rgba(81,217,255,.18)}
+.user-menu .menu-section .save-name{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#02131f;border:0;border-radius:7px;padding:7px 11px;font-weight:800;font-size:.82rem;cursor:pointer;letter-spacing:.02em}
+.user-menu .menu-section .save-name:hover{filter:brightness(1.08)}
+.user-menu .menu-section .hint{color:var(--muted);font-size:.72rem;line-height:1.4;margin:0}
 
 /* LAYOUT */
 .main-grid{display:grid;grid-template-columns:370px minmax(0,1fr);gap:16px;align-items:start}
@@ -481,6 +494,14 @@ body{padding:12px}
 <span style="opacity:.55;margin-left:2px">▾</span>
 </button>
 <div class="user-menu" id="userMenu">
+<div class="menu-section">
+<label for="teacherNameInput">Teacher Name</label>
+<div class="row">
+<input type="text" id="teacherNameInput" placeholder="e.g. Mr. Smith" autocomplete="off" />
+<button type="button" class="save-name" id="saveTeacherNameBtn">Save</button>
+</div>
+<p class="hint">Auto-fills [Your Name] in every email sign-off.</p>
+</div>
 <button type="button" id="resetAllBtn">Reset All Templates</button>
 <button type="button" class="danger" id="signOutBtn">Sign Out</button>
 </div>
@@ -612,6 +633,21 @@ Pick the current term first — the tool filters email options accordingly. Use 
 <button class="audience-btn" id="audSingle" type="button" data-aud="Single Student">Single Student</button>
 </div>
 
+<div class="deadline-callouts" id="dualDeadlineWrap">
+<div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:2px;flex-wrap:wrap">
+<span style="font-weight:900;letter-spacing:.06em;font-size:.78rem;color:var(--cyan);text-transform:uppercase">End-of-Year Deadlines</span>
+<span style="font-size:.72rem;color:var(--muted)">Auto-filled from School Year Setup — override if needed</span>
+</div>
+<div class="deadline-field senior">
+<label for="seniorDeadline">⧡ SENIOR DEADLINE</label>
+<input type="text" id="seniorDeadline" placeholder="e.g. Monday, May 19 at 11:59 p.m." />
+</div>
+<div class="deadline-field general">
+<label for="generalDeadline">◆ GRADES 7–11 DEADLINE</label>
+<input type="text" id="generalDeadline" placeholder="e.g. Monday, June 2 at 11:59 p.m." />
+</div>
+</div>
+
 <div class="form-grid">
 <div class="field hidden" id="studentNameField">
 <label for="studentName">Student Name</label>
@@ -638,22 +674,9 @@ Pick the current term first — the tool filters email options accordingly. Use 
 </div>
 </div>
 
-<div class="deadline-callouts" id="dualDeadlineWrap">
-<div class="deadline-field senior">
-<label for="seniorDeadline">⬡ SENIOR DEADLINE</label>
-<input type="text" id="seniorDeadline" placeholder="e.g. Monday, May 19 at 11:59 p.m." />
-</div>
-<div class="deadline-field general">
-<label for="generalDeadline">◆ GRADES 7–11 DEADLINE</label>
-<input type="text" id="generalDeadline" placeholder="e.g. Monday, June 2 at 11:59 p.m." />
-</div>
-</div>
-
 <div class="toolbar">
 <div class="toolbar-left">
-<button class="edit-btn" id="editSubjectToggle" type="button">Edit Subject</button>
-<button class="edit-btn" id="editBodyToggle" type="button">Edit Body</button>
-<button class="global-save-btn" id="saveEmailBtn" type="button">Save Changes Globally</button>
+<button class="edit-btn" id="editEmailToggle" type="button">Edit Template</button>
 <button class="reset-btn" id="resetEmailBtn" type="button">Reset Template</button>
 </div>
 <div class="toolbar-right">
@@ -677,7 +700,6 @@ Pick the current term first — the tool filters email options accordingly. Use 
 
 <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
 <button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject</button>
-<button class="ghost-btn" id="copyCombinedBtn" type="button">Copy Combined</button>
 </div>
 <button class="copy-btn" id="copyBodyBtn" type="button" style="padding:12px 18px;font-size:.95rem;letter-spacing:.02em;margin-top:6px">Copy Email Body</button>
 </div>
@@ -919,7 +941,8 @@ const STORAGE_KEYS = {
 gradeOverrides: "cybergrader_grade_overrides_v4",
 emailOverrides: "cybergrader_email_overrides_v4",
 portalOverrides: "cybergrader_portal_overrides_v4",
-lastValues: "cybergrader_last_values_v4"
+lastValues: "cybergrader_last_values_v4",
+teacherName: "cybergrader_teacher_name_v4"
 };
 
 const gradeConfig = {
@@ -1292,11 +1315,6 @@ setTimeout(()=>{button.textContent=old;button.classList.remove("copied");statusE
 }
 
 // ── EMAIL ──
-function setEmailEditable(textarea,button,editable){
-textarea.readOnly=!editable;button.classList.toggle("saving",editable);
-button.textContent=editable?(textarea===$("emailSubjectOutput")?"Save Subject":"Save Body"):(textarea===$("emailSubjectOutput")?"Edit Subject":"Edit Body");
-if(editable)textarea.focus();
-}
 function getReferenceDate(){return $("currentDateField").value.trim()||shortDate}
 function getProgressDefault(){
 const type=$("emailType").value;
@@ -1326,7 +1344,7 @@ $("progressField").classList.toggle("hidden",!showProgress);
 $("referenceDateField").classList.toggle("hidden",!showRefDate);
 $("studentNameField").classList.toggle("hidden",!showSingle);
 $("deadlineFieldWrap").classList.toggle("hidden",!showDeadline);
-$("dualDeadlineWrap").classList.toggle("hidden",!showDual);
+// Dual deadlines block is now always visible — teachers can pre-fill before fourth term hits.
 
 // Lock audience if type forces seniors or 7-11
 const levels=gradeLevelsByType[type]||["All Students"];
@@ -1412,6 +1430,11 @@ let result = text;
 for(const [tok, val] of Object.entries(tokens)){
 result = result.split(tok).join(val);
 }
+// Replace literal [Your Name] with stored teacher name if set (otherwise leave as placeholder)
+const storedName = (localStorage.getItem(STORAGE_KEYS.teacherName) || "").trim();
+if(storedName){
+result = result.split("[Your Name]").join(storedName);
+}
 return result;
 }
 
@@ -1459,12 +1482,12 @@ body:`{{greet}}\n\nWelcome to your {{course}}cyber course! I'll be your teacher 
 
 case"Early Check-In":return{
 subject:"Cyber Check-In",
-body:`{{greet}}\n\nI wanted to check in now that we've completed the first week of the {{term}}. This is a good time to make sure you're actively working in your cyber course and not letting yourself fall behind — I always recommend being ahead of the assignment calendar, but staying on target at a minimum is the key to success.\n\nPlease remember that cyber courses can affect academic eligibility, including NCAA eligibility, so it's important to stay on pace from the start. If something is unclear or you need help getting going, reach out.\n\nThanks,\n\n[Your Name]`
+body:`{{greet}}\n\nI wanted to check in now that we've wrapped up the first week of the {{term}}. This is a good time to make sure you're actively working in your cyber course and staying on top of the assignment calendar. Being a little ahead is ideal, but staying on pace is what keeps things manageable.\n\nA quick reminder: cyber courses can affect academic eligibility, including NCAA eligibility, so a strong start matters. If you need help getting going or something is unclear, just reach out.\n\nThanks,\n\n[Your Name]`
 };
 
 case"Zero Grade Clarification":return{
 subject:"Clarification on Zeros and the Grading Process",
-body:`{{greet}}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the {{term}} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want each of you supported this nine weeks.\n\nThanks,\n\n[Your Name]`
+body:`{{greet}}\n\nJust clarifying how zeros and grading work in our course. I've graded all coursework submitted from the start of the {{term}} up to today.\n\nQuick reminders:\n1. Every "0" has an explanation — either in the feedback or because I haven't graded it yet.\n2. A "0" with a note = graded, with the reason why.\n3. A "0" with no note = not graded yet, nothing to worry about.\n\nGrading happens after school hours, so scores update as soon as I get to them. You're always welcome to reach out if you'd like to retake an assignment, revise, or talk through your grade. I want every one of you to feel supported this grading period.\n\nThanks,\n\n[Your Name]`
 };
 
 case"25% Check-In":return{
@@ -1663,6 +1686,27 @@ $("userChip").addEventListener("click",(e)=>{
 e.stopPropagation();
 $("userMenu").classList.toggle("open");
 });
+// Teacher name: load saved value, save on button or Enter
+(function initTeacherName(){
+const stored = localStorage.getItem(STORAGE_KEYS.teacherName) || "";
+$("teacherNameInput").value = stored;
+function saveTeacherName(){
+const v = $("teacherNameInput").value.trim();
+if(v) localStorage.setItem(STORAGE_KEYS.teacherName, v);
+else localStorage.removeItem(STORAGE_KEYS.teacherName);
+const btn = $("saveTeacherNameBtn");
+const orig = btn.textContent;
+btn.textContent = "Saved ✓";
+setTimeout(()=>{btn.textContent = orig;},1400);
+// Refresh outputs so [Your Name] swaps live
+if(typeof updateEmailOutput === "function"){ try{ updateEmailOutput(true); }catch(e){} }
+}
+$("saveTeacherNameBtn").addEventListener("click",(e)=>{e.stopPropagation();saveTeacherName();});
+$("teacherNameInput").addEventListener("keydown",(e)=>{
+if(e.key==="Enter"){e.preventDefault();saveTeacherName();}
+});
+$("teacherNameInput").addEventListener("click",(e)=>e.stopPropagation());
+})();
 document.addEventListener("click",(e)=>{
 if(!e.target.closest(".user-chip-wrap")) $("userMenu").classList.remove("open");
 });
@@ -1722,8 +1766,36 @@ if(window.cgAuth) wireAuth();
 else window.addEventListener("cgAuthReady",wireAuth,{once:true});
 
 // ── EMAIL WIRING ──
-$("editSubjectToggle").addEventListener("click",()=>setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),$("emailSubjectOutput").readOnly));
-$("editBodyToggle").addEventListener("click",()=>setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),$("emailBodyOutput").readOnly));
+// Single "Edit Template" toggle controls BOTH subject + body together.
+let emailEditMode = false;
+function updateEmailEditUI(){
+const btn = $("editEmailToggle");
+const subj = $("emailSubjectOutput");
+const body = $("emailBodyOutput");
+subj.readOnly = !emailEditMode;
+body.readOnly = !emailEditMode;
+btn.textContent = emailEditMode ? "Save Template" : "Edit Template";
+btn.classList.toggle("saving", emailEditMode);
+}
+$("editEmailToggle").addEventListener("click",()=>{
+if(!emailEditMode){
+emailEditMode = true;
+updateEmailEditUI();
+$("emailBodyOutput").focus();
+}else{
+// Save
+emailOverrides[getEmailKey()] = {
+subject: tokenizeOnSave($("emailSubjectOutput").value.trim()),
+body: tokenizeOnSave($("emailBodyOutput").value.trim())
+};
+saveJSON(STORAGE_KEYS.emailOverrides, emailOverrides);
+emailEditMode = false;
+updateEmailEditUI();
+updateEmailOutput(true);
+$("emailStatus").textContent = "Saved on this device. Dates stay fresh.";
+setTimeout(()=>$("emailStatus").textContent="",2400);
+}
+});
 // Reverses resolveTokens: when user saves an edited email, convert any live
 // values (dates, term names, progress %) back to {{tokens}} so the saved
 // version stays fresh when school year dates or term change later.
@@ -1764,31 +1836,15 @@ if(termName && termName !== "current grading period") result = result.split(term
 return result;
 }
 
-$("saveEmailBtn").addEventListener("click",()=>{
-emailOverrides[getEmailKey()]={
-subject:tokenizeOnSave($("emailSubjectOutput").value.trim()),
-body:tokenizeOnSave($("emailBodyOutput").value.trim())
-};
-saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
-setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),false);
-setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),false);
-// Re-render so tokens resolve with fresh values
-updateEmailOutput(true);
-$("emailStatus").textContent="Saved globally on this device. Dates will stay fresh.";setTimeout(()=>$("emailStatus").textContent="",2800);
-});
-// Remove old duplicate saveEmailBtn listener (the following will be our original that we kept accidentally)
-(function removeDuplicate(){})();
 $("resetEmailBtn").addEventListener("click",()=>{
 if(!confirm("Reset this email template?\n\nOnly the currently selected email template will be reset. Your school year dates and other saved templates are safe."))return;
 delete emailOverrides[getEmailKey()];saveJSON(STORAGE_KEYS.emailOverrides,emailOverrides);
-setEmailEditable($("emailSubjectOutput"),$("editSubjectToggle"),false);
-setEmailEditable($("emailBodyOutput"),$("editBodyToggle"),false);
+emailEditMode = false; updateEmailEditUI();
 updateEmailOutput(true);
 $("emailStatus").textContent="Template reset.";setTimeout(()=>$("emailStatus").textContent="",2000);
 });
 $("copySubjectBtn").addEventListener("click",()=>copyText(cleanSingleLine($("emailSubjectOutput").value),$("emailStatus"),$("copySubjectBtn")));
 $("copyBodyBtn").addEventListener("click",()=>copyText($("emailBodyOutput").value.trim(),$("emailStatus"),$("copyBodyBtn")));
-$("copyCombinedBtn").addEventListener("click",()=>{const combined=`Subject: ${$("emailSubjectOutput").value}\n\n${$("emailBodyOutput").value}`;copyText(combined,$("emailStatus"),$("copyCombinedBtn"));});
 
 $("term").addEventListener("change",()=>{populateEmailTypes();updateEmailOutput(true);saveLastValues();});
 $("emailType").addEventListener("change",()=>{updateEmailOutput(true);saveLastValues();});
