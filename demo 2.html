@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberGrader.io — How It Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Sora:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1e2128; --panel:#2d313c; --panel2:#323642; --border:rgba(81,217,255,.18);
+  --text:#edf6ff; --muted:#a4b3c7; --cyan:#51d9ff; --cyan2:#00b7ff; --pink:#ff4ec9; --green:#4ade80;
+}
+html,body{margin:0;padding:0;background:#16181d;color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
+.scene-bg{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 30%, #1f2330 0%, #14161c 60%, #0a0c11 100%)}
+.label{position:fixed;top:24px;left:24px;font-family:'Sora',sans-serif;font-weight:800;letter-spacing:.04em;color:var(--cyan);font-size:.78rem;text-transform:uppercase;opacity:.85}
+.label .num{display:inline-block;background:rgba(81,217,255,.15);border:1px solid rgba(81,217,255,.4);border-radius:6px;padding:2px 8px;margin-right:8px;color:#cdf2ff}
+.brand{position:fixed;bottom:18px;right:24px;font-family:'Sora',sans-serif;font-weight:900;color:#cdf2ff;font-size:.85rem;letter-spacing:.06em;opacity:.6}
+#root{width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<div class="scene-bg"></div>
+<div class="brand">CyberGrader.io</div>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="animations.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+const { Stage, Sprite, useTime, interpolate, Easing } = window;
+
+// SCENE TIMINGS (seconds)
+const T = {
+  scene1: { in: 0.5, copy: 4.0, copied: 4.8, out: 6.0 },
+  label1: 6.5,
+  scene2: { in: 7.0, audience: 9.5, copy: 12.0, copied: 12.8, out: 14.0 },
+  label2: 14.5,
+  scene3: { in: 15.0, copy: 18.0, copied: 18.8, out: 20.5 },
+  end: 22.0,
+};
+
+// ── PANEL FRAME (the cybergrader card)
+function Panel({ children, title, icon }){
+  return (
+    <div style={{
+      width:760, background:'linear-gradient(180deg,#2d313c,#252934)',
+      border:'1px solid rgba(81,217,255,.22)', borderRadius:18,
+      boxShadow:'0 30px 80px rgba(0,0,0,.5), inset 0 0 0 1px rgba(81,217,255,.04)',
+      padding:'24px 28px', fontFamily:'Inter,sans-serif',
+    }}>
+      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:18,paddingBottom:14,borderBottom:'1px solid rgba(81,217,255,.12)'}}>
+        <span style={{fontSize:24}}>{icon}</span>
+        <div style={{fontFamily:'Sora,sans-serif',fontSize:'1.05rem',fontWeight:900,letterSpacing:'.05em',textTransform:'uppercase',color:'#cdf2ff'}}>{title}</div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, value, highlight }){
+  return (
+    <div style={{flex:1}}>
+      <div style={{fontSize:'.72rem',fontWeight:800,color:'var(--muted)',letterSpacing:'.04em',textTransform:'uppercase',marginBottom:6}}>{label}</div>
+      <div style={{
+        background:'linear-gradient(180deg,#23272f,#1e2128)',
+        border:`1px solid ${highlight ? 'rgba(81,217,255,.5)' : 'rgba(81,217,255,.18)'}`,
+        borderRadius:10, padding:'10px 14px', fontWeight:700, fontSize:'.92rem',
+        boxShadow: highlight ? '0 0 0 3px rgba(81,217,255,.12)' : 'none',
+      }}>{value}</div>
+    </div>
+  );
+}
+
+function CopyBtn({ copied }){
+  return (
+    <div style={{
+      padding:'12px 22px', borderRadius:12,
+      background: copied ? 'linear-gradient(180deg,#7fffd4,#22c8a0)' : 'linear-gradient(180deg,#7fe6ff,#00b7ff)',
+      color:'#001624', fontWeight:900, letterSpacing:'.06em', textTransform:'uppercase', fontSize:'.88rem',
+      boxShadow:'0 8px 22px rgba(0,183,255,.4)', display:'inline-flex', alignItems:'center', gap:8,
+      transition:'background .25s ease',
+    }}>{copied ? '✓ Copied!' : 'Copy Output'}</div>
+  );
+}
+
+// ── SCENE 1 · TEACHER FEEDBACK
+function Scene1(){
+  const t = useTime();
+  const inProg = interpolate(t, [T.scene1.in, T.scene1.in+0.5], [0,1], Easing.outCubic);
+  const outProg = interpolate(t, [T.scene1.out, T.scene1.out+0.5], [0,1], Easing.inCubic);
+  const opacity = inProg * (1 - outProg);
+  const y = interpolate(inProg, [0,1], [30,0]) + interpolate(outProg, [0,1], [0,-20]);
+  const copied = t >= T.scene1.copied;
+  const cursorX = interpolate(t, [T.scene1.in+0.8, T.scene1.copy], [-200, 280], Easing.inOutCubic);
+  const cursorY = interpolate(t, [T.scene1.in+0.8, T.scene1.copy], [-50, 200], Easing.inOutCubic);
+  const cursorVisible = t >= T.scene1.in+0.8 && t < T.scene1.copied + 0.5;
+
+  return (
+    <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',opacity,transform:`translateY(${y}px)`}}>
+      <Panel title="Teacher Feedback" icon="📝">
+        <div style={{display:'flex',gap:16,marginBottom:18}}>
+          <Field label="Work Type" value="Assignment" />
+          <Field label="Output Type" value="Partial Credit" />
+        </div>
+        <div style={{
+          background:'linear-gradient(180deg,#23272f,#1e2128)',
+          border:'1px solid rgba(81,217,255,.18)', borderRadius:10, padding:'14px 16px',
+          fontSize:'.95rem', lineHeight:1.55, color:'#dde7f3', minHeight:90, marginBottom:18,
+        }}>
+          Graded 11/14/2025 — Solid effort here, you got most of the core ideas down and your work showed real thinking, the partial-credit comes from a couple of steps that needed a closer look, take a quick pass and resubmit when you're ready.
+        </div>
+        <div style={{display:'flex',justifyContent:'flex-end'}}><CopyBtn copied={copied} /></div>
+      </Panel>
+      {cursorVisible && (
+        <div style={{position:'absolute',left:'50%',top:'50%',transform:`translate(${cursorX}px, ${cursorY}px)`,fontSize:32,filter:'drop-shadow(0 2px 6px rgba(0,0,0,.6))',pointerEvents:'none'}}>👆</div>
+      )}
+    </div>
+  );
+}
+
+// ── SCENE 2 · EMAIL GENERATOR
+function Scene2(){
+  const t = useTime();
+  const inProg = interpolate(t, [T.scene2.in, T.scene2.in+0.5], [0,1], Easing.outCubic);
+  const outProg = interpolate(t, [T.scene2.out, T.scene2.out+0.5], [0,1], Easing.inCubic);
+  const opacity = inProg * (1 - outProg);
+  const y = interpolate(inProg, [0,1], [30,0]) + interpolate(outProg, [0,1], [0,-20]);
+  const copied = t >= T.scene2.copied;
+  const audienceSwap = t >= T.scene2.audience;
+
+  return (
+    <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',opacity,transform:`translateY(${y}px)`}}>
+      <Panel title="Email Generator" icon="✉️">
+        <div style={{display:'flex',gap:16,marginBottom:14}}>
+          <Field label="Term" value="4th Nine Weeks" />
+          <Field label="Email Type" value="Final Week Reminder" />
+        </div>
+        {/* AUDIENCE TOGGLE */}
+        <div style={{display:'flex',gap:8,marginBottom:14,padding:4,background:'rgba(10,18,30,.5)',borderRadius:10,border:'1px solid rgba(81,217,255,.15)'}}>
+          <div style={{
+            flex:1,padding:'8px 14px',borderRadius:8,textAlign:'center',fontWeight:800,fontSize:'.85rem',
+            background: audienceSwap ? 'transparent' : 'linear-gradient(180deg,rgba(255,78,201,.25),rgba(255,78,201,.12))',
+            border: audienceSwap ? '1px solid transparent' : '1px solid rgba(255,78,201,.5)',
+            color: audienceSwap ? 'var(--muted)' : '#ffb3e3',
+            transition:'all .25s ease',
+          }}>👑 Seniors</div>
+          <div style={{
+            flex:1,padding:'8px 14px',borderRadius:8,textAlign:'center',fontWeight:800,fontSize:'.85rem',
+            background: audienceSwap ? 'linear-gradient(180deg,rgba(74,222,128,.25),rgba(74,222,128,.12))' : 'transparent',
+            border: audienceSwap ? '1px solid rgba(74,222,128,.5)' : '1px solid transparent',
+            color: audienceSwap ? '#a8f3c5' : 'var(--muted)',
+            transition:'all .25s ease',
+          }}>🎓 Grades 7–11</div>
+        </div>
+        {/* DUAL DEADLINES */}
+        <div style={{display:'flex',gap:12,marginBottom:14}}>
+          <div style={{flex:1,padding:'10px 14px',borderRadius:10,background:'rgba(255,78,201,.08)',border:'1px solid rgba(255,78,201,.4)'}}>
+            <div style={{fontSize:'.7rem',fontWeight:800,color:'#ffb3e3',letterSpacing:'.06em',textTransform:'uppercase'}}>Senior Deadline</div>
+            <div style={{fontWeight:900,fontSize:'1.05rem',color:'#ffd6f0'}}>05/18/26</div>
+          </div>
+          <div style={{flex:1,padding:'10px 14px',borderRadius:10,background:'rgba(74,222,128,.08)',border:'1px solid rgba(74,222,128,.4)'}}>
+            <div style={{fontSize:'.7rem',fontWeight:800,color:'#a8f3c5',letterSpacing:'.06em',textTransform:'uppercase'}}>Grades 7–11</div>
+            <div style={{fontWeight:900,fontSize:'1.05rem',color:'#c8f9da'}}>06/02/26</div>
+          </div>
+        </div>
+        <div style={{display:'flex',justifyContent:'flex-end'}}><CopyBtn copied={copied} /></div>
+      </Panel>
+    </div>
+  );
+}
+
+// ── SCENE 3 · GRADEBOOK SETUP
+function Scene3(){
+  const t = useTime();
+  const inProg = interpolate(t, [T.scene3.in, T.scene3.in+0.5], [0,1], Easing.outCubic);
+  const outProg = interpolate(t, [T.scene3.out, T.scene3.out+0.5], [0,1], Easing.inCubic);
+  const opacity = inProg * (1 - outProg);
+  const y = interpolate(inProg, [0,1], [30,0]) + interpolate(outProg, [0,1], [0,-20]);
+  const copied = t >= T.scene3.copied;
+
+  return (
+    <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',opacity,transform:`translateY(${y}px)`}}>
+      <Panel title="Gradebook Setup" icon="⚙️">
+        <div style={{marginBottom:16}}>
+          <Field label="Placeholder Type" value="Weekly Overall Grade Update" />
+        </div>
+        <div style={{
+          background:'linear-gradient(180deg,#23272f,#1e2128)',
+          border:'1px solid rgba(81,217,255,.18)', borderRadius:10, padding:'14px 16px',
+          fontSize:'.88rem', lineHeight:1.6, color:'#dde7f3', minHeight:120, marginBottom:18, fontFamily:'monospace',
+        }}>
+          <div style={{color:'var(--cyan)',fontWeight:800,marginBottom:6}}>Assignment Name:</div>
+          <div style={{marginBottom:10}}>Weekly Overall Grade Update</div>
+          <div style={{color:'var(--cyan)',fontWeight:800,marginBottom:6}}>Assignment Detail:</div>
+          <div>This grade reflects the student's current weekly progress for the grading period and is updated weekly…</div>
+        </div>
+        <div style={{display:'flex',justifyContent:'flex-end'}}><CopyBtn copied={copied} /></div>
+      </Panel>
+    </div>
+  );
+}
+
+// ── SCENE LABEL (top-left chip)
+function SceneLabel(){
+  const t = useTime();
+  let num=1, name='Teacher Feedback';
+  if (t >= T.label1) { num=2; name='Email Generator'; }
+  if (t >= T.label2) { num=3; name='Gradebook Setup'; }
+  return (
+    <div style={{
+      position:'fixed',top:28,left:28,
+      fontFamily:'Sora,sans-serif',fontWeight:800,letterSpacing:'.04em',
+      color:'var(--cyan)',fontSize:'.78rem',textTransform:'uppercase',
+      display:'flex',alignItems:'center',gap:10,
+    }}>
+      <span style={{background:'rgba(81,217,255,.15)',border:'1px solid rgba(81,217,255,.4)',borderRadius:6,padding:'4px 10px',color:'#cdf2ff',fontWeight:900}}>{num} / 3</span>
+      <span style={{color:'#cdf2ff'}}>{name}</span>
+    </div>
+  );
+}
+
+// ── INTRO + OUTRO
+function Intro(){
+  const t = useTime();
+  const opacity = interpolate(t, [0, 0.4, T.scene1.in - 0.3, T.scene1.in], [0,1,1,0], Easing.linear);
+  return (
+    <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',opacity,gap:14}}>
+      <div style={{fontFamily:'Sora,sans-serif',fontSize:'3.2rem',fontWeight:900,letterSpacing:'.02em',background:'linear-gradient(180deg,#aef0ff,#00b7ff 60%,#7a3fdb)',WebkitBackgroundClip:'text',backgroundClip:'text',color:'transparent',filter:'drop-shadow(0 0 24px rgba(81,217,255,.5))'}}>CyberGrader.io</div>
+      <div style={{color:'var(--muted)',fontSize:'1.05rem',fontWeight:600}}>Three workflows. Pick. Copy. Paste. Done.</div>
+    </div>
+  );
+}
+function Outro(){
+  const t = useTime();
+  const opacity = interpolate(t, [T.scene3.out + 0.5, T.scene3.out + 1, T.end - 0.3, T.end], [0,1,1,0.2], Easing.linear);
+  return (
+    <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',opacity,gap:14}}>
+      <div style={{fontFamily:'Sora,sans-serif',fontSize:'2.4rem',fontWeight:900,letterSpacing:'.01em',color:'#cdf2ff'}}>Stop copy-pasting.</div>
+      <div style={{fontFamily:'Sora,sans-serif',fontSize:'2.4rem',fontWeight:900,letterSpacing:'.01em',background:'linear-gradient(180deg,#aef0ff,#00b7ff)',WebkitBackgroundClip:'text',backgroundClip:'text',color:'transparent'}}>Start CyberGrading.</div>
+      <div style={{marginTop:14,padding:'14px 26px',borderRadius:14,background:'linear-gradient(180deg,#7fe6ff,#00b7ff)',color:'#001624',fontFamily:'Inter,sans-serif',fontWeight:900,letterSpacing:'.06em',textTransform:'uppercase',fontSize:'.9rem',boxShadow:'0 12px 30px rgba(0,183,255,.5)'}}>Create Free Account</div>
+    </div>
+  );
+}
+
+function App(){
+  return (
+    <Stage width={1280} height={720} duration={T.end} fps={60} loop={true} background="transparent">
+      <Intro />
+      <Scene1 />
+      <Scene2 />
+      <Scene3 />
+      <Outro />
+      <SceneLabel />
+    </Stage>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
