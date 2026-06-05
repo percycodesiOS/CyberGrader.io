@@ -96,6 +96,16 @@ transition:.18s ease;text-shadow:0 1px 2px rgba(0,0,0,.25)
 0%,100%{box-shadow:0 0 0 0 rgba(255,46,147,0)}
 50%{box-shadow:0 0 18px 2px rgba(255,46,147,.5)}
 }
+.break-btn{font-family:inherit}
+.game-launch-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.game-launch-card{background:rgba(10,18,30,.5);border:1px solid rgba(81,217,255,.18);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.game-launch-card .glc-emoji{font-size:1.9rem;line-height:1}
+.game-launch-card h3{margin:0;color:#fff;font-size:1.08rem}
+.game-launch-card p{margin:0;flex:1;color:var(--muted);font-size:.88rem;line-height:1.5}
+.glc-btn{margin-top:8px;display:block;text-align:center;text-decoration:none;background:linear-gradient(180deg,#7fe6ff,#51d9ff);color:#02131f;font-weight:800;padding:11px 14px;border-radius:11px;font-size:.92rem;transition:.15s ease}
+.glc-btn.alt{background:linear-gradient(180deg,#ff5fa6,#ec1f86);color:#fff}
+.glc-btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+@media (max-width:560px){.game-launch-grid{grid-template-columns:1fr}}
 .signin-btn{
 padding:11px 20px;border-radius:14px;border:1px solid rgba(127,230,255,.85);
 background:linear-gradient(180deg,#7fe6ff,#00b7ff);
@@ -512,7 +522,7 @@ body{padding:12px}
 </div>
 <div class="topbar-right">
 <div class="topbar-stack">
-<a class="break-btn" id="gameBtn" href="game/mynecraft.html" target="_blank" rel="noopener" title="Play MYnecraft"><span class="break-ico">🎮</span><span>Take a Break</span></a>
+<button class="break-btn" id="gameBtn" type="button" title="Play a game"><span class="break-ico">🎮</span><span>Take a Break</span></button>
 <div class="user-chip-wrap">
 <button class="user-chip" id="userChip" type="button">
 <span class="avatar" id="userAvatar">?</span>
@@ -900,6 +910,29 @@ Continue with Google
 <p style="margin-top:16px"><strong>Edit Output → Save</strong> locks in your custom wording globally. <strong>Reset Template</strong> restores the original. <strong>Generate Variation</strong> toggles between the default and your saved version.</p>
 <p style="margin-top:12px;padding:12px 14px;background:rgba(255,215,0,.10);border:1px solid rgba(255,215,0,.35);border-radius:10px;color:#ffe066;font-weight:700;font-size:.92rem">💡 School year dates are set once at sign in and sync across devices. Edit them anytime from the user menu top right.</p>
 <div class="modal-actions"><button class="modal-close" id="howtoGotIt">Got It</button></div>
+</div>
+</div>
+
+<!-- TAKE A BREAK / GAMES MODAL -->
+<div class="modal-overlay" id="gamesModal">
+<div class="modal wide">
+<button class="modal-x" id="gamesClose" aria-label="Close">✕</button>
+<h2>🎮 Take a Break – Class Games</h2>
+<p>A couple of games to unwind with, or to play with your whole class. They open in a new tab – your work here stays put.</p>
+<div class="game-launch-grid">
+<div class="game-launch-card">
+<div class="glc-emoji">🧱</div>
+<h3>MYnecraft</h3>
+<p>A chill 3D blocky world. Place and break blocks, build something, and wander around. Just you – no setup, and it saves where you left off.</p>
+<a class="glc-btn" href="game/mynecraft.html" target="_blank" rel="noopener">Play MYnecraft →</a>
+</div>
+<div class="game-launch-card">
+<div class="glc-emoji">🎲</div>
+<h3>GameBash</h3>
+<p>Design and play board &amp; card games in real time. Pick a board, drop pieces, roll dice – and your whole class can join the same game from their own devices.</p>
+<a class="glc-btn alt" href="gamebash-web/index.html" target="_blank" rel="noopener">Open GameBash →</a>
+</div>
+</div>
 </div>
 </div>
 
@@ -1415,10 +1448,14 @@ $("deadlineFieldWrap").classList.toggle("hidden",!showDeadline);
 
 // Lock audience if type forces seniors or 7-11
 const levels=gradeLevelsByType[type]||["All Students"];
+const audToggle=document.querySelector(".audience-toggle");
 if(levels.length===1){
 setAudience(levels[0],true);
-document.querySelectorAll(".audience-btn").forEach(b=>b.style.display=b.dataset.aud===levels[0]?"":"none");
+// This email targets one fixed audience (e.g. Seniors), so hide the whole
+// All Students / Single Student switch instead of leaving an empty glitchy bar.
+if(audToggle) audToggle.style.display="none";
 }else{
+if(audToggle) audToggle.style.display="";
 document.querySelectorAll(".audience-btn").forEach(b=>b.style.display="");
 }
 }
@@ -2006,6 +2043,9 @@ document.querySelectorAll(".audience-btn").forEach(b=>b.addEventListener("click"
 $("howtoBtn").addEventListener("click",()=>$("howtoModal").classList.add("open"));
 $("howtoClose").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
 $("howtoGotIt").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
+$("gameBtn").addEventListener("click",()=>$("gamesModal").classList.add("open"));
+$("gamesClose").addEventListener("click",()=>$("gamesModal").classList.remove("open"));
+$("gamesModal").addEventListener("click",(e)=>{ if(e.target===$("gamesModal")) $("gamesModal").classList.remove("open"); });
 $("portalReminderClose").addEventListener("click",()=>$("portalReminderModal").classList.remove("open"));
 $("portalReminderGotIt").addEventListener("click",()=>$("portalReminderModal").classList.remove("open"));
 $("checklistClose").addEventListener("click",()=>$("checklistModal").classList.remove("open"));
