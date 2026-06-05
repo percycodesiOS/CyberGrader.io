@@ -1629,10 +1629,6 @@ const emailVariationTemplates = {
 "End of Year Grade 12":[
 {subject:"Seniors – Final Deadline",body:`Hi Seniors,\n\nAs your final year wraps up, this is the last reminder that all cyber coursework is due by {{senior_deadline}}. Confirm you're submitted, finish anything open, and reach out if you're stuck. Nothing is accepted after the deadline.\n\nCongratulations on making it here. Best of luck with what's next.\n\n[Your Name]`},
 {subject:"Seniors – The Last One",body:`Hi Seniors,\n\nThis is the big one – your last deadline. All cyber coursework is due by {{senior_deadline}}. Take a moment to make sure everything's turned in and message me with any final questions.\n\nSo proud of how far you've come. Wishing you the best ahead.\n\n[Your Name]`}
-],
-"End of Year Message":[
-{subject:"That's a Wrap – Great Summer!",body:`{{greet}}\n\nThat's a wrap on the year – congratulations! Final grades are in and your courses are complete. I just wanted to say how much I enjoyed working with each of you.\n\nOnline coursework takes real independence and grit, and you brought it. Be proud of what you finished.\n\nNow go enjoy your summer – rest, get outside, and have some fun. You earned every bit of it.\n\nLogging out,\n\n[Your Name]`},
-{subject:"We Made It – Enjoy the Summer",body:`{{greet}}\n\nWe made it – the year is officially done! Grades are final and every course is closed out. Thank you for all the effort you put in; it was a pleasure having you.\n\nThe late nights and busy weeks paid off. Take real pride in finishing.\n\nGo soak up the summer with the people you care about. You've more than earned the break.\n\nLogging out,\n\n[Your Name]`}
 ]
 };
 
@@ -1715,7 +1711,7 @@ body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder th
 
 case"End of Year Message":return{
 subject:"End of Year Message – Have a Great Summer!!",
-body:`{{greet}}\n\nCongratulations... you made it to the end of the year! I quickly wanted to let you know that final grades are in and courses are completed, which means that's a wrap. I also wanted to take a moment to say that I truly enjoyed working with each of you throughout our course.\n\nAnd I get it... online coursework demands a lot of independence, responsibility, and commitment. Between the late nights, time crunches, and everything else you had going on, I appreciate the effort that went into this learning adventure. Be proud of the work you accomplished!\n\nI'll end by saying this: take time to relax, recharge, get outside, and enjoy the summer weather with family or friends. You put in the work, now reward yourself and enjoy the next few months of sun!\n\nLogging out,\n\n[Your Name]`
+body:`Hi everyone,\n\nCongratulations... you made it to the end of the year! I quickly wanted to let you know that final grades are in and courses are completed, which means that's a wrap! I also wanted to take a moment to say that I truly enjoyed working with each of you throughout our course.\n\nAnd I get it... online coursework demands a lot of independence, responsibility, and commitment. Between the late nights, time crunches, and everything else you had going on, I appreciate the effort that went into this learning adventure. Be proud of the work you accomplished!\n\nI'll end by saying this: take time to relax, recharge/reset, get outside, and enjoy the summer weather with family or friends. You put in the work, now reward yourself and enjoy the next few months of sun!\n\nLogging out,\n\n[Your Name]`
 };
 
 default:return{subject:"Cyber Update",body:`{{greet}}\n\nCourse update.\n\n[Your Name]`};

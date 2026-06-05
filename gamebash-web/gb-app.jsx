@@ -159,15 +159,16 @@ function App(){
       )}
 
       <main className="flex-1 relative">
-        {view==='lobby' && <Lobby profile={profile} isAdmin={isAdmin} onPlay={(rid)=>{ setRoomId(rid); setView('room'); }} />}
+        {view==='lobby' && <Lobby profile={profile} isAdmin={isAdmin} onPlay={(rid)=>{ setRoomId(rid); setView('room'); }} onCreate={()=>setView('editor')} />}
         {view==='room' && roomId && GBRoom && <GBRoom roomId={roomId} profile={profile} onLeave={()=>{ setView('lobby'); setRoomId(null); }} />}
+        {view==='editor' && window.GBEditor && <window.GBEditor profile={profile} isAdmin={isAdmin} onClose={()=>setView('lobby')} />}
       </main>
     </div>
   );
 }
 
 // ── Lobby ──
-function Lobby({ profile, isAdmin, onPlay }){
+function Lobby({ profile, isAdmin, onPlay, onCreate }){
   const [games, setGames] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [seeding, setSeeding] = useState(false);
@@ -183,15 +184,34 @@ function Lobby({ profile, isAdmin, onPlay }){
   const seedDemos = async ()=>{
     setSeeding(true);
     try{
+      const existing = new Set(games.map(g=>g.name));
+      let added = 0;
       for(const s of window.GB_STARTERS){
+        if(existing.has(s.name)) continue;
         await fbDb.collection('games').add({
           name:s.name, description:s.description, creatorId:profile.uid, creatorName:profile.displayName,
           createdAt:fbTimestamp(), updatedAt:fbTimestamp(), config:s.config, status:'approved', isPublic:true,
         });
+        added++;
       }
-      gbToast('Demo games added!');
+      gbToast(added ? `Added ${added} game${added===1?'':'s'}.` : 'Starter games are already here.');
     }catch(e){ console.error(e); gbToast('Seeding failed — check permissions.','error'); }
     finally{ setSeeding(false); }
+  };
+
+  const tidyDuplicates = async ()=>{
+    const seen = new Set(); const dups = [];
+    for(const g of games){ if(seen.has(g.name)) dups.push(g); else seen.add(g.name); }
+    if(!dups.length){ gbToast('No duplicates to remove.'); return; }
+    if(!confirm(`Remove ${dups.length} duplicate game${dups.length===1?'':'s'}? (keeps one of each)`)) return;
+    try{ for(const d of dups){ await fbDb.collection('games').doc(d.id).delete(); } gbToast(`Removed ${dups.length} duplicate${dups.length===1?'':'s'}.`); }
+    catch(e){ console.error(e); gbToast('Cleanup failed.','error'); }
+  };
+
+  const deleteGame = async (g)=>{
+    if(!confirm(`Delete “${g.name}”? This removes it for everyone.`)) return;
+    try{ await fbDb.collection('games').doc(g.id).delete(); gbToast('Game deleted.'); }
+    catch(e){ console.error(e); gbToast('Could not delete.','error'); }
   };
 
   const startRoom = async (game)=>{
@@ -240,13 +260,23 @@ function Lobby({ profile, isAdmin, onPlay }){
 
       {/* Game templates */}
       <section>
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2"><Icon name="sparkles" className="w-6 h-6 text-emerald-500" /> Games</h2>
-          {isAdmin && (
-            <button onClick={seedDemos} disabled={seeding} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
-              <Icon name="plus" className="w-4 h-4" /> {seeding?'Adding...':'Make demo games'}
+          <div className="flex items-center gap-2">
+            <button onClick={onCreate} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+              <Icon name="plus" className="w-4 h-4" /> Create game
             </button>
-          )}
+            {isAdmin && (
+              <button onClick={seedDemos} disabled={seeding} className="bg-white/5 hover:bg-white/10 border border-white/10 disabled:opacity-50 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                {seeding?'Adding...':'Add starters'}
+              </button>
+            )}
+            {isAdmin && (
+              <button onClick={tidyDuplicates} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                <Icon name="trash" className="w-4 h-4" /> Tidy duplicates
+              </button>
+            )}
+          </div>
         </div>
         {games.length===0 ? (
           <div className="text-neutral-500 text-sm bg-neutral-900/40 border border-white/5 rounded-2xl p-8 text-center">
@@ -258,6 +288,11 @@ function Lobby({ profile, isAdmin, onPlay }){
               <div key={g.id} className="group bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden">
                 <div className="aspect-[16/9] relative" style={{backgroundColor:g.config?.board?.backgroundColor, backgroundImage:g.config?.board?.backgroundImage?`url("${g.config.board.backgroundImage}")`:undefined, backgroundSize:'cover', backgroundPosition:'center'}}>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  {isAdmin && (
+                    <button onClick={()=>deleteGame(g)} title="Delete game" className="absolute top-2 right-2 p-2 bg-black/60 hover:bg-red-600 text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                      <Icon name="trash" className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-white">{g.name}</h3>

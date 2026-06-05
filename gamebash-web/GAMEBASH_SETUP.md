@@ -12,14 +12,17 @@ your auth + database work carries over.
 ## What works right now
 - **Teacher sign-in** with Google, **student sign-in** with just a name
 - **Lobby** — see all games and any games currently being played
-- **"Make demo games"** (teacher only) — seeds the 7 starter games into your database
+- **Create game** — pick a board, click pieces onto it, drag to position, set dice, name it, save.
+  Teachers' games publish instantly; students' games save as a request (teacher approval UI is still to come).
+- **"Add starters"** (teacher) — adds the 7 starter games once (it won't make duplicates anymore)
+- **"Tidy duplicates"** (teacher) — one click removes any duplicate piles from earlier
+- **Delete** — hover any game card (teacher) and click the trash icon
 - **Play a game live** — open a game, and you + your students share one board in real time:
   drag pieces (synced to everyone), roll dice, and chat
 
 ## What's NOT built yet (next milestone)
-- The **game Editor** (designing brand-new games from scratch / editing boards, pieces, cards)
-- The **Classroom dashboard** and the teacher **approval workflow**
-- For now, use the 7 starter games — they cover race, trivia, dungeon, chess, naval, hex, blank.
+- A **teacher approval screen** for student-submitted games (students' games save but you can't review/approve them in this version yet)
+- The **Classroom dashboard** and **card decks** in the editor
 
 ---
 

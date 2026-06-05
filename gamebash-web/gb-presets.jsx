@@ -85,4 +85,49 @@
     {id:'battleship', name:'Naval Battle', tagline:'10×8 grid + ships', emoji:'🚢', description:'Coordinate grid for battleship-style games. 4 ships pre-placed.', config:TEMPLATE_BATTLESHIP},
     {id:'hex', name:'Hex Strategy', tagline:'Territory & tactics', emoji:'🛡️', description:'Hexagonal map with two team flags. Capture territory.', config:TEMPLATE_HEX},
   ];
+
+  // ── board themes (used by the Create-game editor) ──
+  const dotsPattern = (bg, dot, size=60) => svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" fill="${bg}"/><circle cx="${size/2}" cy="${size/2}" r="2" fill="${dot}"/></svg>`);
+  const stripesPattern = (a, b) => svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="${a}"/><rect y="0" width="80" height="40" fill="${b}"/></svg>`);
+
+  window.GB_BOARDS = [
+    {id:'blank-light', name:'Blank (Light)', width:800, height:600, backgroundColor:'#fafafa', gridSize:40},
+    {id:'blank-dark',  name:'Blank (Dark)',  width:800, height:600, backgroundColor:'#171717', gridSize:40},
+    {id:'chess',  name:'Chess', width:640, height:640, backgroundColor:'#fafafa', gridSize:0, backgroundImage:checkerboard('#fafafa','#737373',80)},
+    {id:'race',   name:'Race Track', width:1000, height:200, backgroundColor:'#1f2937', gridSize:0, backgroundImage:trackPattern()},
+    {id:'trivia', name:'Quiz Show', width:800, height:600, backgroundColor:'#0f172a', gridSize:0, backgroundImage:trivia4QPattern()},
+    {id:'dungeon',name:'Dungeon', width:800, height:600, backgroundColor:'#1c1917', gridSize:40, backgroundImage:dungeonPattern()},
+    {id:'hex',    name:'Hex Map', width:900, height:600, backgroundColor:'#0e7490', gridSize:0, backgroundImage:hexPattern('#0e7490','#7dd3fc')},
+    {id:'naval',  name:'Naval Grid', width:800, height:600, backgroundColor:'#0c4a6e', gridSize:0, backgroundImage:battleshipPattern()},
+    {id:'space',  name:'Deep Space', width:1000, height:700, backgroundColor:'#020617', gridSize:50, backgroundImage:dotsPattern('#020617','#fafafa',60)},
+    {id:'grass',  name:'Grass Field', width:1100, height:650, backgroundColor:'#15803d', gridSize:60, backgroundImage:stripesPattern('#15803d','#166534')},
+  ];
+
+  // ── piece palette (used by the editor) ──
+  window.GB_PIECES = [
+    {name:'Red Pawn', color:'#ef4444', shape:'circle'},
+    {name:'Blue Pawn', color:'#3b82f6', shape:'circle'},
+    {name:'Green Pawn', color:'#22c55e', shape:'circle'},
+    {name:'Yellow Pawn', color:'#eab308', shape:'circle'},
+    {name:'Purple Pawn', color:'#a855f7', shape:'circle'},
+    {name:'Pink Pawn', color:'#ec4899', shape:'circle'},
+    {name:'Red Square', color:'#ef4444', shape:'square'},
+    {name:'Blue Square', color:'#3b82f6', shape:'square'},
+    {name:'Car', color:'#ef4444', shape:'image', imageUrl:lucideIcon('car-front','#ef4444')},
+    {name:'Rocket', color:'#f97316', shape:'image', imageUrl:lucideIcon('rocket','#f97316')},
+    {name:'Crown', color:'#facc15', shape:'image', imageUrl:lucideIcon('crown','#facc15')},
+    {name:'Sword', color:'#22c55e', shape:'image', imageUrl:lucideIcon('swords','#22c55e')},
+    {name:'Shield', color:'#3b82f6', shape:'image', imageUrl:lucideIcon('shield','#3b82f6')},
+    {name:'Skull', color:'#e5e5e5', shape:'image', imageUrl:lucideIcon('skull','#e5e5e5')},
+    {name:'Gem', color:'#22d3ee', shape:'image', imageUrl:lucideIcon('gem','#22d3ee')},
+    {name:'Star', color:'#facc15', shape:'image', imageUrl:lucideIcon('star','#facc15')},
+    {name:'Heart', color:'#ef4444', shape:'image', imageUrl:lucideIcon('heart','#ef4444')},
+    {name:'Flag', color:'#3b82f6', shape:'image', imageUrl:lucideIcon('flag','#3b82f6')},
+    {name:'Ship', color:'#fafafa', shape:'image', imageUrl:lucideIcon('ship','#fafafa')},
+    {name:'Cat', color:'#f97316', shape:'image', imageUrl:lucideIcon('cat','#f97316')},
+    {name:'Dog', color:'#a16207', shape:'image', imageUrl:lucideIcon('dog','#a16207')},
+    {name:'Trophy', color:'#facc15', shape:'image', imageUrl:lucideIcon('trophy','#facc15')},
+    {name:'Player', color:'#fb7185', shape:'image', imageUrl:lucideIcon('user','#fb7185')},
+    {name:'Pizza', color:'#f97316', shape:'image', imageUrl:lucideIcon('pizza','#f97316')},
+  ];
 })();
