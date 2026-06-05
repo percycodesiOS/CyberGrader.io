@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PercyCodes — Logo Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E1525;
+    --ink-soft:#3A4256;
+    --paper:#F6F7F9;
+    --acc:#E11D74;       /* refined raspberry — grown-up cousin of the bubblegum pink */
+    --acc-deep:#B01259;
+    --cyan:#0FA3B1;      /* quiet teal tie to CyberGrader */
+  }
+  html,body{margin:0;background:#EAECEF;}
+  *{box-sizing:border-box;}
+
+  .lg-card{
+    width:100%;height:100%;background:var(--paper);
+    border-radius:14px;padding:26px 24px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+    position:relative;
+  }
+  .lg-card.dark{background:#0E1525;}
+  .lg-note{
+    position:absolute;bottom:14px;left:0;right:0;text-align:center;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
+    color:var(--ink-soft);text-transform:uppercase;
+  }
+  .lg-note.light{color:#8B93A7;}
+  .ink{color:var(--ink);}
+  .acc{color:var(--acc);}
+
+  .lg-foot{display:flex;align-items:center;gap:14px;}
+  .lg-fav{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .lg-chip-dark{background:#0E1525;border-radius:8px;padding:8px 12px;display:flex;align-items:center;}
+
+  /* 1 — mono cursor */
+  .lg-mono{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:40px;letter-spacing:-.01em;display:inline-flex;align-items:center;}
+  .lg-mono.sm{font-size:16px;}
+  .cursor{display:inline-block;width:.5em;height:1em;background:var(--acc);margin-left:4px;border-radius:1px;animation:blink 1.1s steps(1) infinite;}
+  .cursor.light{background:#fff;}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* 2 — tile + wordmark */
+  .lg-row{display:flex;align-items:center;gap:16px;}
+  .lg-tile{
+    width:64px;height:64px;border-radius:16px;flex-shrink:0;
+    background:linear-gradient(150deg,var(--acc),var(--acc-deep));
+    color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:40px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 16px rgba(225,29,116,.28);
+  }
+  .lg-tile.sm{width:38px;height:38px;border-radius:9px;font-size:24px;box-shadow:none;}
+  .lg-wm{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;letter-spacing:-.02em;}
+  .lg-wm.sm{font-size:15px;}
+
+  /* 3 — terminal */
+  .lg-term{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;display:inline-flex;align-items:center;}
+  .lg-term .prompt{color:var(--acc);margin-right:14px;}
+
+  /* 4 — domain */
+  .lg-dot{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:42px;letter-spacing:-.02em;}
+  .lg-dot .acc{font-weight:700;}
+
+  /* 5 — brackets */
+  .lg-brk{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:36px;letter-spacing:-.02em;display:inline-flex;align-items:center;}
+  .lg-brk .brk{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:26px;margin:0 4px;opacity:.9;}
+
+  /* 6 — monogram */
+  .lg-badge{
+    width:64px;height:64px;border-radius:50%;flex-shrink:0;border:2.5px solid var(--ink);
+    color:var(--ink);font-family:'Sora',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.04em;
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .lg-badge .pc-c{color:var(--acc);}
+  .lg-badge .paw{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--acc);}
+
+  /* 7 — stacked editorial */
+  .lg-stack{text-align:center;font-family:'Sora',sans-serif;line-height:.92;}
+  .lg-stack .l1{font-weight:800;font-size:42px;letter-spacing:-.03em;color:var(--ink);display:block;}
+  .lg-stack .l2{font-weight:700;font-size:42px;letter-spacing:-.03em;color:var(--acc);display:block;}
+
+  /* 8 — slash */
+  .lg-slash{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:38px;display:inline-flex;align-items:center;}
+  .lg-slash .sl{color:var(--acc);margin:0 2px;}
+
+  .canvas-intro{font-family:'Space Grotesk',sans-serif;}
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { DesignCanvas, DCSection, DCArtboard } = window;
+
+function App(){
+  return (
+    <DesignCanvas>
+      <DCSection id="dir" title="PercyCodes — logo directions" subtitle="Grown-up replacements for the comic sticker. One refined accent (raspberry), clean type, each proven to shrink down to a favicon.">
+
+        <DCArtboard id="d1" label="1 · Mono cursor" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-mono"><span className="ink">percy</span><span className="acc">codes</span><span className="cursor"></span></div>
+            <div className="lg-foot">
+              <div className="lg-fav" style={{background:'#0E1525'}}><span className="lg-mono sm" style={{fontSize:'18px'}}><span style={{color:'#fff'}}>p</span><span className="acc">c</span></span></div>
+              <div className="lg-chip-dark"><span className="lg-mono sm"><span style={{color:'#fff'}}>percy</span><span className="acc">codes</span></span></div>
+            </div>
+            <div className="lg-note">Monospace · terminal nod</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d2" label="2 · App tile + wordmark" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-row">
+              <div className="lg-tile">P</div>
+              <div className="lg-wm"><span className="ink">Percy</span><span className="acc">Codes</span></div>
+            </div>
+            <div className="lg-foot">
+              <div className="lg-tile sm">P</div>
+              <div className="lg-chip-dark"><span className="lg-wm sm"><span style={{color:'#fff'}}>Percy</span><span className="acc">Codes</span></span></div>
+            </div>
+            <div className="lg-note">App-tile mark · echoes the favicon</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d3" label="3 · Terminal prompt" width={400} height={300}>
+          <div className="lg-card dark">
+            <div className="lg-term"><span className="prompt">&#10095;</span><span style={{color:'#fff'}}>percycodes</span><span className="cursor light"></span></div>
+            <div className="lg-note light">CLI prompt · unmistakably for coders</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d4" label="4 · Domain style" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-dot"><span className="ink">percy</span><span className="acc">.</span><span className="ink">codes</span></div>
+            <div className="lg-note">Reads like a web address · clean</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d5" label="5 · Refined brackets" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-brk"><span className="ink">percy</span><span className="acc brk">&lt;/&gt;</span><span className="ink">codes</span></div>
+            <div className="lg-note">The original idea, calmed down</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d6" label="6 · Monogram + paw" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-row">
+              <div className="lg-badge">P<span className="pc-c">C</span><span className="paw"></span></div>
+              <div className="lg-wm"><span className="ink">Percy</span><span className="acc">Codes</span></div>
+            </div>
+            <div className="lg-note">Monogram · tiny dot nods to Percy the dog</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d7" label="7 · Stacked editorial" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-stack"><span className="l1">PERCY</span><span className="l2">CODES</span></div>
+            <div className="lg-note">Bold, confident, poster-like</div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="d8" label="8 · Slash mark" width={400} height={300}>
+          <div className="lg-card">
+            <div className="lg-slash"><span className="ink">percy</span><span className="sl">/</span><span className="ink">codes</span></div>
+            <div className="lg-note">Path-style · minimal and techy</div>
+          </div>
+        </DCArtboard>
+
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
