@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GameBash · Class Game Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2310b981'/%3E%3Ctext x='50' y='70' font-size='58' text-anchor='middle' fill='%23052e22' font-family='Arial' font-weight='bold'%3EG%3C/text%3E%3C/svg%3E">
+
+<!-- React + Babel (pinned) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Firebase (compat build — runs from a static file, no bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<style>
+  :root{
+    --bg:#0a0a0a; --panel:#171717; --panel2:#1f1f1f; --line:rgba(255,255,255,.08);
+    --emerald:#10b981; --emerald-bright:#34d399; --text:#e5e5e5; --muted:#a3a3a3; --faint:#6b7280;
+    --red:#f87171; --amber:#fbbf24; --blue:#60a5fa; --purple:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{background:radial-gradient(1100px 700px at 50% -8%, #15231d 0%, var(--bg) 58%);color:var(--text);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh}
+  button{font-family:inherit}
+  .gb-spin{width:46px;height:46px;border:4px solid var(--emerald);border-top-color:transparent;border-radius:50%;animation:gbspin .8s linear infinite}
+  @keyframes gbspin{to{transform:rotate(360deg)}}
+  .scroll::-webkit-scrollbar{width:9px;height:9px}
+  .scroll::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:5px}
+  .scroll::-webkit-scrollbar-track{background:transparent}
+  ::selection{background:rgba(16,185,129,.3)}
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center">
+    <div class="gb-spin"></div>
+  </div>
+</div>
+
+<script>
+  // ── Firebase init (your gamebash-92555 project) ──
+  firebase.initializeApp({
+    apiKey: "AIzaSyBMv2OMCYb5tKTZyZ7mzrEUBEbijbaf4zI",
+    authDomain: "gamebash-92555.firebaseapp.com",
+    projectId: "gamebash-92555",
+    storageBucket: "gamebash-92555.firebasestorage.app",
+    messagingSenderId: "902925998744",
+    appId: "1:902925998744:web:a3116476def041d39d0eed"
+  });
+  window.fbAuth = firebase.auth();
+  window.fbDb = firebase.firestore();
+  window.fbTimestamp = firebase.firestore.FieldValue.serverTimestamp;
+  window.fbArrayUnion = firebase.firestore.FieldValue.arrayUnion;
+  window.fbArrayRemove = firebase.firestore.FieldValue.arrayRemove;
+  window.GoogleProvider = firebase.auth.GoogleAuthProvider;
+  window.ADMIN_EMAIL = "kmacek715@gmail.com";
+</script>
+
+<script type="text/babel" src="gb-presets.jsx"></script>
+<script type="text/babel" src="gb-editor.jsx"></script>
+<script type="text/babel" src="gb-room.jsx"></script>
+<script type="text/babel" src="gb-app.jsx"></script>
+
+</body>
+</html>
