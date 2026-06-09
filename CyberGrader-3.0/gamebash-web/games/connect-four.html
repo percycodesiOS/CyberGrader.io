@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Connect Four · GameBash</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2310b981'/%3E%3Ccircle cx='50' cy='52' r='26' fill='%23052e22'/%3E%3C/svg%3E">
+<style>
+  :root{--bg:#0a0a0a;--panel:#171717;--panel2:#1f1f1f;--line:rgba(255,255,255,.08);
+    --emerald:#10b981;--emerald-bright:#34d399;--text:#e5e5e5;--muted:#a3a3a3;--faint:#6b7280;
+    --red:#ef4444;--yellow:#fbbf24;--boardblue:#1e40af;--boardblue2:#1e3a8a}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:radial-gradient(1200px 800px at 50% -10%, #14211c 0%, var(--bg) 60%);color:var(--text);
+    font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh}
+  .topbar{height:60px;border-bottom:1px solid var(--line);background:rgba(23,23,23,.6);backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:30}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem}
+  .brand .tile{width:30px;height:30px;border-radius:8px;background:var(--emerald);color:#052e22;display:flex;align-items:center;justify-content:center;font-weight:900}
+  .brand .sub{color:var(--muted);font-weight:600;font-size:.82rem}
+  .back-link{display:inline-flex;align-items:center;gap:7px;color:var(--muted);text-decoration:none;font-weight:700;font-size:.9rem;padding:8px 12px;border-radius:10px;transition:.15s}
+  .back-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px 40px;gap:20px}
+
+  .turn-banner{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 18px}
+  .turn-banner .disc{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 -3px 5px rgba(0,0,0,.3)}
+  .turn-banner .who{font-weight:800;font-size:1.05rem}
+  .disc.red{background:radial-gradient(circle at 35% 30%,#ff7b7b,var(--red))}
+  .disc.yellow{background:radial-gradient(circle at 35% 30%,#ffe08a,var(--yellow))}
+
+  .board-wrap{position:relative;padding:14px;background:linear-gradient(160deg,var(--boardblue),var(--boardblue2));border-radius:22px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.12)}
+  .cols{display:grid;grid-template-columns:repeat(7,1fr);gap:0}
+  .col{display:flex;flex-direction:column;gap:10px;padding:0 7px;cursor:pointer;border-radius:12px;transition:background .12s}
+  .col:hover{background:rgba(255,255,255,.07)}
+  .col.full{cursor:not-allowed}
+  .cell{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 38% 34%, #0a0a0a 0%, #050505 60%);
+    box-shadow:inset 0 4px 8px rgba(0,0,0,.7);position:relative}
+  @media(max-width:620px){.cell{width:42px;height:42px}}
+  .cell .token{position:absolute;inset:0;border-radius:50%;transform:scale(0)}
+  .cell.red .token{background:radial-gradient(circle at 35% 30%,#ff7b7b,var(--red));box-shadow:inset 0 -4px 6px rgba(0,0,0,.3);animation:drop .28s cubic-bezier(.5,1.3,.7,1) forwards}
+  .cell.yellow .token{background:radial-gradient(circle at 35% 30%,#ffe08a,var(--yellow));box-shadow:inset 0 -4px 6px rgba(0,0,0,.3);animation:drop .28s cubic-bezier(.5,1.3,.7,1) forwards}
+  .cell.win .token{box-shadow:0 0 0 4px #fff, inset 0 -4px 6px rgba(0,0,0,.3);}
+  @keyframes drop{0%{transform:translateY(-340px) scale(1)}100%{transform:translateY(0) scale(1)}}
+
+  .controls{display:flex;gap:12px}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--text);font-weight:800;padding:11px 20px;border-radius:12px;cursor:pointer;font:inherit;font-weight:800;transition:.15s}
+  .btn:hover{background:#2a2a2a}
+  .btn.primary{background:linear-gradient(180deg,var(--emerald-bright),var(--emerald));color:#04231a;border:0}
+  .score{display:flex;gap:18px;align-items:center;color:var(--muted);font-weight:700;font-size:.92rem}
+  .score .s{display:flex;align-items:center;gap:7px}
+  .score .disc{width:16px;height:16px;border-radius:50%}
+
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+  .overlay.show{display:flex}
+  .modal{background:linear-gradient(180deg,var(--panel),#141414);border:1px solid var(--line);border-radius:24px;padding:32px;max-width:420px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .modal h1{font-size:1.9rem;font-weight:900;margin-bottom:8px}
+  .modal .big-disc{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;box-shadow:inset 0 -5px 8px rgba(0,0,0,.3)}
+  .modal p{color:var(--muted);margin-bottom:20px}
+  .modal .btn{width:100%}
+  .pname{display:flex;align-items:center;gap:10px;margin-bottom:10px;text-align:left}
+  .pname .disc{width:18px;height:18px;border-radius:50%;flex-shrink:0}
+  .pname input{flex:1;background:var(--panel2);border:1px solid var(--line);color:#fff;border-radius:10px;padding:11px 13px;font:inherit;outline:none}
+  .pname input:focus{border-color:var(--emerald)}
+  .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800;margin:8px 0 12px;text-align:left}
+  .confetti{position:fixed;width:11px;height:11px;top:-20px;z-index:70;pointer-events:none;border-radius:2px}
+  @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.2}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="tile">G</span>GameBash <span class="sub">· Connect Four</span></div>
+  <a class="back-link" href="../index.html">← Game Library</a>
+</div>
+
+<div class="stage" id="stage" style="display:none">
+  <div class="turn-banner"><span class="disc red" id="turnDisc"></span><span class="who" id="turnWho">Red</span><span style="color:var(--faint)">to drop</span></div>
+  <div class="board-wrap"><div class="cols" id="cols"></div></div>
+  <div class="score" id="scoreBar"></div>
+  <div class="controls">
+    <button class="btn" id="newRoundBtn">New Round</button>
+    <button class="btn" id="resetBtn">Reset Scores</button>
+  </div>
+</div>
+
+<div class="overlay show" id="setup">
+  <div class="modal" style="text-align:left">
+    <h1 style="text-align:center">🔴🟡 Connect Four</h1>
+    <p style="text-align:center">Drop discs and get four in a row — across, down, or diagonal. Pass and play.</p>
+    <div class="label">Players</div>
+    <div class="pname"><span class="disc" style="background:radial-gradient(circle at 35% 30%,#ff7b7b,#ef4444)"></span><input id="p1" maxlength="14" placeholder="Red"></div>
+    <div class="pname"><span class="disc" style="background:radial-gradient(circle at 35% 30%,#ffe08a,#fbbf24)"></span><input id="p2" maxlength="14" placeholder="Yellow"></div>
+    <button class="btn primary" id="startBtn" style="margin-top:14px">Start Game</button>
+  </div>
+</div>
+
+<div class="overlay" id="winScreen">
+  <div class="modal">
+    <div class="big-disc" id="winDisc"></div>
+    <h1 id="winTitle">Red wins!</h1>
+    <p id="winSub">Four in a row.</p>
+    <button class="btn primary" id="againBtn">Next Round</button>
+  </div>
+</div>
+
+<script src="connect-four.js"></script>
+</body>
+</html>
