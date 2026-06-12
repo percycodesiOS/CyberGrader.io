@@ -106,6 +106,36 @@ transition:.18s ease;text-shadow:0 1px 2px rgba(0,0,0,.25)
 .glc-btn.alt{background:linear-gradient(180deg,#ff5fa6,#ec1f86);color:#fff}
 .glc-btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
 @media (max-width:560px){.game-launch-grid{grid-template-columns:1fr}}
+
+/* LEFT-EDGE GAMES TAB – the "need a distraction?" handle */
+.side-games-tab{
+position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:90;
+display:none;align-items:center;
+background:linear-gradient(180deg,#ff5fa6,#ec1f86);color:#fff;
+border:0;border-radius:0 14px 14px 0;cursor:pointer;
+padding:18px 9px;writing-mode:vertical-rl;text-orientation:mixed;
+font:inherit;font-weight:900;font-size:.82rem;letter-spacing:.14em;
+box-shadow:0 4px 18px rgba(236,31,134,.35);
+transition:padding .18s ease, box-shadow .18s ease
+}
+.side-games-tab:hover{padding-right:16px;box-shadow:0 6px 24px rgba(236,31,134,.55)}
+.side-games-tab .tab-ico{writing-mode:horizontal-tb;font-size:1.05rem;margin-bottom:8px}
+@media (min-width:1100px){.side-games-tab{display:flex;flex-direction:column;gap:2px}}
+
+/* WELCOME CARD – first-run setup, hides itself once all 3 steps are done */
+.welcome-card{display:none;background:linear-gradient(180deg,rgba(81,217,255,.10),rgba(81,217,255,.04));border:1px solid rgba(81,217,255,.35);border-radius:14px;padding:16px 18px;margin-bottom:18px;position:relative}
+.welcome-card h3{margin:0 0 4px;color:#fff;font-size:1.02rem}
+.welcome-card p{margin:0 0 12px;color:var(--muted);font-size:.86rem}
+.wc-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wc-step{display:flex;align-items:center;gap:9px;background:rgba(10,18,30,.5);border:1px solid rgba(81,217,255,.22);border-radius:11px;padding:11px 13px;cursor:pointer;font:inherit;color:var(--text);text-align:left;font-size:.86rem;font-weight:700;transition:.15s ease}
+.wc-step:hover{border-color:var(--cyan);background:rgba(81,217,255,.08)}
+.wc-step .wc-mark{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.78rem;font-weight:900;background:rgba(255,255,255,.07);color:var(--muted);border:1px solid var(--border)}
+.wc-step.done .wc-mark{background:rgba(125,255,181,.15);color:#7dffb5;border-color:rgba(125,255,181,.4)}
+.wc-step.done{opacity:.72}
+.wc-x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px;line-height:1}
+.wc-x:hover{color:#fff}
+@media (max-width:760px){.wc-steps{grid-template-columns:1fr}}
+
 .signin-btn{
 padding:11px 20px;border-radius:14px;border:1px solid rgba(127,230,255,.85);
 background:linear-gradient(180deg,#7fe6ff,#00b7ff);
@@ -462,6 +492,7 @@ text-align:center;padding:20px;margin:0
 .topbar-logo{height:130px}
 .topbar-left,.topbar-right{order:2}
 .topbar-center{order:1}
+.topbar-stack{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center}
 }
 @media (max-width:1040px){
 .main-grid{grid-template-columns:1fr}
@@ -548,6 +579,7 @@ body{padding:12px}
 </header>
 
 <main class="main-grid">
+<button class="side-games-tab" id="sideGamesTab" type="button" title="Need a distraction? Play a game"><span class="tab-ico">🎮</span>GAMES</button>
 <!-- SIDEBAR -->
 <aside class="panel">
 <div class="panel-inner stack">
@@ -582,6 +614,17 @@ body{padding:12px}
 <!-- MAIN PANEL -->
 <section class="panel">
 <div class="panel-inner">
+
+<div class="welcome-card" id="welcomeCard">
+<button class="wc-x" id="wcDismiss" type="button" aria-label="Dismiss" title="Dismiss">✕</button>
+<h3>Welcome! Three steps and you're set for the year:</h3>
+<p>Do these once – after that, everything auto-fills.</p>
+<div class="wc-steps">
+<button class="wc-step" id="wcStep1" type="button"><span class="wc-mark">1</span><span>Enter your school year dates</span></button>
+<button class="wc-step" id="wcStep2" type="button"><span class="wc-mark">2</span><span>Set your teacher name</span></button>
+<button class="wc-step" id="wcStep3" type="button"><span class="wc-mark">3</span><span>Copy your first template</span></button>
+</div>
+</div>
 
 <h2 class="panel-title" style="margin-bottom:18px">Choose Your Workflow</h2>
 
@@ -630,6 +673,9 @@ Pick an assignment type and nine weeks – you'll see pre-generated feedback you
 <button class="edit-btn" id="editGradeToggle" type="button">Edit Output</button>
 <button class="reset-btn" id="resetGradeBtn" type="button">Reset Template</button>
 </div>
+<div class="toolbar-right">
+<button class="ghost-btn" id="gradeAIBtn" type="button">🔀 Variation</button>
+</div>
 </div>
 
 <div class="field full">
@@ -638,7 +684,6 @@ Pick an assignment type and nine weeks – you'll see pre-generated feedback you
 </div>
 
 <div class="copy-status" id="gradeStatus"></div>
-<button class="ghost-btn" id="gradeAIBtn" type="button" style="width:100%;padding:14px;margin-bottom:10px;font-size:.95rem">🔀 Generate Variation</button>
 <button class="copy-btn" id="copyGradeBtn" type="button">Copy Output</button>
 </div>
 
@@ -734,10 +779,8 @@ Pick the current term first – the tool filters email options accordingly. Use 
 
 <div class="copy-status" id="emailStatus"></div>
 
-<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-<button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject</button>
-</div>
-<button class="copy-btn" id="copyBodyBtn" type="button" style="padding:12px 18px;font-size:.95rem;letter-spacing:.02em;margin-top:6px">Copy Email Body</button>
+<button class="ghost-btn" id="copySubjectBtn" type="button" style="width:100%;margin-bottom:10px">Copy Subject Only</button>
+<button class="copy-btn" id="copyBodyBtn" type="button">Copy Email Body</button>
 </div>
 
 <!-- PORTAL BLOCK -->
@@ -907,7 +950,7 @@ Continue with Google
 <div class="section-card"><h3>📝 Teacher Feedback</h3><p>Pick an assignment type and output type. You'll get pre-generated feedback with today's date already filled in. Customize if you need to. Copy. Paste into the gradebook.</p></div>
 <div class="section-card"><h3>✉️ Email Generator</h3><p>Pick the term first, then the email type. The tool only shows options that make sense for that term. Toggle between All Students and Single Student. Fill in deadlines or progress as needed. Copy and send.</p></div>
 <div class="section-card"><h3>⚙️ Gradebook Setup</h3><p>Pick which gradebook placeholder you're setting up. Copy the name and detail. A reminder pops up when you select Final Overall Grade to make sure you delete the weekly placeholder before publishing finals.</p></div>
-<p style="margin-top:16px"><strong>Edit Output → Save</strong> locks in your custom wording globally. <strong>Reset Template</strong> restores the original. <strong>Generate Variation</strong> toggles between the default and your saved version.</p>
+<p style="margin-top:16px"><strong>Edit Output → Save</strong> locks in your custom wording globally. <strong>Reset Template</strong> restores the original. <strong>Generate Variation</strong> cycles through alternate phrasings of the same message (your saved edit is kept in the rotation).</p>
 <p style="margin-top:12px;padding:12px 14px;background:rgba(255,215,0,.10);border:1px solid rgba(255,215,0,.35);border-radius:10px;color:#ffe066;font-weight:700;font-size:.92rem">💡 School year dates are set once at sign in and sync across devices. Edit them anytime from the user menu top right.</p>
 <div class="modal-actions"><button class="modal-close" id="howtoGotIt">Got It</button></div>
 </div>
@@ -921,16 +964,16 @@ Continue with Google
 <p>A couple of games to unwind with, or to play with your whole class. They open in a new tab – your work here stays put.</p>
 <div class="game-launch-grid">
 <div class="game-launch-card">
-<div class="glc-emoji">🧱</div>
-<h3>MYnecraft</h3>
-<p>A chill 3D blocky world. Place and break blocks, build something, and wander around. Just you – no setup, and it saves where you left off.</p>
-<a class="glc-btn" href="game/mynecraft.html" target="_blank" rel="noopener">Play MYnecraft →</a>
-</div>
-<div class="game-launch-card">
 <div class="glc-emoji">🎲</div>
 <h3>GameBash</h3>
-<p>Design and play board &amp; card games in real time. Pick a board, drop pieces, roll dice – and your whole class can join the same game from their own devices.</p>
+<p>Your private class game studio. Sign in (you with Google, students by name) to build board &amp; card games and play them live together – move pieces, roll dice, take turns, chat. Yahtzee and Connect Four are built in too.</p>
 <a class="glc-btn alt" href="gamebash-web/index.html" target="_blank" rel="noopener">Open GameBash →</a>
+</div>
+<div class="game-launch-card">
+<div class="glc-emoji">🧱</div>
+<h3>MYnecraft</h3>
+<p>A chill 3D blocky world with day &amp; night. Place and break blocks, build something, and wander around. Just you – no setup, and it saves where you left off.</p>
+<a class="glc-btn" href="game/mynecraft.html" target="_blank" rel="noopener">Play MYnecraft →</a>
 </div>
 </div>
 </div>
@@ -1164,7 +1207,7 @@ return list.map(fn => fn(d));
 const allEmailTypes = [
 "Welcome Letter","Early Check-In","Zero Grade Clarification","25% Check-In","50% Check-In","75% Check-In",
 "Next Nine Weeks Loaded","Semester / Part Change","Upcoming Break Example",
-"Final Week Reminder","Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12","End of Year Message"
+"Final Week Reminder","Senior Final Reminder","End of Year (Grades 7–12)"
 ];
 // Types only available in certain terms
 // Early season types (welcome, early check-in, zero grade) = available all terms
@@ -1174,9 +1217,9 @@ const HIDE_ON_FOURTH = new Set(["Next Nine Weeks Loaded","Semester / Part Change
 // Types only available in 2nd, 3rd, 4th (not first)
 const ONLY_AFTER_FIRST = new Set(["Semester / Part Change"]);
 // End-of-year and senior-final types ONLY appear in fourth nine weeks
-const ONLY_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12","End of Year Message"]);
+const ONLY_FOURTH = new Set(["Senior Final Reminder","End of Year (Grades 7–12)"]);
 // Break reminder and final week reminder can appear in any term where it makes sense, but we'll allow them all terms (teacher discretion)
-const TERM_LOCKED_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12","End of Year Message"]);
+const TERM_LOCKED_FOURTH = new Set(["Senior Final Reminder","End of Year (Grades 7–12)"]);
 
 const gradeLevelsByType = {
 "Welcome Letter":["All Students","Single Student"],
@@ -1190,9 +1233,7 @@ const gradeLevelsByType = {
 "Upcoming Break Example":["All Students"],
 "Final Week Reminder":["All Students"],
 "Senior Final Reminder":["Seniors"],
-"End of Year Grades 7–11":["Grades 7–11"],
-"End of Year Grade 12":["Seniors"],
-"End of Year Message":["All Students","Single Student"]
+"End of Year (Grades 7–12)":["All Students","Single Student"]
 };
 
 let weekday = today.toLocaleDateString('en-US',{weekday:'long'});
@@ -1231,6 +1272,13 @@ saveJSON(STORAGE_KEYS.lastValues,payload);
 function restoreLastValues(){
 const vals = loadJSON(STORAGE_KEYS.lastValues);
 Object.keys(vals).forEach(k=>{if(k!=="audience" && $(k))$(k).value=vals[k]});
+// A saved value that no longer exists (renamed or removed email type) leaves the
+// select empty and the template falls to its blank fallback. Snap back to the
+// first real option so the output ALWAYS populates.
+["emailType","term"].forEach(id=>{
+const el=$(id);
+if(el && el.tagName==="SELECT" && !el.value && el.options.length) el.selectedIndex=0;
+});
 if(vals.audience){ setAudience(vals.audience); }
 }
 
@@ -1407,6 +1455,8 @@ function cleanSingleLine(text){return text.replace(/\s+/g," ").trim()}
 async function copyText(text,statusEl,button){
 try{
 await navigator.clipboard.writeText(text);
+localStorage.setItem("cybergrader_copied_once_v1","1");
+if(typeof updateWelcomeCard==="function"){try{updateWelcomeCard();}catch(e){}}
 const old=button.textContent;
 button.textContent="Copied ✓";button.classList.add("copied");
 statusEl.textContent="Copied to clipboard.";
@@ -1433,18 +1483,33 @@ if(!types.includes(current))$("emailType").value=types[0];
 }
 function maybeAdjustFields(){
 const type=$("emailType").value;
-const showProgress=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
+const isFourth=$("term").value==="fourth";
+const checkinType=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
+const seniorOnly=["Senior Final Reminder"].includes(type);
+const generalOnly=[].includes(type);
+
+const showProgress=checkinType;
 const showRefDate=["25% Check-In","50% Check-In","75% Check-In"].includes(type);
 const showSingle=currentAudience==="Single Student";
-const showDeadline=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12"].includes(type);
-const showDual=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder","Next Nine Weeks Loaded"].includes(type)&&$("term").value==="fourth"&&currentAudience==="All Students";
+// Clean, non-overlapping deadline model:
+//  • Non-fourth check-ins  → one simple "Deadline / End Date" field
+//  • Fourth-term emails     → the split Senior / Grades 7–11 deadline callout,
+//                             showing only the field(s) that email actually uses.
+const showDeadline=checkinType && !isFourth;
+const showDual=isFourth && (checkinType || seniorOnly || generalOnly);
 
 if(TERM_LOCKED_FOURTH.has(type)){$("term").value="fourth";}
 $("progressField").classList.toggle("hidden",!showProgress);
 $("referenceDateField").classList.toggle("hidden",!showRefDate);
 $("studentNameField").classList.toggle("hidden",!showSingle);
 $("deadlineFieldWrap").classList.toggle("hidden",!showDeadline);
-// Dual deadlines block is now always visible – teachers can pre-fill before fourth term hits.
+$("dualDeadlineWrap").classList.toggle("hidden",!showDual);
+if(showDual){
+const seniorField=document.querySelector('#dualDeadlineWrap .deadline-field.senior');
+const generalField=document.querySelector('#dualDeadlineWrap .deadline-field.general');
+if(seniorField) seniorField.style.display=generalOnly?"none":"";
+if(generalField) generalField.style.display=seniorOnly?"none":"";
+}
 
 // Lock audience if type forces seniors or 7-11
 const levels=gradeLevelsByType[type]||["All Students"];
@@ -1455,6 +1520,10 @@ setAudience(levels[0],true);
 // All Students / Single Student switch instead of leaving an empty glitchy bar.
 if(audToggle) audToggle.style.display="none";
 }else{
+// Multi-audience email: show the toggle. If we're carrying a locked audience
+// (e.g. "Seniors") left over from a previous email type, reset to a valid one
+// so a normal email never opens addressed to the wrong group.
+if(!levels.includes(currentAudience)) setAudience(levels[0],true);
 if(audToggle) audToggle.style.display="";
 document.querySelectorAll(".audience-btn").forEach(b=>b.style.display="");
 }
@@ -1621,14 +1690,6 @@ const emailVariationTemplates = {
 "Senior Final Reminder":[
 {subject:"Seniors – Last Call on Coursework",body:`Hi Seniors,\n\nFinal reminder: all cyber coursework needs to be in by {{senior_deadline}}. Double-check your progress, close out anything open, and message me if you need help. Nothing can be accepted after that point.\n\nFinish strong – you're almost there.\n\n[Your Name]`},
 {subject:"Seniors – Deadline Is Here",body:`Hi Seniors,\n\nThis is your last call – everything in your cyber course is due by {{senior_deadline}}. Take a few minutes to confirm you're fully submitted and reach out if anything's in the way. After the deadline the course locks.\n\nYou've got this.\n\n[Your Name]`}
-],
-"End of Year Grades 7–11":[
-{subject:"Year-End Coursework Due",body:`Hi Students,\n\nAs the year winds down, this is your reminder that all cyber coursework for grades 7–11 is due by {{general_deadline}}. Check your progress, finish anything open, and let me know if you need help.\n\nHave a great summer!\n\n[Your Name]`},
-{subject:"Almost Summer – Wrap It Up",body:`Hi Students,\n\nWe're almost to summer! Before then, make sure all your grades 7–11 cyber coursework is submitted by {{general_deadline}}. Reach out with any questions while there's still time.\n\nEnjoy the break – you've earned it.\n\n[Your Name]`}
-],
-"End of Year Grade 12":[
-{subject:"Seniors – Final Deadline",body:`Hi Seniors,\n\nAs your final year wraps up, this is the last reminder that all cyber coursework is due by {{senior_deadline}}. Confirm you're submitted, finish anything open, and reach out if you're stuck. Nothing is accepted after the deadline.\n\nCongratulations on making it here. Best of luck with what's next.\n\n[Your Name]`},
-{subject:"Seniors – The Last One",body:`Hi Seniors,\n\nThis is the big one – your last deadline. All cyber coursework is due by {{senior_deadline}}. Take a moment to make sure everything's turned in and message me with any final questions.\n\nSo proud of how far you've come. Wishing you the best ahead.\n\n[Your Name]`}
 ]
 };
 
@@ -1699,17 +1760,7 @@ subject:"Seniors – Final Reminder on Coursework",
 body:`Hi Seniors,\n\nThis is it – your final reminder that all cyber coursework needs to be submitted by {{senior_deadline}}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\n[Your Name]`
 };
 
-case"End of Year Grades 7–11":return{
-subject:"End-of-Year Reminder: Cyber Coursework Due",
-body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by {{general_deadline}}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\n[Your Name]`
-};
-
-case"End of Year Grade 12":return{
-subject:"Seniors – End-of-Year Reminder",
-body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by {{senior_deadline}}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far. Best of luck with whatever comes next.\n\n[Your Name]`
-};
-
-case"End of Year Message":return{
+case"End of Year (Grades 7–12)":return{
 subject:"End of Year Message – Have a Great Summer!!",
 body:`Hi everyone,\n\nCongratulations... you made it to the end of the year! I quickly wanted to let you know that final grades are in and courses are completed, which means that's a wrap! I also wanted to take a moment to say that I truly enjoyed working with each of you throughout our course.\n\nAnd I get it... online coursework demands a lot of independence, responsibility, and commitment. Between the late nights, time crunches, and everything else you had going on, I appreciate the effort that went into this learning adventure. Be proud of the work you accomplished!\n\nI'll end by saying this: take time to relax, recharge/reset, get outside, and enjoy the summer weather with family or friends. You put in the work, now reward yourself and enjoy the next few months of sun!\n\nLogging out,\n\n[Your Name]`
 };
@@ -1726,13 +1777,14 @@ let subjectSource, bodySource;
 if(saved){
 subjectSource = saved.subject; bodySource = saved.body;
 }else{
-// No saved override: show a remembered (or freshly random) variation so it
-// doesn't always open on the same phrasing. The index sticks per email key,
-// so typing in other fields won't reshuffle it.
+// No saved override: ALWAYS show the canonical default (slot 0) so the email
+// populates predictably every time – switching term/type never reshuffles to a
+// random phrasing. The 🔀 Variation button is how you cycle the alternates.
 const variations = getEmailVariations(type);
-let idx = emailVariationIndex[key];
-if(idx==null || idx>=variations.length){ idx = Math.floor(Math.random()*variations.length); emailVariationIndex[key]=idx; }
-subjectSource = variations[idx].subject; bodySource = variations[idx].body;
+let idx = emailVariationIndex[key] ?? 0;
+if(idx==null || idx<0 || idx>=variations.length) idx = 0;
+const pick = variations[idx] || variations[0] || {subject:"",body:""};
+subjectSource = pick.subject; bodySource = pick.body;
 }
 if($("emailSubjectOutput").readOnly||force)$("emailSubjectOutput").value = resolveTokens(subjectSource);
 if($("emailBodyOutput").readOnly||force)$("emailBodyOutput").value = resolveTokens(bodySource);
@@ -1810,6 +1862,7 @@ let currentSchoolYear = null;
 
 function renderSchoolYearCard(sy){
 currentSchoolYear = sy || null;
+if(typeof updateWelcomeCard==="function"){try{updateWelcomeCard();}catch(e){}}
 if(!sy){
 $("schoolYearDisplay").innerHTML = `<div style="color:var(--muted);text-align:center;padding:8px 0">No dates set yet.</div>`;
 return;
@@ -1881,6 +1934,7 @@ const btn = $("saveTeacherNameBtn");
 const orig = btn.textContent;
 btn.textContent = "Saved ✓";
 setTimeout(()=>{btn.textContent = orig;},1400);
+if(typeof updateWelcomeCard==="function"){try{updateWelcomeCard();}catch(e){}}
 // Refresh outputs so [Your Name] swaps live
 if(typeof updateEmailOutput === "function"){ try{ updateEmailOutput(true); }catch(e){} }
 }
@@ -2040,6 +2094,7 @@ $("howtoBtn").addEventListener("click",()=>$("howtoModal").classList.add("open")
 $("howtoClose").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
 $("howtoGotIt").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
 $("gameBtn").addEventListener("click",()=>$("gamesModal").classList.add("open"));
+$("sideGamesTab").addEventListener("click",()=>$("gamesModal").classList.add("open"));
 $("gamesClose").addEventListener("click",()=>$("gamesModal").classList.remove("open"));
 $("gamesModal").addEventListener("click",(e)=>{ if(e.target===$("gamesModal")) $("gamesModal").classList.remove("open"); });
 $("portalReminderClose").addEventListener("click",()=>$("portalReminderModal").classList.remove("open"));
@@ -2050,6 +2105,37 @@ document.querySelectorAll(".modal-overlay").forEach(overlay=>{
 overlay.addEventListener("click",(e)=>{if(e.target===overlay && overlay.id!=="schoolYearModal") overlay.classList.remove("open");});
 });
 
+// ── WELCOME CARD (first-run setup) ──
+function updateWelcomeCard(){
+const card=$("welcomeCard"); if(!card) return;
+if(localStorage.getItem("cybergrader_welcome_done_v1")==="1"){card.style.display="none";return;}
+const steps=[
+{el:$("wcStep1"),done:!!currentSchoolYear},
+{el:$("wcStep2"),done:!!(localStorage.getItem(STORAGE_KEYS.teacherName)||"").trim()},
+{el:$("wcStep3"),done:localStorage.getItem("cybergrader_copied_once_v1")==="1"}
+];
+// All three done – the card retires itself for good
+if(steps.every(s=>s.done)){localStorage.setItem("cybergrader_welcome_done_v1","1");card.style.display="none";return;}
+steps.forEach((s,i)=>{
+s.el.classList.toggle("done",s.done);
+s.el.querySelector(".wc-mark").textContent=s.done?"✓":String(i+1);
+});
+card.style.display="block";
+}
+$("wcDismiss").addEventListener("click",()=>{localStorage.setItem("cybergrader_welcome_done_v1","1");$("welcomeCard").style.display="none";});
+$("wcStep1").addEventListener("click",()=>$("todayDate").click());
+$("wcStep2").addEventListener("click",(e)=>{
+e.stopPropagation();
+$("userMenu").classList.add("open");
+setTimeout(()=>$("teacherNameInput").focus(),60);
+});
+$("wcStep3").addEventListener("click",()=>{
+const b=document.querySelector(".block-btn");
+if(b) activateBlock(b);
+const sel=document.querySelector(".block-selector");
+if(sel) window.scrollTo({top:sel.getBoundingClientRect().top+window.scrollY-90,behavior:"smooth"});
+});
+
 // INIT
 setSelectOptions($("workType"),Object.keys(gradeConfig));
 populateEmailTypes();
@@ -2058,6 +2144,7 @@ updateGradeTypes();
 updateEmailOutput(true);
 updatePortalOutput(true);
 maybeAdjustFields();
+updateWelcomeCard();
 </script>
 </body>
 </html>

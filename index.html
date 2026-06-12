@@ -370,6 +370,8 @@ img{max-width:100%;display:block}
 
 /* FEATURES */
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+/* games section has two cards, not three — keep it balanced and centered */
+#games .feat-grid{grid-template-columns:repeat(2,1fr);max-width:860px}
 .feat{padding:26px;border-radius:18px;border:1px solid var(--pc-border);background:var(--pc-bg-panel);
   box-shadow:var(--pc-shadow-card-inset);position:relative;overflow:hidden}
 .feat .glyph{font-size:1.8rem;margin-bottom:14px;display:inline-flex;align-items:center;justify-content:center;
@@ -466,7 +468,7 @@ img{max-width:100%;display:block}
 
     <div class="product">
       <div class="product__chrome">
-        <div class="product__pill"><small>TODAY'S DATE</small>Friday, May 8, 2026</div>
+        <div class="product__pill"><small>TODAY'S DATE</small><span id="previewDate">Friday, May 8, 2026</span></div>
         <img src="assets/cybergrader-logo.png" alt="">
         <div class="product__user"><span>T</span>Teacher ▾</div>
       </div>
@@ -554,18 +556,18 @@ img{max-width:100%;display:block}
 
   <section class="section wrap" id="games">
     <h2>And when class needs a break... 🎮</h2>
-    <p class="lede">Two classroom games built right in. Open them anytime – from inside the tool or straight from here.</p>
+    <p class="lede">Games for your classroom – open them anytime, from inside the tool or straight from here.</p>
     <div class="feat-grid">
       <div class="feat">
         <div class="glyph">🎲</div>
         <h3>GameBash</h3>
-        <p>Design and play board &amp; card games in real time. Pick a board, drop pieces, roll dice – and your whole class can join the same game from their own devices.</p>
+        <p>Your private class game studio. Sign in – you with Google, students by name – to <strong style="color:var(--pc-cyan)">build</strong> board &amp; card games and <strong style="color:var(--pc-cyan)">play them live together</strong>: move pieces, roll dice, take turns, chat. Yahtzee and Connect Four are built in too.</p>
         <a href="gamebash-web/index.html" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:8px">Open GameBash →</a>
       </div>
       <div class="feat">
         <div class="glyph">🧱</div>
         <h3>MYnecraft</h3>
-        <p>A chill 3D blocky world. Place and break blocks, build something, and wander around – no setup, and it saves where you left off.</p>
+        <p>A chill 3D blocky world with a day &amp; night cycle. Place and break blocks, build something, and wander around – no setup, and it saves where you left off.</p>
         <a href="game/mynecraft.html" target="_blank" rel="noopener" class="btn btn-secondary" style="margin-top:8px">Play MYnecraft →</a>
       </div>
     </div>
@@ -598,6 +600,14 @@ img{max-width:100%;display:block}
   <p>Created by <span class="brand">PercyCodes</span> · named after my dog Percy.</p>
   <p style="margin-top:10px;font-size:.85rem"><a href="app.html" style="color:var(--pc-cyan)">Open the tool</a> · <a href="gamebash-web/index.html" target="_blank" rel="noopener" style="color:var(--pc-cyan)">GameBash</a> · <a href="game/mynecraft.html" target="_blank" rel="noopener" style="color:var(--pc-cyan)">MYnecraft</a></p>
 </footer>
+
+<script>
+  // Keep the product-preview date current so the mockup never looks stale.
+  try{
+    document.getElementById('previewDate').textContent =
+      new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }catch(e){}
+</script>
 
 </body>
 </html>

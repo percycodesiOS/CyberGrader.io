@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>MYnecraft 2.0</title>
+<title>MYnecraft 3.0</title>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
   canvas { display: block; }
@@ -50,12 +50,12 @@
 <body>
 <div id="hud"><div id="crosshair"></div></div>
 <div id="info">
-  WASD — move &nbsp;·&nbsp; DRAG MOUSE — look &nbsp;·&nbsp; SPACE — jump<br/>
-  LEFT CLICK — break &nbsp;·&nbsp; RIGHT CLICK — place &nbsp;·&nbsp; 1–6 — block
+  WASD move &nbsp;·&nbsp; DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
+  LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / SCROLL pick block
 </div>
 <div id="start">
-  <h1>MYNECRAFT 2.0</h1>
-  <p>A tiny blocky world.<br/>Click + drag to look around. ESC to reopen this menu.</p>
+  <h1>MYNECRAFT 3.0</h1>
+  <p>A tiny blocky world with day &amp; night.<br/>Click + drag to look around &nbsp;·&nbsp; press F to fly &nbsp;·&nbsp; ESC for this menu.</p>
   <div class="btn">▶ ENTER WORLD</div>
 </div>
 
@@ -89,6 +89,7 @@ sun.shadow.camera.top = 60; sun.shadow.camera.bottom = -60;
 sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 200;
 scene.add(sun);
 scene.add(new THREE.HemisphereLight(0xa9d8ff, 0x4a5b3a, 0.55));
+const hemi = scene.children[scene.children.length-1];
 
 // ---------- procedurally-generated pixel textures ----------
 function makeTexture(draw) {
@@ -148,6 +149,35 @@ const texLeaves = makeTexture(ctx => {
     ctx.fillRect(Math.random()*16|0, Math.random()*16|0, 1, 1);
   }
 });
+const texPlanks = makeTexture(ctx => {
+  noise(ctx, [178, 140, 92], 12);
+  ctx.fillStyle = '#7a5a36';
+  for (let y = 0; y < 16; y += 4) ctx.fillRect(0, y, 16, 1);
+  for (let x = 0; x < 16; x += 8) ctx.fillRect(x, 0, 1, 16);
+});
+const texBrick = makeTexture(ctx => {
+  noise(ctx, [168, 74, 60], 14);
+  ctx.fillStyle = '#d6d2c4';
+  for (let y = 0; y < 16; y += 4) ctx.fillRect(0, y, 16, 1);
+  for (let y = 0; y < 16; y += 8) for (let x = 0; x < 16; x += 8) ctx.fillRect(x, y, 1, 4);
+  for (let y = 4; y < 16; y += 8) for (let x = 4; x < 16; x += 8) ctx.fillRect(x, y, 1, 4);
+});
+const texSnow = makeTexture(ctx => {
+  noise(ctx, [236, 242, 252], 8);
+  for (let i = 0; i < 12; i++) { ctx.fillStyle = 'rgba(200,220,240,.5)'; ctx.fillRect(Math.random()*16|0, Math.random()*16|0, 1, 1); }
+});
+const texGlow = makeTexture(ctx => {
+  noise(ctx, [250, 224, 120], 18);
+  ctx.fillStyle = '#fff6c8';
+  for (let y = 2; y < 16; y += 5) for (let x = 2; x < 16; x += 5) ctx.fillRect(x, y, 2, 2);
+});
+const texGlass = makeTexture(ctx => {
+  ctx.clearRect(0,0,16,16);
+  ctx.fillStyle = 'rgba(180,225,245,.20)'; ctx.fillRect(0,0,16,16);
+  ctx.strokeStyle = 'rgba(220,245,255,.85)'; ctx.lineWidth = 1;
+  ctx.strokeRect(0.5,0.5,15,15);
+  ctx.beginPath(); ctx.moveTo(3,2); ctx.lineTo(2,6); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.stroke();
+});
 
 // ---------- block defs ----------
 // each block: array of 6 materials [px, nx, py, ny, pz, nz]
@@ -169,8 +199,13 @@ const BLOCKS = {
     swatch: '#6e4e30'
   },
   leaves:{ name: 'Leaves',mats: Array(6).fill(0).map(()=>mkMat(texLeaves, {transparent:false})), swatch: '#367a32' },
+  planks:{ name: 'Planks',mats: Array(6).fill(0).map(()=>mkMat(texPlanks)), swatch: '#b28c5c' },
+  brick: { name: 'Brick', mats: Array(6).fill(0).map(()=>mkMat(texBrick)), swatch: '#a84a3c' },
+  snow:  { name: 'Snow',  mats: Array(6).fill(0).map(()=>mkMat(texSnow)),  swatch: '#ecf2fc' },
+  glow:  { name: 'Glowstone', mats: Array(6).fill(0).map(()=>mkMat(texGlow, {emissive:0xfff0b0, emissiveIntensity:0.9})), swatch: '#fae078' },
+  glass: { name: 'Glass', mats: Array(6).fill(0).map(()=>mkMat(texGlass, {transparent:true, opacity:0.55})), swatch: '#bfe6f5' },
 };
-const BLOCK_KEYS = ['grass','dirt','stone','sand','wood','leaves'];
+const BLOCK_KEYS = ['grass','dirt','stone','sand','wood','leaves','planks','brick','snow','glow','glass'];
 
 // ---------- voxel world ----------
 const WORLD = new Map(); // key "x,y,z" -> blockKey
@@ -558,11 +593,70 @@ function spawnNPC(name, x, z) {
 spawnNPC('Steve',  4, 4);
 spawnNPC('Alex',  -5, 3);
 
+// ---------- clouds ----------
+const cloudGroup = new THREE.Group();
+scene.add(cloudGroup);
+const cloudMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.82, depthWrite: false });
+for (let i = 0; i < 14; i++) {
+  const cloud = new THREE.Group();
+  const puffs = 3 + (Math.random()*4|0);
+  for (let p = 0; p < puffs; p++) {
+    const w = 4 + Math.random()*6, d = 4 + Math.random()*5;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, 2.2, d), cloudMat);
+    m.position.set((Math.random()-0.5)*10, (Math.random()-0.5)*1.5, (Math.random()-0.5)*8);
+    cloud.add(m);
+  }
+  cloud.position.set((Math.random()-0.5)*180, 34 + Math.random()*14, (Math.random()-0.5)*180);
+  cloud.userData.speed = 0.4 + Math.random()*0.5;
+  cloudGroup.add(cloud);
+}
+
+// ---------- night sky: stars + moon ----------
+const starGeo = new THREE.BufferGeometry();
+const STAR_COUNT = 700;
+const starPos = new Float32Array(STAR_COUNT * 3);
+for (let i = 0; i < STAR_COUNT; i++) {
+  const r = 260;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(Math.random() * 2 - 1);
+  starPos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+  starPos[i*3+1] = Math.abs(r * Math.cos(phi)) * 0.75 + 18; // bias above horizon
+  starPos[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.5, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false });
+const stars = new THREE.Points(starGeo, starMat);
+scene.add(stars);
+
+const moon = new THREE.Mesh(
+  new THREE.SphereGeometry(7, 18, 18),
+  new THREE.MeshBasicMaterial({ color: 0xeaf0ff })
+);
+scene.add(moon);
+
+// ---------- sound (WebAudio, no files) ----------
+let _ac = null;
+function blip(freq, dur, type, vol) {
+  try {
+    if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+    const o = _ac.createOscillator(), g = _ac.createGain();
+    o.type = type || 'square'; o.frequency.value = freq;
+    o.connect(g); g.connect(_ac.destination);
+    g.gain.setValueAtTime(vol || 0.08, _ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, _ac.currentTime + (dur || 0.08));
+    o.start(); o.stop(_ac.currentTime + (dur || 0.08));
+  } catch (e) {}
+}
+const sndBreak = () => blip(180 + Math.random()*40, 0.09, 'square', 0.07);
+const sndPlace = () => blip(320 + Math.random()*40, 0.07, 'triangle', 0.07);
+const sndStep  = () => blip(120, 0.05, 'sine', 0.03);
+
 // ---------- player + controls ----------
 const player = {
   pos: new THREE.Vector3(0, heightAt(0,0)+3, 0),
   vel: new THREE.Vector3(),
   onGround: false,
+  flying: false,
   yaw: 0, pitch: 0,
   height: 1.7, radius: 0.3,
 };
@@ -582,9 +676,15 @@ if (saveState.player) {
   camera.position.copy(player.pos);
 }
 addEventListener('keydown', e => {
-  const m = e.code.match(/^Digit([1-6])$/);
+  const m = e.code.match(/^Digit([1-9])$/);
   if (m) selected = Math.min(BLOCK_KEYS.length-1, parseInt(m[1],10)-1);
+  // mouse wheel / brackets cycle too (handled elsewhere)
 });
+addEventListener('wheel', e => {
+  if (!started) return;
+  selected = (selected + (e.deltaY > 0 ? 1 : -1) + BLOCK_KEYS.length) % BLOCK_KEYS.length;
+  refreshHotbar();
+}, { passive: true });
 
 // pointer lock — try, but don't depend on it (iframes often block it)
 const startEl = document.getElementById('start');
@@ -612,6 +712,15 @@ addEventListener('keydown', e => {
   }
 });
 
+// F toggles creative flight (press SPACE to rise, SHIFT to descend while flying)
+addEventListener('keydown', e => {
+  if (e.code === 'KeyF' && started) {
+    player.flying = !player.flying;
+    player.vel.set(0, 0, 0);
+    if (typeof flashFly === 'function') flashFly(player.flying);
+  }
+});
+
 // look controls — works with OR without pointer lock
 let lookActive = false;
 renderer.domElement.addEventListener('mousedown', () => {
@@ -635,6 +744,54 @@ addEventListener('mousemove', e => {
 // ---------- raycast for break / place ----------
 const raycaster = new THREE.Raycaster();
 raycaster.far = 7;
+
+// ---------- block targeting highlight (wireframe on the block you're aiming at) ----------
+const hlGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.004, 1.004, 1.004));
+const hlMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.5, depthTest: true });
+const highlight = new THREE.LineSegments(hlGeo, hlMat);
+highlight.visible = false;
+scene.add(highlight);
+let aimHit = null; // cached each frame for break/place
+function updateHighlight() {
+  aimHit = started ? castVoxel() : null;
+  if (aimHit) {
+    highlight.position.set(aimHit.x + 0.5, aimHit.y + 0.5, aimHit.z + 0.5);
+    highlight.visible = true;
+  } else {
+    highlight.visible = false;
+  }
+}
+
+// ---------- break particles (satisfying voxel shards) ----------
+const particles = []; // { mesh, vel, life }
+const _pGeo = new THREE.BoxGeometry(0.16, 0.16, 0.16);
+function spawnParticles(x, y, z, blockKey) {
+  const swatch = new THREE.Color(BLOCKS[blockKey]?.swatch || '#ffffff');
+  for (let i = 0; i < 12; i++) {
+    const m = new THREE.Mesh(_pGeo, new THREE.MeshLambertMaterial({ color: swatch }));
+    m.position.set(x + 0.5 + (Math.random()-0.5)*0.6, y + 0.5 + (Math.random()-0.5)*0.6, z + 0.5 + (Math.random()-0.5)*0.6);
+    m.castShadow = false;
+    scene.add(m);
+    particles.push({
+      mesh: m,
+      vel: new THREE.Vector3((Math.random()-0.5)*4, 2 + Math.random()*3, (Math.random()-0.5)*4),
+      life: 0.55 + Math.random()*0.25,
+      spin: (Math.random()-0.5)*10
+    });
+  }
+}
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.life -= dt;
+    if (p.life <= 0) { scene.remove(p.mesh); p.mesh.material.dispose(); particles.splice(i,1); continue; }
+    p.vel.y -= 16 * dt;
+    p.mesh.position.addScaledVector(p.vel, dt);
+    p.mesh.rotation.x += p.spin * dt; p.mesh.rotation.y += p.spin * dt;
+    const s = Math.max(0.01, Math.min(1, p.life / 0.4));
+    p.mesh.scale.setScalar(s);
+  }
+}
 
 function castVoxel() {
   raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
@@ -662,8 +819,11 @@ addEventListener('mousedown', e => {
   if (!hit) return;
   if (e.button === 0) {
     // break
+    const brokenKey = getBlock(hit.x, hit.y, hit.z);
     setBlock(hit.x, hit.y, hit.z, null);
     recordEdit(hit.x, hit.y, hit.z, null);
+    spawnParticles(hit.x, hit.y, hit.z, brokenKey);
+    sndBreak();
     buildMeshes();
   } else if (e.button === 2) {
     // place
@@ -679,6 +839,7 @@ addEventListener('mousedown', e => {
     if (overlap) return;
     setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
     recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
+    sndPlace();
     buildMeshes();
   }
 });
@@ -714,14 +875,50 @@ function collideAxis(axis, delta) {
 }
 
 // ---------- main loop ----------
+const SKY_DAY = new THREE.Color(0x87ceeb);
+const SKY_NOON = new THREE.Color(0x9fd8ff);
+const SKY_DUSK = new THREE.Color(0xff9e5a);
+const SKY_NIGHT = new THREE.Color(0x0b1430);
+let dayTime = 0.28; // 0..1 around the clock; start mid-morning
+const _tmpSky = new THREE.Color();
 let last = performance.now();
 function tick(now) {
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;
 
+  // ---- day / night cycle (~5 min full day) ----
+  dayTime = (dayTime + dt / 300) % 1;
+  const ang = dayTime * Math.PI * 2;
+  // sun arcs overhead; moon opposite
+  sun.position.set(Math.cos(ang) * 80, Math.sin(ang) * 90, 30);
+  const daylight = Math.max(0, Math.sin(ang));            // 0 at night, 1 at noon
+  // moon opposite the sun + stars that fade in after dusk
+  moon.position.set(Math.cos(ang + Math.PI) * 80, Math.sin(ang + Math.PI) * 90, 30);
+  moon.visible = moon.position.y > -8;
+  starMat.opacity = Math.max(0, 1 - daylight * 3);
+  stars.visible = starMat.opacity > 0.02;
+  sun.intensity = 0.25 + daylight * 0.95;
+  hemi.intensity = 0.22 + daylight * 0.5;
+  // sky color blend
+  if (daylight > 0.25) _tmpSky.copy(SKY_NIGHT).lerp(SKY_DAY, Math.min(1,(daylight-0.05)/0.6)).lerp(SKY_NOON, Math.max(0,(daylight-0.5)*2)*0.5);
+  else if (daylight > 0.0) _tmpSky.copy(SKY_NIGHT).lerp(SKY_DUSK, daylight/0.25);
+  else _tmpSky.copy(SKY_NIGHT);
+  scene.background.copy(_tmpSky);
+  scene.fog.color.copy(_tmpSky);
+  sun.color.setHSL(0.09 + daylight*0.05, 0.6, 0.55 + daylight*0.25);
+
+  // ---- drift clouds ----
+  cloudGroup.children.forEach(c => {
+    c.position.x += c.userData.speed * dt;
+    if (c.position.x > 100) c.position.x = -100;
+  });
+
   // camera rotation from yaw/pitch
   const euler = new THREE.Euler(player.pitch, player.yaw, 0, 'YXZ');
   camera.quaternion.setFromEuler(euler);
+  updateHighlight();
+  updateParticles(dt);
+  updateCoordHUD();
 
   // movement vector (yaw only)
   const forward = new THREE.Vector3(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
@@ -738,9 +935,15 @@ function tick(now) {
   player.vel.x = accel.x * speed;
   player.vel.z = accel.z * speed;
 
-  // gravity + jump
-  player.vel.y -= 22 * dt;
-  if (keys['Space'] && player.onGround) { player.vel.y = 8.4; player.onGround = false; }
+  // gravity + jump (or vertical control while flying)
+  if (player.flying) {
+    player.vel.y = 0;
+    if (keys['Space']) player.vel.y = speed;
+    if (keys['ShiftLeft'] || keys['ShiftRight']) player.vel.y = -speed;
+  } else {
+    player.vel.y -= 22 * dt;
+    if (keys['Space'] && player.onGround) { player.vel.y = 8.4; player.onGround = false; }
+  }
 
   player.onGround = false;
   collideAxis('x', player.vel.x * dt);
@@ -798,7 +1001,7 @@ function refreshHotbar() {
 refreshHotbar();
 const _origDown = window.onkeydown;
 addEventListener('keydown', e => {
-  if (/^Digit[1-6]$/.test(e.code)) refreshHotbar();
+  if (/^Digit[1-9]$/.test(e.code)) refreshHotbar();
 });
 
 // ---------- top-right controls: back to app, autosave indicator, reset ----------
@@ -842,6 +1045,51 @@ function flashSaved(){
   saveTag.style.opacity = '1';
   clearTimeout(flashSaved._t);
   flashSaved._t = setTimeout(() => { saveTag.style.opacity = '.5'; saveTag.textContent = 'Autosave on'; }, 1100);
+}
+
+// ---------- flight-mode toast ----------
+const flyTag = document.createElement('div');
+flyTag.style.cssText = `
+  position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%);
+  background: #102a1c; color: #8fffa8; border: 2px solid #000;
+  border-radius: 6px; padding: 8px 16px; font: 700 13px ui-monospace, monospace;
+  box-shadow: 3px 3px 0 #0006; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 6;
+`;
+document.body.appendChild(flyTag);
+function flashFly(on){
+  flyTag.textContent = on ? '\u2708 Flight ON   (SPACE up \u00b7 SHIFT down)' : 'Flight OFF';
+  flyTag.style.color = on ? '#8fffa8' : '#ffd0d0';
+  flyTag.style.opacity = '1';
+  clearTimeout(flashFly._t);
+  flashFly._t = setTimeout(() => { flyTag.style.opacity = '0'; }, 1600);
+}
+
+// ---------- coordinates + time-of-day HUD ----------
+const coordHUD = document.createElement('div');
+coordHUD.style.cssText = `
+  position: fixed; bottom: 12px; left: 12px; z-index: 6;
+  background: #0008; color: #fff; border: 2px solid #000;
+  border-radius: 6px; padding: 7px 11px; pointer-events: none;
+  font: 700 12px ui-monospace, monospace; line-height: 1.5; text-shadow: 0 1px 2px #000c;
+`;
+document.body.appendChild(coordHUD);
+function timeLabel() {
+  // dayTime 0..1 → clock; sunrise ~0, noon 0.25, sunset 0.5, midnight 0.75 (matches sin arc)
+  const hours = ((dayTime * 24) + 6) % 24;
+  const h = Math.floor(hours), m = Math.floor((hours - h) * 60);
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const h12 = ((h + 11) % 12) + 1;
+  const phase = (dayTime < 0.04 || dayTime > 0.54) && (dayTime < 0.96) ?
+    (Math.sin(dayTime*Math.PI*2) > 0 ? '' : '') : '';
+  const isDay = Math.sin(dayTime * Math.PI * 2) > 0;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm} ${isDay ? '\u2600\ufe0f' : '\u{1f319}'}`;
+}
+function updateCoordHUD() {
+  const bk = BLOCKS[BLOCK_KEYS[selected]];
+  coordHUD.innerHTML =
+    `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
+    `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
+    `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`;
 }
 
 addEventListener('beforeunload', persistSave);
