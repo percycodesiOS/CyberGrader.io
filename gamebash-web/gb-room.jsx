@@ -4,6 +4,12 @@
 (function(){
   const { useState, useEffect, useRef } = React;
 
+  function shuffledIdx(n){
+    const a=[...Array(n).keys()];
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+
   function GBRoom({ roomId, profile, isAdmin, onLeave }){
     const I = window.GBIcon;
     const [room, setRoom] = useState(null);
@@ -115,6 +121,24 @@
       if(!(isHost || uid===profile.uid)) return;
       const next = Math.max(0, (scores[uid]||0) + delta);
       fbDb.collection('rooms').doc(roomId).update({ ['state.scores.'+uid]: next }).catch(e=>console.error(e));
+    };
+
+    // ── deck: expand cards by their copy count, draw in a synced shuffled order ──
+    const deckCards = (config.cards||[]).flatMap(c=>Array.from({length:Math.max(1,c.count||1)},()=>c));
+    const deckState = room.state?.deck;
+    const cardsLeft = deckState && deckState.order ? Math.max(0, deckState.order.length - deckState.pos) : deckCards.length;
+    const currentCard = room.state?.currentCard;
+    const drawCard = ()=>{
+      if(winner || deckCards.length===0) return;
+      let order = deckState?.order, pos = deckState?.pos ?? 0;
+      let reshuffled = false;
+      if(!order || pos >= order.length){ order = shuffledIdx(deckCards.length); pos = 0; reshuffled = !!deckState; }
+      const card = deckCards[order[pos]];
+      fbDb.collection('rooms').doc(roomId).update({
+        'state.deck':{ order, pos: pos+1 },
+        'state.currentCard':{ name:card.name, description:card.description||'', drawnBy:profile.displayName }
+      }).then(()=>{ if(reshuffled) window.gbToast('Deck reshuffled.'); })
+        .catch(e=>{ console.error(e); window.gbToast('Could not draw.','error'); });
     };
 
     const finishGame = (winUid)=>{
@@ -270,6 +294,25 @@
                   </div>
                   <button onClick={rollDice} disabled={!!winner} style={{background:'var(--emerald)',color:'#04231a',fontWeight:800,padding:'9px 16px',borderRadius:11,border:0,cursor:'pointer',fontSize:'.88rem',transform:rolling?'rotate(12deg)':'none',transition:'transform .25s',opacity:winner?.5:1}}>🎲 Roll</button>
                 </div>
+              </div>
+            )}
+
+            {deckCards.length>0 && (
+              <div style={{padding:16,borderBottom:'1px solid var(--line)'}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,marginBottom:currentCard?10:0}}>
+                  <div>
+                    <div style={{fontSize:'.68rem',textTransform:'uppercase',letterSpacing:'.1em',fontWeight:800,color:'var(--faint)'}}>Deck</div>
+                    <div style={{color:'var(--muted)',fontSize:'.78rem'}}>{cardsLeft} card{cardsLeft===1?'':'s'} left</div>
+                  </div>
+                  <button onClick={drawCard} disabled={!!winner} style={{background:'var(--purple)',color:'#1c1233',fontWeight:800,padding:'9px 16px',borderRadius:11,border:0,cursor:'pointer',fontSize:'.88rem',opacity:winner?.5:1}}>🃏 Draw card</button>
+                </div>
+                {currentCard && (
+                  <div style={{background:'rgba(167,139,250,.1)',border:'1px solid rgba(167,139,250,.35)',borderRadius:12,padding:'11px 13px'}}>
+                    <div style={{color:'#fff',fontWeight:800,fontSize:'.94rem'}}>{currentCard.name}</div>
+                    {currentCard.description && <div style={{color:'var(--text)',fontSize:'.84rem',lineHeight:1.55,marginTop:3,whiteSpace:'pre-wrap'}}>{currentCard.description}</div>}
+                    <div style={{color:'var(--faint)',fontSize:'.7rem',marginTop:6}}>drawn by {currentCard.drawnBy}</div>
+                  </div>
+                )}
               </div>
             )}
 

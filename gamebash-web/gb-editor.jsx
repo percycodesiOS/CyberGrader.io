@@ -26,14 +26,14 @@
 
   function GuideModal({ onClose }){
     const steps = [
-      ['1. Name it', 'Type a name at the top. Example: "Math Race" or "Trivia Battle".'],
-      ['2. Pick a board', 'Open the BOARD tab and tap a background. This is the table your game is played on.'],
-      ['3. Add pieces', 'Open the PIECES tab and click pieces to drop them on the board. Drag each one to its starting spot. Hover a placed piece and hit the red X to remove it.'],
-      ['4. Add your own artwork', 'In the ARTWORK tab, upload a picture (a drawing, a photo, anything). It becomes a piece you can place just like the built-in ones.'],
-      ['5. Set the dice', 'In the DICE tab, choose how many dice and how many sides (or turn dice off for games that do not need them).'],
-      ['6. Write the rules', 'In the RULES tab, fill in "How to play" (what players do on a turn) and "How to win" (how the game ENDS). Every game needs an ending... first to the finish line, first to 10 points, last one standing.'],
-      ['7. Save', 'Hit Save. Teacher games go live instantly. Student games go to the teacher for approval first, then show up in the lobby for everyone.'],
-      ['8. Play it', 'Back in the lobby, press Play on your game. Friends join from their own devices, you take turns, roll dice, move pieces, and chat. The host hits "Finish game" to crown the winner.'],
+      ['1. Pick your game type', 'Board game (pieces on a board), Card game (a deck players draw from), or Dice game (roll and score). You get every tool either way – this just sets up the right starting point.'],
+      ['2. Name it', 'Type a name at the top. Example: "Math Race" or "Trivia Battle".'],
+      ['3. Pick a board', 'Open the BOARD tab and tap a background. This is the table your game is played on.'],
+      ['4. Add pieces and cards', 'PIECES: click pieces to drop them on the board, drag each to its starting spot. CARDS: write the cards for your deck (questions, actions, challenges) – players draw them during the game.'],
+      ['5. Add your own artwork', 'In the ARTWORK tab, upload a picture (a drawing, a photo, anything). It becomes a piece you can place just like the built-in ones.'],
+      ['6. Set the dice', 'In the DICE tab, choose how many dice and how many sides (or turn dice off for games that do not need them).'],
+      ['7. Write the rules', 'In the RULES tab, fill in "How to play" (what players do on a turn) and "How to win" (how the game ENDS). Every game needs an ending... first to the finish line, first to 10 points, last one standing.'],
+      ['8. Save and play', 'Hit Save. Teacher games go live instantly; student games go to the teacher for approval. Then press Play in the lobby – friends join from their own devices, the rules pop up, and the host crowns the winner with Finish Game.'],
     ];
     return (
       <div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.75)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
@@ -74,8 +74,10 @@
     }, []);
 
     const [name, setName] = useState(existing?.name || '');
+    const [gameType, setGameType] = useState(existing ? (existing.config?.gameType || 'board') : null);
     const [board, setBoard] = useState(startBoard);
     const [pieces, setPieces] = useState(existing?.config?.pieces ? existing.config.pieces.map(p=>({...p})) : []);
+    const [cards, setCards] = useState(existing?.config?.cards ? existing.config.cards.map(c=>({...c})) : []);
     const [artwork, setArtwork] = useState(existing?.config?.assets || []);
     const [howToPlay, setHowToPlay] = useState(existing?.config?.rules?.howToPlay || '');
     const [howToWin, setHowToWin] = useState(existing?.config?.rules?.howToWin || '');
@@ -102,10 +104,42 @@
     const checks = [
       { label:'Name', done: !!name.trim() },
       { label:'Board', done: true },
-      { label:'Pieces', done: pieces.length>0 },
+      { label: gameType==='card' ? 'Cards' : 'Pieces or cards', done: pieces.length>0 || cards.some(c=>(c.name||'').trim()||(c.description||'').trim()) },
       { label:'How to win', done: !!howToWin.trim() },
     ];
     const ready = checks.every(c=>c.done);
+
+    // Type chooser — the first thing you see when building a NEW game
+    const pickType = (t)=>{
+      setGameType(t);
+      if(t==='card'){ setDiceEnabled(false); setTab('cards'); const dark=BOARDS.find(b=>b.id==='blank-dark'); if(dark) setBoard(dark); }
+      else if(t==='dice'){ setDiceEnabled(true); setDiceCount(2); setDiceSides(6); setTab('dice'); const dark=BOARDS.find(b=>b.id==='blank-dark'); if(dark) setBoard(dark); }
+      else { setTab('board'); }
+    };
+    if(!gameType){
+      const opts = [
+        ['board','\u265f\ufe0f','Board game','Pieces on a board. Race tracks, quests, chess variants, territory battles.'],
+        ['card','\ud83c\udccf','Card game','A deck players draw from. Trivia questions, action cards, quiz battles.'],
+        ['dice','\ud83c\udfb2','Dice game','Roll and score. Push-your-luck, math practice, Yahtzee-style scoring.'],
+      ];
+      return (
+        <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24}}>
+          <h1 style={{color:'#fff',fontSize:'1.9rem',fontWeight:900,marginBottom:8,textAlign:'center'}}>What kind of game are you building?</h1>
+          <p style={{color:'var(--muted)',fontSize:'.95rem',marginBottom:28,textAlign:'center',maxWidth:480}}>Pick a starting point. You get every tool no matter what – this just sets things up the right way.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:16,width:'100%',maxWidth:780}}>
+            {opts.map(([id,emoji,title,desc])=>(
+              <button key={id} onClick={()=>pickType(id)} className="gb-card" style={{background:'var(--panel)',border:'1px solid var(--line)',borderRadius:18,padding:'26px 20px',cursor:'pointer',textAlign:'center'}}>
+                <div style={{fontSize:'2.8rem',marginBottom:10}}>{emoji}</div>
+                <div style={{color:'#fff',fontWeight:800,fontSize:'1.1rem',marginBottom:6}}>{title}</div>
+                <div style={{color:'var(--muted)',fontSize:'.84rem',lineHeight:1.55}}>{desc}</div>
+              </button>
+            ))}
+          </div>
+          <button onClick={onClose} style={{marginTop:26,background:'none',border:0,color:'var(--faint)',fontWeight:700,fontSize:'.88rem',cursor:'pointer'}}>← Back to the lobby</button>
+          <style>{`.gb-card{transition:transform .16s, border-color .16s} .gb-card:hover{transform:translateY(-3px);border-color:rgba(16,185,129,.5)}`}</style>
+        </div>
+      );
+    }
 
     const addPiece = (preset)=>{
       const n = pieces.length, size = 50;
@@ -149,18 +183,20 @@
     };
 
     const save = async ()=>{
-      if(!name.trim()){ window.gbToast('Step 1: give your game a name (top bar).','error'); return; }
-      if(pieces.length===0){ window.gbToast('Step 3: add at least one piece to the board.','error'); setTab('pieces'); return; }
-      if(!howToWin.trim()){ window.gbToast('Step 6: fill in "How to win" so players know when the game ends.','error'); setTab('rules'); return; }
+      if(!name.trim()){ window.gbToast('Give your game a name (top bar).','error'); return; }
+      const realCards = cards.filter(c=>(c.name||'').trim()||(c.description||'').trim());
+      if(pieces.length===0 && realCards.length===0){ window.gbToast('Add at least one piece or card so there is something to play with.','error'); setTab(gameType==='card'?'cards':'pieces'); return; }
+      if(!howToWin.trim()){ window.gbToast('Fill in "How to win" so players know when the game ends.','error'); setTab('rules'); return; }
       setSaving(true);
       try{
         const config = {
+          gameType,
           board:{ width:board.width, height:board.height, backgroundColor:board.backgroundColor, gridSize:board.gridSize||0, ...(board.backgroundImage?{backgroundImage:board.backgroundImage}:{}) },
           pieces: pieces.map(p=>({ id:p.id, name:p.name, type:'token', color:p.color, shape:p.shape, ...(p.imageUrl?{imageUrl:p.imageUrl}:{}), x:p.x, y:p.y, width:p.width, height:p.height })),
-          cards: existing?.config?.cards || [],
+          cards: realCards.map(c=>({ id:c.id, name:(c.name||'').trim()||'Card', description:(c.description||'').trim(), count:Math.max(1,Math.min(8,Number(c.count)||1)) })),
           dice:{ enabled:diceEnabled, count:diceCount, sides:diceSides },
           rules:{ howToPlay:howToPlay.trim(), howToWin:howToWin.trim() },
-          features:{ enableDice:diceEnabled, enableCards:(existing?.config?.cards||[]).length>0, enableScores:true, enableTurns:true },
+          features:{ enableDice:diceEnabled, enableCards:realCards.length>0, enableScores:true, enableTurns:true },
           assets: artwork,
         };
         // Firestore documents max out at 1MB — guard before we hit the wall
@@ -237,7 +273,8 @@
           <div className="ed-panel scroll" style={{borderTop:'1px solid var(--line)',background:'rgba(23,23,23,.5)',display:'flex',flexDirection:'column'}}>
             <div style={{display:'flex',borderBottom:'1px solid var(--line)'}}>
               <button onClick={()=>setTab('pieces')} style={tabBtn('pieces')}>Pieces</button>
-              <button onClick={()=>setTab('art')} style={tabBtn('art')}>Artwork</button>
+              <button onClick={()=>setTab('cards')} style={tabBtn('cards')}>Cards</button>
+              <button onClick={()=>setTab('art')} style={tabBtn('art')}>Art</button>
               <button onClick={()=>setTab('board')} style={tabBtn('board')}>Board</button>
               <button onClick={()=>setTab('dice')} style={tabBtn('dice')}>Dice</button>
               <button onClick={()=>setTab('rules')} style={tabBtn('rules')}>Rules</button>
@@ -250,6 +287,25 @@
                     <button key={i} onClick={()=>addPiece(pp)} title={pp.name} style={{aspectRatio:'1',background:'#262626',border:'1px solid var(--line)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',padding:8,cursor:'pointer'}}>
                       {pp.shape==='image' ? <img src={pp.imageUrl} alt="" style={{width:'100%',height:'100%'}} /> : <div style={{width:26,height:26,background:pp.color,borderRadius:pp.shape==='circle'?'50%':6}}></div>}
                     </button>
+                  ))}
+                </div>
+              </div>)}
+              {tab==='cards' && (<div>
+                <p style={{fontSize:'.78rem',color:'var(--faint)',marginBottom:12,lineHeight:1.5}}>Cards make up your game's deck. During the game, players hit "Draw card" and everyone sees what comes up – great for trivia questions, actions, and challenges.</p>
+                <button onClick={()=>setCards(c=>[...c,{id:'cd'+Date.now()+Math.floor(Math.random()*999),name:'',description:'',count:1}])} style={{width:'100%',background:'rgba(16,185,129,.12)',color:'var(--emerald-bright)',border:'1px dashed rgba(16,185,129,.45)',borderRadius:12,padding:'13px',fontWeight:800,fontSize:'.9rem',cursor:'pointer',marginBottom:14}}>+ Add a card</button>
+                {cards.length===0 && <div style={{fontSize:'.78rem',color:'var(--faint)',textAlign:'center'}}>No cards yet. Add one and write what it says or does.</div>}
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {cards.map((c,i)=>(
+                    <div key={c.id} style={{background:'rgba(255,255,255,.03)',border:'1px solid var(--line)',borderRadius:12,padding:'10px 12px'}}>
+                      <div style={{display:'flex',gap:8,marginBottom:7}}>
+                        <input value={c.name} onChange={e=>setCards(arr=>arr.map(x=>x.id===c.id?{...x,name:e.target.value}:x))} placeholder={'Card '+(i+1)+' name (e.g. "Question 1")'} style={{...inputStyle,flex:1}} />
+                        <button onClick={()=>setCards(arr=>arr.filter(x=>x.id!==c.id))} title="Remove card" style={{width:32,flexShrink:0,background:'rgba(248,113,113,.12)',color:'var(--red)',border:'1px solid rgba(248,113,113,.3)',borderRadius:9,cursor:'pointer',fontWeight:800}}>✕</button>
+                      </div>
+                      <textarea value={c.description} onChange={e=>setCards(arr=>arr.map(x=>x.id===c.id?{...x,description:e.target.value}:x))} rows={2} placeholder="What the card says or does" style={{...inputStyle,resize:'vertical',lineHeight:1.5,marginBottom:7}} />
+                      <label style={{display:'flex',alignItems:'center',gap:8,fontSize:'.76rem',color:'var(--faint)',fontWeight:700}}>Copies in deck
+                        <select value={c.count||1} onChange={e=>setCards(arr=>arr.map(x=>x.id===c.id?{...x,count:Number(e.target.value)}:x))} style={{...inputStyle,width:64}}>{[1,2,3,4].map(n=><option key={n} value={n}>{n}</option>)}</select>
+                      </label>
+                    </div>
                   ))}
                 </div>
               </div>)}
