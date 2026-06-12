@@ -1469,11 +1469,13 @@ setTimeout(()=>{button.textContent=old;button.classList.remove("copied");statusE
 
 // ── EMAIL ──
 function getReferenceDate(){return $("currentDateField").value.trim()||shortDate}
+// Each progress email has a canonical target. The field PREFILLS with it when you
+// switch email type (so Final Week never shows a stale 75%), and whatever is in
+// the field is what the email actually uses – edit it and the email follows.
+const PROGRESS_DEFAULTS={"25% Check-In":"25%","50% Check-In":"50%","75% Check-In":"75%","Final Week Reminder":"90%"};
 function getProgressDefault(){
 const type=$("emailType").value;
-if(type.includes("25%"))return"25%";if(type.includes("50%"))return"50%";
-if(type.includes("75%"))return"75%";if(type.includes("Final Week"))return"90%";
-return $("progressValue").value.trim();
+return $("progressValue").value.trim() || PROGRESS_DEFAULTS[type] || "";
 }
 function populateEmailTypes(){
 const t=$("term").value;let types=allEmailTypes.slice();
@@ -1486,6 +1488,12 @@ if(!types.includes(current))$("emailType").value=types[0];
 }
 function maybeAdjustFields(){
 const type=$("emailType").value;
+// Snap the Progress Target to this email's canonical number when the TYPE changes
+// (typing in the field doesn't reset it – only switching emails does).
+if(PROGRESS_DEFAULTS[type] && window.__lastProgressType!==type){
+window.__lastProgressType=type;
+$("progressValue").value=PROGRESS_DEFAULTS[type];
+}
 const isFourth=$("term").value==="fourth";
 const checkinType=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
 const seniorOnly=["Senior Final Reminder"].includes(type);
