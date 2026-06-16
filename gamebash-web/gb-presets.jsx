@@ -106,18 +106,6 @@
     {name:'Pizza', color:'#f97316', shape:'image', imageUrl:lucideIcon('pizza','#f97316')},
   ];
 
-  // Default rules for every starter, so each game opens with "how to play / how to win"
-  const STARTER_RULES = {
-    blank:      { howToPlay:'This is a sandbox. Decide your own rules as a group before you start.', howToWin:'You choose! Pick a goal together (first to 10 points is a classic) and the host crowns the winner with the Finish Game button.' },
-    race:       { howToPlay:'On your turn, roll the die and move your racer that many squares toward the finish line. Then end your turn.', howToWin:'First racer to reach the FINISH square wins.' },
-    trivia:     { howToPlay:'The host asks a question. Move your token to the A, B, C, or D corner you think is right. Correct answers score 1 point (use the scoreboard).', howToWin:'First player to 10 points wins.' },
-    dungeon:    { howToPlay:'Heroes take turns moving and rolling the d20 to fight monsters. The host narrates what happens on each roll (10+ is a hit).', howToWin:'The heroes win when they reach the treasure. The monsters win if every hero falls.' },
-    chess:      { howToPlay:'Take turns moving one pawn per turn. House rules welcome: capture by landing on an opponent piece.', howToWin:'Capture all of the other side\'s pieces, or be the first to reach the far row.' },
-    naval:      { howToPlay:'Place your ships, then take turns calling grid squares. The other captain says hit or miss; track shots with the scoreboard.', howToWin:'Sink the whole enemy fleet first.' },
-    hex:        { howToPlay:'On your turn, roll the die and claim that many hexes by moving your flag. Defend your territory.', howToWin:'Control the most hexes when time is up. The host calls the end and crowns the winner.' },
-  };
-  window.GB_STARTERS.forEach(s=>{ if(STARTER_RULES[s.id]) s.config.rules = STARTER_RULES[s.id]; });
-
   // Built-in fully-playable games (their own self-contained HTML), surfaced in the lobby.
   window.GB_BUILTINS = [
     {id:'yahtzee', name:'Yahtzee', emoji:'🎲', href:'games/yahtzee.html', tag:'1–6 players', description:'Roll, hold, and fill your scorecard. Full 13-category rules with upper bonus.'},

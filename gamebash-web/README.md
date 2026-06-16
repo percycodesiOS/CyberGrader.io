@@ -14,15 +14,10 @@ and your security rules all carry over.
   and sign-in only works from web addresses you authorized in Firebase.
 
 ## What you can do
-- **Build a game** — a guided, step-by-step builder with a live checklist: name it, pick a
-  board, place pieces, **upload your own artwork** (drawings, photos — they become pieces),
-  set the dice, and write the rules ("how to play" + "how to win" is required, so every
-  game has a real ending). A "? Guide" button walks students through it start to finish.
+- **Build a game** — pick a board, click pieces onto it, drag to place, set dice, save.
   Your games publish instantly. Student games go to your **approval queue** first.
 - **Play live** — open a game, and everyone in the room shares one board in real time:
-  the rules pop up first, then drag pieces (synced to all), roll dice, take turns, track
-  points on the **scoreboard**, and chat. The host hits **Finish game** to crown a winner —
-  confetti, final standings, and a Play Again button included.
+  drag pieces (synced to all), roll dice, take turns, and chat.
 - **Classroom** (teacher) — see every student who has joined.
 - **Approve / reject / edit / delete** games, and **tidy duplicates** in one click.
 - **Quick games** — Yahtzee, Connect Four, and MYnecraft are built in, ready to play.
