@@ -218,6 +218,7 @@ function Lobby({ profile, isAdmin, onPlay, onCreate, onEdit }){
   const [pending, setPending] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [seeding, setSeeding] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(()=>{
     const unsubGames = fbDb.collection('games').where('status','==','approved')
@@ -281,6 +282,7 @@ function Lobby({ profile, isAdmin, onPlay, onCreate, onEdit }){
 
   return (
     <div style={{maxWidth:1180,margin:'0 auto',padding:'34px 22px 70px',display:'flex',flexDirection:'column',gap:42}}>
+      {showGuide && window.GBGuideModal && <window.GBGuideModal onClose={()=>setShowGuide(false)} />}
 
       {/* Teacher approval queue */}
       {isAdmin && pending.length>0 && (
@@ -330,6 +332,7 @@ function Lobby({ profile, isAdmin, onPlay, onCreate, onEdit }){
         <SectionLabel icon="sparkles" extra={
           <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
             <button onClick={onCreate} style={btn('var(--emerald)','#04231a')}><Icon name="plus" /> Build a game</button>
+            <button onClick={()=>setShowGuide(true)} title="Step-by-step: how to build a game" style={btn('rgba(255,255,255,.05)','var(--text)')}>? How it works</button>
             {isAdmin && <button onClick={seedDemos} disabled={seeding} style={btn('rgba(255,255,255,.05)','#fff')}>{seeding?'Adding...':'Add starters'}</button>}
             {isAdmin && games.length>0 && <button onClick={tidyDuplicates} style={btn('rgba(255,255,255,.05)','var(--muted)')}><Icon name="trash" /> Tidy</button>}
           </div>

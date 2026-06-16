@@ -17,12 +17,12 @@
 --panel:#2d313c;
 --panel2:#323642;
 --panel3:#2a2e39;
---border:rgba(81,217,255,.22);
---border-strong:rgba(81,217,255,.38);
+--border:rgba(79,227,207,.22);
+--border-strong:rgba(79,227,207,.38);
 --text:#edf6ff;
 --muted:#a4b3c7;
---cyan:#51d9ff;
---cyan2:#00b7ff;
+--cyan:#4fe3cf;
+--cyan2:#00c4ad;
 --orange:#ff9f43;
 --green:#7dffb5;
 --red:#ff7d7d;
@@ -34,8 +34,8 @@
 html,body{
 margin:0;padding:0;min-height:100%;
 background:
-radial-gradient(circle at top right, rgba(0,183,255,.06), transparent 30%),
-radial-gradient(circle at bottom left, rgba(81,217,255,.04), transparent 30%),
+radial-gradient(circle at top right, rgba(0,196,173,.06), transparent 30%),
+radial-gradient(circle at bottom left, rgba(79,227,207,.04), transparent 30%),
 linear-gradient(180deg,#23262e 0%, #1e2128 100%);
 color:var(--text);
 font-family:'Segoe UI',system-ui,sans-serif;
@@ -52,7 +52,7 @@ background:rgba(45,49,60,.92);box-shadow:var(--shadow);backdrop-filter:blur(12px
 }
 .topbar-left{display:flex;align-items:center;justify-content:flex-start;gap:20px}
 .topbar-center{display:flex;align-items:center;justify-content:center}
-.topbar-logo{height:170px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(81,217,255,.22));max-width:100%}
+.topbar-logo{height:170px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(79,227,207,.22));max-width:100%}
 .brand{margin:0;font-size:clamp(2.5rem,5vw,4.2rem);font-weight:900;letter-spacing:.02em}
 .brand .dot{color:var(--cyan)}
 .topbar-right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap}
@@ -67,16 +67,16 @@ display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2
 .date-pill .date-label{
 font-size:.82rem;letter-spacing:.2em;font-weight:900;
 color:var(--cyan);
-text-shadow:0 0 6px rgba(81,217,255,.5),0 0 12px rgba(81,217,255,.22)
+text-shadow:0 0 6px rgba(79,227,207,.5),0 0 12px rgba(79,227,207,.22)
 }
 .date-pill .date-value{font-weight:800;color:var(--text);font-size:1.08rem;letter-spacing:.02em}
 .howto-btn{
-padding:10px 14px;border-radius:12px;border:1px solid rgba(81,217,255,.35);
-background:linear-gradient(180deg, rgba(0,183,255,.14), rgba(81,217,255,.06));
+padding:10px 14px;border-radius:12px;border:1px solid rgba(79,227,207,.35);
+background:linear-gradient(180deg, rgba(0,196,173,.14), rgba(79,227,207,.06));
 color:#fff;font-weight:900;font-size:1.2rem;cursor:pointer;transition:.18s ease;
 font-family:inherit;line-height:1
 }
-.howto-btn:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.55);box-shadow:0 0 12px rgba(81,217,255,.25)}
+.howto-btn:hover{transform:translateY(-1px);border-color:rgba(79,227,207,.55);box-shadow:0 0 12px rgba(79,227,207,.25)}
 a.howto-btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .break-btn{
 display:inline-flex;align-items:center;gap:8px;
@@ -98,30 +98,64 @@ transition:.18s ease;text-shadow:0 1px 2px rgba(0,0,0,.25)
 }
 .break-btn{font-family:inherit}
 .game-launch-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.game-launch-card{background:rgba(10,18,30,.5);border:1px solid rgba(81,217,255,.18);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.game-launch-card{background:rgba(10,18,30,.5);border:1px solid rgba(79,227,207,.18);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
 .game-launch-card .glc-emoji{font-size:1.9rem;line-height:1}
 .game-launch-card h3{margin:0;color:#fff;font-size:1.08rem}
 .game-launch-card p{margin:0;flex:1;color:var(--muted);font-size:.88rem;line-height:1.5}
-.glc-btn{margin-top:8px;display:block;text-align:center;text-decoration:none;background:linear-gradient(180deg,#7fe6ff,#51d9ff);color:#02131f;font-weight:800;padding:11px 14px;border-radius:11px;font-size:.92rem;transition:.15s ease}
+.glc-btn{margin-top:8px;display:block;text-align:center;text-decoration:none;background:linear-gradient(180deg,#7ff0df,#4fe3cf);color:#02131f;font-weight:800;padding:11px 14px;border-radius:11px;font-size:.92rem;transition:.15s ease}
 .glc-btn.alt{background:linear-gradient(180deg,#ff5fa6,#ec1f86);color:#fff}
 .glc-btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
 @media (max-width:560px){.game-launch-grid{grid-template-columns:1fr}}
-.signin-btn{
-padding:11px 20px;border-radius:14px;border:1px solid rgba(127,230,255,.85);
-background:linear-gradient(180deg,#7fe6ff,#00b7ff);
-color:#001624;font-weight:900;font-size:.94rem;letter-spacing:.02em;cursor:pointer;transition:.18s ease;
-font-family:inherit;box-shadow:0 6px 16px rgba(0,183,255,.35)
+
+/* LEFT-EDGE GAMES TAB – the "need a distraction?" handle */
+.side-games-tab{
+position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:90;
+display:flex;flex-direction:column;gap:2px;align-items:center;
+background:linear-gradient(180deg,#ff5fa6,#ec1f86);color:#fff;
+border:0;border-radius:0 14px 14px 0;cursor:pointer;
+padding:18px 9px;writing-mode:vertical-rl;text-orientation:mixed;
+font:inherit;font-weight:900;font-size:.82rem;letter-spacing:.14em;
+box-shadow:0 4px 18px rgba(236,31,134,.35);
+transition:padding .18s ease, box-shadow .18s ease
 }
-.signin-btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,#aef0ff,#22c8ff);box-shadow:0 10px 24px rgba(0,183,255,.5)}
+.side-games-tab:hover{padding-right:16px;box-shadow:0 6px 24px rgba(236,31,134,.55)}
+.side-games-tab .tab-ico{writing-mode:horizontal-tb;font-size:1.05rem;margin-bottom:8px}
+
+/* WELCOME CARD – first-run setup, hides itself once all 3 steps are done */
+.welcome-card{display:none;background:linear-gradient(180deg,rgba(79,227,207,.13),rgba(79,227,207,.05));border:2px solid rgba(79,227,207,.55);border-radius:14px;padding:18px 20px;margin-bottom:18px;position:relative}
+@media (prefers-reduced-motion: no-preference){
+.welcome-card{animation:wcGlow 3.2s ease-in-out infinite}
+@keyframes wcGlow{0%,100%{box-shadow:0 0 12px rgba(79,227,207,.14)}50%{box-shadow:0 0 28px rgba(79,227,207,.32)}}
+}
+.welcome-card h3{margin:0 0 4px;color:#fff;font-size:1.08rem}
+.welcome-card h3 .wc-spark{color:var(--cyan)}
+.welcome-card p{margin:0 0 12px;color:var(--muted);font-size:.86rem}
+.wc-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wc-step{display:flex;align-items:center;gap:9px;background:rgba(10,18,30,.5);border:1px solid rgba(79,227,207,.22);border-radius:11px;padding:11px 13px;cursor:pointer;font:inherit;color:var(--text);text-align:left;font-size:.86rem;font-weight:700;transition:.15s ease}
+.wc-step:hover{border-color:var(--cyan);background:rgba(79,227,207,.08)}
+.wc-step .wc-mark{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.78rem;font-weight:900;background:rgba(255,255,255,.07);color:var(--muted);border:2px solid rgba(79,227,207,.4)}
+.wc-step.done .wc-mark{background:rgba(125,255,181,.15);color:#7dffb5;border-color:rgba(125,255,181,.4)}
+.wc-step.done{opacity:.72}
+.wc-x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px;line-height:1}
+.wc-x:hover{color:#fff}
+@media (max-width:760px){.wc-steps{grid-template-columns:1fr}}
+
+.signin-btn{
+padding:11px 20px;border-radius:14px;border:1px solid rgba(127,240,223,.85);
+background:linear-gradient(180deg,#7ff0df,#00c4ad);
+color:#001624;font-weight:900;font-size:.94rem;letter-spacing:.02em;cursor:pointer;transition:.18s ease;
+font-family:inherit;box-shadow:0 6px 16px rgba(0,196,173,.35)
+}
+.signin-btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,#aef0ff,#22c8ff);box-shadow:0 10px 24px rgba(0,196,173,.5)}
 .user-chip-wrap{position:relative;display:inline-block}
 .user-chip{
 display:flex;align-items:center;gap:10px;
 padding:8px 14px 8px 8px;border-radius:999px;
-border:1px solid rgba(81,217,255,.35);
-background:linear-gradient(180deg, rgba(0,183,255,.14), rgba(81,217,255,.08));
+border:1px solid rgba(79,227,207,.35);
+background:linear-gradient(180deg, rgba(0,196,173,.14), rgba(79,227,207,.08));
 cursor:pointer;transition:.18s ease;font-family:inherit;color:#fff;font-weight:700;font-size:.9rem
 }
-.user-chip:hover{border-color:rgba(81,217,255,.55)}
+.user-chip:hover{border-color:rgba(79,227,207,.55)}
 .user-chip .avatar{
 width:32px;height:32px;border-radius:50%;
 background:linear-gradient(135deg,var(--cyan),var(--cyan2));
@@ -131,7 +165,7 @@ font-weight:900;font-size:.88rem;flex-shrink:0
 .user-menu{
 position:absolute;top:calc(100% + 8px);right:0;min-width:260px;
 background:linear-gradient(180deg,#323642,#2a2e39);
-border:1px solid rgba(81,217,255,.25);border-radius:12px;
+border:1px solid rgba(79,227,207,.25);border-radius:12px;
 box-shadow:0 16px 40px rgba(0,0,0,.5);
 display:none;flex-direction:column;padding:6px;z-index:50
 }
@@ -141,14 +175,14 @@ background:transparent;border:0;color:var(--text);
 padding:10px 14px;text-align:left;font:inherit;font-size:.9rem;
 border-radius:8px;cursor:pointer;transition:.15s ease
 }
-.user-menu button:hover{background:rgba(81,217,255,.1)}
+.user-menu button:hover{background:rgba(79,227,207,.1)}
 .user-menu button.danger{color:var(--red)}
 .user-menu button.danger:hover{background:rgba(255,125,125,.08)}
-.user-menu .menu-section{padding:10px 12px 8px;border-bottom:1px solid rgba(81,217,255,.15);margin-bottom:4px;display:grid;gap:6px}
+.user-menu .menu-section{padding:10px 12px 8px;border-bottom:1px solid rgba(79,227,207,.15);margin-bottom:4px;display:grid;gap:6px}
 .user-menu .menu-section label{font-size:.7rem;font-weight:900;letter-spacing:.08em;color:var(--cyan);text-transform:uppercase}
 .user-menu .menu-section .row{display:flex;gap:6px}
-.user-menu .menu-section input{flex:1;background:rgba(10,18,30,.55);border:1px solid rgba(81,217,255,.25);color:var(--text);border-radius:7px;padding:7px 9px;font:inherit;font-size:.88rem;min-width:0}
-.user-menu .menu-section input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 2px rgba(81,217,255,.18)}
+.user-menu .menu-section input{flex:1;background:rgba(10,18,30,.55);border:1px solid rgba(79,227,207,.25);color:var(--text);border-radius:7px;padding:7px 9px;font:inherit;font-size:.88rem;min-width:0}
+.user-menu .menu-section input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 2px rgba(79,227,207,.18)}
 .user-menu .menu-section .save-name{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#02131f;border:0;border-radius:7px;padding:7px 11px;font-weight:800;font-size:.82rem;cursor:pointer;letter-spacing:.02em}
 .user-menu .menu-section .save-name:hover{filter:brightness(1.08)}
 .user-menu .menu-section .hint{color:var(--muted);font-size:.72rem;line-height:1.4;margin:0}
@@ -163,8 +197,8 @@ border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shad
 .panel-title{
 margin:0 0 14px;font-size:1.2rem;font-weight:900;letter-spacing:.06em;
 color:#fff;text-transform:uppercase;text-align:center;
-text-shadow:0 0 10px rgba(81,217,255,.55),0 0 22px rgba(81,217,255,.25),0 0 32px rgba(0,183,255,.12);
-padding-bottom:12px;border-bottom:2px solid rgba(81,217,255,.4);
+text-shadow:0 0 10px rgba(79,227,207,.55),0 0 22px rgba(79,227,207,.25),0 0 32px rgba(0,196,173,.12);
+padding-bottom:12px;border-bottom:2px solid rgba(79,227,207,.4);
 position:relative
 }
 .panel-title::after{
@@ -175,8 +209,8 @@ box-shadow:0 0 8px var(--cyan)
 .stack{display:grid;gap:16px}
 .section-card{
 background:linear-gradient(180deg, rgba(55,59,72,.95), rgba(48,52,64,.95));
-border:1px solid rgba(81,217,255,.22);border-radius:16px;padding:14px;margin-bottom:12px;
-box-shadow:inset 0 0 0 1px rgba(81,217,255,.04)
+border:1px solid rgba(79,227,207,.22);border-radius:16px;padding:14px;margin-bottom:12px;
+box-shadow:inset 0 0 0 1px rgba(79,227,207,.04)
 }
 .section-card:last-child{margin-bottom:0}
 .section-card h3{margin:0 0 10px;font-size:.98rem}
@@ -184,8 +218,8 @@ box-shadow:inset 0 0 0 1px rgba(81,217,255,.04)
 .section-card ul{margin:0;padding-left:18px;display:grid;gap:8px}
 .senior-highlight{color:var(--pink);font-weight:700}
 .general-highlight{color:#7dffb5;font-weight:700}
-.notes-heading{color:var(--cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 6px rgba(81,217,255,.18)}
-.notes-card{border:1px solid rgba(81,217,255,.28);box-shadow:0 0 0 1px rgba(81,217,255,.04),0 4px 16px rgba(0,0,0,.25)}
+.notes-heading{color:var(--cyan);font-weight:900;letter-spacing:.02em;margin:0 0 10px;font-size:1rem;text-shadow:0 0 6px rgba(79,227,207,.18)}
+.notes-card{border:1px solid rgba(79,227,207,.28);box-shadow:0 0 0 1px rgba(79,227,207,.04),0 4px 16px rgba(0,0,0,.25)}
 .no-extensions{
 margin-top:12px;padding:10px 14px;border-radius:10px;text-align:center;
 background:rgba(255,110,180,.10);border:1px solid rgba(255,110,180,.38);
@@ -200,16 +234,16 @@ background:linear-gradient(180deg, rgba(58,62,76,.95), rgba(50,54,66,.95));
 color:var(--text);font-family:inherit;transition:.2s ease;
 display:flex;flex-direction:column;align-items:center;gap:8px
 }
-.block-btn:hover{transform:translateY(-2px);border-color:rgba(81,217,255,.55);color:#fff}
+.block-btn:hover{transform:translateY(-2px);border-color:rgba(79,227,207,.55);color:#fff}
 .block-btn .icon{font-size:1.8rem;line-height:1}
 .block-btn .icon img{height:44px;width:auto;display:block}
 .block-btn .title{font-weight:900;font-size:1rem;letter-spacing:.02em;color:#fff}
 .block-btn .desc{font-size:.8rem;color:#b8c6db;text-align:center;line-height:1.4}
 .block-btn.active{
 color:#fff;
-background:linear-gradient(180deg, rgba(0,183,255,.30), rgba(81,217,255,.14));
-border-color:rgba(81,217,255,.6);
-box-shadow:0 0 22px rgba(0,183,255,.22),inset 0 0 0 1px rgba(81,217,255,.18)
+background:linear-gradient(180deg, rgba(0,196,173,.30), rgba(79,227,207,.14));
+border-color:rgba(79,227,207,.6);
+box-shadow:0 0 22px rgba(0,196,173,.22),inset 0 0 0 1px rgba(79,227,207,.18)
 }
 .block-panel{display:none}
 .block-panel.active{display:block}
@@ -221,7 +255,7 @@ box-shadow:0 0 22px rgba(0,183,255,.22),inset 0 0 0 1px rgba(81,217,255,.18)
 .field.hidden{display:none}
 label{font-size:.84rem;color:var(--muted);font-weight:800;letter-spacing:.02em}
 select,input[type="text"],input[type="email"],input[type="password"],input[type="date"],textarea{
-width:100%;border:1px solid rgba(81,217,255,.28);
+width:100%;border:1px solid rgba(79,227,207,.28);
 background:linear-gradient(180deg, rgba(35,39,48,1), rgba(30,34,42,1));
 color:#edf6ff !important;border-radius:14px;padding:13px 14px;font:inherit;transition:.18s ease;
 -webkit-appearance:none;-moz-appearance:none;appearance:none;
@@ -234,7 +268,7 @@ color:#edf6ff !important;font-weight:600
 }
 textarea[readonly]{color:#edf6ff !important;-webkit-text-fill-color:#edf6ff;opacity:1}
 select:focus,input:focus,textarea:focus{
-outline:none;border-color:rgba(81,217,255,.45);box-shadow:0 0 0 4px rgba(81,217,255,.08)
+outline:none;border-color:rgba(79,227,207,.45);box-shadow:0 0 0 4px rgba(79,227,207,.08)
 }
 select option{background:#0c1220;color:#eef7ff}
 textarea{min-height:170px;resize:vertical;line-height:1.5}
@@ -244,12 +278,12 @@ input[type="date"]{color-scheme:dark}
 .textarea-wrap{position:relative}
 .textarea-icons{position:absolute;bottom:10px;right:10px;display:flex;gap:6px;z-index:2}
 .icon-btn{
-width:32px;height:32px;border-radius:9px;border:1px solid rgba(81,217,255,.22);
+width:32px;height:32px;border-radius:9px;border:1px solid rgba(79,227,207,.22);
 background:rgba(10,18,30,.85);color:var(--cyan);cursor:pointer;
 display:flex;align-items:center;justify-content:center;
 font-size:1rem;transition:.15s ease;backdrop-filter:blur(4px);font-family:inherit
 }
-.icon-btn:hover{background:rgba(0,183,255,.18);border-color:rgba(81,217,255,.5);transform:scale(1.08)}
+.icon-btn:hover{background:rgba(0,196,173,.18);border-color:rgba(79,227,207,.5);transform:scale(1.08)}
 
 /* BUTTONS */
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -257,9 +291,9 @@ font-size:1rem;transition:.15s ease;backdrop-filter:blur(4px);font-family:inheri
 .edit-btn,.ghost-btn,.global-save-btn,.reset-btn{
 border:none;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;cursor:pointer;transition:.18s ease;font-size:.88rem
 }
-.edit-btn{background:rgba(81,217,255,.12);color:#9de8ff;border:1px solid rgba(81,217,255,.45);font-weight:900}
+.edit-btn{background:rgba(79,227,207,.12);color:#9de8ff;border:1px solid rgba(79,227,207,.45);font-weight:900}
 .edit-btn.saving{background:rgba(125,255,181,.16);color:#baffd3;border:1px solid rgba(125,255,181,.4)}
-.ghost-btn{background:rgba(81,217,255,.08);color:var(--text);border:1px solid rgba(81,217,255,.18)}
+.ghost-btn{background:rgba(79,227,207,.08);color:var(--text);border:1px solid rgba(79,227,207,.18)}
 .global-save-btn{background:rgba(125,255,181,.12);color:#baffd3;border:1px solid rgba(125,255,181,.25)}
 .reset-btn{background:rgba(255,125,125,.12);color:#ffc0c0;border:1px solid rgba(255,125,125,.22)}
 .edit-btn:hover,.ghost-btn:hover,.global-save-btn:hover,.reset-btn:hover{transform:translateY(-1px)}
@@ -269,11 +303,11 @@ border:none;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;cu
 border:0;border-radius:14px;padding:18px 24px;font:inherit;font-weight:900;cursor:pointer;
 font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;
 background:linear-gradient(180deg, var(--cyan2), var(--cyan));
-color:#02131f;border:1px solid rgba(81,217,255,.6);
-box-shadow:0 8px 22px rgba(0,183,255,.25),0 0 0 1px rgba(255,255,255,.08) inset;
+color:#02131f;border:1px solid rgba(79,227,207,.6);
+box-shadow:0 8px 22px rgba(0,196,173,.25),0 0 0 1px rgba(255,255,255,.08) inset;
 transition:.18s ease;width:100%;margin-top:14px
 }
-.copy-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,183,255,.35),0 0 0 1px rgba(255,255,255,.12) inset}
+.copy-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,196,173,.35),0 0 0 1px rgba(255,255,255,.12) inset}
 .copy-btn.copied{background:linear-gradient(180deg,#5ae89a,#7dffb5)}
 
 .copy-status{font-size:.85rem;color:var(--green);min-height:1.1em;margin-top:6px}
@@ -295,7 +329,7 @@ box-shadow:0 4px 12px rgba(225,29,116,.32)
 .pc-mark .pc-word .a{color:#ff5fa6}
 .footer .created-by{font-style:italic;color:var(--muted);font-size:.9rem;margin:0}
 
-.divider{height:1px;background:linear-gradient(90deg, transparent, rgba(81,217,255,.2), transparent);margin:18px 0 4px}
+.divider{height:1px;background:linear-gradient(90deg, transparent, rgba(79,227,207,.2), transparent);margin:18px 0 4px}
 .subgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .hint{font-size:.82rem;color:var(--muted);margin-top:4px}
 
@@ -303,7 +337,7 @@ box-shadow:0 4px 12px rgba(225,29,116,.32)
 .deadline-callouts{
 display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;
 padding:16px;border-radius:14px;
-background:rgba(10,18,30,.5);border:1px solid rgba(81,217,255,.15)
+background:rgba(10,18,30,.5);border:1px solid rgba(79,227,207,.15)
 }
 .deadline-callouts.hidden{display:none}
 .deadline-field{display:grid;gap:6px}
@@ -311,13 +345,13 @@ background:rgba(10,18,30,.5);border:1px solid rgba(81,217,255,.15)
 .deadline-field input{font-weight:700}
 .deadline-field.senior label{color:var(--pink);text-shadow:0 0 10px rgba(255,110,180,.4)}
 .deadline-field.senior input{border-color:rgba(255,110,180,.35);box-shadow:0 0 0 3px rgba(255,110,180,.06)}
-.deadline-field.general label{color:var(--cyan);text-shadow:0 0 10px rgba(81,217,255,.4)}
-.deadline-field.general input{border-color:rgba(81,217,255,.35);box-shadow:0 0 0 3px rgba(81,217,255,.06)}
+.deadline-field.general label{color:var(--cyan);text-shadow:0 0 10px rgba(79,227,207,.4)}
+.deadline-field.general input{border-color:rgba(79,227,207,.35);box-shadow:0 0 0 3px rgba(79,227,207,.06)}
 
 /* AUDIENCE TOGGLE */
 .audience-toggle{
 display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px;
-border-radius:12px;background:rgba(10,18,30,.6);border:1px solid rgba(81,217,255,.12);
+border-radius:12px;background:rgba(10,18,30,.6);border:1px solid rgba(79,227,207,.12);
 margin-bottom:14px
 }
 .audience-btn{
@@ -325,8 +359,8 @@ padding:10px;border-radius:9px;border:0;background:transparent;
 color:var(--muted);font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
 }
 .audience-btn.active{
-background:linear-gradient(180deg, rgba(0,183,255,.22), rgba(81,217,255,.10));
-color:#fff;box-shadow:inset 0 0 0 1px rgba(81,217,255,.3)
+background:linear-gradient(180deg, rgba(0,196,173,.22), rgba(79,227,207,.10));
+color:#fff;box-shadow:inset 0 0 0 1px rgba(79,227,207,.3)
 }
 
 /* MODALS */
@@ -337,7 +371,7 @@ align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px
 .modal-overlay.open{display:flex}
 .modal{
 background:linear-gradient(180deg,#323642,#2a2e39);
-border:1px solid rgba(81,217,255,.3);border-radius:20px;
+border:1px solid rgba(79,227,207,.3);border-radius:20px;
 padding:28px 32px;max-width:500px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);
 position:relative;max-height:90vh;overflow-y:auto
 }
@@ -346,8 +380,8 @@ position:relative;max-height:90vh;overflow-y:auto
 .modal h2{margin:0 0 8px;font-size:1.3rem;color:var(--cyan)}
 .modal p{color:var(--muted);line-height:1.6;font-size:.95rem;margin:0 0 16px}
 .modal-close{
-background:linear-gradient(180deg,rgba(0,183,255,.28),rgba(81,217,255,.18));
-border:1px solid rgba(81,217,255,.4);color:#fff;border-radius:12px;
+background:linear-gradient(180deg,rgba(0,196,173,.28),rgba(79,227,207,.18));
+border:1px solid rgba(79,227,207,.4);color:#fff;border-radius:12px;
 padding:12px 24px;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
 }
 .modal-close:hover{transform:translateY(-1px)}
@@ -368,10 +402,10 @@ background:#fff;color:#1f1f1f;font:inherit;font-weight:700;cursor:pointer;transi
 .google-btn:hover{transform:translateY(-1px)}
 .google-btn svg{width:18px;height:18px;flex-shrink:0}
 .auth-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem;margin:4px 0}
-.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:rgba(81,217,255,.18)}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:rgba(79,227,207,.18)}
 .auth-submit{
-padding:12px;border-radius:12px;border:1px solid rgba(81,217,255,.4);
-background:linear-gradient(180deg, rgba(0,183,255,.3), rgba(81,217,255,.2));
+padding:12px;border-radius:12px;border:1px solid rgba(79,227,207,.4);
+background:linear-gradient(180deg, rgba(0,196,173,.3), rgba(79,227,207,.2));
 color:#fff;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease
 }
 .auth-submit:hover{transform:translateY(-1px)}
@@ -409,12 +443,12 @@ text-align:center;padding:20px;margin:0
   display:flex;flex-direction:column;align-items:center;gap:18px;
   padding:36px 32px 32px;
   background:linear-gradient(180deg, rgba(50,54,66,.85), rgba(38,42,52,.85));
-  border:1px solid rgba(81,217,255,.22);
+  border:1px solid rgba(79,227,207,.22);
   border-radius:22px;
-  box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(81,217,255,.06) inset;
+  box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(79,227,207,.06) inset;
   backdrop-filter:blur(8px);
 }
-.landing img{height:140px;width:auto;max-width:100%;filter:drop-shadow(0 0 24px rgba(81,217,255,.55)) drop-shadow(0 0 48px rgba(184,69,255,.25));margin-bottom:4px}
+.landing img{height:140px;width:auto;max-width:100%;filter:drop-shadow(0 0 24px rgba(79,227,207,.55)) drop-shadow(0 0 48px rgba(184,69,255,.25));margin-bottom:4px}
 .landing h1{margin:0;font-size:1.55rem;font-weight:900;letter-spacing:.01em;color:var(--text);line-height:1.2}
 .landing .lede{color:var(--muted);font-size:1rem;line-height:1.55;margin:0;max-width:440px}
 .landing .reasons{
@@ -422,7 +456,7 @@ text-align:center;padding:20px;margin:0
 }
 .landing .reason{
   display:flex;align-items:flex-start;gap:12px;padding:10px 14px;
-  background:rgba(10,18,30,.4);border:1px solid rgba(81,217,255,.14);border-radius:12px;
+  background:rgba(10,18,30,.4);border:1px solid rgba(79,227,207,.14);border-radius:12px;
   font-size:.92rem;line-height:1.45;color:#cdd9ea;
 }
 .landing .reason .ico{font-size:1.1rem;flex:0 0 auto;line-height:1.4}
@@ -430,26 +464,26 @@ text-align:center;padding:20px;margin:0
 .landing .cta-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:100%;margin-top:6px}
 .landing .cta-row > button{flex:1 1 200px;max-width:240px}
 .landing-primary{
-  padding:14px 26px;border-radius:14px;border:1px solid rgba(127,230,255,.85);
-  background:linear-gradient(180deg,#7fe6ff,#00b7ff);color:#001624;
+  padding:14px 26px;border-radius:14px;border:1px solid rgba(127,240,223,.85);
+  background:linear-gradient(180deg,#7ff0df,#00c4ad);color:#001624;
   font-weight:900;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;
-  box-shadow:0 8px 22px rgba(0,183,255,.35), inset 0 0 0 1px rgba(255,255,255,.2);
+  box-shadow:0 8px 22px rgba(0,196,173,.35), inset 0 0 0 1px rgba(255,255,255,.2);
   text-shadow:0 1px 0 rgba(255,255,255,.3);cursor:pointer;font-family:inherit;
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
-.landing-primary:hover{transform:translateY(-2px);background:linear-gradient(180deg,#aef0ff,#22c8ff);box-shadow:0 12px 30px rgba(0,183,255,.5), inset 0 0 0 1px rgba(255,255,255,.3)}
+.landing-primary:hover{transform:translateY(-2px);background:linear-gradient(180deg,#aef0ff,#22c8ff);box-shadow:0 12px 30px rgba(0,196,173,.5), inset 0 0 0 1px rgba(255,255,255,.3)}
 .landing-secondary{
-  padding:14px 26px;border-radius:14px;border:1px solid rgba(81,217,255,.6);
-  background:rgba(81,217,255,.22);color:#eaf9ff;
+  padding:14px 26px;border-radius:14px;border:1px solid rgba(79,227,207,.6);
+  background:rgba(79,227,207,.22);color:#eaf9ff;
   font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer;font-family:inherit;
   transition:transform .18s ease, border-color .18s ease, background .18s ease;
 }
-.landing-secondary:hover{transform:translateY(-1px);border-color:rgba(81,217,255,.85);background:rgba(81,217,255,.32)}
+.landing-secondary:hover{transform:translateY(-1px);border-color:rgba(79,227,207,.85);background:rgba(79,227,207,.32)}
 .landing .fineprint{font-size:.78rem;color:rgba(180,200,220,.6);margin-top:4px;letter-spacing:.01em}
 .landing .badge{
   display:inline-flex;align-items:center;gap:6px;
   padding:6px 12px;border-radius:999px;
-  background:rgba(81,217,255,.12);border:1px solid rgba(81,217,255,.35);
+  background:rgba(79,227,207,.12);border:1px solid rgba(79,227,207,.35);
   color:#9de8ff;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   margin-bottom:-4px;
 }
@@ -462,6 +496,7 @@ text-align:center;padding:20px;margin:0
 .topbar-logo{height:130px}
 .topbar-left,.topbar-right{order:2}
 .topbar-center{order:1}
+.topbar-stack{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center}
 }
 @media (max-width:1040px){
 .main-grid{grid-template-columns:1fr}
@@ -522,7 +557,6 @@ body{padding:12px}
 </div>
 <div class="topbar-right">
 <div class="topbar-stack">
-<button class="break-btn" id="gameBtn" type="button" title="Play a game"><span class="break-ico">🎮</span><span>Take a Break</span></button>
 <div class="user-chip-wrap">
 <button class="user-chip" id="userChip" type="button">
 <span class="avatar" id="userAvatar">?</span>
@@ -548,6 +582,7 @@ body{padding:12px}
 </header>
 
 <main class="main-grid">
+<button class="side-games-tab" id="sideGamesTab" type="button" title="Need a distraction? Play a game"><span class="tab-ico">🎮</span>GAMES</button>
 <!-- SIDEBAR -->
 <aside class="panel">
 <div class="panel-inner stack">
@@ -573,7 +608,7 @@ body{padding:12px}
 <div id="schoolYearDisplay" style="display:grid;gap:10px;font-size:.88rem;line-height:1.5">
 <div style="color:var(--muted);text-align:center;padding:8px 0">No dates set yet.</div>
 </div>
-<button id="editDatesBtn" type="button" style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:1px solid rgba(81,217,255,.4);background:rgba(81,217,255,.12);color:#9de8ff;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease">✏️ Edit Dates</button>
+<button id="editDatesBtn" type="button" style="width:100%;margin-top:12px;padding:10px;border-radius:10px;border:1px solid rgba(79,227,207,.4);background:rgba(79,227,207,.12);color:#9de8ff;font:inherit;font-weight:800;cursor:pointer;transition:.15s ease">✏️ Edit Dates</button>
 </div>
 </section>
 </div>
@@ -583,9 +618,20 @@ body{padding:12px}
 <section class="panel">
 <div class="panel-inner">
 
+<div class="welcome-card" id="welcomeCard">
+<button class="wc-x" id="wcDismiss" type="button" aria-label="Dismiss" title="Dismiss">✕</button>
+<h3><span class="wc-spark">✦</span> Welcome! Three steps and you're set for the year:</h3>
+<p>Do these once – after that, everything auto-fills.</p>
+<div class="wc-steps">
+<button class="wc-step" id="wcStep1" type="button"><span class="wc-mark">1</span><span>Enter your school year dates</span></button>
+<button class="wc-step" id="wcStep2" type="button"><span class="wc-mark">2</span><span>Set your teacher name</span></button>
+<button class="wc-step" id="wcStep3" type="button"><span class="wc-mark">3</span><span>Copy your first template</span></button>
+</div>
+</div>
+
 <h2 class="panel-title" style="margin-bottom:18px">Choose Your Workflow</h2>
 
-<div style="background:rgba(81,217,255,.08);border:1px solid rgba(81,217,255,.20);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:var(--text);font-size:.95rem;line-height:1.5;text-align:center;font-weight:700">
+<div style="background:rgba(79,227,207,.08);border:1px solid rgba(79,227,207,.20);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:var(--text);font-size:.95rem;line-height:1.5;text-align:center;font-weight:700">
 Choose a block below to select pre-generated feedback or emails. Once you pick a block, narrow down the type you're looking for.
 </div>
 
@@ -610,7 +656,7 @@ Choose a block below to select pre-generated feedback or emails. Once you pick a
 
 <!-- FEEDBACK BLOCK -->
 <div class="block-panel active" id="feedbackBlock">
-<div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
+<div style="background:rgba(79,227,207,.06);border:1px solid rgba(79,227,207,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
 Pick an assignment type and nine weeks – you'll see pre-generated feedback you can customize further.
 </div>
 
@@ -630,6 +676,9 @@ Pick an assignment type and nine weeks – you'll see pre-generated feedback you
 <button class="edit-btn" id="editGradeToggle" type="button">Edit Output</button>
 <button class="reset-btn" id="resetGradeBtn" type="button">Reset Template</button>
 </div>
+<div class="toolbar-right">
+<button class="ghost-btn" id="gradeAIBtn" type="button">🔀 Variation</button>
+</div>
 </div>
 
 <div class="field full">
@@ -638,13 +687,12 @@ Pick an assignment type and nine weeks – you'll see pre-generated feedback you
 </div>
 
 <div class="copy-status" id="gradeStatus"></div>
-<button class="ghost-btn" id="gradeAIBtn" type="button" style="width:100%;padding:14px;margin-bottom:10px;font-size:.95rem">🔀 Generate Variation</button>
 <button class="copy-btn" id="copyGradeBtn" type="button">Copy Output</button>
 </div>
 
 <!-- EMAIL BLOCK -->
 <div class="block-panel" id="emailBlock">
-<div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
+<div style="background:rgba(79,227,207,.06);border:1px solid rgba(79,227,207,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
 Pick the current term first – the tool filters email options accordingly. Use the audience toggle to switch between a single student and your whole class.
 </div>
 
@@ -689,7 +737,7 @@ Pick the current term first – the tool filters email options accordingly. Use 
 <label for="studentName">Student Name</label>
 <input type="text" id="studentName" placeholder="For single-student emails" />
 </div>
-<div class="field">
+<div class="field hidden" id="courseNameField">
 <label for="courseName">Course Name (optional)</label>
 <input type="text" id="courseName" placeholder="e.g. Intro to Cybersecurity" />
 </div>
@@ -734,15 +782,13 @@ Pick the current term first – the tool filters email options accordingly. Use 
 
 <div class="copy-status" id="emailStatus"></div>
 
-<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-<button class="ghost-btn" id="copySubjectBtn" type="button">Copy Subject</button>
-</div>
-<button class="copy-btn" id="copyBodyBtn" type="button" style="padding:12px 18px;font-size:.95rem;letter-spacing:.02em;margin-top:6px">Copy Email Body</button>
+<button class="ghost-btn" id="copySubjectBtn" type="button" style="width:100%;margin-bottom:10px">Copy Subject Only</button>
+<button class="copy-btn" id="copyBodyBtn" type="button">Copy Email Body</button>
 </div>
 
 <!-- PORTAL BLOCK -->
 <div class="block-panel" id="portalBlock">
-<div style="background:rgba(81,217,255,.06);border:1px solid rgba(81,217,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
+<div style="background:rgba(79,227,207,.06);border:1px solid rgba(79,227,207,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px;color:var(--muted);font-size:.9rem;line-height:1.5">
 Pick the assignment placeholder you need to set up in your gradebook. Copy the name and detail into the gradebook fields.
 </div>
 
@@ -1164,7 +1210,7 @@ return list.map(fn => fn(d));
 const allEmailTypes = [
 "Welcome Letter","Early Check-In","Zero Grade Clarification","25% Check-In","50% Check-In","75% Check-In",
 "Next Nine Weeks Loaded","Semester / Part Change","Upcoming Break Example",
-"Final Week Reminder","Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12","End of Year Message"
+"Final Week Reminder","Senior Final Reminder","End of Year (Grades 7–12)"
 ];
 // Types only available in certain terms
 // Early season types (welcome, early check-in, zero grade) = available all terms
@@ -1174,9 +1220,9 @@ const HIDE_ON_FOURTH = new Set(["Next Nine Weeks Loaded","Semester / Part Change
 // Types only available in 2nd, 3rd, 4th (not first)
 const ONLY_AFTER_FIRST = new Set(["Semester / Part Change"]);
 // End-of-year and senior-final types ONLY appear in fourth nine weeks
-const ONLY_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12","End of Year Message"]);
+const ONLY_FOURTH = new Set(["Senior Final Reminder","End of Year (Grades 7–12)"]);
 // Break reminder and final week reminder can appear in any term where it makes sense, but we'll allow them all terms (teacher discretion)
-const TERM_LOCKED_FOURTH = new Set(["Senior Final Reminder","End of Year Grades 7–11","End of Year Grade 12","End of Year Message"]);
+const TERM_LOCKED_FOURTH = new Set(["Senior Final Reminder","End of Year (Grades 7–12)"]);
 
 const gradeLevelsByType = {
 "Welcome Letter":["All Students","Single Student"],
@@ -1190,9 +1236,7 @@ const gradeLevelsByType = {
 "Upcoming Break Example":["All Students"],
 "Final Week Reminder":["All Students"],
 "Senior Final Reminder":["Seniors"],
-"End of Year Grades 7–11":["Grades 7–11"],
-"End of Year Grade 12":["Seniors"],
-"End of Year Message":["All Students","Single Student"]
+"End of Year (Grades 7–12)":["All Students","Single Student"]
 };
 
 let weekday = today.toLocaleDateString('en-US',{weekday:'long'});
@@ -1231,6 +1275,13 @@ saveJSON(STORAGE_KEYS.lastValues,payload);
 function restoreLastValues(){
 const vals = loadJSON(STORAGE_KEYS.lastValues);
 Object.keys(vals).forEach(k=>{if(k!=="audience" && $(k))$(k).value=vals[k]});
+// A saved value that no longer exists (renamed or removed email type) leaves the
+// select empty and the template falls to its blank fallback. Snap back to the
+// first real option so the output ALWAYS populates.
+["emailType","term"].forEach(id=>{
+const el=$(id);
+if(el && el.tagName==="SELECT" && !el.value && el.options.length) el.selectedIndex=0;
+});
 if(vals.audience){ setAudience(vals.audience); }
 }
 
@@ -1407,6 +1458,8 @@ function cleanSingleLine(text){return text.replace(/\s+/g," ").trim()}
 async function copyText(text,statusEl,button){
 try{
 await navigator.clipboard.writeText(text);
+localStorage.setItem("cybergrader_copied_once_v1","1");
+if(typeof updateWelcomeCard==="function"){try{updateWelcomeCard();}catch(e){}}
 const old=button.textContent;
 button.textContent="Copied ✓";button.classList.add("copied");
 statusEl.textContent="Copied to clipboard.";
@@ -1416,11 +1469,13 @@ setTimeout(()=>{button.textContent=old;button.classList.remove("copied");statusE
 
 // ── EMAIL ──
 function getReferenceDate(){return $("currentDateField").value.trim()||shortDate}
+// Each progress email has a canonical target. The field PREFILLS with it when you
+// switch email type (so Final Week never shows a stale 75%), and whatever is in
+// the field is what the email actually uses – edit it and the email follows.
+const PROGRESS_DEFAULTS={"25% Check-In":"25%","50% Check-In":"50%","75% Check-In":"75%","Final Week Reminder":"90%"};
 function getProgressDefault(){
 const type=$("emailType").value;
-if(type.includes("25%"))return"25%";if(type.includes("50%"))return"50%";
-if(type.includes("75%"))return"75%";if(type.includes("Final Week"))return"90%";
-return $("progressValue").value.trim();
+return $("progressValue").value.trim() || PROGRESS_DEFAULTS[type] || "";
 }
 function populateEmailTypes(){
 const t=$("term").value;let types=allEmailTypes.slice();
@@ -1433,10 +1488,16 @@ if(!types.includes(current))$("emailType").value=types[0];
 }
 function maybeAdjustFields(){
 const type=$("emailType").value;
+// Snap the Progress Target to this email's canonical number when the TYPE changes
+// (typing in the field doesn't reset it – only switching emails does).
+if(PROGRESS_DEFAULTS[type] && window.__lastProgressType!==type){
+window.__lastProgressType=type;
+$("progressValue").value=PROGRESS_DEFAULTS[type];
+}
 const isFourth=$("term").value==="fourth";
 const checkinType=["25% Check-In","50% Check-In","75% Check-In","Final Week Reminder"].includes(type);
-const seniorOnly=["Senior Final Reminder","End of Year Grade 12"].includes(type);
-const generalOnly=["End of Year Grades 7–11"].includes(type);
+const seniorOnly=["Senior Final Reminder"].includes(type);
+const generalOnly=[].includes(type);
 
 const showProgress=checkinType;
 const showRefDate=["25% Check-In","50% Check-In","75% Check-In"].includes(type);
@@ -1452,6 +1513,8 @@ if(TERM_LOCKED_FOURTH.has(type)){$("term").value="fourth";}
 $("progressField").classList.toggle("hidden",!showProgress);
 $("referenceDateField").classList.toggle("hidden",!showRefDate);
 $("studentNameField").classList.toggle("hidden",!showSingle);
+// Course name only matters for the Welcome Letter – keep the form minimal otherwise
+$("courseNameField").classList.toggle("hidden",type!=="Welcome Letter");
 $("deadlineFieldWrap").classList.toggle("hidden",!showDeadline);
 $("dualDeadlineWrap").classList.toggle("hidden",!showDual);
 if(showDual){
@@ -1640,14 +1703,6 @@ const emailVariationTemplates = {
 "Senior Final Reminder":[
 {subject:"Seniors – Last Call on Coursework",body:`Hi Seniors,\n\nFinal reminder: all cyber coursework needs to be in by {{senior_deadline}}. Double-check your progress, close out anything open, and message me if you need help. Nothing can be accepted after that point.\n\nFinish strong – you're almost there.\n\n[Your Name]`},
 {subject:"Seniors – Deadline Is Here",body:`Hi Seniors,\n\nThis is your last call – everything in your cyber course is due by {{senior_deadline}}. Take a few minutes to confirm you're fully submitted and reach out if anything's in the way. After the deadline the course locks.\n\nYou've got this.\n\n[Your Name]`}
-],
-"End of Year Grades 7–11":[
-{subject:"Year-End Coursework Due",body:`Hi Students,\n\nAs the year winds down, this is your reminder that all cyber coursework for grades 7–11 is due by {{general_deadline}}. Check your progress, finish anything open, and let me know if you need help.\n\nHave a great summer!\n\n[Your Name]`},
-{subject:"Almost Summer – Wrap It Up",body:`Hi Students,\n\nWe're almost to summer! Before then, make sure all your grades 7–11 cyber coursework is submitted by {{general_deadline}}. Reach out with any questions while there's still time.\n\nEnjoy the break – you've earned it.\n\n[Your Name]`}
-],
-"End of Year Grade 12":[
-{subject:"Seniors – Final Deadline",body:`Hi Seniors,\n\nAs your final year wraps up, this is the last reminder that all cyber coursework is due by {{senior_deadline}}. Confirm you're submitted, finish anything open, and reach out if you're stuck. Nothing is accepted after the deadline.\n\nCongratulations on making it here. Best of luck with what's next.\n\n[Your Name]`},
-{subject:"Seniors – The Last One",body:`Hi Seniors,\n\nThis is the big one – your last deadline. All cyber coursework is due by {{senior_deadline}}. Take a moment to make sure everything's turned in and message me with any final questions.\n\nSo proud of how far you've come. Wishing you the best ahead.\n\n[Your Name]`}
 ]
 };
 
@@ -1718,17 +1773,7 @@ subject:"Seniors – Final Reminder on Coursework",
 body:`Hi Seniors,\n\nThis is it – your final reminder that all cyber coursework needs to be submitted by {{senior_deadline}}.\n\nPlease double-check your progress, wrap up anything unfinished, and reach out if you need help. After the deadline, nothing else can be accepted.\n\nYou've got this. Finish strong.\n\n[Your Name]`
 };
 
-case"End of Year Grades 7–11":return{
-subject:"End-of-Year Reminder: Cyber Coursework Due",
-body:`Hi Students,\n\nAs we wrap up the year, this is your reminder that all cyber coursework for grades 7–11 needs to be submitted by {{general_deadline}}.\n\nCheck your course progress, wrap up anything unfinished, and reach out if you need help. If you have questions, let me know.\n\nHave a great summer!\n\n[Your Name]`
-};
-
-case"End of Year Grade 12":return{
-subject:"Seniors – End-of-Year Reminder",
-body:`Hi Seniors,\n\nAs we wrap up your final year, this is the last reminder that all cyber coursework is due by {{senior_deadline}}.\n\nCheck your progress, finish anything open, and reach out if you're stuck. After the deadline, nothing else can be accepted.\n\nCongratulations on making it this far. Best of luck with whatever comes next.\n\n[Your Name]`
-};
-
-case"End of Year Message":return{
+case"End of Year (Grades 7–12)":return{
 subject:"End of Year Message – Have a Great Summer!!",
 body:`Hi everyone,\n\nCongratulations... you made it to the end of the year! I quickly wanted to let you know that final grades are in and courses are completed, which means that's a wrap! I also wanted to take a moment to say that I truly enjoyed working with each of you throughout our course.\n\nAnd I get it... online coursework demands a lot of independence, responsibility, and commitment. Between the late nights, time crunches, and everything else you had going on, I appreciate the effort that went into this learning adventure. Be proud of the work you accomplished!\n\nI'll end by saying this: take time to relax, recharge/reset, get outside, and enjoy the summer weather with family or friends. You put in the work, now reward yourself and enjoy the next few months of sun!\n\nLogging out,\n\n[Your Name]`
 };
@@ -1828,8 +1873,34 @@ return `${m}/${d}/${y.slice(2)}`;
 // Global school year data - set once loaded from Firestore, used by email templates for autofill
 let currentSchoolYear = null;
 
+// Auto-select the CURRENT term from the school year dates, once per page load.
+// (Without this, the email tool reopened on whatever term you used last.)
+let termAutoApplied = false;
+function detectCurrentTerm(){
+if(!currentSchoolYear) return null;
+const t=new Date();
+const iso=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+const sy=currentSchoolYear;
+if(sy.q1_end && iso<=sy.q1_end) return "first";
+if(sy.q2_end && iso<=sy.q2_end) return "second";
+if(sy.q3_end && iso<=sy.q3_end) return "third";
+return "fourth";
+}
+function autoSelectTerm(){
+if(termAutoApplied) return;
+const term=detectCurrentTerm();
+if(!term) return;
+termAutoApplied=true;
+$("term").value=term;
+populateEmailTypes();
+updateEmailOutput(true);
+maybeAdjustFields();
+}
+
 function renderSchoolYearCard(sy){
 currentSchoolYear = sy || null;
+if(typeof updateWelcomeCard==="function"){try{updateWelcomeCard();}catch(e){}}
+try{autoSelectTerm();}catch(e){}
 if(!sy){
 $("schoolYearDisplay").innerHTML = `<div style="color:var(--muted);text-align:center;padding:8px 0">No dates set yet.</div>`;
 return;
@@ -1842,14 +1913,14 @@ const rows = [
 {label:"3rd Nine Weeks", start:sy.q3_start, end:sy.q3_end, color:"var(--cyan)"},
 ];
 let html = rows.map(r => `
-<div style="display:grid;grid-template-columns:1fr auto;gap:4px;padding:6px 0;border-bottom:1px solid rgba(81,217,255,.1)">
+<div style="display:grid;grid-template-columns:1fr auto;gap:4px;padding:6px 0;border-bottom:1px solid rgba(79,227,207,.1)">
 <span style="color:${r.color};font-weight:700;font-size:.82rem">${r.label}</span>
 <span style="color:var(--text);font-size:.82rem">${formatDate(r.start)} – ${formatDate(r.end)}</span>
 </div>
 `).join("");
 // Fourth nine weeks - shared start, split ends
 html += `
-<div style="margin-top:6px;padding-top:8px;border-top:2px solid rgba(81,217,255,.2)">
+<div style="margin-top:6px;padding-top:8px;border-top:2px solid rgba(79,227,207,.2)">
 <div style="font-weight:900;color:#fff;font-size:.82rem;letter-spacing:.04em;margin-bottom:6px">4TH NINE WEEKS</div>
 <div style="display:grid;gap:4px;font-size:.8rem">
 <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Starts:</span><span style="color:var(--text);font-weight:700">${formatDate(sy.q4_start)}</span></div>
@@ -1901,6 +1972,7 @@ const btn = $("saveTeacherNameBtn");
 const orig = btn.textContent;
 btn.textContent = "Saved ✓";
 setTimeout(()=>{btn.textContent = orig;},1400);
+if(typeof updateWelcomeCard==="function"){try{updateWelcomeCard();}catch(e){}}
 // Refresh outputs so [Your Name] swaps live
 if(typeof updateEmailOutput === "function"){ try{ updateEmailOutput(true); }catch(e){} }
 }
@@ -2059,7 +2131,7 @@ document.querySelectorAll(".audience-btn").forEach(b=>b.addEventListener("click"
 $("howtoBtn").addEventListener("click",()=>$("howtoModal").classList.add("open"));
 $("howtoClose").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
 $("howtoGotIt").addEventListener("click",()=>$("howtoModal").classList.remove("open"));
-$("gameBtn").addEventListener("click",()=>$("gamesModal").classList.add("open"));
+$("sideGamesTab").addEventListener("click",()=>$("gamesModal").classList.add("open"));
 $("gamesClose").addEventListener("click",()=>$("gamesModal").classList.remove("open"));
 $("gamesModal").addEventListener("click",(e)=>{ if(e.target===$("gamesModal")) $("gamesModal").classList.remove("open"); });
 $("portalReminderClose").addEventListener("click",()=>$("portalReminderModal").classList.remove("open"));
@@ -2070,6 +2142,37 @@ document.querySelectorAll(".modal-overlay").forEach(overlay=>{
 overlay.addEventListener("click",(e)=>{if(e.target===overlay && overlay.id!=="schoolYearModal") overlay.classList.remove("open");});
 });
 
+// ── WELCOME CARD (first-run setup) ──
+function updateWelcomeCard(){
+const card=$("welcomeCard"); if(!card) return;
+if(localStorage.getItem("cybergrader_welcome_done_v1")==="1"){card.style.display="none";return;}
+const steps=[
+{el:$("wcStep1"),done:!!currentSchoolYear},
+{el:$("wcStep2"),done:!!(localStorage.getItem(STORAGE_KEYS.teacherName)||"").trim()},
+{el:$("wcStep3"),done:localStorage.getItem("cybergrader_copied_once_v1")==="1"}
+];
+// All three done – the card retires itself for good
+if(steps.every(s=>s.done)){localStorage.setItem("cybergrader_welcome_done_v1","1");card.style.display="none";return;}
+steps.forEach((s,i)=>{
+s.el.classList.toggle("done",s.done);
+s.el.querySelector(".wc-mark").textContent=s.done?"✓":String(i+1);
+});
+card.style.display="block";
+}
+$("wcDismiss").addEventListener("click",()=>{localStorage.setItem("cybergrader_welcome_done_v1","1");$("welcomeCard").style.display="none";});
+$("wcStep1").addEventListener("click",()=>$("todayDate").click());
+$("wcStep2").addEventListener("click",(e)=>{
+e.stopPropagation();
+$("userMenu").classList.add("open");
+setTimeout(()=>$("teacherNameInput").focus(),60);
+});
+$("wcStep3").addEventListener("click",()=>{
+const b=document.querySelector(".block-btn");
+if(b) activateBlock(b);
+const sel=document.querySelector(".block-selector");
+if(sel) window.scrollTo({top:sel.getBoundingClientRect().top+window.scrollY-90,behavior:"smooth"});
+});
+
 // INIT
 setSelectOptions($("workType"),Object.keys(gradeConfig));
 populateEmailTypes();
@@ -2078,6 +2181,7 @@ updateGradeTypes();
 updateEmailOutput(true);
 updatePortalOutput(true);
 maybeAdjustFields();
+updateWelcomeCard();
 </script>
 </body>
 </html>
