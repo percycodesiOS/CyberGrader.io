@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>MYnecraft 3.0</title>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
-  canvas { display: block; }
+  canvas { display: block; touch-action: none; }
   #hud {
     position: fixed; inset: 0; pointer-events: none;
     display: flex; align-items: center; justify-content: center;
@@ -45,10 +46,77 @@
     pointer-events: none;
   }
   .pixel { image-rendering: pixelated; }
+
+  /* ---------- touch controls (hidden by default; enabled via JS on touch devices) ---------- */
+  #touchUI {
+    display: none; /* JS flips to block on touch devices */
+    position: fixed; inset: 0; z-index: 7;
+    pointer-events: none; /* container passes through; children opt back in */
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+  }
+  #touchUI * { -webkit-user-select: none; user-select: none; touch-action: none; }
+  /* full-screen look layer sits behind the buttons so drags anywhere rotate the view */
+  #touchLook {
+    position: absolute; inset: 0;
+    pointer-events: auto; touch-action: none;
+  }
+  /* on-screen movement thumbstick, lower-left */
+  #touchStick {
+    position: absolute; left: 24px; bottom: 24px;
+    width: 132px; height: 132px; border-radius: 50%;
+    background: #0005; border: 2px solid #fff4;
+    box-shadow: inset 0 0 0 1px #fff2, 2px 2px 0 #0006;
+    pointer-events: auto; touch-action: none;
+  }
+  #touchStickNub {
+    position: absolute; left: 50%; top: 50%;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #fff9; border: 2px solid #000a;
+    box-shadow: 2px 2px 0 #0006;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  /* action buttons, lower-right */
+  #touchActions {
+    position: absolute; right: 20px; bottom: 28px;
+    display: flex; flex-direction: column; gap: 12px; align-items: flex-end;
+    pointer-events: none;
+  }
+  #touchActions .row { display: flex; gap: 12px; }
+  .touchBtn {
+    pointer-events: auto; touch-action: none;
+    min-width: 64px; min-height: 64px; padding: 0 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: #0008; color: #fff; border: 2px solid #000;
+    border-radius: 10px; box-shadow: 2px 2px 0 #0006;
+    font: 900 13px ui-monospace, monospace; letter-spacing: 1px;
+    text-align: center;
+  }
+  .touchBtn:active { background: #fff; color: #1c2a44; }
+  #btnPlace { background: #102a1c; color: #8fffa8; }
+  #btnPlace:active { background: #8fffa8; color: #102a1c; }
+  #btnBreak { background: #2a1118; color: #ff9ec2; }
+  #btnBreak:active { background: #ff9ec2; color: #2a1118; }
 </style>
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
+<div id="touchUI">
+  <div id="touchLook"></div>
+  <div id="touchStick"><div id="touchStickNub"></div></div>
+  <div id="touchActions">
+    <div class="row">
+      <button class="touchBtn" id="btnFly" type="button">FLY</button>
+      <button class="touchBtn" id="btnJump" type="button">JUMP</button>
+    </div>
+    <div class="row">
+      <button class="touchBtn" id="btnBreak" type="button">&#9935; BREAK</button>
+      <button class="touchBtn" id="btnPlace" type="button">&#9632; PLACE</button>
+    </div>
+  </div>
+</div>
 <div id="info">
   WASD move &nbsp;·&nbsp; DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / SCROLL pick block
@@ -811,37 +879,44 @@ function castVoxel() {
   return { x: bx, y: by, z: bz, normal };
 }
 
+// break / place actions (shared by mouse clicks AND touch buttons)
+function doBreak() {
+  if (!started) return;
+  const hit = castVoxel();
+  if (!hit) return;
+  const brokenKey = getBlock(hit.x, hit.y, hit.z);
+  setBlock(hit.x, hit.y, hit.z, null);
+  recordEdit(hit.x, hit.y, hit.z, null);
+  spawnParticles(hit.x, hit.y, hit.z, brokenKey);
+  sndBreak();
+  buildMeshes();
+}
+function doPlace() {
+  if (!started) return;
+  const hit = castVoxel();
+  if (!hit) return;
+  const nx = hit.x + hit.normal.x;
+  const ny = hit.y + hit.normal.y;
+  const nz = hit.z + hit.normal.z;
+  // don't overlap player
+  const px = player.pos.x, py = player.pos.y, pz = player.pos.z;
+  const overlap =
+    nx + 1 > px - player.radius && nx < px + player.radius &&
+    nz + 1 > pz - player.radius && nz < pz + player.radius &&
+    ny + 1 > py - player.height && ny < py + 0.2;
+  if (overlap) return;
+  setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
+  recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
+  sndPlace();
+  buildMeshes();
+}
+
 addEventListener('mousedown', e => {
   if (!started) return;
   // skip the very first click that's just dismissing the start overlay
   if (e.target !== renderer.domElement) return;
-  const hit = castVoxel();
-  if (!hit) return;
-  if (e.button === 0) {
-    // break
-    const brokenKey = getBlock(hit.x, hit.y, hit.z);
-    setBlock(hit.x, hit.y, hit.z, null);
-    recordEdit(hit.x, hit.y, hit.z, null);
-    spawnParticles(hit.x, hit.y, hit.z, brokenKey);
-    sndBreak();
-    buildMeshes();
-  } else if (e.button === 2) {
-    // place
-    const nx = hit.x + hit.normal.x;
-    const ny = hit.y + hit.normal.y;
-    const nz = hit.z + hit.normal.z;
-    // don't overlap player
-    const px = player.pos.x, py = player.pos.y, pz = player.pos.z;
-    const overlap =
-      nx + 1 > px - player.radius && nx < px + player.radius &&
-      nz + 1 > pz - player.radius && nz < pz + player.radius &&
-      ny + 1 > py - player.height && ny < py + 0.2;
-    if (overlap) return;
-    setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
-    recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
-    sndPlace();
-    buildMeshes();
-  }
+  if (e.button === 0) doBreak();
+  else if (e.button === 2) doPlace();
 });
 addEventListener('contextmenu', e => e.preventDefault());
 
@@ -1090,6 +1165,124 @@ function updateCoordHUD() {
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
     `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`;
+}
+
+// ---------- touch controls (iPhone / iPad) ----------
+const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+if (IS_TOUCH) {
+  const touchUI    = document.getElementById('touchUI');
+  const lookLayer  = document.getElementById('touchLook');
+  const stick      = document.getElementById('touchStick');
+  const nub        = document.getElementById('touchStickNub');
+  const btnBreak   = document.getElementById('btnBreak');
+  const btnPlace   = document.getElementById('btnPlace');
+  const btnJump    = document.getElementById('btnJump');
+  const btnFly     = document.getElementById('btnFly');
+  touchUI.style.display = 'block';
+
+  const LOOK_SENS = 0.0022; // same feel as the mouse path
+
+  // --- camera look: drag on the look layer (covers the whole screen behind buttons) ---
+  let lookId = null, lookX = 0, lookY = 0;
+  lookLayer.addEventListener('touchstart', e => {
+    if (!started) { startGame(); }
+    const t = e.changedTouches[0];
+    if (lookId === null) { lookId = t.identifier; lookX = t.clientX; lookY = t.clientY; }
+    e.preventDefault();
+  }, { passive: false });
+  lookLayer.addEventListener('touchmove', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== lookId) continue;
+      const dx = t.clientX - lookX, dy = t.clientY - lookY;
+      lookX = t.clientX; lookY = t.clientY;
+      player.yaw   -= dx * LOOK_SENS;
+      player.pitch -= dy * LOOK_SENS;
+      const lim = Math.PI/2 - 0.01;
+      player.pitch = Math.max(-lim, Math.min(lim, player.pitch));
+    }
+    e.preventDefault();
+  }, { passive: false });
+  function endLook(e) {
+    for (const t of e.changedTouches) if (t.identifier === lookId) lookId = null;
+  }
+  lookLayer.addEventListener('touchend', endLook);
+  lookLayer.addEventListener('touchcancel', endLook);
+
+  // --- movement thumbstick: drives the same keys[] flags the game loop reads ---
+  let stickId = null, stickCx = 0, stickCy = 0;
+  const STICK_R = 66;   // half of the 132px pad
+  const DEAD = 0.28;    // dead-zone fraction
+  function clearMoveKeys() {
+    keys['KeyW'] = keys['KeyS'] = keys['KeyA'] = keys['KeyD'] = false;
+  }
+  function resetNub() { nub.style.transform = 'translate(-50%, -50%)'; }
+  function setStick(dx, dy) {
+    const len = Math.hypot(dx, dy) || 1;
+    const cl = Math.min(len, STICK_R);
+    const ux = dx / len, uy = dy / len;
+    nub.style.transform = `translate(calc(-50% + ${ux*cl}px), calc(-50% + ${uy*cl}px))`;
+    const fx = dx / STICK_R, fy = dy / STICK_R; // -1..1
+    clearMoveKeys();
+    if (Math.hypot(fx, fy) < DEAD) return;
+    if (fy < -DEAD) keys['KeyW'] = true;   // up = forward
+    if (fy >  DEAD) keys['KeyS'] = true;   // down = back
+    if (fx < -DEAD) keys['KeyA'] = true;   // left
+    if (fx >  DEAD) keys['KeyD'] = true;   // right
+  }
+  stick.addEventListener('touchstart', e => {
+    if (!started) { startGame(); }
+    const t = e.changedTouches[0];
+    if (stickId === null) {
+      stickId = t.identifier;
+      const r = stick.getBoundingClientRect();
+      stickCx = r.left + r.width/2; stickCy = r.top + r.height/2;
+      setStick(t.clientX - stickCx, t.clientY - stickCy);
+    }
+    e.preventDefault();
+  }, { passive: false });
+  stick.addEventListener('touchmove', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== stickId) continue;
+      setStick(t.clientX - stickCx, t.clientY - stickCy);
+    }
+    e.preventDefault();
+  }, { passive: false });
+  function endStick(e) {
+    for (const t of e.changedTouches) {
+      if (t.identifier === stickId) { stickId = null; clearMoveKeys(); resetNub(); }
+    }
+  }
+  stick.addEventListener('touchend', endStick);
+  stick.addEventListener('touchcancel', endStick);
+
+  // --- action buttons ---
+  function bindTap(el, fn) {
+    el.addEventListener('touchstart', e => {
+      if (!started) { startGame(); return; }
+      fn();
+      e.preventDefault();
+    }, { passive: false });
+  }
+  bindTap(btnBreak, doBreak);
+  bindTap(btnPlace, doPlace);
+
+  // jump: hold to keep Space held (same as keyboard jump)
+  btnJump.addEventListener('touchstart', e => {
+    if (!started) { startGame(); return; }
+    keys['Space'] = true; e.preventDefault();
+  }, { passive: false });
+  function jumpUp(e) { keys['Space'] = false; }
+  btnJump.addEventListener('touchend', jumpUp);
+  btnJump.addEventListener('touchcancel', jumpUp);
+
+  // fly: toggle, same as pressing F
+  btnFly.addEventListener('touchstart', e => {
+    if (!started) { startGame(); return; }
+    player.flying = !player.flying;
+    player.vel.set(0, 0, 0);
+    if (typeof flashFly === 'function') flashFly(player.flying);
+    e.preventDefault();
+  }, { passive: false });
 }
 
 addEventListener('beforeunload', persistSave);
