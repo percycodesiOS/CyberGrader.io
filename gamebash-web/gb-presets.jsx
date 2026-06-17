@@ -122,6 +122,7 @@
   window.GB_BUILTINS = [
     {id:'yahtzee', name:'Yahtzee', emoji:'🎲', href:'games/yahtzee.html', tag:'1–6 players', description:'Roll, hold, and fill your scorecard. Full 13-category rules with upper bonus.'},
     {id:'connect-four', name:'Connect Four', emoji:'🔴', href:'games/connect-four.html', tag:'2 players', description:'Drop discs and line up four. Head-to-head, keeps score across rounds.'},
+    {id:'tic-tac-toe', name:'Tic-Tac-Toe', emoji:'❌', href:'games/tic-tac-toe.html', tag:'1–2 players', description:'Three in a row. Pass-and-play with a friend, or beat the computer on easy or hard.'},
     {id:'mynecraft', name:'MYnecraft', emoji:'🧱', href:'../game/mynecraft.html', tag:'Solo', description:'A calm 3D blocky world. Build, mine, and explore. Saves where you left off.'},
   ];
 })();

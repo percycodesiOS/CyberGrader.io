@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Tic-Tac-Toe · GameBash</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%8C%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0a0a0a; --panel:#171717; --panel2:#1f1f1f; --line:rgba(255,255,255,.08);
+  --emerald:#10b981; --emerald-bright:#34d399; --pink:#ec4899; --pink-bright:#f472b6;
+  --text:#e5e5e5; --muted:#a3a3a3; --faint:#6b7280;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:radial-gradient(700px 400px at 50% -5%,rgba(16,185,129,.10),transparent 60%),var(--bg);
+  color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  min-height:100%;display:flex;flex-direction:column;align-items:center;
+  padding:20px 16px 40px;
+}
+a.back{align-self:flex-start;color:var(--muted);text-decoration:none;font-size:.9rem;margin-bottom:14px}
+a.back:hover{color:var(--text)}
+h1{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+h1 .x{color:var(--pink-bright)}
+h1 .o{color:var(--emerald-bright)}
+.sub{color:var(--muted);font-size:.9rem;margin-bottom:20px;text-align:center}
+.modes{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;justify-content:center}
+.mode{
+  background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  border-radius:999px;padding:9px 16px;font-size:.85rem;font-weight:600;cursor:pointer;
+  min-height:44px;transition:.15s;
+}
+.mode.active{background:var(--emerald);border-color:var(--emerald);color:#04140d}
+.status{font-size:1.05rem;font-weight:700;margin-bottom:16px;min-height:1.4em;text-align:center}
+.board{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  width:min(86vw,360px);aspect-ratio:1;margin-bottom:22px;
+}
+.cell{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(2.4rem,16vw,4.2rem);font-weight:800;cursor:pointer;
+  user-select:none;transition:background .12s,transform .06s;
+}
+.cell:hover{background:var(--panel2)}
+.cell:active{transform:scale(.97)}
+.cell.x{color:var(--pink-bright)}
+.cell.o{color:var(--emerald-bright)}
+.cell.win{background:rgba(16,185,129,.18);border-color:var(--emerald)}
+.cell.full{cursor:default}
+.score{display:flex;gap:22px;margin-bottom:20px;font-size:.92rem}
+.score .s{display:flex;flex-direction:column;align-items:center;gap:2px}
+.score .s b{font-size:1.5rem;font-weight:800}
+.score .x b{color:var(--pink-bright)}
+.score .o b{color:var(--emerald-bright)}
+.score .t b{color:var(--muted)}
+.score .lbl{color:var(--faint);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+button.new{
+  background:var(--emerald);color:#04140d;border:none;border-radius:12px;
+  padding:13px 26px;font-size:1rem;font-weight:800;cursor:pointer;min-height:48px;
+}
+button.new:hover{background:var(--emerald-bright)}
+.reset{background:none;border:none;color:var(--faint);font-size:.82rem;margin-top:14px;cursor:pointer}
+.reset:hover{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">&larr; GameBash</a>
+<h1><span class="x">Tic</span>-Tac-<span class="o">Toe</span></h1>
+<div class="sub" id="sub">Two players, pass and play. Get three in a row.</div>
+
+<div class="modes">
+  <button class="mode active" data-mode="2p">2 Players</button>
+  <button class="mode" data-mode="easy">Vs Computer · Easy</button>
+  <button class="mode" data-mode="hard">Vs Computer · Hard</button>
+</div>
+
+<div class="status" id="status">X goes first</div>
+<div class="board" id="board"></div>
+
+<div class="score">
+  <div class="s x"><b id="sx">0</b><span class="lbl">X</span></div>
+  <div class="s t"><b id="st">0</b><span class="lbl">Ties</span></div>
+  <div class="s o"><b id="so">0</b><span class="lbl">O</span></div>
+</div>
+
+<button class="new" id="new">New Round</button>
+<button class="reset" id="reset">Reset score</button>
+
+<script>
+const boardEl=document.getElementById('board');
+const statusEl=document.getElementById('status');
+const subEl=document.getElementById('sub');
+let cells=Array(9).fill('');
+let turn='X';
+let over=false;
+let mode='2p';
+let score={X:0,O:0,T:0};
+const WINS=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function build(){
+  boardEl.innerHTML='';
+  cells.forEach((v,i)=>{
+    const c=document.createElement('div');
+    c.className='cell'+(v?' '+v.toLowerCase()+' full':'');
+    c.textContent=v;
+    c.addEventListener('click',()=>play(i));
+    boardEl.appendChild(c);
+  });
+}
+function winner(b){
+  for(const [a,c,d] of WINS){ if(b[a]&&b[a]===b[c]&&b[a]===b[d]) return {who:b[a],line:[a,c,d]}; }
+  if(b.every(x=>x)) return {who:'T',line:[]};
+  return null;
+}
+function play(i){
+  if(over||cells[i]) return;
+  cells[i]=turn; render();
+  if(checkEnd()) return;
+  turn=turn==='X'?'O':'X'; updateStatus();
+  if(mode!=='2p' && turn==='O' && !over){ setTimeout(aiMove,380); }
+}
+function aiMove(){
+  let i;
+  if(mode==='hard') i=bestMove('O');
+  else i = Math.random()<0.5 ? bestMove('O') : randomMove();
+  if(i==null) return;
+  cells[i]='O'; render();
+  if(checkEnd()) return;
+  turn='X'; updateStatus();
+}
+function randomMove(){ const f=cells.map((v,i)=>v?null:i).filter(x=>x!=null); return f.length?f[Math.floor(Math.random()*f.length)]:null; }
+function bestMove(p){
+  const o=p==='O'?'X':'O';
+  let best=-Infinity,move=null;
+  cells.forEach((v,i)=>{ if(!v){ cells[i]=p; const s=minimax(cells,false,p,o); cells[i]=''; if(s>best){best=s;move=i;} }});
+  return move;
+}
+function minimax(b,maxing,p,o){
+  const w=winner(b);
+  if(w){ if(w.who===p) return 10; if(w.who===o) return -10; return 0; }
+  const cur=maxing?p:o;
+  let best=maxing?-Infinity:Infinity;
+  for(let i=0;i<9;i++){ if(!b[i]){ b[i]=cur; const s=minimax(b,!maxing,p,o); b[i]=''; best=maxing?Math.max(best,s):Math.min(best,s); }}
+  return best;
+}
+function checkEnd(){
+  const w=winner(cells);
+  if(!w) return false;
+  over=true;
+  if(w.who==='T'){ score.T++; statusEl.textContent="It's a tie!"; }
+  else{
+    score[w.who]++;
+    const name = (mode!=='2p' && w.who==='O') ? 'Computer' : (mode!=='2p' && w.who==='X' ? 'You' : 'Player '+w.who);
+    statusEl.textContent = name+' wins!';
+    w.line.forEach(idx=>boardEl.children[idx].classList.add('win'));
+  }
+  document.getElementById('sx').textContent=score.X;
+  document.getElementById('so').textContent=score.O;
+  document.getElementById('st').textContent=score.T;
+  return true;
+}
+function updateStatus(){
+  if(over) return;
+  if(mode==='2p') statusEl.textContent = turn+"'s turn";
+  else statusEl.textContent = turn==='X' ? 'Your turn (X)' : 'Computer thinking...';
+}
+function render(){ build(); }
+function newRound(){ cells=Array(9).fill(''); turn='X'; over=false; build(); updateStatus(); }
+
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); mode=b.dataset.mode;
+  subEl.textContent = mode==='2p' ? 'Two players, pass and play. Get three in a row.'
+    : (mode==='easy' ? 'You are X. Beat the computer, it makes mistakes.' : 'You are X. Hard mode never loses, go for the tie.');
+  newRound();
+}));
+document.getElementById('new').addEventListener('click',newRound);
+document.getElementById('reset').addEventListener('click',()=>{ score={X:0,O:0,T:0}; document.getElementById('sx').textContent=0; document.getElementById('so').textContent=0; document.getElementById('st').textContent=0; newRound(); });
+
+build(); updateStatus();
+</script>
+</body>
+</html>
