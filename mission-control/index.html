@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#04070B">
+<title>MISSION CONTROL · ECMS · EMBRACE THE CHALLENGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#04070B;
+  --hull:#0B1219;
+  --hull-2:#0E1722;
+  --line:rgba(0,229,255,.22);
+  --line-dim:rgba(0,229,255,.10);
+  --ion:#00E5FF;
+  --ion-dim:rgba(0,229,255,.45);
+  --current:#3E6BFF;
+  --tank:#C44DFF;
+  --flare:#FFB13B;
+  --burn:#FF3B57;
+  --grow:#3BFF8E;
+  --text:#E8F6FA;
+  --text-dim:#7FA3B0;
+  --display:'Chakra Petch',system-ui,sans-serif;
+  --body:'Lexend',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:var(--body);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,229,255,.07), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(62,107,255,.05), transparent 60%);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(rgba(0,229,255,.045) 1px, transparent 1px);
+  background-size:34px 34px;
+  pointer-events:none;z-index:0;
+}
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ---------- shared ---------- */
+.eyebrow{
+  font-family:var(--display);
+  font-size:clamp(.62rem,1.6vw,.78rem);
+  font-weight:600;
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+}
+.screen-title{
+  font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  font-size:clamp(1.3rem,4.5vw,2rem);margin:8px 0 18px;
+}
+.btn{
+  font-family:var(--display);
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  background:transparent;
+  color:var(--ion);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:.8em 1.4em;
+  font-size:clamp(.72rem,1.8vw,.88rem);
+  cursor:pointer;
+  transition:background .15s,box-shadow .15s,color .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:hover{background:rgba(0,229,255,.08);box-shadow:0 0 18px rgba(0,229,255,.18)}
+.btn:focus-visible{outline:2px solid var(--ion);outline-offset:3px}
+.btn.primary{background:rgba(0,229,255,.12);border-color:var(--ion);box-shadow:0 0 24px rgba(0,229,255,.22)}
+.btn.primary:hover{background:rgba(0,229,255,.2)}
+.btn.ghost{color:var(--text-dim);border-color:rgba(127,163,176,.3)}
+.btn.ghost:hover{color:var(--text);background:rgba(127,163,176,.08);box-shadow:none}
+.btn.danger{color:var(--burn);border-color:rgba(255,59,87,.4)}
+.btn.danger:hover{background:rgba(255,59,87,.1);box-shadow:0 0 18px rgba(255,59,87,.15)}
+.btn:disabled{opacity:.35;cursor:default;box-shadow:none}
+.btn:disabled:hover{background:transparent}
+.actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.note{font-size:.78rem;color:var(--text-dim);margin-top:14px;line-height:1.6}
+
+/* ---------- HOME ---------- */
+.home{max-width:1080px;width:100%;margin:0 auto;padding:clamp(20px,5vw,56px) clamp(16px,4vw,40px) 80px}
+.brand{margin-bottom:clamp(20px,4vw,32px)}
+.brand-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand h1{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(2rem,7vw,4.2rem);
+  letter-spacing:.06em;
+  line-height:1.02;
+  color:var(--text);
+  margin-top:6px;
+}
+.brand h1 .ion{color:var(--ion);text-shadow:0 0 30px rgba(0,229,255,.5)}
+.brand .sub{margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand .sub .dot{width:5px;height:5px;border-radius:50%;background:var(--ion);box-shadow:0 0 8px var(--ion)}
+.id-edit{
+  background:none;border:1px solid var(--line-dim);border-radius:6px;cursor:pointer;
+  font-family:var(--display);font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text-dim);padding:7px 11px;transition:color .15s,border-color .15s;white-space:nowrap;
+}
+.id-edit:hover{color:var(--ion);border-color:var(--line)}
+
+.section-label{margin:clamp(24px,4vw,40px) 0 14px;display:flex;align-items:center;gap:14px}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.mission-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{
+  background:linear-gradient(160deg,var(--hull),var(--hull-2));
+  border:1px solid var(--line-dim);
+  border-radius:10px;
+  padding:20px 20px 16px;
+  cursor:pointer;
+  text-align:left;
+  color:var(--text);
+  font-family:var(--body);
+  transition:border-color .15s,box-shadow .15s,transform .15s;
+  position:relative;
+  overflow:hidden;
+}
+.card:hover{border-color:var(--line);box-shadow:0 0 28px rgba(0,229,255,.12);transform:translateY(-2px)}
+.card:focus-visible{outline:2px solid var(--ion);outline-offset:3px}
+.card .theme{
+  display:inline-block;
+  font-family:var(--display);font-size:.62rem;font-weight:600;
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ion);
+  border:1px solid var(--line);
+  border-radius:4px;padding:4px 9px;margin-bottom:14px;
+}
+.card .chip-row .theme{margin-bottom:0}
+.card.broadcast .theme{color:var(--current);border-color:rgba(62,107,255,.4)}
+.card.tank .theme{color:var(--tank);border-color:rgba(196,77,255,.4)}
+.card h3{font-family:var(--display);font-weight:600;font-size:1.18rem;letter-spacing:.04em;margin-bottom:8px}
+.card .meta{font-size:.8rem;color:var(--text-dim);display:flex;gap:14px;flex-wrap:wrap}
+.card .meta b{color:var(--text);font-weight:600}
+.card .phasebar{display:flex;gap:3px;margin-top:16px;height:4px}
+.card .phasebar span{border-radius:2px;background:var(--ion-dim)}
+.card.broadcast .phasebar span{background:rgba(62,107,255,.55)}
+.card.tank .phasebar span{background:rgba(196,77,255,.55)}
+.card .edit-link{
+  position:absolute;top:14px;right:14px;
+  font-family:var(--display);font-size:.6rem;font-weight:600;letter-spacing:.2em;
+  color:var(--text-dim);background:none;border:none;cursor:pointer;padding:6px;
+}
+.card .edit-link:hover{color:var(--ion)}
+.card .mini-emblems{display:flex;gap:7px;margin-top:16px;align-items:center;min-height:26px;flex-wrap:wrap}
+.card .mini-emblems svg{width:26px;height:26px;display:block}
+.card .mini-emblems .empty{font-size:.78rem;color:var(--text-dim)}
+.new-mission{
+  border:1px dashed rgba(0,229,255,.3);
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  min-height:130px;
+  color:var(--text-dim);
+  font-family:var(--display);font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:.8rem;
+}
+.new-mission:hover{color:var(--ion);transform:none}
+
+.band-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:20px 0 4px}
+.band-filter .bf-label{font-family:var(--display);font-size:.62rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-dim);margin-right:6px}
+.band-btn{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;
+  background:transparent;color:var(--text-dim);border:1px solid var(--line-dim);border-radius:99px;padding:0 1.1em;min-height:40px;
+  display:inline-flex;align-items:center;cursor:pointer;transition:color .15s,border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.band-btn:hover{color:var(--text);border-color:var(--line)}
+.band-btn.on{color:var(--ion);border-color:var(--ion);background:rgba(0,229,255,.1);box-shadow:0 0 16px rgba(0,229,255,.15)}
+.chip-row{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.band-chip{font-family:var(--display);font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--flare);border:1px solid rgba(255,177,59,.4);border-radius:4px;padding:4px 8px;white-space:nowrap}
+
+/* ---------- RUNNER ---------- */
+.runner{flex:1;display:flex;flex-direction:column;min-height:100vh}
+.hud{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px clamp(14px,3vw,28px);
+  border-bottom:1px solid var(--line-dim);
+  flex-wrap:wrap;
+}
+.hud .left,.hud .right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hud .mission-name{font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:clamp(.78rem,2.2vw,.95rem)}
+.pill{
+  font-family:var(--display);font-size:clamp(.6rem,1.8vw,.72rem);font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:99px;
+  padding:6px 14px;color:var(--ion);
+  background:rgba(0,229,255,.05);
+  white-space:nowrap;
+}
+.pill.run{cursor:pointer;user-select:none}
+.pill.run:hover{background:rgba(0,229,255,.14)}
+.pill.onair{color:var(--burn);border-color:rgba(255,59,87,.5);background:rgba(255,59,87,.07);display:flex;align-items:center;gap:8px}
+.pill.onair .blink{width:7px;height:7px;border-radius:50%;background:var(--burn);box-shadow:0 0 10px var(--burn)}
+.running .pill.onair .blink{animation:blink 1.1s infinite}
+.pill.tankpill{color:var(--tank);border-color:rgba(196,77,255,.5);background:rgba(196,77,255,.07)}
+@keyframes blink{0%,55%{opacity:1}56%,100%{opacity:.25}}
+.hud .exit{font-size:.68rem;padding:.6em 1em}
+
+.stage{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:clamp(12px,3vw,30px) clamp(14px,4vw,40px);
+  gap:clamp(10px,2vh,22px);
+  text-align:center;
+}
+.phase-eyebrow{display:flex;align-items:center;gap:14px;color:var(--ion);letter-spacing:.4em}
+.phase-eyebrow::before,.phase-eyebrow::after{content:'';width:34px;height:1px;background:var(--line)}
+.phase-name{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(1.5rem,5.5vw,3.1rem);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.instruction{
+  max-width:880px;
+  font-size:clamp(1.02rem,2.9vw,1.55rem);
+  font-weight:500;
+  line-height:1.55;
+  color:var(--text);
+}
+.challenge-link{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;
+  max-width:780px;
+  border:1px solid rgba(255,177,59,.42);
+  border-radius:12px;
+  background:linear-gradient(150deg, rgba(255,177,59,.12), rgba(255,177,59,.03));
+  padding:13px clamp(16px,3vw,22px);
+  text-align:left;
+}
+.challenge-link .cl-tag{
+  font-family:var(--display);font-size:clamp(.56rem,1.5vw,.66rem);font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--flare);white-space:nowrap;display:flex;align-items:center;gap:8px;flex:none;
+}
+.challenge-link .cl-tag .cl-dot{width:7px;height:7px;border-radius:50%;background:var(--flare);box-shadow:0 0 9px var(--flare)}
+.challenge-link .cl-text{font-size:clamp(.9rem,2.2vw,1.12rem);color:var(--text);line-height:1.45;font-weight:500;flex:1;min-width:200px}
+.pill.theme-pill{color:var(--flare);border-color:rgba(255,177,59,.42);background:rgba(255,177,59,.07)}
+.midrow{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,44px);flex-wrap:wrap}
+.ring-wrap{position:relative;width:clamp(240px,42vmin,420px);aspect-ratio:1;margin:clamp(4px,1vh,12px) 0}
+.ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.ring-wrap .timebox{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+}
+.timer{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(3.4rem,12vmin,6.6rem);
+  letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+  color:var(--ion);
+  text-shadow:0 0 36px rgba(0,229,255,.45);
+  line-height:1;
+  transition:color .3s;
+}
+.timer.flare{color:var(--flare);text-shadow:0 0 36px rgba(255,177,59,.45)}
+.timer.burn{color:var(--burn);text-shadow:0 0 36px rgba(255,59,87,.5)}
+.running .timer.burn{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.timer-label{font-family:var(--display);font-size:clamp(.58rem,1.6vw,.72rem);font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--text-dim)}
+.next-up{font-size:clamp(.8rem,2.2vw,.95rem);color:var(--text-dim)}
+.next-up b{color:var(--text);font-weight:600}
+
+.phase-track{display:flex;gap:6px;width:min(880px,92%);margin-top:4px}
+.phase-track .seg{
+  flex-grow:1;height:7px;border-radius:4px;
+  background:rgba(0,229,255,.12);
+  position:relative;overflow:hidden;
+}
+.phase-track .seg .fill{position:absolute;inset:0;width:0%;background:var(--ion);border-radius:4px;box-shadow:0 0 10px rgba(0,229,255,.5)}
+.phase-track .seg.done .fill{width:100%;background:rgba(0,229,255,.35);box-shadow:none}
+
+/* schematic / diagram slot */
+.schematic{
+  position:relative;border:1px solid var(--line-dim);border-radius:10px;
+  background:rgba(0,229,255,.03);padding:14px;cursor:zoom-in;
+  transition:border-color .15s, box-shadow .15s;
+}
+.schematic:hover{border-color:var(--line);box-shadow:0 0 22px rgba(0,229,255,.12)}
+.schematic img{display:block;max-width:min(440px,78vw);max-height:clamp(150px,30vmin,300px);object-fit:contain}
+.schematic .tag{
+  position:absolute;top:-9px;left:12px;background:var(--void);padding:0 8px;
+  font-family:var(--display);font-size:.56rem;font-weight:600;letter-spacing:.26em;
+  color:var(--text-dim);text-transform:uppercase;
+}
+.schematic::before,.schematic::after{content:'';position:absolute;width:14px;height:14px;border:2px solid var(--ion);opacity:.55}
+.schematic::before{left:-2px;bottom:-2px;border-top:none;border-right:none;border-radius:0 0 0 6px}
+.schematic::after{right:-2px;top:-2px;border-bottom:none;border-left:none;border-radius:0 6px 0 0}
+.viewer{
+  position:fixed;inset:0;z-index:60;background:rgba(4,7,11,.93);
+  display:none;align-items:center;justify-content:center;padding:4vmin;cursor:zoom-out;
+}
+.viewer.show{display:flex}
+.viewer img{max-width:92vw;max-height:88vh;object-fit:contain;filter:drop-shadow(0 0 30px rgba(0,229,255,.18))}
+
+/* side rail (broadcast rundown + tank queue) */
+.broadcast-layout{display:flex;flex:1;min-height:0}
+.rundown{
+  width:min(310px,34vw);
+  border-right:1px solid var(--line-dim);
+  padding:18px 14px;
+  overflow-y:auto;
+  display:flex;flex-direction:column;gap:8px;
+}
+.rundown .rd-title{margin-bottom:6px}
+.rd-item{
+  border:1px solid transparent;border-radius:8px;
+  padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  color:var(--text-dim);font-size:.84rem;
+}
+.rd-item .nm{font-weight:600;display:flex;flex-direction:column;gap:2px;text-align:left}
+.rd-item .role{font-family:var(--display);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--current)}
+.rd-item .tm{font-family:var(--display);font-variant-numeric:tabular-nums;font-size:.78rem}
+.rd-item .ob{display:flex;align-items:center;gap:10px;min-width:0}
+.rd-item .ob svg{width:30px;height:30px;flex:none;display:block}
+.rd-item .tag{font-family:var(--display);font-size:.55rem;font-weight:600;letter-spacing:.22em;color:var(--text-dim);white-space:nowrap}
+.rd-item.done{opacity:.38;text-decoration:line-through}
+.rd-item.live{
+  border-color:rgba(62,107,255,.55);
+  background:rgba(62,107,255,.1);
+  color:var(--text);
+  box-shadow:0 0 18px rgba(62,107,255,.15);
+}
+.mode-tank .rd-item.live{
+  border-color:rgba(196,77,255,.55);
+  background:rgba(196,77,255,.1);
+  box-shadow:0 0 18px rgba(196,77,255,.15);
+}
+.mode-tank .rd-item.ondeck{border-color:rgba(196,77,255,.25)}
+.mode-tank .rd-item.ondeck .tag{color:var(--tank)}
+@media (max-width:760px){
+  .broadcast-layout{flex-direction:column}
+  .rundown{width:100%;border-right:none;border-bottom:1px solid var(--line-dim);flex-direction:row;overflow-x:auto;padding:12px}
+  .rd-item{min-width:160px;flex-direction:column;align-items:flex-start}
+}
+
+/* broadcast accent */
+.runner.mode-broadcast .timer{color:var(--current);text-shadow:0 0 36px rgba(62,107,255,.45)}
+.runner.mode-broadcast .timer.flare{color:var(--flare);text-shadow:0 0 36px rgba(255,177,59,.45)}
+.runner.mode-broadcast .timer.burn{color:var(--burn);text-shadow:0 0 36px rgba(255,59,87,.5)}
+.runner.mode-broadcast .phase-eyebrow{color:var(--current)}
+.runner.mode-broadcast .phase-track .seg .fill{background:var(--current);box-shadow:0 0 10px rgba(62,107,255,.5)}
+
+/* tank accent */
+.runner.mode-tank .timer{color:var(--tank);text-shadow:0 0 36px rgba(196,77,255,.45)}
+.runner.mode-tank .timer.flare{color:var(--flare);text-shadow:0 0 36px rgba(255,177,59,.45)}
+.runner.mode-tank .timer.burn{color:var(--burn);text-shadow:0 0 36px rgba(255,59,87,.5)}
+.runner.mode-tank .phase-eyebrow{color:var(--tank)}
+.runner.mode-tank .phase-track .seg .fill{background:var(--tank);box-shadow:0 0 10px rgba(196,77,255,.5)}
+.team-hero{display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,26px);flex-wrap:wrap}
+.team-hero .emb svg{width:clamp(64px,13vmin,118px);height:auto;display:block}
+.team-name{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(2rem,9vw,4.8rem);
+  letter-spacing:.07em;text-transform:uppercase;line-height:1.05;
+  max-width:min(900px,92vw);overflow-wrap:break-word;
+  text-shadow:0 0 44px rgba(196,77,255,.45);
+}
+
+.deck{
+  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  padding:18px clamp(14px,3vw,28px) max(20px, env(safe-area-inset-bottom));
+  border-top:1px solid var(--line-dim);
+}
+.deck .btn{min-width:104px}
+.deck .btn.big{min-width:150px;padding:1em 1.6em}
+
+/* phase clear flash */
+.flash{
+  position:fixed;inset:0;z-index:50;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,229,255,.08);
+  opacity:0;
+}
+.flash.show{animation:flashIn .9s ease}
+@keyframes flashIn{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+.flash .msg{
+  font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,7vw,3.6rem);
+  letter-spacing:.3em;text-transform:uppercase;color:var(--ion);
+  text-shadow:0 0 50px rgba(0,229,255,.8);
+}
+
+/* complete */
+.complete{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:30px;text-align:center}
+.complete .big{
+  font-family:var(--display);font-weight:700;font-size:clamp(2rem,8vw,4.4rem);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ion);
+  text-shadow:0 0 50px rgba(0,229,255,.55);
+}
+.mode-tank .complete .big{color:var(--tank);text-shadow:0 0 50px rgba(196,77,255,.55)}
+.complete .crew{font-size:clamp(.95rem,2.6vw,1.2rem);color:var(--text-dim)}
+.complete .crew b{color:var(--text)}
+.complete .creed{max-width:560px;font-size:clamp(.95rem,2.4vw,1.15rem);color:var(--text);line-height:1.55}
+
+/* ---------- CHECK-IN ---------- */
+.checkin{max-width:860px;width:100%;margin:0 auto;padding:clamp(20px,5vw,48px) clamp(16px,4vw,32px) 90px}
+.ci-row{display:flex;gap:10px;flex-wrap:wrap}
+.ci-row input{
+  flex:1;min-width:220px;
+  font-family:var(--display);font-weight:600;font-size:clamp(1rem,3vw,1.3rem);
+  letter-spacing:.08em;text-transform:uppercase;
+  background:var(--hull);border:1px solid var(--line-dim);border-radius:10px;
+  color:var(--text);padding:14px 16px;
+}
+.ci-row input:focus{outline:none;border-color:var(--tank);box-shadow:0 0 16px rgba(196,77,255,.18)}
+.ci-err{color:var(--flare);font-size:.82rem;margin-top:10px;min-height:1.3em}
+.reveal{
+  display:flex;align-items:center;gap:clamp(14px,4vw,26px);margin:22px 0 6px;
+  padding:18px 20px;border:1px solid var(--line-dim);border-radius:12px;
+  background:linear-gradient(160deg,var(--hull),var(--hull-2));
+  flex-wrap:wrap;
+}
+.reveal .emb svg{width:clamp(88px,17vw,136px);height:auto;display:block}
+.reveal.stamp .emb{animation:stamp .55s cubic-bezier(.2,1.4,.4,1)}
+@keyframes stamp{0%{transform:scale(1.8);opacity:0}60%{transform:scale(.94);opacity:1}100%{transform:scale(1)}}
+.reveal .rv-name{font-family:var(--display);font-weight:700;font-size:clamp(1.2rem,4.5vw,2rem);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
+.tile{
+  position:relative;border:1px solid var(--line-dim);border-radius:10px;
+  padding:16px 12px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:linear-gradient(160deg,var(--hull),var(--hull-2));text-align:center;
+}
+.tile svg{width:58px;height:58px;display:block}
+.tile .tn{font-family:var(--display);font-weight:600;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;overflow-wrap:anywhere}
+.tile .rm{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:.85rem;padding:5px;line-height:1}
+.tile .rm:hover{color:var(--burn)}
+
+/* ---------- LOADOUT ---------- */
+.loadout{max-width:640px;width:100%;margin:0 auto;padding:clamp(20px,5vw,48px) clamp(16px,4vw,32px) 90px;display:flex;flex-direction:column}
+.lo-list{display:flex;flex-direction:column;gap:10px;margin:18px 0 8px}
+.lo-item{
+  display:flex;align-items:center;gap:14px;width:100%;
+  border:1px solid var(--line-dim);border-radius:10px;padding:14px 16px;
+  background:linear-gradient(160deg,var(--hull),var(--hull-2));
+  cursor:pointer;color:var(--text-dim);text-align:left;
+  font-family:var(--body);font-size:clamp(.95rem,2.6vw,1.12rem);
+  transition:border-color .15s,color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.lo-item:hover{border-color:var(--line)}
+.lo-item:focus-visible{outline:2px solid var(--ion);outline-offset:3px}
+.lo-item .box{
+  flex:none;width:22px;height:22px;border:2px solid var(--ion-dim);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:700;font-size:.85rem;color:var(--void);
+  transition:background .15s,border-color .15s,box-shadow .15s;
+}
+.lo-item.ok{color:var(--text);border-color:var(--line)}
+.lo-item.ok .box{background:var(--ion);border-color:var(--ion);box-shadow:0 0 12px rgba(0,229,255,.5)}
+.lo-item.ok .box::after{content:'\2713'}
+.lo-count{font-family:var(--display);font-weight:600;letter-spacing:.24em;color:var(--text-dim);font-size:.8rem;margin-top:6px;text-transform:uppercase}
+.lo-count b{color:var(--ion)}
+
+/* ---------- EDITOR / SETTINGS ---------- */
+.editor{max-width:760px;width:100%;margin:0 auto;padding:clamp(20px,5vw,48px) clamp(16px,4vw,32px) 90px}
+.editor h2{font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:clamp(1.3rem,4.5vw,2rem);margin:8px 0 26px}
+.field{margin-bottom:18px}
+.field label{display:block;font-family:var(--display);font-size:.66rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
+.field input,.field textarea{
+  width:100%;
+  background:var(--hull);
+  border:1px solid var(--line-dim);
+  border-radius:8px;
+  color:var(--text);
+  font-family:var(--body);
+  font-size:.95rem;
+  padding:12px 14px;
+}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--ion);box-shadow:0 0 14px rgba(0,229,255,.15)}
+.field textarea{resize:vertical;min-height:70px;line-height:1.5}
+.typeSel{display:flex;gap:8px;flex-wrap:wrap}
+.typeSel .btn{font-size:.66rem;padding:.6em 1em}
+.typeSel .btn.on{background:rgba(0,229,255,.12);border-color:var(--ion);color:var(--ion)}
+.phase-row{
+  border:1px solid var(--line-dim);border-radius:10px;
+  padding:16px;margin-bottom:12px;
+  background:linear-gradient(160deg,var(--hull),var(--hull-2));
+  position:relative;
+}
+.phase-row .row-head{display:flex;gap:10px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap}
+.phase-row .row-head .field{flex:1;margin-bottom:0;min-width:140px}
+.phase-row .row-head .field.min{flex:0 0 96px;min-width:96px}
+.phase-row .row-head .field.role{flex:0 0 150px;min-width:130px}
+.phase-row .remove{
+  background:none;border:none;color:var(--text-dim);cursor:pointer;
+  font-family:var(--display);font-size:.6rem;letter-spacing:.2em;padding:8px;
+}
+.phase-row .remove:hover{color:var(--burn)}
+.lo-edit-row{display:flex;gap:8px;margin-bottom:8px}
+.lo-edit-row input{flex:1}
+.lo-edit-row .remove{background:none;border:1px solid var(--line-dim);border-radius:8px;color:var(--text-dim);cursor:pointer;font-family:var(--display);font-size:.6rem;letter-spacing:.2em;padding:0 14px}
+.lo-edit-row .remove:hover{color:var(--burn);border-color:rgba(255,59,87,.4)}
+.reset-row{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-top:22px;padding-top:18px;border-top:1px solid var(--line-dim);
+}
+.btn.ghost.reset-defaults{font-size:.66rem;padding:.7em 1.1em}
+
+/* ---------- SEASON THEME BANNER ---------- */
+.season{
+  position:relative;
+  margin:0 0 6px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:clamp(16px,3.5vw,24px) clamp(18px,4vw,28px);
+  background:linear-gradient(150deg, rgba(0,229,255,.06), rgba(255,177,59,.05));
+  overflow:hidden;
+}
+.season::before,.season::after{content:'';position:absolute;width:16px;height:16px;border:2px solid var(--flare);opacity:.6}
+.season::before{left:-1px;top:-1px;border-bottom:none;border-right:none;border-radius:6px 0 0 0}
+.season::after{right:-1px;bottom:-1px;border-top:none;border-left:none;border-radius:0 0 6px 0}
+.season .s-tag{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:clamp(.6rem,1.6vw,.72rem);font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--flare)}
+.season .s-tag .s-dot{width:5px;height:5px;border-radius:50%;background:var(--flare);box-shadow:0 0 8px var(--flare)}
+.season .s-theme{font-family:var(--display);font-weight:700;font-size:clamp(1.4rem,5vw,2.4rem);letter-spacing:.07em;text-transform:uppercase;color:var(--text);margin:9px 0 7px;line-height:1.04}
+.season .s-theme .hot{color:var(--flare);text-shadow:0 0 26px rgba(255,177,59,.45)}
+.season .s-line{font-size:clamp(.82rem,2.2vw,.98rem);color:var(--text-dim);line-height:1.5;max-width:640px}
+
+@media (max-width:640px){
+  .mission-grid{grid-template-columns:1fr;gap:12px}
+  .card{padding:18px 16px 14px}
+  .card .edit-link{padding:10px;font-size:.64rem}
+  .ring-wrap{width:min(72vw,300px)}
+  .instruction{font-size:clamp(1rem,4.4vw,1.25rem)}
+  .phase-track{width:96%}
+  .deck{gap:10px;padding:14px 12px max(16px, env(safe-area-inset-bottom))}
+  .deck .btn{flex:1 1 44%;min-width:0;min-height:48px;padding:.9em 1em}
+  .deck .btn.big{flex:1 1 100%;min-height:52px}
+  .btn{min-height:44px}
+  .pill{min-height:44px;display:inline-flex;align-items:center}
+  .hud{gap:8px;padding:12px 14px}
+  .hud .left,.hud .right{gap:10px}
+  .field input,.field textarea{font-size:1rem;padding:13px 14px}
+  .hud .theme-pill{display:none}
+}
+
+/* ---------- ACCOUNTS · ROSTER · RECORDS ---------- */
+.acct-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.you-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--grow);border:1px solid rgba(59,255,142,.4);border-radius:99px;padding:8px 13px}
+.you-badge .yb-dot{width:6px;height:6px;border-radius:50%;background:var(--grow);box-shadow:0 0 8px var(--grow)}
+.tile{color:var(--text)}
+.list-stack{display:flex;flex-direction:column;gap:10px;margin:18px 0}
+.row-card{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border:1px solid var(--line-dim);border-radius:10px;padding:14px 16px;
+  background:linear-gradient(160deg,var(--hull),var(--hull-2));
+  color:var(--text);font-family:var(--body);text-align:left;
+}
+.row-card .rc-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.row-card .rc-title{font-family:var(--display);font-weight:600;letter-spacing:.05em;font-size:1rem}
+.row-card .rc-sub{font-size:.8rem;color:var(--text-dim)}
+.code-chip{font-family:var(--display);font-weight:700;letter-spacing:.3em;color:var(--ion);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:1.1rem;white-space:nowrap}
+.field select{width:100%;background:var(--hull);border:1px solid var(--line-dim);border-radius:8px;color:var(--text);font-family:var(--body);font-size:.95rem;padding:12px 14px}
+.field select:focus{outline:none;border-color:var(--ion);box-shadow:0 0 14px rgba(0,229,255,.15)}
+.pin-row{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.pin-row input{width:54px;height:64px;text-align:center;font-family:var(--display);font-size:1.8rem;font-weight:700;background:var(--hull);border:1px solid var(--line-dim);border-radius:10px;color:var(--text)}
+.pin-row input:focus{outline:none;border-color:var(--ion);box-shadow:0 0 14px rgba(0,229,255,.18)}
+.rec-day{margin-top:16px}
+.rec-day .day-label{font-family:var(--display);font-size:.66rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.rec-day .day-label::after{content:'';flex:1;height:1px;background:var(--line-dim)}
+.log-entry{border:1px solid var(--line-dim);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:linear-gradient(160deg,var(--hull),var(--hull-2))}
+.log-entry .le-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;flex-wrap:wrap;align-items:baseline}
+.log-entry .le-mission{font-family:var(--display);font-weight:600;letter-spacing:.05em;color:var(--ion);font-size:.85rem}
+.log-entry .le-who{font-size:.78rem;color:var(--text-dim)}
+.log-entry .le-body b{color:var(--text-dim);font-weight:600;font-family:var(--display);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;display:block;margin-top:8px}
+.log-entry .le-body p{font-size:.92rem;line-height:1.5;margin:3px 0}
+.cloud-note{border:1px dashed rgba(127,163,176,.3);border-radius:10px;padding:14px 16px;margin-top:22px;font-size:.8rem;color:var(--text-dim);line-height:1.65}
+.cloud-note b{color:var(--text);font-weight:600}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="flash" id="flash"><div class="msg" id="flashMsg">PHASE CLEAR</div></div>
+<div class="viewer" id="viewer" onclick="closeDiagram()"><img id="viewerImg" alt="Diagram, enlarged"></div>
+
+<script>
+/* ==============================================================
+   MISSION CONTROL  ·  ECMS  ·  PercyCodes  ·  2026-2027 SEASON
+   Building theme: EMBRACE THE CHALLENGE.
+   One self-contained page. Runs a 35-minute lesson, a morning
+   broadcast, or a CIRC Tank pitch competition. Built to read from
+   across the room. Every phase names how it embraces the challenge.
+   Voice rule: launch-ops vernacular kids know. No em dashes.
+   ============================================================== */
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = s => {
+  s = Math.max(0, Math.round(s));
+  return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+};
+const fmtMin = t => t%1===0 ? t : t.toFixed(1);
+
+/* ---------- emblem generator (deterministic from team name) ---------- */
+const NEON = ['#00E5FF','#3E6BFF','#C44DFF','#3BFF8E','#FFB13B','#FF4D88'];
+function hashStr(s){
+  let h = 2166136261; s = s.toUpperCase();
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function initialsOf(name){
+  const parts = name.trim().split(/[^A-Za-z0-9]+/).filter(Boolean);
+  let s = '';
+  if(parts.length >= 2) s = parts.slice(0,3).map(p=>p[0]).join('');
+  else if(parts.length === 1) s = parts[0].slice(0,2);
+  return (s || 'X').toUpperCase();
+}
+function polyPts(cx,cy,r,n,rot){
+  const pts=[];
+  for(let i=0;i<n;i++){ const a=rot+i*2*Math.PI/n; pts.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1)); }
+  return pts.join(' ');
+}
+function starPts(cx,cy,r1,r2,n,rot){
+  const pts=[];
+  for(let i=0;i<n*2;i++){ const r=i%2?r2:r1, a=rot+i*Math.PI/n; pts.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1)); }
+  return pts.join(' ');
+}
+function emblemSVG(name){
+  const h = hashStr(name);
+  const col = NEON[h % NEON.length];
+  const ringStyle = (h>>>3) % 4;
+  const sides = 3 + ((h>>>6) % 5);
+  const isStar = ((h>>>9) % 4) === 0;
+  const rot = ((h>>>11) % 360) * Math.PI/180;
+  const dots = 1 + ((h>>>16) % 4);
+  const dotOff = ((h>>>20) % 360) * Math.PI/180;
+  const ini = initialsOf(name);
+  const fs = ini.length >= 3 ? 20 : (ini.length === 2 ? 25 : 31);
+  let ring = '';
+  if(ringStyle===0) ring = `<circle cx="60" cy="60" r="52" stroke="${col}" stroke-width="3" fill="none"/>`;
+  if(ringStyle===1) ring = `<circle cx="60" cy="60" r="52" stroke="${col}" stroke-width="3" fill="none" stroke-dasharray="14 8"/>`;
+  if(ringStyle===2) ring = `<circle cx="60" cy="60" r="52" stroke="${col}" stroke-width="2.5" fill="none"/><circle cx="60" cy="60" r="45" stroke="${col}" stroke-width="1.2" fill="none" opacity=".55"/>`;
+  if(ringStyle===3) ring = `<circle cx="60" cy="60" r="52" stroke="${col}" stroke-width="4" fill="none" stroke-dasharray="2.5 7"/>`;
+  const core = isStar
+    ? `<polygon points="${starPts(60,60,34,15,5,rot)}" stroke="${col}" stroke-width="2.5" fill="${col}" fill-opacity=".07" stroke-linejoin="round"/>`
+    : `<polygon points="${polyPts(60,60,32,sides,rot)}" stroke="${col}" stroke-width="2.5" fill="${col}" fill-opacity=".07" stroke-linejoin="round"/>`;
+  let dd = '';
+  for(let i=0;i<dots;i++){
+    const a = dotOff + i*2*Math.PI/dots;
+    dd += `<circle cx="${(60+52*Math.cos(a)).toFixed(1)}" cy="${(60+52*Math.sin(a)).toFixed(1)}" r="4" fill="${col}"/>`;
+  }
+  return `<svg viewBox="0 0 120 120" role="img" aria-label="${esc(name)} emblem">
+    <g style="filter:drop-shadow(0 0 5px ${col})">${ring}${core}${dd}
+      <text x="60" y="60" text-anchor="middle" dominant-baseline="central" dy=".04em"
+        font-family="'Chakra Petch',sans-serif" font-weight="700" font-size="${fs}"
+        letter-spacing="1" fill="${col}">${esc(ini)}</text>
+    </g></svg>`;
+}
+
+/* ---------- seeded example diagrams (inline SVG data URIs) ---------- */
+const svgURI = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s);
+const DIAG_GLIDER = svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200">
+  <g stroke="#00E5FF" stroke-width="2" fill="none">
+    <rect x="14" y="26" width="96" height="130" rx="4" opacity=".5"/>
+    <line x1="62" y1="26" x2="62" y2="156" stroke-dasharray="5 6"/>
+    <rect x="162" y="26" width="96" height="130" rx="4" opacity=".5"/>
+    <line x1="210" y1="26" x2="210" y2="156" stroke-dasharray="5 6" opacity=".5"/>
+    <path d="M162 26 L210 78 M258 26 L210 78"/>
+    <path d="M310 96 L398 56 L398 136 Z"/>
+    <line x1="324" y1="96" x2="398" y2="96" stroke-dasharray="4 5"/>
+  </g>
+  <g fill="#7FA3B0" font-family="sans-serif" font-size="13" letter-spacing="2">
+    <text x="14" y="184">1 CENTER FOLD</text>
+    <text x="150" y="184">2 NOSE FOLDS</text>
+    <text x="298" y="184">3 WING FOLDS</text>
+  </g>
+</svg>`);
+const DIAG_TOWER = svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200">
+  <g stroke="#FF3B57" stroke-width="2" fill="none">
+    <path d="M40 140 L120 140 L104 60 L24 60 Z"/>
+  </g>
+  <g stroke="#00E5FF" stroke-width="2" fill="none">
+    <path d="M170 140 L254 140 L212 62 Z"/>
+    <path d="M300 140 L392 140 L346 72 Z"/>
+    <path d="M323 106 L369 106 M346 72 L346 140" opacity=".8"/>
+  </g>
+  <g fill="#7FA3B0" font-family="sans-serif" font-size="13" letter-spacing="2">
+    <text x="20" y="170">SQUARES TWIST</text>
+    <text x="160" y="170">TRIANGLES HOLD</text>
+    <text x="288" y="170">STACK TRIANGLES</text>
+  </g>
+</svg>`);
+const DIAG_BRIDGE = svgURI(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200">
+  <g stroke="#00E5FF" stroke-width="2" fill="none">
+    <rect x="14" y="120" width="74" height="64" opacity=".5"/>
+    <rect x="332" y="120" width="74" height="64" opacity=".5"/>
+    <path d="M88 118 L332 118"/>
+    <path d="M120 118 l10 -15 l22 0 l10 15 M180 118 l10 -15 l22 0 l10 15 M240 118 l10 -15 l22 0 l10 15"/>
+    <path d="M196 118 L196 92 L224 92 L224 118"/>
+  </g>
+  <g fill="#7FA3B0" font-family="sans-serif" font-size="13" letter-spacing="2">
+    <text x="104" y="150">FOLD FOR STIFFNESS</text>
+    <text x="168" y="178">SPAN THE GAP</text>
+    <text x="250" y="84">LOAD HERE</text>
+  </g>
+</svg>`);
+
+/* ---------- default missions: the 2026-2027 starter season ---------- */
+/* Each lesson runs to 35 minutes and asks for productive struggle:
+   build, test, fail forward, rebuild, show what got better.
+   Edit freely. Changes save to this device. */
+const DEFAULT_MISSIONS = [
+  {
+    id:'challenge', type:'lesson', title:'THE CHALLENGE', theme:'EMBRACE IT', band:'ALL',
+    loadout:['Challenge cards face down at each table','Build materials sorted in trays','A fail log sheet per builder','Timer on the board','Showcase zone cleared'],
+    phases:[
+      {name:'THE BRIEF', minutes:4, text:'Flip your challenge card. Read the goal and the limits out loud at your table. You will not get it right the first time, and that is exactly the point.', challenge:'Saying the hard part out loud before you start is how you embrace it.'},
+      {name:'FIRST ATTEMPT', minutes:10, text:'Build version one. Do not aim for perfect, aim for something you can test. Get it standing, get it moving, get it done.', challenge:'A rough version one is brave. You cannot improve a build you never started.'},
+      {name:'FAIL FORWARD', minutes:6, text:'Test it. Push it until it breaks. Find the weakest point and write it on your fail log. A failure you understand beats a guess that happened to work.', challenge:'Hunting for the weak point on purpose IS the challenge. A failure you understand is progress.'},
+      {name:'REBUILD', minutes:8, text:'Fix the ONE biggest weakness you found. Change that, leave the rest, test again. Iterate, do not restart.', challenge:'Choosing to fix it and go again, instead of quitting, is the whole point.'},
+      {name:'SHOWCASE', minutes:5, text:'Show us what broke first and how you fixed it. The best story is not the build that never failed, it is the one that got better.', challenge:'Sharing what broke takes guts. The challenge is owning the struggle, not hiding it.'},
+      {name:'RESET + RECOVER', minutes:2, text:'Materials back in the trays. Fail logs in the bin with your name on top. Tables clear. Sit when your station is set.', challenge:'Leaving the space better than you found it is a challenge too. Finish strong.'}
+    ]
+  },
+  {
+    id:'cuptowers', type:'lesson', title:'CUP TOWERS', theme:'STACK + REBUILD', band:'K-2',
+    loadout:['A tub of plastic cups per table','A clear flat space at each spot','A builder spot marked for each kid','Camera ready for the tall towers'],
+    phases:[
+      {name:'WATCH + LEARN', minutes:4, text:'Eyes on me. Watch the cups stack up. Your job today: build the tallest cup tower you can. When it falls, that is okay. Builders always build again.', challenge:'A tower that falls is not a fail. Trying again is how we embrace the challenge.'},
+      {name:'BUILD IT', minutes:12, text:'Stack your cups as high as you can reach. Go slow near the top. If it tips over, take a breath and build it back up.', challenge:'Steady hands and a calm restart. Keep going when it gets wobbly.'},
+      {name:'KNOCK + REBUILD', minutes:8, text:'Knock your tower down on purpose. Now build it back even taller and even faster. You know how this time.', challenge:'You get better the second time. That is what practice does.'},
+      {name:'SHOW + COUNT', minutes:6, text:'Hands in your lap. We count how many cups tall each tower is. Big towers and small towers both get a clap.', challenge:'Cheer for every builder. Brave tries matter more than first place.'},
+      {name:'CLEAN UP', minutes:5, text:'Cups back in the tub. Sit criss-cross when your spot is clean and quiet.', challenge:'A clean room is a team win. Finish strong together.'}
+    ]
+  },
+  {
+    id:'ballramps', type:'lesson', title:'BALL RAMPS', theme:'PUSH + ROLL', band:'K-2',
+    loadout:['A ball or toy car for each pair','Books, boards, and blocks for ramps','A start line taped on the floor','Floor tiles or a tape measure to count distance'],
+    phases:[
+      {name:'WATCH + LEARN', minutes:4, text:'Watch the ball roll down the ramp. Today you build a ramp that makes your ball roll far. Taller ramps and smoother paths help.', challenge:'Making something roll farther takes tries. We learn by testing.'},
+      {name:'BUILD + ROLL', minutes:14, text:'Build your ramp with the blocks and books. Roll your ball. Change one thing, like making it taller, then roll again. Watch what helps.', challenge:'Change one thing and test it. One step at a time is how builders solve problems.'},
+      {name:'BIG ROLL', minutes:8, text:'Line up at the start line. Each pair gets two big rolls. We watch how far the ball goes and cheer it on.', challenge:'Your ramp meets the real test. Cheer the long rolls and the short ones.'},
+      {name:'SHOW + TELL', minutes:4, text:'Tell us one thing you changed that helped your ball roll farther. Short and proud.', challenge:'Saying what you learned out loud is part of being a builder.'},
+      {name:'CLEAN UP', minutes:5, text:'Blocks and balls back in the bin. Sit criss-cross when your space is clean.', challenge:'Reset the space for the next class. Finish strong.'}
+    ]
+  },
+  {
+    id:'glider', type:'lesson', title:'GLIDER LAB', theme:'FLIGHT', band:'3-4',
+    loadout:['1 sheet of paper per builder','2 paper clips max each','Launch line taped to the floor','Measuring tape at the wall','Recovery bin for gliders'],
+    phases:[
+      {name:'MISSION BRIEF', minutes:5, text:'Eyes up front. Watch the demo flight. Your mission: build a glider that flies far and flies straight. Materials: 1 sheet of paper and 2 paper clips, no more.', challenge:'Tight limits are the challenge. One sheet and two clips forces real problem solving.'},
+      {name:'BUILD WINDOW', minutes:20, text:'Build at your table. Test toward the wall only. After every flight, change ONE thing and fly it again. One change at a time is how you learn what works.', img:DIAG_GLIDER, challenge:'Change one thing, fly, repeat. Iterating instead of guessing is how you embrace it.'},
+      {name:'FLIGHT TRIALS', minutes:8, text:'Line up at the launch line. Two official throws each. Spotters mark the landing and call out the distance. Cheer for far and for straight.', challenge:'Your design meets the real world. Cheer the long flights and learn from the nose dives.'},
+      {name:'RESET + RECOVER', minutes:2, text:'Gliders in the bin with your name on the wing. Tables clear. Chairs in. Sit when your station is done.', challenge:'A clean recovery is part of the mission. Finish what you started.'}
+    ]
+  },
+  {
+    id:'tower', type:'lesson', title:'TOWER CHALLENGE', theme:'STRUCTURES', band:'5-6',
+    loadout:['20 spaghetti sticks per team','1 meter of tape per team','1 marshmallow per team','Scissors at each table','Measuring stick ready'],
+    phases:[
+      {name:'MISSION BRIEF', minutes:5, text:'Your mission: build the tallest tower that holds a marshmallow on top for 10 seconds. Materials: 20 spaghetti sticks, 1 meter of tape, 1 marshmallow.', challenge:'Tall and steady fight each other. Living with that tension is the challenge.'},
+      {name:'BUILD WINDOW', minutes:20, text:'Plan fast, build faster. Test as you go. The marshmallow goes on top the whole time, not on at the end. Towers must stand on their own.', img:DIAG_TOWER, challenge:'Test as you build. Every wobble is data, not defeat.'},
+      {name:'MEASURE + SHOW', minutes:8, text:'Hands off your towers. We measure together. Tallest standing tower wins. Be ready to say the one thing that made yours work.', challenge:'Win or fall, you can name what made it work. That is the growth.'},
+      {name:'RESET + RECOVER', minutes:2, text:'Spaghetti in the cup. Tape balls in the trash. Marshmallows stay where they are. Tables clear. Sit when done.', challenge:'Pack down fast and fair. Reset the space for the next crew.'}
+    ]
+  },
+  {
+    id:'bridge', type:'lesson', title:'BRIDGE OUT', theme:'SPAN + LOAD', band:'5-6',
+    loadout:['20 index cards per team','30 cm of tape per team','1 paper cup for the load','A handful of washers or coins','Two desks set one hand-span apart'],
+    phases:[
+      {name:'MISSION BRIEF', minutes:5, text:'Your mission: span the gap between two desks and hold the most weight in the middle. Materials: 20 index cards and 30 cm of tape. No taping to the desks.', challenge:'Holding weight with flimsy paper sounds impossible. Taking that on is the challenge.'},
+      {name:'BUILD WINDOW', minutes:18, text:'Fold cards to make them stiff. Flat paper bends, folded paper holds. Build your span, then test with a few washers before the real load.', img:DIAG_BRIDGE, challenge:'Fold weak paper into something strong. Turning a limit into a strength is the lesson.'},
+      {name:'LOAD TEST', minutes:8, text:'Bridges across the gap. We add weight one washer at a time until it bends or drops. Count out loud as a class. Last span standing takes it.', challenge:'Watch it bend and hold. Pushing to the breaking point is how you learn the limit.'},
+      {name:'RESET + RECOVER', minutes:4, text:'Washers back in the cup. Cards in the recycle bin. Tape off the desks. Tables clear. Sit when your station is done.', challenge:'Recover the space. A clean finish is a strong finish.'}
+    ]
+  },
+  {
+    id:'chain', type:'lesson', title:'CHAIN REACTION', theme:'CAUSE + EFFECT', band:'3-4',
+    loadout:['Books, blocks, and dominoes per team','1 marble or small ball each','Tape and string available','A start line and a finish cup','Clear floor or long table per team'],
+    phases:[
+      {name:'MISSION BRIEF', minutes:5, text:'Your mission: build a chain reaction that starts with one push and ends by dropping the marble in the cup. At least three steps, and no hands once it starts.', challenge:'One push, many steps, no hands. Long odds are exactly the challenge.'},
+      {name:'BUILD WINDOW', minutes:16, text:'Build it in small sections and test each one before you connect them. If a section fails twice, fix that part before you add more. Save the full run for the end.', challenge:'Build and test in small sections. Fixing one piece at a time beats starting over.'},
+      {name:'RUN THE CHAIN', minutes:10, text:'One push to start, then hands off. If it stalls, note where it broke and reset that section. You get three official runs. Cheer for every cup that fills.', challenge:'It will stall. Reset that section and run it again. Persistence is the point.'},
+      {name:'RESET + RECOVER', minutes:4, text:'Marbles in the bin. Blocks and books stacked. Tape balls in the trash. Tables and floor clear. Sit when your station is set.', challenge:'Break it down and reset. Leave the floor ready for the next team.'}
+    ]
+  },
+  {
+    id:'pitchpolish', type:'lesson', title:'PITCH POLISH', theme:'TANK PREP', band:'5-6',
+    loadout:['Team prototypes on the table','A pitch card per team','A 60 second timer or phone','Feedback slips for listeners','Showcase zone cleared'],
+    phases:[
+      {name:'THE BRIEF', minutes:4, text:'Today we sharpen your CIRC Tank pitch. The goal: hook us in one sentence, show the thing, and say who it helps. Sixty seconds, no slides.', challenge:'Saying it simply is harder than saying it long. That is the challenge.'},
+      {name:'DRAFT THE HOOK', minutes:8, text:'Write your one sentence hook. Make it about the person you help, not the parts you used. Try three versions and circle the one that sounds best out loud.', challenge:'Cutting your idea down to one sentence is real work. Embrace the edit.'},
+      {name:'PRACTICE ROUND', minutes:10, text:'Pitch to the team next to you. Listeners fill one feedback slip: one thing that landed, one thing to fix. Swap and repeat so everyone pitches once.', challenge:'Pitching to a real listener is nerve-racking. Doing it anyway is the growth.'},
+      {name:'FEEDBACK + FIX', minutes:10, text:'Take the feedback and change one thing that makes your pitch clearer. Practice the new version twice. Confident and clear beats long and fancy.', challenge:'Take the note and change one thing. Humility plus grit is the challenge.'},
+      {name:'RESET + RECOVER', minutes:3, text:'Pitch cards with your team name on top. Feedback slips in the bin. Prototypes back in the tote. Tables clear. Sit when your team is set.', challenge:'Pack up sharp and walk away ready for the Tank.'}
+    ]
+  },
+  {
+    id:'broadcast', type:'broadcast', title:'MORNING BROADCAST', theme:'ON AIR', band:'ALL',
+    loadout:['Camera on and framed','Mics tested','Lunch menu card on the desk','Birthday list printed','Shout-out slips collected','Anchor scripts in place'],
+    phases:[
+      {name:'STANDBY', minutes:1, role:'DIRECTOR', text:'Crew in positions. Mic check. Anchors seated. Director counts down from 10.', challenge:'Live means no do-over. Settling your nerves before the count is the challenge.'},
+      {name:'WELCOME + PLEDGE', minutes:1.5, role:'ANCHORS', text:'Good morning Ehrman Crest! Today is ___. Please stand for the Pledge of Allegiance.', challenge:'Speak to the whole school with confidence. Owning the mic is the growth.'},
+      {name:'LUNCH MENU', minutes:0.75, role:'ANCHOR 2', text:'Read today\'s lunch from the menu card. Slow and clear, like they cannot see it.', challenge:'Clear and slow under pressure. Small job, real focus.'},
+      {name:'BIRTHDAYS', minutes:0.75, role:'ANCHOR 1', text:'Happy birthday to: read today\'s names. Big energy on every single one.', challenge:'Bring the energy even on take one. That is showing up.'},
+      {name:'SHOUT-OUTS', minutes:1, role:'ANCHORS', text:'Crest shout-outs: read the teacher submissions. Smile, you are on camera.', challenge:'Read someone else\'s words with heart. Being generous on camera is brave.'},
+      {name:'SIGN-OFF', minutes:0.5, role:'ALL', text:'That is your morning broadcast. Make it a great day, Ehrman Crest!', challenge:'Land the ending clean. Finishing strong on live TV is the challenge.'}
+    ]
+  },
+  {
+    id:'tank', type:'tank', title:'CIRC TANK', theme:'PITCH', band:'5-6',
+    loadout:['Pitch order locked','Teams checked in with emblems','Prototypes on the props table','Judges have feedback sheets','Audience seated, demo zone clear'],
+    phases:[
+      {name:'PITCH', minutes:3, text:'You have the floor. Hook us in one sentence, demo your innovation, and tell us who it helps.', challenge:'Putting your work in front of judges is the biggest challenge of all. Own the floor.'},
+      {name:'Q+A', minutes:2, text:'Judges ask, you answer. Short and honest beats long and fancy. If you do not know, say how you would find out.', challenge:'Answering on the spot is hard. Honest beats fancy, and "I would find out" is a strong answer.'}
+    ]
+  }
+];
+
+/* ---------- identity (editable, persisted) ---------- */
+const IDENT_KEY = 'missionControl.identity.v1';
+const DEFAULT_IDENTITY = {
+  school:'EHRMAN CREST',
+  group:'CIRC · GRADES K-6',
+  teacher:'MR. MACEK',
+  room:'',
+  seasonLabel:'2026 / 2027 SEASON',
+  seasonTheme:'EMBRACE THE CHALLENGE',
+  seasonCreed:'Productive struggle is the point. We build, we test, we fail forward, and we make it better. Every mission this year asks you to take on something hard and grow from it.'
+};
+function loadIdentity(){
+  try{
+    const raw = localStorage.getItem(IDENT_KEY);
+    if(!raw) return {...DEFAULT_IDENTITY};
+    const d = JSON.parse(raw);
+    return {...DEFAULT_IDENTITY, ...d};
+  }catch(err){ return {...DEFAULT_IDENTITY}; }
+}
+function saveIdentity(){
+  try{ localStorage.setItem(IDENT_KEY, JSON.stringify(identity)); }catch(err){}
+}
+let identity = loadIdentity();
+
+/* ---------- persistence: missions (localStorage) ---------- */
+const STORE_KEY = 'missionControl.missions.v2';
+function defaultMissions(){ return JSON.parse(JSON.stringify(DEFAULT_MISSIONS)); }
+function isValidMission(m){
+  return m && typeof m==='object'
+    && typeof m.id==='string'
+    && Array.isArray(m.phases) && m.phases.length>0
+    && m.phases.every(p=>p && typeof p.name==='string' && typeof p.minutes==='number');
+}
+function loadMissions(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return defaultMissions();
+    const data = JSON.parse(raw);
+    if(Array.isArray(data) && data.length && data.every(isValidMission)) return data;
+    return defaultMissions();
+  }catch(err){ return defaultMissions(); }
+}
+function saveMissions(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(missions)); }catch(err){}
+}
+function resetMissionsToDefaults(){
+  if(!confirm('Reset all missions back to the built-in starter season? Your custom missions and edits will be erased.')) return;
+  try{ localStorage.removeItem(STORE_KEY); }catch(err){}
+  missions = defaultMissions();
+  screen='home'; render();
+}
+let missions = loadMissions();
+let teams = [];
+let homeBand = 'ALL';
+
+/* ---------- audio ---------- */
+let actx = null, soundOn = true;
+function audio(){ if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
+function tone(freq, t0, dur, gainV=0.12, type='sine'){
+  const ctx = audio();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, ctx.currentTime + t0);
+  g.gain.exponentialRampToValueAtTime(gainV, ctx.currentTime + t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t0 + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(ctx.currentTime + t0); o.stop(ctx.currentTime + t0 + dur + 0.05);
+}
+const sfx = {
+  launch(){ if(!soundOn) return; tone(330,0,.18,.09); tone(494,.1,.22,.09); tone(740,.22,.3,.1); },
+  chime(){ if(!soundOn) return; tone(740,0,.28); tone(1175,.16,.4); },
+  tick(){ if(!soundOn) return; tone(1568,0,.07,.05,'square'); },
+  done(){ if(!soundOn) return; tone(659,0,.25); tone(880,.18,.25); tone(1319,.36,.6); }
+};
+
+/* ---------- state ---------- */
+let screen = 'home';     // home | runner | editor | checkin | loadout | settings
+let R = null;            // runner state
+let editing = null;      // editor working copy
+let lo = null;           // loadout working state
+let ci = null;           // check-in working state
+let ciErr = '';
+let tickHandle = null, lastTs = null;
+
+/* ---------- mission flow ---------- */
+function startMission(id){
+  const m = missions.find(x=>x.id===id);
+  if(!m) return;
+  if(m.type==='tank'){ openCheckin(id); return; }
+  if(m.loadout && m.loadout.length){ openLoadout(id); return; }
+  startRunner(id);
+}
+
+function startRunner(missionId){
+  const m = missions.find(x=>x.id===missionId);
+  if(!m) return;
+  R = {
+    m: JSON.parse(JSON.stringify(m)),
+    phase: 0,
+    remaining: m.phases[0].minutes*60,
+    curDur: m.phases[0].minutes*60,
+    running: false,
+    run: 1,
+    finished: false,
+    lastWholeSec: null
+  };
+  if(m.type==='tank'){
+    R.teams = teams.map(t=>({...t}));
+    R.teamIdx = 0;
+    R.standby = true;
+  }
+  screen = 'runner';
+  render();
+}
+
+function setPhase(idx){
+  R.phase = idx;
+  R.remaining = R.m.phases[idx].minutes*60;
+  R.curDur = R.remaining;
+  R.lastWholeSec = null;
+  lastTs = null;
+}
+
+function loop(ts){
+  if(!R || !R.running){ lastTs = null; return; }
+  if(lastTs === null) lastTs = ts;
+  const dt = (ts - lastTs)/1000;
+  lastTs = ts;
+  R.remaining -= dt;
+
+  const whole = Math.ceil(R.remaining);
+  if(whole !== R.lastWholeSec){
+    R.lastWholeSec = whole;
+    if(whole <= 5 && whole > 0) sfx.tick();
+    updateTimerDom();
+  } else {
+    updateRingDom();
+  }
+
+  if(R.remaining <= 0){ phaseDone(); return; }
+  tickHandle = requestAnimationFrame(loop);
+}
+
+function setRunning(v){
+  if(!R || R.finished) return;
+  R.running = v;
+  lastTs = null;
+  if(v){
+    audio();
+    if(R.standby){ R.standby = false; sfx.launch(); render(); }
+    tickHandle = requestAnimationFrame(loop);
+  } else if(tickHandle){ cancelAnimationFrame(tickHandle); }
+  renderRunnerControls();
+  document.querySelector('.runner')?.classList.toggle('running', v);
+}
+
+function phaseDone(){
+  cancelAnimationFrame(tickHandle);
+  const tank = R.m.type==='tank';
+  const lastPhase = R.phase >= R.m.phases.length - 1;
+
+  if(tank){
+    if(lastPhase){
+      if(R.teamIdx >= R.teams.length - 1){
+        R.finished = true; R.running = false;
+        sfx.done(); flash('TANK CLEAR'); render();
+      } else {
+        sfx.chime(); flash('PITCH COMPLETE');
+        R.teamIdx++; R.running = false; R.standby = true;
+        setPhase(0); render();
+      }
+    } else {
+      sfx.chime();
+      setPhase(R.phase + 1);
+      flash(R.m.phases[R.phase].name);
+      render();
+      tickHandle = requestAnimationFrame(loop);
+    }
+    return;
+  }
+
+  if(lastPhase){
+    R.finished = true; R.running = false;
+    sfx.done();
+    flash(R.m.type==='broadcast' ? 'OFF AIR' : 'MISSION COMPLETE');
+    render();
+  } else {
+    sfx.chime();
+    flash('PHASE CLEAR');
+    setPhase(R.phase + 1);
+    render();
+    tickHandle = requestAnimationFrame(loop);
+  }
+}
+
+function flash(msg){
+  const f = document.getElementById('flash');
+  document.getElementById('flashMsg').textContent = msg;
+  f.classList.remove('show'); void f.offsetWidth; f.classList.add('show');
+}
+
+function plusMinute(){
+  if(!R||R.finished) return;
+  R.remaining += 60; R.curDur += 60; R.m.phases[R.phase].minutes += 1;
+  render();
+  if(R.running){ lastTs=null; tickHandle=requestAnimationFrame(loop); }
+}
+function skipPhase(){ if(!R||R.finished) return; R.remaining = 0; phaseDone(); }
+function resetMission(keepRun){
+  if(!R) return;
+  const id = R.m.id, run = keepRun ? R.run : 1;
+  cancelAnimationFrame(tickHandle);
+  startRunner(id);
+  R.run = run;
+  render();
+}
+function nextCrew(){ const r = R.run; resetMission(true); R.run = Math.min(13, r+1); render(); }
+
+/* ---------- ring geometry ---------- */
+function ringSVG(){
+  const Rad = 100, C = 2*Math.PI*Rad;
+  const total = R.m.phases.reduce((a,p)=>a+p.minutes,0);
+  const gapFrac = 0.018;
+  const gaps = R.m.phases.length * gapFrac;
+  let acc = 0, segs = '';
+  const liveCol = R.m.type==='broadcast' ? '#3E6BFF' : (R.m.type==='tank' ? '#C44DFF' : '#00E5FF');
+  const doneCol = R.m.type==='broadcast' ? 'rgba(62,107,255,.4)' : (R.m.type==='tank' ? 'rgba(196,77,255,.4)' : 'rgba(0,229,255,.4)');
+  R.m.phases.forEach((p,i)=>{
+    const frac = (p.minutes/total) * (1 - gaps);
+    const len = frac * C, off = -(acc * C);
+    let col = 'rgba(0,229,255,.14)', w = 7;
+    if(i < R.phase){ col = doneCol; }
+    segs += `<circle cx="110" cy="110" r="${Rad}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"
+      stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${off}"></circle>`;
+    if(i === R.phase){
+      const dur = p.minutes*60;
+      const prog = Math.min(1, Math.max(0, (dur - R.remaining)/dur));
+      segs += `<circle id="liveArc" data-start="${acc}" data-frac="${frac}" cx="110" cy="110" r="${Rad}" fill="none"
+        stroke="${liveCol}" stroke-width="${w}" stroke-linecap="round"
+        style="filter:drop-shadow(0 0 8px ${liveCol})"
+        stroke-dasharray="${len*prog} ${C-len*prog}" stroke-dashoffset="${off}"></circle>`;
+    }
+    acc += frac + gapFrac;
+  });
+  return `<svg viewBox="0 0 220 220" aria-hidden="true">${segs}</svg>`;
+}
+function updateRingDom(){
+  const arc = document.getElementById('liveArc');
+  if(!arc || !R) return;
+  const Rad = 100, C = 2*Math.PI*Rad;
+  const frac = parseFloat(arc.dataset.frac);
+  const p = R.m.phases[R.phase], dur = p.minutes*60;
+  const prog = Math.min(1, Math.max(0,(dur - R.remaining)/dur));
+  const len = frac*C*prog;
+  arc.setAttribute('stroke-dasharray', `${len} ${C-len}`);
+}
+function updateTimerDom(){
+  const t = document.getElementById('timer');
+  if(!t || !R) return;
+  t.textContent = fmt(R.remaining);
+  t.classList.toggle('flare', R.remaining<=60 && R.remaining>10);
+  t.classList.toggle('burn', R.remaining<=10);
+  updateRingDom();
+  document.querySelectorAll('.phase-track .seg').forEach((el,i)=>{
+    el.classList.toggle('done', i < R.phase);
+    const fill = el.querySelector('.fill');
+    if(i===R.phase){
+      const dur = R.m.phases[i].minutes*60;
+      fill.style.width = `${Math.min(100,(dur-R.remaining)/dur*100)}%`;
+    } else if(i>R.phase){ fill.style.width='0%'; }
+  });
+  document.querySelectorAll('.rd-item').forEach((el,i)=>{
+    el.classList.toggle('live', i===R.phase);
+    el.classList.toggle('done', i<R.phase);
+  });
+}
+
+/* ---------- render ---------- */
+const app = document.getElementById('app');
+function render(){
+  if(screen==='home') renderHome();
+  else if(screen==='studenthome') renderStudentHome();
+  else if(screen==='runner') renderRunner();
+  else if(screen==='editor') renderEditor();
+  else if(screen==='checkin') renderCheckin();
+  else if(screen==='loadout') renderLoadout();
+  else if(screen==='settings') renderSettings();
+  else if(screen==='roster') renderRoster();
+  else if(screen==='join') renderJoin();
+  else if(screen==='log') renderLog();
+  else if(screen==='records') renderRecords();
+}
+
+function identityLine(){
+  const bits = [identity.school, identity.group, identity.teacher];
+  if(identity.room && identity.room.trim()) bits.push('ROOM ' + identity.room.trim().toUpperCase());
+  return bits.filter(Boolean).map(esc).join(' · ');
+}
+
+function renderHome(){
+  const bands=['ALL','K-2','3-4','5-6'];
+  const lessons = missions.filter(m=>m.type==='lesson' && bandMatch(m));
+  const casts = missions.filter(m=>m.type==='broadcast' && bandMatch(m));
+  const tanks = missions.filter(m=>m.type==='tank' && bandMatch(m));
+  const themeHTML = esc(identity.seasonTheme).replace(/(CHALLENGE)/i, '<span class="hot">$1</span>');
+  app.innerHTML = `
+  <div class="home">
+    <div class="brand">
+      <div class="brand-top">
+        <div class="eyebrow">${identityLine()}</div>
+        <div class="acct-bar">
+          <button class="id-edit" onclick="openJoin()">STUDENT SIGN IN</button>
+          <button class="id-edit" onclick="openRoster()">ROSTER</button>
+          <button class="id-edit" onclick="openRecords()">RECORDS</button>
+          <button class="id-edit" onclick="openSettings()">IDENTITY</button>
+        </div>
+      </div>
+      <h1>MISSION<br><span class="ion">CONTROL</span></h1>
+      <div class="sub">
+        <span class="eyebrow">CREW RUNS THE SHOW</span><span class="dot"></span>
+        <span class="eyebrow">YOU RUN THE ROOM</span>
+      </div>
+    </div>
+
+    <div class="season">
+      <div class="s-tag"><span class="s-dot"></span>${esc(identity.seasonLabel)} · BUILDING THEME</div>
+      <div class="s-theme">${themeHTML}</div>
+      <div class="s-line">${esc(identity.seasonCreed)}</div>
+    </div>
+
+    <div class="band-filter">
+      <span class="bf-label">GRADE BAND</span>
+      ${bands.map(b=>`<button class="band-btn ${homeBand===b?'on':''}" onclick="setBand('${b}')">${b==='ALL'?'ALL GRADES':'GRADES '+b}</button>`).join('')}
+    </div>
+
+    <div class="section-label"><span class="eyebrow">LESSON OPS</span></div>
+    <div class="mission-grid">
+      ${lessons.map(cardHTML).join('')}
+      <button class="card new-mission" onclick="openEditor(null)">+ NEW MISSION</button>
+    </div>
+
+    ${casts.length?`<div class="section-label"><span class="eyebrow">MORNING BROADCAST</span></div>
+    <div class="mission-grid">${casts.map(cardHTML).join('')}</div>`:''}
+
+    ${tanks.length?`<div class="section-label"><span class="eyebrow">CIRC TANK</span></div>
+    <div class="mission-grid">${tanks.map(cardHTML).join('')}</div>`:''}
+  </div>`;
+}
+function bandMatch(m){
+  if(homeBand==='ALL') return true;
+  const b=m.band||'ALL';
+  return b===homeBand || b==='ALL';
+}
+function setBand(b){ homeBand=b; renderHome(); }
+
+function cardHTML(m){
+  const total = m.phases.reduce((a,p)=>a+p.minutes,0);
+  const bars = m.phases.map(p=>`<span style="flex-grow:${p.minutes}"></span>`).join('');
+  const cls = m.type==='broadcast' ? 'broadcast' : (m.type==='tank' ? 'tank' : '');
+  let footer = `<div class="phasebar">${bars}</div>`;
+  if(m.type==='tank'){
+    footer = `<div class="mini-emblems">${
+      teams.length
+        ? teams.slice(0,8).map(t=>emblemSVG(t.name)).join('') + (teams.length>8?`<span class="empty">+${teams.length-8}</span>`:'')
+        : '<span class="empty">No teams yet. Tap to check in.</span>'
+    }</div>`;
+  }
+  return `
+  <div class="card ${cls}" tabindex="0" role="button"
+       onclick="startMission('${m.id}')" onkeydown="if(event.key==='Enter')startMission('${m.id}')">
+    <button class="edit-link" onclick="event.stopPropagation();openEditor('${m.id}')">EDIT</button>
+    <div class="chip-row"><span class="theme">${esc(m.theme)}</span><span class="band-chip">${esc(m.band||'ALL')}</span></div>
+    <h3>${esc(m.title)}</h3>
+    <div class="meta"><span><b>${m.phases.length}</b> ${m.type==='tank'?'phases / team':'phases'}</span><span><b>${fmtMin(total)}</b> min${m.type==='tank'?' / team':''}</span></div>
+    ${footer}
+  </div>`;
+}
+
+function renderRunner(){
+  const m = R.m, p = m.phases[R.phase];
+  const isCast = m.type==='broadcast';
+  const isTank = m.type==='tank';
+  const next = m.phases[R.phase+1];
+  const modeCls = isCast ? 'mode-broadcast' : (isTank ? 'mode-tank' : '');
+
+  if(R.finished){
+    const creed = isCast
+      ? 'Great show. Reset the desk and the gear for tomorrow\'s crew.'
+      : (isTank ? 'Every team put their work on the line. That is the whole idea.' : 'You took on something hard and made it better. That is the challenge.');
+    app.innerHTML = `
+    <div class="runner ${modeCls}">
+      ${hudHTML()}
+      <div class="complete">
+        <div class="eyebrow">${isCast?'BROADCAST ENDED':(isTank?'TANK COMPLETE':'ALL PHASES CLEAR')}</div>
+        <div class="big">${isCast?'OFF AIR':(isTank?'TANK CLEAR':'MISSION COMPLETE')}</div>
+        ${isCast||isTank?'':`<div class="crew">Crew <b>${R.run} of 13</b> cleared the mission.</div>`}
+        <div class="creed">${creed}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px">
+          ${isCast
+            ? `<button class="btn primary big" onclick="resetMission(false)">RESET BROADCAST</button>`
+            : (isTank
+              ? `<button class="btn primary big" onclick="exitRunner()">BACK TO HOME</button>
+                 <button class="btn ghost" onclick="resetMission(false)">RUN TANK AGAIN</button>`
+              : `<button class="btn primary big" onclick="nextCrew()">NEXT CREW &rarr;</button>
+                 <button class="btn ghost" onclick="resetMission(true)">RERUN THIS CREW</button>`)}
+          ${isCast?'':`<button class="btn" onclick="openLog('${R.m.id}')">LOG THE BUILD</button>`}
+          <button class="btn ghost" onclick="exitRunner()">HOME</button>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+
+  const teamHero = isTank ? `
+    <div class="team-hero">
+      <span class="emb">${emblemSVG(R.teams[R.teamIdx].name)}</span>
+      <div class="team-name">${esc(R.teams[R.teamIdx].name)}</div>
+    </div>` : '';
+
+  const diagram = p.img ? `
+    <div class="schematic" onclick="openDiagram('${R.phase}')" title="Tap to enlarge">
+      <span class="tag">REFERENCE</span>
+      <img src="${p.img}" alt="Reference diagram for ${esc(p.name)}">
+    </div>` : '';
+
+  const teamCounter = isTank ? `TEAM ${R.teamIdx+1} OF ${R.teams.length}` : `PHASE ${R.phase+1} OF ${m.phases.length}`;
+
+  const stage = `
+    <div class="stage">
+      <div class="phase-eyebrow eyebrow">${esc(p.name)} · ${teamCounter}${p.role?` · ${esc(p.role)}`:''}</div>
+      ${isTank ? teamHero : `<div class="phase-name">${esc(p.name)}</div>`}
+      <div class="ring-wrap">
+        ${ringSVG()}
+        <div class="timebox">
+          <div class="timer" id="timer">${fmt(R.remaining)}</div>
+          <div class="timer-label">${R.standby?'ON DECK':'REMAINING'}</div>
+        </div>
+      </div>
+      <div class="instruction">${esc(p.text)}</div>
+      ${p.challenge ? `<div class="challenge-link"><span class="cl-tag"><span class="cl-dot"></span>${esc(identity.seasonTheme)}</span><span class="cl-text">${esc(p.challenge)}</span></div>` : ''}
+      ${diagram}
+      <div class="next-up">${next ? `NEXT: <b>${esc(next.name)}</b> · ${fmtMin(next.minutes)} min` : (isCast?'FINAL SEGMENT':(isTank?'LAST PHASE FOR THIS TEAM':'FINAL PHASE'))}</div>
+      <div class="phase-track">
+        ${m.phases.map((ph,i)=>`<div class="seg ${i<R.phase?'done':''}" style="flex-grow:${ph.minutes}"><div class="fill"></div></div>`).join('')}
+      </div>
+    </div>`;
+
+  let body = stage;
+  if(isCast){
+    body = `<div class="broadcast-layout">
+      <div class="rundown">
+        <div class="eyebrow rd-title">RUNDOWN</div>
+        ${m.phases.map((ph,i)=>`
+          <div class="rd-item ${i<R.phase?'done':''} ${i===R.phase?'live':''}">
+            <span class="nm">${esc(ph.name)}${ph.role?`<span class="role">${esc(ph.role)}</span>`:''}</span>
+            <span class="tm">${fmt(ph.minutes*60)}</span>
+          </div>`).join('')}
+      </div>
+      ${stage}
+    </div>`;
+  } else if(isTank){
+    body = `<div class="broadcast-layout">
+      <div class="rundown">
+        <div class="eyebrow rd-title">ON DECK</div>
+        ${R.teams.map((t,i)=>`
+          <div class="rd-item ${i<R.teamIdx?'done':''} ${i===R.teamIdx?'live':''} ${i===R.teamIdx+1?'ondeck':''}">
+            <span class="ob">${emblemSVG(t.name)}<span class="nm">${esc(t.name)}</span></span>
+            ${i===R.teamIdx?'<span class="tag">PITCHING</span>':(i===R.teamIdx+1?'<span class="tag">NEXT</span>':'')}
+          </div>`).join('')}
+      </div>
+      ${stage}
+    </div>`;
+  }
+
+  app.innerHTML = `
+  <div class="runner ${modeCls} ${R.running?'running':''}">
+    ${hudHTML()}
+    ${body}
+    <div class="deck" id="deck"></div>
+  </div>`;
+  renderRunnerControls();
+  updateTimerDom();
+}
+
+function hudHTML(){
+  const m = R.m, isCast = m.type==='broadcast', isTank = m.type==='tank';
+  let statusPill;
+  if(isCast){
+    statusPill = `<span class="pill onair"><span class="blink"></span>${R.running?'ON AIR':'STANDBY'}</span>`;
+  } else if(isTank){
+    statusPill = `<span class="pill tankpill">TEAM ${R.teamIdx+1} / ${R.teams.length}</span>`;
+  } else {
+    statusPill = `<span class="pill run" title="Tap to set which class period this is" onclick="bumpRun()">RUN ${R.run} / 13</span>`;
+  }
+  return `
+  <div class="hud">
+    <div class="left">
+      <button class="btn ghost exit" onclick="exitRunner()">&larr; HOME</button>
+      <span class="mission-name">${esc(m.title)}</span>
+      <span class="pill theme-pill">${esc(identity.seasonTheme)}</span>
+    </div>
+    <div class="right">
+      ${statusPill}
+      <button class="btn ghost exit" id="sndBtn" onclick="toggleSound()">${soundOn?'SOUND ON':'SOUND OFF'}</button>
+    </div>
+  </div>`;
+}
+
+function renderRunnerControls(){
+  const deck = document.getElementById('deck');
+  if(!deck || !R || R.finished) return;
+  const launchLabel = R.standby ? 'LAUNCH PITCH' : (R.running ? 'HOLD' : 'LAUNCH');
+  deck.innerHTML = `
+    <button class="btn primary big" onclick="setRunning(${!R.running})">${launchLabel}</button>
+    <button class="btn" onclick="plusMinute()">+1 MIN</button>
+    <button class="btn" onclick="skipPhase()">NEXT PHASE</button>
+    <button class="btn danger" onclick="resetMission(true)">RESET</button>`;
+}
+
+function bumpRun(){ if(!R) return; R.run = R.run >= 13 ? 1 : R.run+1; render(); }
+function toggleSound(){ soundOn = !soundOn; const b=document.getElementById('sndBtn'); if(b) b.textContent = soundOn?'SOUND ON':'SOUND OFF'; }
+function exitRunner(){ cancelAnimationFrame(tickHandle); R=null; screen='home'; render(); }
+
+/* ---------- diagram viewer ---------- */
+function openDiagram(i){
+  const p = R.m.phases[i];
+  if(!p || !p.img) return;
+  const v = document.getElementById('viewer');
+  document.getElementById('viewerImg').src = p.img;
+  v.classList.add('show');
+}
+function closeDiagram(){ document.getElementById('viewer').classList.remove('show'); }
+
+/* ---------- check-in (CIRC Tank) ---------- */
+function openCheckin(id){ ci = { id }; ciErr=''; screen='checkin'; render(); }
+function renderCheckin(){
+  const m = missions.find(x=>x.id===ci.id);
+  app.innerHTML = `
+  <div class="checkin">
+    <button class="btn ghost" onclick="screen='home';render()">&larr; HOME</button>
+    <h2 class="screen-title" style="color:var(--tank)">${esc(m.title)} · CHECK-IN</h2>
+    <p class="note" style="margin-top:0">Type a team name and check in. Every team gets its own emblem, generated from the name. Same name, same emblem, every time.</p>
+    <div class="ci-row" style="margin-top:18px">
+      <input id="teamName" maxlength="40" placeholder="TEAM NAME" autocomplete="off"
+        onkeydown="if(event.key==='Enter')addTeam()">
+      <button class="btn primary" onclick="addTeam()">CHECK IN</button>
+    </div>
+    <div class="ci-err">${esc(ciErr)}</div>
+    <div id="reveal"></div>
+    <div class="section-label"><span class="eyebrow">ROSTER · ${teams.length} TEAM${teams.length===1?'':'S'}</span></div>
+    <div class="roster">
+      ${teams.map((t,i)=>`
+        <div class="tile">
+          <button class="rm" title="Remove" onclick="removeTeam(${i})">&times;</button>
+          ${emblemSVG(t.name)}
+          <span class="tn">${esc(t.name)}</span>
+        </div>`).join('') || '<p class="note" style="grid-column:1/-1;margin:0">No teams checked in yet.</p>'}
+    </div>
+    <div class="actions">
+      <button class="btn primary big" onclick="startTankFromCheckin()" ${teams.length?'':'disabled'}>START TANK &rarr;</button>
+      ${teams.length?`<button class="btn ghost" onclick="clearTeams()">CLEAR ROSTER</button>`:''}
+    </div>
+  </div>`;
+  const input = document.getElementById('teamName');
+  if(input) input.focus();
+}
+function addTeam(){
+  const input = document.getElementById('teamName');
+  const name = input.value.trim();
+  if(!name){ ciErr='Type a team name first.'; renderCheckin(); return; }
+  if(teams.some(t=>t.name.toUpperCase()===name.toUpperCase())){ ciErr='That team is already checked in.'; renderCheckin(); return; }
+  teams.push({ name });
+  ciErr='';
+  renderCheckin();
+  const rv = document.getElementById('reveal');
+  if(rv){
+    rv.innerHTML = `<div class="reveal stamp"><span class="emb">${emblemSVG(name)}</span>
+      <div><div class="eyebrow" style="color:var(--tank)">CHECKED IN</div><div class="rv-name">${esc(name)}</div></div></div>`;
+  }
+}
+function removeTeam(i){ teams.splice(i,1); renderCheckin(); }
+function clearTeams(){ if(confirm('Clear the whole roster?')){ teams=[]; renderCheckin(); } }
+function startTankFromCheckin(){
+  if(!teams.length) return;
+  const m = missions.find(x=>x.id===ci.id);
+  if(m.loadout && m.loadout.length){ openLoadout(ci.id); return; }
+  startRunner(ci.id);
+}
+
+/* ---------- loadout checklist ---------- */
+function openLoadout(id){
+  const m = missions.find(x=>x.id===id);
+  lo = { id, items: m.loadout.map(t=>({t, ok:false})) };
+  screen='loadout'; render();
+}
+function renderLoadout(){
+  const m = missions.find(x=>x.id===lo.id);
+  const done = lo.items.filter(x=>x.ok).length;
+  const accent = m.type==='broadcast' ? 'var(--current)' : (m.type==='tank' ? 'var(--tank)' : 'var(--ion)');
+  app.innerHTML = `
+  <div class="loadout">
+    <button class="btn ghost" onclick="backFromLoadout()">&larr; BACK</button>
+    <h2 class="screen-title" style="color:${accent}">${esc(m.title)} · LOADOUT</h2>
+    <p class="note" style="margin-top:0">Check the room before you launch. Tap each item as it is ready. This is a pre-flight check, not a gate, so you can launch whenever you are set.</p>
+    <div class="lo-list">
+      ${lo.items.map((x,i)=>`
+        <button class="lo-item ${x.ok?'ok':''}" onclick="toggleLoadoutItem(${i})">
+          <span class="box"></span><span>${esc(x.t)}</span>
+        </button>`).join('')}
+    </div>
+    <div class="lo-count"><b>${done}</b> of ${lo.items.length} ready</div>
+    <div class="actions">
+      <button class="btn primary big" onclick="launchFromLoadout()">LAUNCH &rarr;</button>
+    </div>
+  </div>`;
+}
+function toggleLoadoutItem(i){ lo.items[i].ok = !lo.items[i].ok; renderLoadout(); }
+function backFromLoadout(){
+  const m = missions.find(x=>x.id===lo.id);
+  if(m.type==='tank'){ screen='checkin'; render(); }
+  else { screen='home'; render(); }
+}
+function launchFromLoadout(){ startRunner(lo.id); }
+
+/* ---------- editor ---------- */
+function openEditor(id){
+  editing = id
+    ? JSON.parse(JSON.stringify(missions.find(m=>m.id===id)))
+    : { id:'m'+Date.now(), type:'lesson', title:'', theme:'', band:'ALL', isNew:true,
+        loadout:[],
+        phases:[
+          {name:'MISSION BRIEF', minutes:5, text:''},
+          {name:'BUILD WINDOW', minutes:20, text:''},
+          {name:'TEST + SHOW', minutes:8, text:''},
+          {name:'RESET + RECOVER', minutes:2, text:''}
+        ]};
+  if(!editing.loadout) editing.loadout = [];
+  screen='editor'; render();
+}
+function renderEditor(){
+  const isCast = editing.type==='broadcast';
+  app.innerHTML = `
+  <div class="editor">
+    <button class="btn ghost" onclick="screen='home';render()">&larr; HOME</button>
+    <h2>${editing.isNew?'NEW MISSION':'EDIT MISSION'}</h2>
+    <div class="field"><label>MISSION TYPE</label>
+      <div class="typeSel">
+        <button class="btn ${editing.type==='lesson'?'on':''}" onclick="setType('lesson')">LESSON OPS</button>
+        <button class="btn ${editing.type==='broadcast'?'on':''}" onclick="setType('broadcast')">BROADCAST</button>
+        <button class="btn ${editing.type==='tank'?'on':''}" onclick="setType('tank')">CIRC TANK</button>
+      </div>
+    </div>
+    <div class="field"><label>GRADE BAND</label>
+      <div class="typeSel">
+        ${['ALL','K-2','3-4','5-6'].map(b=>`<button class="btn ${(editing.band||'ALL')===b?'on':''}" onclick="setBandEdit('${b}')">${b==='ALL'?'ALL GRADES':'GRADES '+b}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field"><label>MISSION TITLE</label>
+      <input id="eTitle" value="${esc(editing.title)}" placeholder="GLIDER LAB"></div>
+    <div class="field"><label>THEME TAG</label>
+      <input id="eTheme" value="${esc(editing.theme)}" placeholder="FLIGHT"></div>
+
+    <div class="section-label"><span class="eyebrow">PHASES</span></div>
+    <div id="phaseList">${editing.phases.map((p,i)=>phaseRowHTML(p,i,isCast)).join('')}</div>
+    <button class="btn" onclick="addPhase()">+ ADD PHASE</button>
+
+    <div class="section-label"><span class="eyebrow">LOADOUT CHECKLIST</span></div>
+    <div id="loEditList">${editing.loadout.map((t,i)=>loEditRowHTML(t,i)).join('')}</div>
+    <button class="btn" onclick="addLoadoutItem()">+ ADD ITEM</button>
+    <p class="note">Loadout items show as a pre-flight checklist before the mission launches. Leave empty to skip straight to the runner.</p>
+
+    <div class="actions">
+      <button class="btn primary big" onclick="saveMission()">SAVE MISSION</button>
+      ${editing.isNew?'':`<button class="btn danger" onclick="deleteMission()">DELETE</button>`}
+    </div>
+    <p class="note">Missions save to this device automatically. They will still be here next time you open this page.</p>
+    <div class="reset-row">
+      <button class="btn ghost reset-defaults" onclick="resetMissionsToDefaults()">RESET TO DEFAULTS</button>
+      <span class="note" style="margin:0">Erases all custom missions and restores the built-in starter season.</span>
+    </div>
+  </div>`;
+}
+function phaseRowHTML(p,i,isCast){
+  return `
+  <div class="phase-row" data-i="${i}">
+    <div class="row-head">
+      <div class="field"><label>PHASE ${i+1} NAME</label>
+        <input class="pName" value="${esc(p.name)}"></div>
+      ${isCast?`<div class="field role"><label>ROLE</label><input class="pRole" value="${esc(p.role||'')}" placeholder="ANCHORS"></div>`:''}
+      <div class="field min"><label>MIN</label>
+        <input class="pMin" type="number" min="0.25" step="0.25" value="${p.minutes}"></div>
+      <button class="remove" onclick="removePhase(${i})">REMOVE</button>
+    </div>
+    <div class="field"><label>WHAT THE CREW SEES</label>
+      <textarea class="pText" placeholder="Big, simple, kid-readable instructions.">${esc(p.text||'')}</textarea></div>
+    <div class="field" style="margin-bottom:0"><label style="color:var(--flare)">CHALLENGE CONNECTION &middot; GOLD CALLOUT</label>
+      <textarea class="pChallenge" placeholder="How does this phase embrace the challenge? Shown on screen the whole phase.">${esc(p.challenge||'')}</textarea></div>
+  </div>`;
+}
+function loEditRowHTML(t,i){
+  return `<div class="lo-edit-row" data-i="${i}">
+    <input class="loVal" value="${esc(t)}" placeholder="1 sheet of paper per builder">
+    <button class="remove" onclick="removeLoadoutItem(${i})">REMOVE</button>
+  </div>`;
+}
+function setType(t){ harvestEditor(); editing.type = t; renderEditor(); }
+function setBandEdit(b){ harvestEditor(); editing.band = b; renderEditor(); }
+function harvestEditor(){
+  const title = document.getElementById('eTitle');
+  if(title) editing.title = title.value.trim();
+  const theme = document.getElementById('eTheme');
+  if(theme) editing.theme = theme.value.trim();
+  const rows = [...document.querySelectorAll('.phase-row')];
+  if(rows.length){
+    editing.phases = rows.map(r=>{
+      const phase = {
+        name: r.querySelector('.pName').value.trim() || 'PHASE',
+        minutes: Math.max(0.25, parseFloat(r.querySelector('.pMin').value)||1),
+        text: r.querySelector('.pText').value.trim()
+      };
+      const role = r.querySelector('.pRole');
+      if(role && role.value.trim()) phase.role = role.value.trim();
+      const ch = r.querySelector('.pChallenge');
+      if(ch && ch.value.trim()) phase.challenge = ch.value.trim();
+      const old = editing.phases[parseInt(r.dataset.i,10)];
+      if(old && old.img) phase.img = old.img;
+      return phase;
+    });
+  }
+  const loRows = [...document.querySelectorAll('.lo-edit-row')];
+  editing.loadout = loRows.map(r=>r.querySelector('.loVal').value.trim()).filter(Boolean);
+}
+function addPhase(){ harvestEditor(); editing.phases.push({name:'NEW PHASE',minutes:5,text:''}); renderEditor(); }
+function removePhase(i){ harvestEditor(); if(editing.phases.length>1) editing.phases.splice(i,1); renderEditor(); }
+function addLoadoutItem(){ harvestEditor(); editing.loadout.push(''); renderEditor(); }
+function removeLoadoutItem(i){ harvestEditor(); editing.loadout.splice(i,1); renderEditor(); }
+function saveMission(){
+  harvestEditor();
+  editing.title = editing.title || 'UNTITLED MISSION';
+  editing.theme = editing.theme || 'MISSION';
+  editing.band = editing.band || 'ALL';
+  delete editing.isNew;
+  const idx = missions.findIndex(m=>m.id===editing.id);
+  if(idx>=0) missions[idx]=editing; else missions.push(editing);
+  saveMissions();
+  screen='home'; render();
+}
+function deleteMission(){
+  if(!confirm('Delete this mission? This cannot be undone.')) return;
+  missions = missions.filter(m=>m.id!==editing.id);
+  saveMissions();
+  screen='home'; render();
+}
+
+/* ---------- settings / identity ---------- */
+function openSettings(){ screen='settings'; render(); }
+function renderSettings(){
+  app.innerHTML = `
+  <div class="editor">
+    <button class="btn ghost" onclick="screen='home';render()">&larr; HOME</button>
+    <h2>IDENTITY</h2>
+    <p class="note" style="margin-top:0">This skins the home screen and the season banner. It saves to this device.</p>
+    <div class="field"><label>SCHOOL</label><input id="sSchool" value="${esc(identity.school)}" placeholder="EHRMAN CREST"></div>
+    <div class="field"><label>GROUP</label><input id="sGroup" value="${esc(identity.group)}" placeholder="CIRC · GRADES 5-6"></div>
+    <div class="field"><label>TEACHER</label><input id="sTeacher" value="${esc(identity.teacher)}" placeholder="MR. MACEK"></div>
+    <div class="field"><label>ROOM (OPTIONAL)</label><input id="sRoom" value="${esc(identity.room)}" placeholder="e.g. 214"></div>
+
+    <div class="section-label"><span class="eyebrow">SEASON</span></div>
+    <div class="field"><label>SEASON LABEL</label><input id="sSeasonLabel" value="${esc(identity.seasonLabel)}" placeholder="2026 / 2027 SEASON"></div>
+    <div class="field"><label>SEASON THEME</label><input id="sSeasonTheme" value="${esc(identity.seasonTheme)}" placeholder="EMBRACE THE CHALLENGE"></div>
+    <div class="field"><label>SEASON CREED</label><textarea id="sSeasonCreed" placeholder="One or two lines about the year.">${esc(identity.seasonCreed)}</textarea></div>
+
+    <div class="actions">
+      <button class="btn primary big" onclick="saveSettings()">SAVE</button>
+      <button class="btn ghost" onclick="resetIdentity()">RESET IDENTITY</button>
+    </div>
+  </div>`;
+}
+function saveSettings(){
+  const g = id => (document.getElementById(id)?.value ?? '').trim();
+  identity.school = g('sSchool') || DEFAULT_IDENTITY.school;
+  identity.group = g('sGroup') || DEFAULT_IDENTITY.group;
+  identity.teacher = g('sTeacher') || DEFAULT_IDENTITY.teacher;
+  identity.room = g('sRoom');
+  identity.seasonLabel = g('sSeasonLabel') || DEFAULT_IDENTITY.seasonLabel;
+  identity.seasonTheme = g('sSeasonTheme') || DEFAULT_IDENTITY.seasonTheme;
+  identity.seasonCreed = g('sSeasonCreed') || DEFAULT_IDENTITY.seasonCreed;
+  saveIdentity();
+  screen='home'; render();
+}
+function resetIdentity(){
+  if(!confirm('Reset the school and season identity back to defaults?')) return;
+  identity = {...DEFAULT_IDENTITY};
+  saveIdentity();
+  renderSettings();
+}
+
+/* ==============================================================
+   ROSTER + ACCOUNTS + RECORDS  (cross-day tracking)
+   --------------------------------------------------------------
+   HONEST NOTE ON STORAGE. This layer keeps classes, students, and
+   records in THIS browser via localStorage. That means it works
+   offline and persists across days on this device, and it is great
+   for a shared sign-in station (one tablet at the door). It does
+   NOT sync across devices on its own. For students on their own
+   phones at the same time, and for one pooled set of records, you
+   need a backend. Firebase is the plan in the project brief.
+
+   Everything reads and writes through the Store object below, so
+   the swap is contained: reimplement Store.read / Store.write to
+   talk to Firestore, sign students in with Firebase Auth (or, once
+   your district approves it, Microsoft or Clever SSO), and call
+   render() from a Firestore snapshot listener so every device sees
+   changes live. The screens and data model do not change.
+   ============================================================== */
+const Store = {
+  read(key, fallback){ try{ const r = localStorage.getItem(key); return r ? JSON.parse(r) : fallback; }catch(e){ return fallback; } },
+  write(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+};
+const CLASSES_KEY = 'missionControl.classes.v1';
+const RECORDS_KEY = 'missionControl.records.v1';
+const SESSION_KEY = 'missionControl.session.v1';
+let classes = Store.read(CLASSES_KEY, []);
+let records = Store.read(RECORDS_KEY, []);
+let session = Store.read(SESSION_KEY, null);   // {classId, studentId} signed-in student
+let roster = {};      // roster screen working state
+let join = null;      // student join flow
+let logState = null;  // log screen working state
+let pendingLog = null;
+let recordsView = {classId:'all'};
+function saveClasses(){ Store.write(CLASSES_KEY, classes); }
+function saveRecords(){ Store.write(RECORDS_KEY, records); }
+function saveSession(){ Store.write(SESSION_KEY, session); }
+
+const uid = () => 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const todayKey = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const prettyDay = k => { const [y,m,d]=k.split('-'); return new Date(+y,+m-1,+d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); };
+function genCode(){ const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s=''; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+function findClass(id){ return classes.find(c=>c.id===id); }
+function findStudent(c, sid){ return c ? (c.students||[]).find(s=>s.id===sid) : null; }
+function currentStudent(){ if(!session) return null; const c=findClass(session.classId); return c ? findStudent(c, session.studentId) : null; }
+function cloudNoteHTML(){ return `<div class="cloud-note"><b>Where this data lives:</b> records save to this device only, which is ideal for one shared sign-in station. To sync across phones and pool every class in one place, connect a backend (Firebase, per your project plan). District sign-in (Microsoft or Clever) needs your IT team to approve the app first, so until then keep it to first names plus a 4-digit code, with no emails or passwords.</div>`; }
+function download(filename, text, type){ const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},120); }
+
+/* ---------- roster (teacher) ---------- */
+function openRoster(){ roster={}; screen='roster'; render(); }
+function renderRoster(){
+  if(roster.classId){ renderClassDetail(); return; }
+  app.innerHTML = `
+  <div class="editor">
+    <button class="btn ghost" onclick="screen='home';render()">&larr; HOME</button>
+    <h2>ROSTER</h2>
+    <p class="note" style="margin-top:0">Set up your classes and students. Each class gets a join code. Students sign in by tapping their name and entering a 4-digit code they pick. No emails, no passwords.</p>
+    <div class="list-stack">
+      ${classes.map(c=>`
+        <button class="row-card" style="cursor:pointer" onclick="openClass('${c.id}')">
+          <span class="rc-main"><span class="rc-title">${esc(c.name)}</span>
+            <span class="rc-sub">${(c.students||[]).length} students</span></span>
+          <span class="code-chip">${esc(c.code)}</span>
+        </button>`).join('') || '<p class="note" style="margin:0">No classes yet. Add your first one below.</p>'}
+    </div>
+    <div class="ci-row">
+      <input id="newClass" placeholder="CLASS NAME, e.g. PERIOD 3" onkeydown="if(event.key==='Enter')addClass()">
+      <button class="btn primary" onclick="addClass()">ADD CLASS</button>
+    </div>
+    ${cloudNoteHTML()}
+  </div>`;
+  document.getElementById('newClass')?.focus();
+}
+function addClass(){ const i=document.getElementById('newClass'); const name=i.value.trim(); if(!name) return; classes.push({id:uid(), name, code:genCode(), students:[]}); saveClasses(); renderRoster(); }
+function openClass(id){ roster={classId:id}; renderRoster(); }
+function renderClassDetail(){
+  const c=findClass(roster.classId); if(!c){ roster={}; renderRoster(); return; }
+  app.innerHTML = `
+  <div class="editor">
+    <button class="btn ghost" onclick="roster={};renderRoster()">&larr; ALL CLASSES</button>
+    <h2>${esc(c.name)}</h2>
+    <div class="row-card" style="margin-bottom:18px">
+      <span class="rc-main"><span class="rc-sub">STUDENT JOIN CODE</span><span class="rc-title">Tap STUDENT SIGN IN, then enter this</span></span>
+      <span class="code-chip">${esc(c.code)}</span>
+    </div>
+    <div class="section-label"><span class="eyebrow">STUDENTS · ${c.students.length}</span></div>
+    <div class="roster">
+      ${c.students.map(s=>`<div class="tile"><button class="rm" title="Remove" onclick="removeStudent('${c.id}','${s.id}')">&times;</button>
+        ${emblemSVG(s.name)}<span class="tn">${esc(s.name)}</span></div>`).join('') || '<p class="note" style="grid-column:1/-1;margin:0">No students yet.</p>'}
+    </div>
+    <div class="ci-row" style="margin-top:14px">
+      <input id="newStudent" placeholder="STUDENT NAME" onkeydown="if(event.key==='Enter')addStudent()">
+      <button class="btn primary" onclick="addStudent()">ADD</button>
+    </div>
+    <div class="field" style="margin-top:14px"><label>OR PASTE A LIST (one name per line)</label>
+      <textarea id="pasteRoster" placeholder="Ada Lovelace&#10;Grace Hopper&#10;Katherine Johnson"></textarea></div>
+    <button class="btn" onclick="importRoster()">IMPORT NAMES</button>
+    <div class="reset-row"><button class="btn danger" onclick="deleteClass('${c.id}')">DELETE CLASS</button>
+      <span class="note" style="margin:0">Saved student logs stay in Records even if you delete the class.</span></div>
+  </div>`;
+  document.getElementById('newStudent')?.focus();
+}
+function addStudent(){ const c=findClass(roster.classId); const i=document.getElementById('newStudent'); const name=i.value.trim(); if(!name||!c) return; if(c.students.some(s=>s.name.toUpperCase()===name.toUpperCase())){ i.value=''; return; } c.students.push({id:uid(), name, pin:null}); saveClasses(); renderClassDetail(); }
+function importRoster(){ const c=findClass(roster.classId); if(!c) return; const t=document.getElementById('pasteRoster').value; const names=t.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean); names.forEach(n=>{ if(!c.students.some(s=>s.name.toUpperCase()===n.toUpperCase())) c.students.push({id:uid(),name:n,pin:null}); }); saveClasses(); renderClassDetail(); }
+function removeStudent(cid,sid){ const c=findClass(cid); if(!c) return; c.students=c.students.filter(s=>s.id!==sid); saveClasses(); renderClassDetail(); }
+function deleteClass(id){ if(!confirm('Delete this class and its student list? Their saved logs stay in Records.')) return; classes=classes.filter(c=>c.id!==id); saveClasses(); roster={}; renderRoster(); }
+
+/* ---------- student sign-in ---------- */
+function openJoin(){ join={step:'code', classId:null}; ciErr=''; screen='join'; render(); }
+function renderJoin(){
+  if(join.step==='code') return renderJoinCode();
+  if(join.step==='name') return renderJoinName();
+  if(join.step==='pin') return renderJoinPin();
+}
+function renderJoinCode(){
+  app.innerHTML = `
+  <div class="checkin">
+    <button class="btn ghost" onclick="screen='home';render()">&larr; HOME</button>
+    <h2 class="screen-title">STUDENT SIGN IN</h2>
+    <p class="note" style="margin-top:0">Enter the join code your teacher put on the board.</p>
+    <div class="ci-row" style="margin-top:18px">
+      <input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off" style="text-transform:uppercase;letter-spacing:.4em" onkeydown="if(event.key==='Enter')submitCode()">
+      <button class="btn primary" onclick="submitCode()">NEXT</button>
+    </div>
+    <div class="ci-err">${esc(ciErr)}</div>
+  </div>`;
+  document.getElementById('joinCode')?.focus();
+}
+function submitCode(){
+  const v=document.getElementById('joinCode').value.trim().toUpperCase();
+  const c=classes.find(x=>x.code===v);
+  if(!c){ ciErr='No class found for that code. Check with your teacher.'; renderJoin(); return; }
+  if(!c.students.length){ ciErr='That class has no names yet. Ask your teacher to add you.'; renderJoin(); return; }
+  ciErr=''; join={step:'name', classId:c.id}; renderJoin();
+}
+function renderJoinName(){
+  const c=findClass(join.classId);
+  app.innerHTML = `
+  <div class="checkin">
+    <button class="btn ghost" onclick="join={step:'code'};ciErr='';renderJoin()">&larr; BACK</button>
+    <h2 class="screen-title">${esc(c.name)} · TAP YOUR NAME</h2>
+    <div class="roster">
+      ${c.students.map(s=>`<button class="tile" style="cursor:pointer" onclick="pickName('${s.id}')">
+        ${emblemSVG(s.name)}<span class="tn">${esc(s.name)}</span></button>`).join('')}
+    </div>
+  </div>`;
+}
+function pickName(sid){ join.studentId=sid; join.step='pin'; ciErr=''; renderJoin(); }
+function renderJoinPin(){
+  const c=findClass(join.classId); const s=findStudent(c,join.studentId);
+  const isNew=!s.pin;
+  app.innerHTML = `
+  <div class="checkin">
+    <button class="btn ghost" onclick="join.step='name';ciErr='';renderJoin()">&larr; BACK</button>
+    <div style="text-align:center;margin-top:10px">
+      <h2 class="screen-title">${esc(s.name)}</h2>
+      <p class="note" style="margin-top:0">${isNew?'Pick a 4-digit code you will remember. You will use it to sign in next time.':'Enter your 4-digit code.'}</p>
+      <div class="pin-row">
+        ${[0,1,2,3].map(i=>`<input class="pinDigit" data-i="${i}" type="tel" inputmode="numeric" maxlength="1" aria-label="PIN digit ${i+1}">`).join('')}
+      </div>
+      <div class="ci-err" style="text-align:center">${esc(ciErr)}</div>
+      <button class="btn primary big" onclick="submitPin(${isNew})">${isNew?'SET CODE + SIGN IN':'SIGN IN'}</button>
+    </div>
+  </div>`;
+  wirePins();
+}
+function wirePins(){
+  const ds=[...document.querySelectorAll('.pinDigit')];
+  ds.forEach((d,i)=>{
+    d.addEventListener('input',()=>{ d.value=d.value.replace(/[^0-9]/g,''); if(d.value&&i<3) ds[i+1].focus(); });
+    d.addEventListener('keydown',e=>{ if(e.key==='Backspace'&&!d.value&&i>0) ds[i-1].focus(); });
+  });
+  ds[0]?.focus();
+}
+function submitPin(isNew){
+  const pin=[...document.querySelectorAll('.pinDigit')].map(d=>d.value).join('');
+  if(pin.length<4){ ciErr='Enter all four digits.'; renderJoin(); return; }
+  const c=findClass(join.classId); const s=findStudent(c,join.studentId);
+  if(isNew){ s.pin=pin; saveClasses(); }
+  else if(s.pin!==pin){ ciErr='That code does not match. Try again.'; renderJoin(); return; }
+  session={classId:c.id, studentId:s.id}; saveSession(); ciErr='';
+  if(pendingLog){ const mid=pendingLog==='__pick__'?null:pendingLog; pendingLog=null; openLog(mid); return; }
+  screen='studenthome'; render();
+}
+function signOut(){ session=null; saveSession(); screen='home'; render(); }
+
+/* ---------- student home ---------- */
+function renderStudentHome(){
+  const c=findClass(session && session.classId); const s=currentStudent();
+  if(!s){ signOut(); return; }
+  const mine=records.filter(r=>r.studentId===s.id).sort((a,b)=>b.ts-a.ts);
+  app.innerHTML = `
+  <div class="home">
+    <div class="brand">
+      <div class="brand-top">
+        <div class="you-badge"><span class="yb-dot"></span>${esc(s.name)} · ${esc(c.name)}</div>
+        <button class="id-edit" onclick="signOut()">SIGN OUT</button>
+      </div>
+      <h1>FAIL<br><span class="ion">FORWARD</span></h1>
+      <div class="sub"><span class="eyebrow">${esc(identity.seasonTheme)}</span></div>
+    </div>
+    <div class="season">
+      <div class="s-tag"><span class="s-dot"></span>YOUR BUILD LOG</div>
+      <div class="s-line">After a mission, write down what you built, what broke, and what you changed. Logging the struggle is how you get better. That is the whole game this year.</div>
+    </div>
+    <div class="actions"><button class="btn primary big" onclick="openLog(null)">+ LOG TODAY'S BUILD</button></div>
+    <div class="section-label"><span class="eyebrow">YOUR LOG · ${mine.length} ENTR${mine.length===1?'Y':'IES'}</span></div>
+    ${mine.length ? groupedLogs(mine, false) : '<p class="note">Nothing logged yet. Your entries will show up here, newest first.</p>'}
+  </div>`;
+}
+
+/* ---------- fail-forward log ---------- */
+function openLog(missionId){
+  if(!currentStudent()){ pendingLog = missionId || '__pick__'; openJoin(); return; }
+  logState={ missionId: missionId || defaultLogMission() };
+  screen='log'; render();
+}
+function defaultLogMission(){ const l=missions.find(m=>m.type==='lesson'); return l?l.id:missions[0].id; }
+function renderLog(){
+  const s=currentStudent(); const c=findClass(session.classId);
+  if(!s){ openJoin(); return; }
+  const opts=missions.filter(m=>m.type!=='broadcast');
+  app.innerHTML = `
+  <div class="editor">
+    <button class="btn ghost" onclick="screen='studenthome';render()">&larr; BACK</button>
+    <h2>LOG YOUR BUILD</h2>
+    <p class="note" style="margin-top:0">${esc(s.name)} · ${esc(c.name)} · ${prettyDay(todayKey())}</p>
+    <div class="field"><label>MISSION</label>
+      <select id="logMission">${opts.map(m=>`<option value="${m.id}" ${m.id===logState.missionId?'selected':''}>${esc(m.title)}</option>`).join('')}</select></div>
+    <div class="field"><label>WHAT DID YOU BUILD OR TRY?</label><textarea id="logTried" placeholder="Version one of my..."></textarea></div>
+    <div class="field"><label>WHAT BROKE OR GOT HARD?</label><textarea id="logBroke" placeholder="The weakest point was..."></textarea></div>
+    <div class="field"><label>WHAT DID YOU CHANGE TO MAKE IT BETTER?</label><textarea id="logChanged" placeholder="I changed one thing:..."></textarea></div>
+    <div class="actions"><button class="btn primary big" onclick="saveLog()">SAVE TO MY LOG</button></div>
+  </div>`;
+}
+function saveLog(){
+  const s=currentStudent(); if(!s){ openJoin(); return; }
+  const mid=document.getElementById('logMission').value;
+  const m=missions.find(x=>x.id===mid);
+  const tried=document.getElementById('logTried').value.trim();
+  const broke=document.getElementById('logBroke').value.trim();
+  const changed=document.getElementById('logChanged').value.trim();
+  if(!tried && !broke && !changed){ alert('Write at least one line before saving.'); return; }
+  records.push({ id:uid(), ts:Date.now(), date:todayKey(), classId:session.classId, studentId:s.id, studentName:s.name, missionId:mid, missionTitle:m?m.title:'MISSION', kind:'log', meta:{tried, broke, changed} });
+  saveRecords();
+  flash('LOGGED');
+  screen='studenthome'; render();
+}
+
+/* ---------- records (teacher) ---------- */
+function openRecords(){ recordsView={classId:'all'}; screen='records'; render(); }
+function groupedLogs(list, showWho){
+  const byDay={};
+  list.forEach(r=>{ (byDay[r.date]=byDay[r.date]||[]).push(r); });
+  const days=Object.keys(byDay).sort().reverse();
+  return days.map(d=>`<div class="rec-day"><div class="day-label">${prettyDay(d)}</div>${byDay[d].map(r=>logEntryHTML(r,showWho)).join('')}</div>`).join('');
+}
+function logEntryHTML(r, showWho){
+  const m=r.meta||{};
+  const who = showWho ? `${esc(r.studentName||'')}${r.classId?` · ${esc(findClass(r.classId)?(findClass(r.classId).name):'')}`:''}` : '';
+  return `<div class="log-entry">
+    <div class="le-top"><span class="le-mission">${esc(r.missionTitle||'MISSION')}</span>${who?`<span class="le-who">${who}</span>`:''}</div>
+    <div class="le-body">
+      ${m.tried?`<b>Built / tried</b><p>${esc(m.tried)}</p>`:''}
+      ${m.broke?`<b>What broke or got hard</b><p>${esc(m.broke)}</p>`:''}
+      ${m.changed?`<b>What I changed</b><p>${esc(m.changed)}</p>`:''}
+    </div>
+  </div>`;
+}
+function renderRecords(){
+  let list=records.slice();
+  if(recordsView.classId!=='all') list=list.filter(r=>r.classId===recordsView.classId);
+  list.sort((a,b)=>b.ts-a.ts);
+  app.innerHTML = `
+  <div class="editor">
+    <button class="btn ghost" onclick="screen='home';render()">&larr; HOME</button>
+    <h2>RECORDS</h2>
+    <p class="note" style="margin-top:0">Every fail-forward entry your students saved, newest first. ${records.length} total.</p>
+    <div class="typeSel" style="margin-bottom:10px">
+      <button class="btn ${recordsView.classId==='all'?'on':''}" onclick="recordsView={classId:'all'};renderRecords()">ALL</button>
+      ${classes.map(c=>`<button class="btn ${recordsView.classId===c.id?'on':''}" onclick="recordsView={classId:'${c.id}'};renderRecords()">${esc(c.name)}</button>`).join('')}
+    </div>
+    <div class="actions" style="margin-top:6px">
+      <button class="btn" onclick="exportCSV()" ${list.length?'':'disabled'}>EXPORT CSV</button>
+      <button class="btn ghost" onclick="exportJSON()" ${records.length?'':'disabled'}>EXPORT JSON</button>
+    </div>
+    ${list.length ? groupedLogs(list, true) : '<p class="note">No entries yet for this view. Students log their builds after a mission.</p>'}
+    ${cloudNoteHTML()}
+  </div>`;
+}
+function csvCell(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+function exportCSV(){
+  const rows=[['date','class','student','mission','built_or_tried','what_broke','what_changed']];
+  let list=records.slice(); if(recordsView.classId!=='all') list=list.filter(r=>r.classId===recordsView.classId);
+  list.sort((a,b)=>a.ts-b.ts);
+  list.forEach(r=>{ const m=r.meta||{}; rows.push([r.date, (findClass(r.classId)||{}).name||'', r.studentName||'', r.missionTitle||'', m.tried||'', m.broke||'', m.changed||'']); });
+  download('mission-control-records.csv', rows.map(row=>row.map(csvCell).join(',')).join('\n'), 'text/csv');
+}
+function exportJSON(){ download('mission-control-records.json', JSON.stringify(records,null,2), 'application/json'); }
+
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown', e=>{
+  if(screen!=='runner' || !R || R.finished) return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.code==='Space'){ e.preventDefault(); setRunning(!R.running); }
+  if(e.key==='n'||e.key==='N'){ skipPhase(); }
+});
+
+if(session && currentStudent()) screen='studenthome';
+render();
+</script>
+</body>
+</html>
