@@ -1,0 +1,71 @@
+// Run: node game/tests/mynecraft.test.mjs
+// Uses the exact Three.js version pinned by the game; no browser or real saves are touched.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import vm from 'node:vm';
+const html=await fs.readFile(new URL('../mynecraft.html',import.meta.url),'utf8');
+const threeURL=JSON.parse(html.match(/<script type="importmap">\s*([\s\S]*?)<\/script>/)[1]).imports.three;
+const cache=path.join(os.tmpdir(),'mynecraft-three-0.160.0.mjs');
+try{await fs.access(cache);}catch{const res=await fetch(threeURL);assert(res.ok);await fs.writeFile(cache,await res.text());}
+const Three=await import(pathToFileURL(cache));
+const events={};
+class Element{
+ constructor(){this.style={};this.children=[];this.dataset={};this.events={};this.classList={add(){},remove(){}};this.textContent='';}
+ appendChild(e){this.children.push(e);} append(...es){this.children.push(...es);}
+ addEventListener(k,f){(this.events[k]??=[]).push(f);} setAttribute(k,v){this[k]=v;}
+ getContext(){return new Proxy({measureText:t=>({width:t.length*15})},{get:(o,k)=>o[k]??(()=>{})});}
+}
+const elements=Object.fromEntries(['start','enter','mode','modeHelp','status','info'].map(k=>[k,new Element()]));
+const document={body:new Element(),createElement:()=>new Element(),getElementById:id=>elements[id]??=new Element(),addEventListener(k,f){(events[k]??=[]).push(f);},exitPointerLock(){}};
+class Renderer{constructor(){this.domElement=new Element();this.shadowMap={};}setPixelRatio(){}setSize(){}render(){}}
+let saved=JSON.stringify({edits:{'25,20,25':'snow'},player:{x:1,y:18,z:12,sel:8}}),reloaded=false;
+const context=vm.createContext({THREE:{...Three,WebGLRenderer:Renderer,TextureLoader:class {load(){return new Three.Texture();}}},document,window:{},navigator:{maxTouchPoints:0},innerWidth:1280,innerHeight:800,devicePixelRatio:1,
+ performance:{now:()=>0},setTimeout:()=>1,clearTimeout(){},setInterval(){},requestAnimationFrame(){},console,
+ addEventListener(k,f){(events[k]??=[]).push(f);},localStorage:{getItem:()=>saved,setItem:(k,v)=>saved=v,removeItem:()=>{saved=null;}},location:{reload(){reloaded=true;}},confirm:()=>true});
+const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1].replace("import * as THREE from 'three';",'');
+const instrumented=script+`\n globalThis.api={WORLD,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,tick,isSolid,isExposed,
+ get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
+ select(i){selected=i;},pause(){started=false;},modeTo(v){gameMode=v;},get keys(){return BLOCK_KEYS;},getBlock,setBlock};`;
+vm.runInContext(instrumented,context);
+const a=context.api;
+assert.equal(a.getBlock(25,20,25),'snow','legacy edits survive');
+assert.equal(a.selected,8,'selection survives');
+assert(a.getBlock(64,0,64),'larger world reaches edge');
+assert.equal(a.getBlock(0,0,0),'water');assert.equal(a.isSolid(0,0,0),false);
+assert.equal(a.getBlock(34,10,-15),'snow','white school roof');assert.equal(a.getBlock(46,6,11),undefined,'school entrance open');
+assert.equal(a.hotbar.children.length,14);
+const event={preventDefault(){}};
+a.startGame();
+// Aim at a high isolated stone target; place and break every material through the actual raycast.
+for(const [i,k] of a.keys.entries()){
+ a.player.pos.set(20.5,20.5,20.5);a.camera.position.copy(a.player.pos);a.camera.quaternion.identity();
+ a.setBlock(20,20,16,'stone');a.setBlock(20,20,17,null);a.select(i);
+ assert.equal(a.castVoxel().z,16);
+ a.doPlace();assert.equal(a.getBlock(20,20,17),k,`${k} places`);
+ a.doBreak();assert.equal(a.getBlock(20,20,17),undefined,`${k} breaks`);
+}
+// The touch/click slots select snow, glowstone, glass and water, not just keys 1-9.
+for(let i=8;i<14;i++){a.hotbar.children[i].events.click[0]();assert.equal(a.selected,i);}
+a.modeTo('survival');a.select(8);a.doPlace();assert.equal(a.getBlock(20,20,17),undefined,'no free survival blocks');
+a.setBlock(20,20,17,'snow');a.doBreak();assert.equal(a.inventory.snow,1);a.doPlace();assert.equal(a.inventory.snow,0);assert.equal(a.getBlock(20,20,17),'snow');
+for(const f of events.keydown) f({...event,code:'KeyF'});assert.equal(a.player.flying,false,'no flight in survival');
+a.modeTo('creative');for(const f of events.keydown)f({...event,code:'KeyF'});assert.equal(a.player.flying,true);
+const positions=a.npcs.map(n=>n.pos.clone());
+for(let i=0;i<200;i++)for(const n of a.npcs)n.update(.05,a.player.pos);
+assert(a.npcs.some((n,i)=>n.pos.distanceTo(positions[i])>.1),'NPCs walk');
+const animalPositions=a.animals.map(n=>n.pos.clone());
+for(let i=0;i<200;i++)for(const n of a.animals)n.update(.05);
+assert(a.animals.some((n,i)=>n.pos.distanceTo(animalPositions[i])>.1),'animals walk');
+let before=a.time;a.tick(50);assert(Math.abs(a.time-before-.05/1200)<1e-9,'20 minute cycle');
+a.pause();before=a.time;const pos=a.player.pos.clone();a.tick(100);assert.equal(a.time,before);assert.equal(a.player.pos.distanceTo(pos),0,'paused movement');
+a.player.pos.set(46.5,32.25,31.5);a.player.yaw=.42;a.player.pitch=-.2;a.player.flying=true;a.select(8);
+a.persistSave();assert.equal(JSON.parse(saved).edits['25,20,25'],'snow');
+const resumeContext=vm.createContext({...context,api:undefined});vm.runInContext(instrumented,resumeContext);
+assert.equal(resumeContext.api.player.pos.y,32.25);assert.equal(resumeContext.api.player.pos.x,46.5);assert.equal(resumeContext.api.player.pos.z,31.5);
+assert.equal(resumeContext.api.player.yaw,.42);assert.equal(resumeContext.api.player.pitch,-.2);assert.equal(resumeContext.api.player.flying,true);assert.equal(resumeContext.api.selected,8);
+
+a.resetBtn.events.click[0]();assert(reloaded);assert.equal(saved,null);a.persistSave();assert.equal(saved,null,'exit handler cannot resurrect reset world');
+console.log('PASS: legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, pause, exact save/resume position and flight, and reset.');

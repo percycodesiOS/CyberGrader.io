@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>MYnecraft 3.0</title>
+<title>MYnecraft 3.1</title>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
   canvas { display: block; touch-action: none; }
@@ -99,6 +99,17 @@
   #btnPlace:active { background: #8fffa8; color: #102a1c; }
   #btnBreak { background: #2a1118; color: #ff9ec2; }
   #btnBreak:active { background: #ff9ec2; color: #2a1118; }
+  #hotbar { z-index: 8; max-width: 94vw; overflow-x: auto; touch-action: pan-x; }
+  #hotbar button { flex: 0 0 auto; cursor: pointer; }
+  .touch-device #hotbar { bottom: 180px !important; }
+  #status { position: fixed; top: 86px; left: 12px; z-index: 8; color: white; background: #163347e8; padding: 8px; border-radius: 6px; font-size: 12px; pointer-events: none; }
+  #start button, #start select { font: inherit; padding: 10px; border-radius: 6px; }
+  @media (max-width: 900px) {
+    #info { top: 58px; font-size: 10px; max-width: 90vw; }
+    #status { top: 108px; }
+    #hotbar { bottom: 180px !important; }
+    #start h1 { font-size: 36px; }
+  }
 </style>
 </head>
 <body>
@@ -109,6 +120,7 @@
   <div id="touchActions">
     <div class="row">
       <button class="touchBtn" id="btnFly" type="button">FLY</button>
+      <button class="touchBtn" id="btnDown" type="button">DOWN</button>
       <button class="touchBtn" id="btnJump" type="button">JUMP</button>
     </div>
     <div class="row">
@@ -119,13 +131,18 @@
 </div>
 <div id="info">
   WASD move &nbsp;·&nbsp; DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
-  LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / SCROLL pick block
+  LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block
 </div>
 <div id="start">
-  <h1>MYNECRAFT 3.0</h1>
-  <p>A tiny blocky world with day &amp; night.<br/>Click + drag to look around &nbsp;·&nbsp; press F to fly &nbsp;·&nbsp; ESC for this menu.</p>
-  <div class="btn">▶ ENTER WORLD</div>
+  <h1>MYNECRAFT 3.1</h1>
+  <p>Build, explore, and make something yours.<br/>A bigger world, a central lake, friendly animals, and a school to discover.<br/>20-minute days · Click + drag to look · ESC for this menu</p>
+  <label>Play your way <select id="mode"><option value="creative">Creative — unlimited blocks + flight</option><option value="survival">Survival — collect blocks + watch your health</option></select></label>
+  <p id="modeHelp">Your existing build stays here when you change modes.</p>
+  <button class="btn" id="enter" type="button">▶ ENTER WORLD</button>
+  <div><button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button> <button id="overview" type="button">School from above · Creative</button></div>
+  <p>School: east at X 46, Z 5. Eddie waits by the entrance.<br/>Swim with SPACE / JUMP. Survival is peaceful: falls and deep water can hurt.</p>
 </div>
+<div id="status" role="status" aria-live="polite">Loading your world…</div>
 
 <script type="importmap">
 { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
@@ -272,8 +289,11 @@ const BLOCKS = {
   snow:  { name: 'Snow',  mats: Array(6).fill(0).map(()=>mkMat(texSnow)),  swatch: '#ecf2fc' },
   glow:  { name: 'Glowstone', mats: Array(6).fill(0).map(()=>mkMat(texGlow, {emissive:0xfff0b0, emissiveIntensity:0.9})), swatch: '#fae078' },
   glass: { name: 'Glass', mats: Array(6).fill(0).map(()=>mkMat(texGlass, {transparent:true, opacity:0.55})), swatch: '#bfe6f5' },
+  water: { name: 'Water', mats: Array(6).fill(0).map(()=>new THREE.MeshLambertMaterial({color:0x289ed1, transparent:true, opacity:0.58, depthWrite:false})), swatch:'#289ed1' },
+  orange: { name:'Orange panels', mats:Array(6).fill(0).map(()=>new THREE.MeshLambertMaterial({color:0xd87830})),swatch:'#d87830' },
+  blue: { name:'Blue panels', mats:Array(6).fill(0).map(()=>new THREE.MeshLambertMaterial({color:0x087bc4})),swatch:'#087bc4' },
 };
-const BLOCK_KEYS = ['grass','dirt','stone','sand','wood','leaves','planks','brick','snow','glow','glass'];
+const BLOCK_KEYS = ['grass','dirt','stone','sand','wood','leaves','planks','brick','snow','glow','glass','water','orange','blue'];
 
 // ---------- voxel world ----------
 const WORLD = new Map(); // key "x,y,z" -> blockKey
@@ -283,9 +303,14 @@ function setBlock(x,y,z,k) {
   if (k == null) WORLD.delete(id); else WORLD.set(id, k);
 }
 function getBlock(x,y,z) { return WORLD.get(key(x,y,z)); }
+function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water'; }
+const inLake = (x,z) => (x/10)**2 + (z/8)**2 < 1;
+const inSchool = (x,z) => x >= 29 && x <= 63 && z >= -21 && z <= 35;
 
 // terrain: smooth-ish heightmap via stacked sine noise
 function heightAt(x, z) {
+  if (inLake(x,z)) return -2;
+  if (inSchool(x,z)) return 3;
   const h =
     Math.sin(x*0.18)*1.2 +
     Math.cos(z*0.21)*1.2 +
@@ -294,24 +319,27 @@ function heightAt(x, z) {
   return Math.round(2 + h);
 }
 
-const SIZE = 28; // half-extent
+const SIZE = 64; // 129 x 129, room to keep building
 for (let x = -SIZE; x <= SIZE; x++) {
   for (let z = -SIZE; z <= SIZE; z++) {
     const h = heightAt(x, z);
-    for (let y = -3; y <= h; y++) {
+    for (let y = -8; y <= h; y++) {
       let k = 'stone';
       if (y === h) k = h <= 0 ? 'sand' : 'grass';
       else if (y > h - 3) k = 'dirt';
       setBlock(x, y, z, k);
     }
+    if (inLake(x,z)) for (let y = h+1; y <= 1; y++) setBlock(x,y,z,'water');
   }
 }
 
 // scatter trees
 function plantTree(x, z) {
   const h = heightAt(x, z);
-  if (h < 1) return; // not on sand
-  const trunk = 4 + (Math.random()*2|0);
+  if (h < 1 || inSchool(x,z) || Math.abs(x)<3 && z>8 && z<17) return;
+  const treeRandom = () => { treeSeed = (Math.imul(treeSeed,1664525)+1013904223)>>>0; return treeSeed/4294967296; };
+  let treeSeed = ((x*73856093) ^ (z*19349663))>>>0;
+  const trunk = 4 + (treeRandom()*2|0);
   for (let i = 1; i <= trunk; i++) setBlock(x, h+i, z, 'wood');
   // canopy
   const top = h + trunk;
@@ -321,16 +349,44 @@ function plantTree(x, z) {
         const dist = Math.abs(dx)+Math.abs(dz)+dy;
         if (dist > 3) continue;
         if (dx===0 && dz===0 && dy<2) continue;
-        if (Math.random() < 0.15 && dist >= 3) continue;
+        if (treeRandom() < 0.15 && dist >= 3) continue;
         setBlock(x+dx, top-1+dy, z+dz, 'leaves');
       }
 }
 // deterministic-ish placement
-for (let i = 0; i < 26; i++) {
+for (let i = 0; i < 90; i++) {
   const tx = ((i*7 + 3) % (SIZE*2-4)) - (SIZE-2);
   const tz = ((i*13 + 5) % (SIZE*2-4)) - (SIZE-2);
   plantTree(tx, tz);
 }
+
+// Block-built interpretation of Kenny's ECMS aerial photo: four branching wings,
+// a central entrance, orange/blue facade panels, white roofs and a loop driveway.
+const wingEnds=[[34,-15],[58,-15],[34,25],[58,25]];
+function schoolFootprint(x,z){
+  if(Math.hypot(x-46,z-5)<=6)return true;
+  return wingEnds.some(([ex,ez])=>{
+    const dx=ex-46,dz=ez-5,t=Math.max(0,Math.min(1,((x-46)*dx+(z-5)*dz)/(dx*dx+dz*dz)));
+    return Math.hypot(x-46-t*dx,z-5-t*dz)<=2.6;
+  });
+}
+for(let x=30;x<=62;x++)for(let z=-20;z<=34;z++){
+  if(schoolFootprint(x,z)){
+    const wall=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz])=>!schoolFootprint(x+dx,z+dz));
+    setBlock(x,4,z,'planks');setBlock(x,10,z,'snow');
+    for(let y=5;y<10;y++)setBlock(x,y,z,wall ? ((y===6||y===7||y===8)&&(x+z)%3!==0?'glass':Math.hypot(x-46,z-5)<8?'blue':'orange'):null);
+  } else {
+    const loop=Math.sqrt(((x-46)/10)**2+((z-27)/6)**2);
+    if(loop>.78&&loop<1.16)setBlock(x,4,z,'stone');
+  }
+}
+// Front doors through the blue central entrance, plus a walkway to the loop.
+for(let x=45;x<=47;x++)for(let z=9;z<=27;z++){
+  setBlock(x,4,z,'stone');
+  for(let y=5;y<=8;y++)setBlock(x,y,z,null);
+}
+// A few classroom tables and roof lights; the interiors stay walkable.
+for(const [x,z] of wingEnds){setBlock(x,5,z,'planks');setBlock(x,9,z,'glow');}
 
 // ---------- meshing: instanced per-block-type ----------
 // Simple approach: one InstancedMesh per block type, only for blocks with ≥1 exposed face.
@@ -338,10 +394,13 @@ const instMeshes = {}; // key -> InstancedMesh
 const instIndex = new Map(); // "x,y,z" -> { key, i }
 
 function isExposed(x,y,z) {
-  return !getBlock(x+1,y,z) || !getBlock(x-1,y,z)
-      || !getBlock(x,y+1,z) || !getBlock(x,y-1,z)
-      || !getBlock(x,y,z+1) || !getBlock(x,y,z-1);
+  const type = getBlock(x,y,z);
+  return [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].some(([dx,dy,dz])=>{
+    const n = getBlock(x+dx,y+dy,z+dz);
+    return !n || (n !== type && (n==='water' || n==='glass'));
+  });
 }
+const voxelGeometry = new THREE.BoxGeometry(1,1,1);
 
 function buildMeshes() {
   // tear down old
@@ -357,12 +416,12 @@ function buildMeshes() {
     (buckets[k] ||= []).push([x,y,z]);
   }
 
-  const geo = new THREE.BoxGeometry(1,1,1);
+  const geo = voxelGeometry;
   const dummy = new THREE.Object3D();
   for (const k of BLOCK_KEYS) {
     const list = buckets[k] || [];
     const mesh = new THREE.InstancedMesh(geo, BLOCKS[k].mats, Math.max(list.length, 1));
-    mesh.castShadow = true; mesh.receiveShadow = true;
+    mesh.castShadow = k !== 'water' && k !== 'glass'; mesh.receiveShadow = true;
     mesh.userData.blockKey = k;
     mesh.count = list.length;
     list.forEach(([x,y,z], i) => {
@@ -379,12 +438,19 @@ function buildMeshes() {
 
 // ---------- persistence (autosave to localStorage) ----------
 const SAVE_KEY = 'mynecraft_save_v1';
+let resetting = false;
 let saveState;
 try { saveState = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { saveState = {}; }
-saveState.edits = saveState.edits || {};
+if (!saveState || typeof saveState !== 'object' || Array.isArray(saveState)) saveState = {};
+saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveState.edits : {};
+let gameMode = saveState.mode === 'survival' ? 'survival' : 'creative';
+let health = Number.isFinite(saveState.health) ? Math.max(1,Math.min(20,saveState.health)) : 20;
+const inventory = Object.fromEntries(BLOCK_KEYS.map(k=>[k, Math.max(0,Math.floor(Number(saveState.inventory?.[k])||0))]));
+let breath = 10;
 // re-apply the player's saved block changes on top of the procedural world
 for (const [id, k] of Object.entries(saveState.edits)) {
-  if (k === null) WORLD.delete(id); else WORLD.set(id, k);
+  if (!/^-?\d+,-?\d+,-?\d+$/.test(id)) continue;
+  if (k === null) WORLD.delete(id); else if (BLOCKS[k]) WORLD.set(id, k);
 }
 
 let _saveTimer = null;
@@ -394,11 +460,14 @@ function recordEdit(x,y,z,k){
   _saveTimer = setTimeout(persistSave, 350);
 }
 function persistSave(){
+  if (resetting) return;
   try {
-    saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected };
+    saveState.mode = gameMode; saveState.health = health; saveState.inventory = inventory;
+    saveState.dayTime = dayTime;
+    saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
     flashSaved();
-  } catch(e){}
+  } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open to keep playing; progress could not be saved.'; }
 }
 
 buildMeshes();
@@ -543,7 +612,7 @@ class NPC {
     // find top solid block at this column near current y
     const cx = Math.floor(x), cz = Math.floor(z);
     for (let y = Math.floor(this.pos.y) + 4; y > -10; y--) {
-      if (getBlock(cx, y, cz)) return y + 1;
+      if (isSolid(cx, y, cz)) return y + 1;
     }
     return 0;
   }
@@ -567,7 +636,7 @@ class NPC {
       // make sure we stay on terrain (don't walk off edges into pits > 2 deep)
       const gNow = this.groundY(this.pos.x, this.pos.z);
       const gNxt = this.groundY(nx, nz);
-      if (Math.abs(gNxt - gNow) <= 1) {
+      if (Math.abs(nx)<SIZE-2 && Math.abs(nz)<SIZE-2 && !inLake(nx,nz) && Math.abs(gNxt - gNow) <= 1) {
         this.pos.x = nx; this.pos.z = nz; this.pos.y = gNxt;
       } else {
         // hit edge — turn
@@ -658,8 +727,75 @@ function spawnNPC(name, x, z) {
   const y = heightAt(x, z) + 1;
   npcs.push(new NPC(name, { x: x + 0.5, y, z: z + 0.5 }));
 }
-spawnNPC('Steve',  4, 4);
-spawnNPC('Alex',  -5, 3);
+spawnNPC('Steve',  12, 5);
+spawnNPC('Alex',  -12, 5);
+
+const schoolLabel = new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('ECMS'),depthTest:true}));
+schoolLabel.scale.set(7,1.75,1); schoolLabel.position.set(46,12,12); scene.add(schoolLabel);
+const schoolLogoTexture=new THREE.TextureLoader().load('./assets/ectv-school-logo.jpg');
+schoolLogoTexture.colorSpace=THREE.SRGBColorSpace;
+// Mount the supplied logo on the south end wall of the southwest classroom wing.
+const schoolLogo=new THREE.Mesh(new THREE.PlaneGeometry(3.8,3.8),new THREE.MeshBasicMaterial({map:schoolLogoTexture,side:THREE.DoubleSide}));
+schoolLogo.position.set(34,7.6,28.015);scene.add(schoolLogo);
+
+function groundSurface(x,z) {
+  for(let y=32;y>=-8;y--) if(isSolid(Math.floor(x),y,Math.floor(z))) return y+1;
+  return -8;
+}
+class Animal {
+  constructor(kind,x,z) {
+    this.kind=kind; this.pos=new THREE.Vector3(x,groundSurface(x,z),z);
+    this.heading=Math.random()*Math.PI*2; this.timer=0; this.phase=0;
+    this.group=new THREE.Group(); this.legs=[];
+    const coat=new THREE.MeshLambertMaterial({color:kind==='Cow'?0x79513a:0xeee8d7});
+    const dark=new THREE.MeshLambertMaterial({color:0x342b28});
+    const part=(w,h,d,mat,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;this.group.add(m);return m;};
+    part(.8,.65,1.2,coat,0,.95,0); part(.5,.55,.55,coat,0,1.12,.73);
+    part(.42,.22,.15,dark,0,.98,1.04);
+    for(const x of [-.26,.26]) for(const z of [-.4,.4]) this.legs.push(part(.18,.65,.18,dark,x,.33,z));
+    for(const x of [-.26,.26]) part(.07,.09,.08,dark,x,1.24,.94);
+    if(kind==='Cow') { part(.81,.3,.35,dark,0,1.02,-.25); for(const x of [-.23,.23]) part(.1,.2,.12,dark,x,1.48,.7); }
+    this.group.position.copy(this.pos); scene.add(this.group);
+  }
+  update(dt) {
+    this.timer-=dt;
+    if(this.timer<=0){this.heading=Math.random()*Math.PI*2;this.timer=2+Math.random()*5;this.walking=Math.random()>.3;}
+    let walking=false;
+    if(this.walking){
+      const x=this.pos.x+Math.sin(this.heading)*dt*.85,z=this.pos.z+Math.cos(this.heading)*dt*.85;
+      const y=groundSurface(x,z);
+      if(Math.abs(x)<SIZE-2&&Math.abs(z)<SIZE-2&&!inLake(x,z)&&Math.abs(y-this.pos.y)<=1){this.pos.set(x,y,z);walking=true;}
+      else this.timer=0;
+    }
+    this.phase+=dt*5;
+    this.legs.forEach((leg,i)=>leg.rotation.x=walking?Math.sin(this.phase+(i%2)*Math.PI)*.4:0);
+    this.group.position.copy(this.pos);this.group.rotation.y=this.heading;
+  }
+}
+const animals=[new Animal('Cow',-14,12),new Animal('Cow',-17,15),new Animal('Sheep',12,12),new Animal('Sheep',15,16)];
+
+// Eddie: blue articulated dragon, big friendly eyes and his little straw hat.
+// Original block geometry drawn from Kenny's reference, not a photo billboard.
+const eddie=new THREE.Group();
+const eddieBlue=new THREE.MeshLambertMaterial({color:0x087bda});
+const eddieLight=new THREE.MeshLambertMaterial({color:0x3aa5ef});
+const eddieDark=new THREE.MeshLambertMaterial({color:0x142b46});
+const hatMat=new THREE.MeshLambertMaterial({color:0xe4b950});
+function eddiePart(w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;eddie.add(m);return m;}
+eddiePart(.9,.55,1.7,eddieBlue,0,.65,0);
+for(let i=0;i<5;i++)eddiePart(.75-i*.11,.36-i*.045,.5,eddieBlue,Math.sin(i*.6)*.25,.5-i*.035,-1-i*.4);
+for(const x of [-.55,.55])for(const z of [-.5,.5]){eddiePart(.3,.3,.6,eddieBlue,x,.27,z);eddiePart(.36,.15,.4,eddieLight,x,.15,z+.22);}
+for(let i=0;i<5;i++){const spike=eddiePart(.23,.3,.23,eddieLight,0,1.02,.55-i*.38);spike.rotation.z=Math.PI/4;}
+const wingLeft=eddiePart(.9,.12,.95,eddieBlue,-.72,.91,-.15);wingLeft.rotation.z=.45;
+const wingRight=eddiePart(.9,.12,.95,eddieBlue,.72,.91,-.15);wingRight.rotation.z=-.45;
+eddiePart(.74,.65,.75,eddieBlue,0,1,1.08);eddiePart(.58,.32,.5,eddieLight,0,.82,1.57);
+const eyeWhite=new THREE.MeshLambertMaterial({color:0xffffff});
+for(const x of [-.39,.39]){eddiePart(.1,.32,.32,eyeWhite,x,1.12,1.28);eddiePart(.12,.19,.19,eddieDark,x*1.02,1.1,1.33);}
+eddiePart(1.1,.1,.95,hatMat,0,1.39,1.03);eddiePart(.67,.32,.56,hatMat,0,1.59,1.03);eddiePart(.7,.1,.59,eddieDark,0,1.46,1.03);
+const eddieTag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('Eddie'),depthTest:true}));eddieTag.scale.set(2,.5,1);eddieTag.position.set(0,2.2,0);eddie.add(eddieTag);
+eddie.position.set(42,groundSurface(42,29),29);eddie.rotation.y=Math.PI/4;scene.add(eddie);
+let eddiePhase=0;
+function updateEddie(dt){eddiePhase+=dt;wingLeft.rotation.z=.45+Math.sin(eddiePhase*2)*.12;wingRight.rotation.z=-wingLeft.rotation.z;}
 
 // ---------- clouds ----------
 const cloudGroup = new THREE.Group();
@@ -721,7 +857,7 @@ const sndStep  = () => blip(120, 0.05, 'sine', 0.03);
 
 // ---------- player + controls ----------
 const player = {
-  pos: new THREE.Vector3(0, heightAt(0,0)+3, 0),
+  pos: new THREE.Vector3(0.5, groundSurface(0,12)+2.7, 12.5),
   vel: new THREE.Vector3(),
   onGround: false,
   flying: false,
@@ -731,22 +867,27 @@ const player = {
 camera.position.copy(player.pos);
 
 const keys = {};
-addEventListener('keydown', e => { keys[e.code] = true; });
+addEventListener('keydown', e => { if(started){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
 addEventListener('keyup',   e => { keys[e.code] = false; });
+addEventListener('blur',()=>{Object.keys(keys).forEach(k=>keys[k]=false);});
 
 let selected = 0; // BLOCK_KEYS index
 // restore saved player position / facing / selected block from a previous session
 if (saveState.player) {
   const sp = saveState.player;
-  player.pos.set(sp.x, sp.y, sp.z);
+  if ([sp.x,sp.y,sp.z].every(Number.isFinite)) player.pos.set(sp.x, sp.y, sp.z);
   player.yaw = sp.yaw || 0; player.pitch = sp.pitch || 0;
-  if (typeof sp.sel === 'number') selected = sp.sel;
+  player.flying = gameMode==='creative' && sp.flying===true;
+  if (Number.isInteger(sp.sel)) selected = Math.max(0,Math.min(BLOCK_KEYS.length-1,sp.sel));
   camera.position.copy(player.pos);
 }
 addEventListener('keydown', e => {
   const m = e.code.match(/^Digit([1-9])$/);
   if (m) selected = Math.min(BLOCK_KEYS.length-1, parseInt(m[1],10)-1);
-  // mouse wheel / brackets cycle too (handled elsewhere)
+  if(e.code==='Digit0')selected=9;
+  if(e.code==='BracketRight')selected=(selected+1)%BLOCK_KEYS.length;
+  if(e.code==='BracketLeft')selected=(selected+BLOCK_KEYS.length-1)%BLOCK_KEYS.length;
+  refreshHotbar();
 });
 addEventListener('wheel', e => {
   if (!started) return;
@@ -762,13 +903,26 @@ function startGame() {
   started = true;
   startEl.classList.add('hidden');
   // try pointer lock — silently no-op if blocked
-  try { renderer.domElement.requestPointerLock?.(); } catch {}
+  try { renderer.domElement.requestPointerLock?.()?.catch?.(()=>{}); } catch {}
 }
-startEl.addEventListener('click', startGame);
+document.getElementById('enter').addEventListener('click', startGame);
+document.getElementById('visitSchool').addEventListener('click',()=>{
+  player.pos.set(46.5,groundSurface(46,31)+player.height+.1,31.5);player.yaw=0;player.pitch=-.06;player.flying=false;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
+});
+document.getElementById('overview').addEventListener('click',()=>{
+  if(gameMode!=='creative'){document.getElementById('modeHelp').textContent='Choose Creative above for the flying campus tour.';return;}
+  player.pos.set(61,32,43);player.yaw=.4;player.pitch=-.6;player.flying=true;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
+});
+const modeSelect=document.getElementById('mode'); modeSelect.value=gameMode;
+modeSelect.addEventListener('change',()=>{
+  gameMode=modeSelect.value;player.flying=false;player.vel.set(0,0,0);health=20;breath=10;
+  document.getElementById('modeHelp').textContent=gameMode==='survival'?'Break blocks to collect them. No flying; falls and deep water can hurt.':'Unlimited blocks and flight. Your build stays here.';
+  refreshHotbar();persistSave();
+});
 renderer.domElement.addEventListener('click', () => {
   if (!started) { startGame(); return; }
   if (document.pointerLockElement !== renderer.domElement) {
-    try { renderer.domElement.requestPointerLock?.(); } catch {}
+    try { renderer.domElement.requestPointerLock?.()?.catch?.(()=>{}); } catch {}
   }
 });
 
@@ -776,13 +930,15 @@ renderer.domElement.addEventListener('click', () => {
 addEventListener('keydown', e => {
   if (e.code === 'Escape' && started) {
     started = false;
+    Object.keys(keys).forEach(k=>keys[k]=false);
+    document.exitPointerLock?.();
     startEl.classList.remove('hidden');
   }
 });
 
 // F toggles creative flight (press SPACE to rise, SHIFT to descend while flying)
 addEventListener('keydown', e => {
-  if (e.code === 'KeyF' && started) {
+  if (e.code === 'KeyF' && started && gameMode==='creative') {
     player.flying = !player.flying;
     player.vel.set(0, 0, 0);
     if (typeof flashFly === 'function') flashFly(player.flying);
@@ -862,21 +1018,20 @@ function updateParticles(dt) {
 }
 
 function castVoxel() {
-  raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
-  const meshes = Object.values(instMeshes).filter(m => m.count > 0);
-  const hits = raycaster.intersectObjects(meshes, false);
-  if (!hits.length) return null;
-  const h = hits[0];
-  const mesh = h.object;
-  // get this instance's position from matrix
-  const m = new THREE.Matrix4();
-  mesh.getMatrixAt(h.instanceId, m);
-  const pos = new THREE.Vector3().setFromMatrixPosition(m);
-  const bx = Math.floor(pos.x), by = Math.floor(pos.y), bz = Math.floor(pos.z);
-  // determine which face
-  const normal = h.face.normal.clone();
-  // (instanced has identity rotation, so face normal is already world)
-  return { x: bx, y: by, z: bz, normal };
+  // Walk the crossed voxels, not every instance in the large world.
+  const origin=camera.position,dir=camera.getWorldDirection(new THREE.Vector3());
+  const cell=[Math.floor(origin.x),Math.floor(origin.y),Math.floor(origin.z)];
+  const o=[origin.x,origin.y,origin.z],d=[dir.x,dir.y,dir.z];
+  const step=d.map(v=>v>=0?1:-1),delta=d.map(v=>v===0?Infinity:Math.abs(1/v));
+  const next=d.map((v,i)=>v===0?Infinity:((cell[i]+(v>0?1:0))-o[i])/v);
+  let distance=0; const normal=new THREE.Vector3();
+  while(distance<=7){
+    if(getBlock(...cell)&&distance>0) return {x:cell[0],y:cell[1],z:cell[2],normal:normal.clone()};
+    const axis=next[0]<next[1]?(next[0]<next[2]?0:2):(next[1]<next[2]?1:2);
+    distance=next[axis]; cell[axis]+=step[axis];next[axis]+=delta[axis];
+    normal.set(0,0,0);normal.setComponent(axis,-step[axis]);
+  }
+  return null;
 }
 
 // break / place actions (shared by mouse clicks AND touch buttons)
@@ -885,6 +1040,8 @@ function doBreak() {
   const hit = castVoxel();
   if (!hit) return;
   const brokenKey = getBlock(hit.x, hit.y, hit.z);
+  if(hit.y<=-8){ document.getElementById('status').textContent='The bottom layer keeps our world safe to build on.';return; }
+  if(gameMode==='survival'){inventory[brokenKey]++;refreshHotbar();}
   setBlock(hit.x, hit.y, hit.z, null);
   recordEdit(hit.x, hit.y, hit.z, null);
   spawnParticles(hit.x, hit.y, hit.z, brokenKey);
@@ -898,6 +1055,10 @@ function doPlace() {
   const nx = hit.x + hit.normal.x;
   const ny = hit.y + hit.normal.y;
   const nz = hit.z + hit.normal.z;
+  if(Math.abs(nx)>SIZE || Math.abs(nz)>SIZE || ny>60 || ny<=-8) return;
+  if(getBlock(nx,ny,nz)) return;
+  const block=BLOCK_KEYS[selected];
+  if(gameMode==='survival' && inventory[block]<=0){document.getElementById('status').textContent='Collect '+BLOCKS[block].name+' by breaking it first.';return;}
   // don't overlap player
   const px = player.pos.x, py = player.pos.y, pz = player.pos.z;
   const overlap =
@@ -905,6 +1066,7 @@ function doPlace() {
     nz + 1 > pz - player.radius && nz < pz + player.radius &&
     ny + 1 > py - player.height && ny < py + 0.2;
   if (overlap) return;
+  if(gameMode==='survival'){inventory[block]--;refreshHotbar();}
   setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
   recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
   sndPlace();
@@ -933,7 +1095,7 @@ function collideAxis(axis, delta) {
   for (let x = minX; x <= maxX; x++)
     for (let y = minY; y <= maxY; y++)
       for (let z = minZ; z <= maxZ; z++) {
-        if (!getBlock(x,y,z)) continue;
+        if (!isSolid(x,y,z)) continue;
         // overlap → push back
         if (axis === 'x') {
           if (delta > 0) p.x = x - r - 0.0001;
@@ -954,15 +1116,16 @@ const SKY_DAY = new THREE.Color(0x87ceeb);
 const SKY_NOON = new THREE.Color(0x9fd8ff);
 const SKY_DUSK = new THREE.Color(0xff9e5a);
 const SKY_NIGHT = new THREE.Color(0x0b1430);
-let dayTime = 0.28; // 0..1 around the clock; start mid-morning
+let dayTime = Number.isFinite(saveState.dayTime) ? saveState.dayTime % 1 : 0.12;
 const _tmpSky = new THREE.Color();
 let last = performance.now();
 function tick(now) {
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;
 
-  // ---- day / night cycle (~5 min full day) ----
-  dayTime = (dayTime + dt / 300) % 1;
+  // A full cycle lasts 20 minutes; opening the menu pauses play.
+  const playDt = started ? dt : 0;
+  dayTime = (dayTime + playDt / 1200) % 1;
   const ang = dayTime * Math.PI * 2;
   // sun arcs overhead; moon opposite
   sun.position.set(Math.cos(ang) * 80, Math.sin(ang) * 90, 30);
@@ -994,6 +1157,8 @@ function tick(now) {
   updateHighlight();
   updateParticles(dt);
   updateCoordHUD();
+  if(started){ npcs.forEach(n=>n.update(dt,player.pos));animals.forEach(a=>a.update(dt));updateEddie(dt); }
+  updateBubble();
 
   // movement vector (yaw only)
   const forward = new THREE.Vector3(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
@@ -1005,7 +1170,8 @@ function tick(now) {
   if (keys['KeyD']) accel.add(right);
   if (keys['KeyA']) accel.sub(right);
   if (accel.lengthSq() > 0) accel.normalize();
-  const speed = (keys['ShiftLeft'] || keys['ShiftRight']) ? 8 : 5;
+  const swimming=getBlock(Math.floor(player.pos.x),Math.floor(player.pos.y-1),Math.floor(player.pos.z))==='water';
+  const speed = swimming ? 3 : (keys['ShiftLeft'] || keys['ShiftRight']) ? 8 : 5;
 
   player.vel.x = accel.x * speed;
   player.vel.z = accel.z * speed;
@@ -1015,20 +1181,36 @@ function tick(now) {
     player.vel.y = 0;
     if (keys['Space']) player.vel.y = speed;
     if (keys['ShiftLeft'] || keys['ShiftRight']) player.vel.y = -speed;
+  } else if(swimming) {
+    player.vel.y = keys['Space'] ? 3.5 : -1.5;
   } else {
     player.vel.y -= 22 * dt;
     if (keys['Space'] && player.onGround) { player.vel.y = 8.4; player.onGround = false; }
   }
 
-  player.onGround = false;
-  collideAxis('x', player.vel.x * dt);
-  collideAxis('z', player.vel.z * dt);
-  collideAxis('y', player.vel.y * dt);
+  const fallSpeed=player.vel.y;
+  if(started){
+    player.onGround = false;
+    collideAxis('x', player.vel.x * dt);
+    collideAxis('z', player.vel.z * dt);
+    collideAxis('y', player.vel.y * dt);
+    player.pos.x=Math.max(-SIZE+.5,Math.min(SIZE+.5,player.pos.x));
+    player.pos.z=Math.max(-SIZE+.5,Math.min(SIZE+.5,player.pos.z));
+    if(gameMode==='survival'){
+      if(player.onGround && fallSpeed < -12) health-=Math.floor((-fallSpeed-12)/2);
+      const underwater=getBlock(Math.floor(player.pos.x),Math.floor(player.pos.y),Math.floor(player.pos.z))==='water';
+      breath=underwater?Math.max(0,breath-dt):10;
+      if(breath===0)health-=dt*2;
+      if(!underwater&&player.onGround)health=Math.min(20,health+dt*.15);
+    }
+  } else player.vel.set(0,0,0);
 
   // fell off the world? respawn
-  if (player.pos.y < -25) {
-    player.pos.set(0, heightAt(0,0)+3, 0);
+  if (player.pos.y < -25 || health<=0) {
+    player.pos.set(.5, groundSurface(0,12)+2.7, 12.5);
     player.vel.set(0,0,0);
+    health=20;breath=10;persistSave();
+    document.getElementById('status').textContent='Back at the lake. Your collected blocks and builds are safe.';
   }
 
   camera.position.copy(player.pos);
@@ -1048,22 +1230,26 @@ addEventListener('resize', () => {
 
 // ---------- hotbar ----------
 const hotbar = document.createElement('div');
+hotbar.id='hotbar';
+hotbar.setAttribute('aria-label','Choose a block');
 hotbar.style.cssText = `
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   display: flex; gap: 6px; padding: 6px;
   background: #0007; border: 2px solid #000; border-radius: 6px;
-  pointer-events: none;
+  pointer-events: auto;
 `;
 BLOCK_KEYS.forEach((k, i) => {
-  const slot = document.createElement('div');
+  const slot = document.createElement('button');
+  slot.type='button';slot.title=BLOCKS[k].name;slot.setAttribute('aria-label',BLOCKS[k].name);
   slot.style.cssText = `
     width: 44px; height: 44px; background: ${BLOCKS[k].swatch};
     border: 3px solid #222; display: flex; align-items: flex-end; justify-content: flex-end;
     color: #fff; font: 700 11px ui-monospace; padding: 2px;
     box-shadow: inset 0 0 0 1px #fff3;
   `;
-  slot.textContent = (i+1).toString();
+  slot.textContent = i<9 ? (i+1).toString() : i===9?'0':BLOCKS[k].name;
   slot.dataset.k = k;
+  slot.addEventListener('click',()=>{selected=i;refreshHotbar();});
   hotbar.appendChild(slot);
 });
 document.body.appendChild(hotbar);
@@ -1071,6 +1257,9 @@ function refreshHotbar() {
   [...hotbar.children].forEach((el, i) => {
     el.style.outline = i === selected ? '3px solid #fff' : 'none';
     el.style.outlineOffset = i === selected ? '2px' : '0';
+    el.setAttribute('aria-pressed',String(i===selected));
+    el.textContent=gameMode==='survival' ? String(inventory[BLOCK_KEYS[i]]) : (i<9?String(i+1):i===9?'0':BLOCKS[BLOCK_KEYS[i]].name);
+    el.style.opacity=gameMode==='survival'&&inventory[BLOCK_KEYS[i]]===0?'.55':'1';
   });
 }
 refreshHotbar();
@@ -1082,7 +1271,7 @@ addEventListener('keydown', e => {
 // ---------- top-right controls: back to app, autosave indicator, reset ----------
 const ctrlPanel = document.createElement('div');
 ctrlPanel.style.cssText = `
-  position: fixed; top: 12px; right: 12px; z-index: 6;
+  position: fixed; top: 12px; right: 12px; z-index: 9;
   display: flex; gap: 8px; align-items: center;
   font: 700 12px ui-monospace, monospace;
 `;
@@ -1109,10 +1298,14 @@ resetBtn.style.cssText = `
 `;
 resetBtn.addEventListener('click', () => {
   if (!confirm('Reset the world back to the original? Your saved blocks will be erased.')) return;
-  try { localStorage.removeItem(SAVE_KEY); } catch(e){}
+  resetting=true; clearTimeout(_saveTimer);
+  try { localStorage.removeItem(SAVE_KEY); } catch(e){resetting=false;document.getElementById('status').textContent='Could not reset storage. Your world was kept.';return;}
   location.reload();
 });
-ctrlPanel.append(backLink, saveTag, resetBtn);
+const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
+menuBtn.addEventListener('click',()=>{started=false;Object.keys(keys).forEach(k=>keys[k]=false);document.exitPointerLock?.();startEl.classList.remove('hidden');persistSave();});
+const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
+ctrlPanel.append(backLink, saveTag, saveBtn, menuBtn, resetBtn);
 document.body.appendChild(ctrlPanel);
 
 function flashSaved(){
@@ -1164,12 +1357,14 @@ function updateCoordHUD() {
   coordHUD.innerHTML =
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
-    `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`;
+    `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}` +
+    (gameMode==='survival'?` (${inventory[BLOCK_KEYS[selected]]})<br>Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative');
 }
 
 // ---------- touch controls (iPhone / iPad) ----------
 const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 if (IS_TOUCH) {
+  document.body.classList.add('touch-device');
   const touchUI    = document.getElementById('touchUI');
   const lookLayer  = document.getElementById('touchLook');
   const stick      = document.getElementById('touchStick');
@@ -1178,6 +1373,7 @@ if (IS_TOUCH) {
   const btnPlace   = document.getElementById('btnPlace');
   const btnJump    = document.getElementById('btnJump');
   const btnFly     = document.getElementById('btnFly');
+  const btnDown    = document.getElementById('btnDown');
   touchUI.style.display = 'block';
 
   const LOOK_SENS = 0.0022; // same feel as the mouse path
@@ -1274,10 +1470,13 @@ if (IS_TOUCH) {
   function jumpUp(e) { keys['Space'] = false; }
   btnJump.addEventListener('touchend', jumpUp);
   btnJump.addEventListener('touchcancel', jumpUp);
+  btnDown.addEventListener('touchstart',e=>{if(started&&player.flying)keys['ShiftLeft']=true;e.preventDefault();},{passive:false});
+  for(const name of ['touchend','touchcancel'])btnDown.addEventListener(name,()=>{keys['ShiftLeft']=false;});
 
   // fly: toggle, same as pressing F
   btnFly.addEventListener('touchstart', e => {
     if (!started) { startGame(); return; }
+    if(gameMode!=='creative'){e.preventDefault();return;}
     player.flying = !player.flying;
     player.vel.set(0, 0, 0);
     if (typeof flashFly === 'function') flashFly(player.flying);
@@ -1287,6 +1486,8 @@ if (IS_TOUCH) {
 
 addEventListener('beforeunload', persistSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistSave(); });
+document.getElementById('status').textContent='Ready. Lake at the center · school to the east · Menu changes your mode.';
+setInterval(()=>{if(started)persistSave();},5000);
 </script>
 </body>
 </html>
