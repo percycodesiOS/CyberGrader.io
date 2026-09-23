@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>MYnecraft 3.1</title>
+<title>MYnecraft 3.2</title>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
   canvas { display: block; touch-action: none; }
@@ -134,13 +134,13 @@
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block
 </div>
 <div id="start">
-  <h1>MYNECRAFT 3.1</h1>
+  <h1>MYNECRAFT 3.2</h1>
   <p>Build, explore, and make something yours.<br/>A bigger world, a central lake, friendly animals, and a school to discover.<br/>20-minute days · Click + drag to look · ESC for this menu</p>
   <label>Play your way <select id="mode"><option value="creative">Creative — unlimited blocks + flight</option><option value="survival">Survival — collect blocks + watch your health</option></select></label>
   <p id="modeHelp">Your existing build stays here when you change modes.</p>
   <button class="btn" id="enter" type="button">▶ ENTER WORLD</button>
   <div><button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button> <button id="overview" type="button">School from above · Creative</button></div>
-  <p>School: east at X 46, Z 5. Eddie waits by the entrance.<br/>Swim with SPACE / JUMP. Survival is peaceful: falls and deep water can hurt.</p>
+  <p>Two-floor ECMS · glass gallery · Sir D, KaY &amp; MaCEk<br/>Ellie and Percy follow MaCEk. Meet everyone at the entrance at sunset.<br/>Swim with SPACE / JUMP. Survival is peaceful: falls and deep water can hurt.</p>
 </div>
 <div id="status" role="status" aria-live="polite">Loading your world…</div>
 
@@ -305,7 +305,7 @@ function setBlock(x,y,z,k) {
 function getBlock(x,y,z) { return WORLD.get(key(x,y,z)); }
 function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water'; }
 const inLake = (x,z) => (x/10)**2 + (z/8)**2 < 1;
-const inSchool = (x,z) => x >= 29 && x <= 63 && z >= -21 && z <= 35;
+const inSchool = (x,z) => x >= 29 && x <= 63 && z >= -26 && z <= 44;
 
 // terrain: smooth-ish heightmap via stacked sine noise
 function heightAt(x, z) {
@@ -362,31 +362,43 @@ for (let i = 0; i < 90; i++) {
 
 // Block-built interpretation of Kenny's ECMS aerial photo: four branching wings,
 // a central entrance, orange/blue facade panels, white roofs and a loop driveway.
-const wingEnds=[[34,-15],[58,-15],[34,25],[58,25]];
+const wingEnds=[[34,-19],[58,-19],[34,29],[58,29]];
+const inGallery=(x,z)=>x>=43&&x<=49&&z>=12&&z<=23;
 function schoolFootprint(x,z){
-  if(Math.hypot(x-46,z-5)<=6)return true;
+  if(Math.hypot(x-46,z-5)<=8 || inGallery(x,z))return true;
   return wingEnds.some(([ex,ez])=>{
     const dx=ex-46,dz=ez-5,t=Math.max(0,Math.min(1,((x-46)*dx+(z-5)*dz)/(dx*dx+dz*dz)));
-    return Math.hypot(x-46-t*dx,z-5-t*dz)<=2.6;
+    return Math.hypot(x-46-t*dx,z-5-t*dz)<=4;
   });
 }
-for(let x=30;x<=62;x++)for(let z=-20;z<=34;z++){
+for(let x=30;x<=62;x++)for(let z=-24;z<=43;z++){
   if(schoolFootprint(x,z)){
     const wall=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz])=>!schoolFootprint(x+dx,z+dz));
-    setBlock(x,4,z,'planks');setBlock(x,10,z,'snow');
-    for(let y=5;y<10;y++)setBlock(x,y,z,wall ? ((y===6||y===7||y===8)&&(x+z)%3!==0?'glass':Math.hypot(x-46,z-5)<8?'blue':'orange'):null);
+    setBlock(x,4,z,'planks');setBlock(x,16,z,inGallery(x,z)?'glass':'snow');
+    for(let y=5;y<16;y++) {
+      const window=inGallery(x,z)?y!==10:((y%6===0||y%6===1||y%6===2)&&(x+z)%3!==0);
+      setBlock(x,y,z,y===10?'planks':wall ? (window?'glass':Math.hypot(x-46,z-5)<10?'blue':'orange'):null);
+    }
   } else {
-    const loop=Math.sqrt(((x-46)/10)**2+((z-27)/6)**2);
+    const loop=Math.sqrt(((x-46)/10)**2+((z-35)/6)**2);
     if(loop>.78&&loop<1.16)setBlock(x,4,z,'stone');
   }
 }
 // Front doors through the blue central entrance, plus a walkway to the loop.
-for(let x=45;x<=47;x++)for(let z=9;z<=27;z++){
+for(let x=45;x<=47;x++)for(let z=22;z<=35;z++){
   setBlock(x,4,z,'stone');
   for(let y=5;y<=8;y++)setBlock(x,y,z,null);
 }
+// Three-block-wide staircase joins the actual floors. Keep a full headroom opening.
+for(let x=40;x<=42;x++)for(let z=3;z<=8;z++){
+  for(let y=5;y<=14;y++)setBlock(x,y,z,null);
+  for(let y=5;y<=z+2;y++)setBlock(x,y,z,'stone');
+}
+// Main entrance frame and canopy; glass door leaves animate below.
+for(const x of [44,48])for(let y=5;y<=9;y++)setBlock(x,y,23,'blue');
+for(let x=44;x<=48;x++)for(let z=23;z<=25;z++)setBlock(x,9,z,'snow');
 // A few classroom tables and roof lights; the interiors stay walkable.
-for(const [x,z] of wingEnds){setBlock(x,5,z,'planks');setBlock(x,9,z,'glow');}
+for(const [x,z] of wingEnds)for(const y of [5,11]){setBlock(x,y,z,'planks');setBlock(x,y+4,z,'glow');}
 
 // ---------- meshing: instanced per-block-type ----------
 // Simple approach: one InstancedMesh per block type, only for blocks with ≥1 exposed face.
@@ -464,6 +476,7 @@ function persistSave(){
   try {
     saveState.mode = gameMode; saveState.health = health; saveState.inventory = inventory;
     saveState.dayTime = dayTime;
+    saveState.campus = campusActors.map(a=>({name:a.name,x:a.pos.x,y:a.pos.y,z:a.pos.z,patrolIndex:a.patrolIndex||0}));
     saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
     flashSaved();
@@ -731,12 +744,12 @@ spawnNPC('Steve',  12, 5);
 spawnNPC('Alex',  -12, 5);
 
 const schoolLabel = new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('ECMS'),depthTest:true}));
-schoolLabel.scale.set(7,1.75,1); schoolLabel.position.set(46,12,12); scene.add(schoolLabel);
+schoolLabel.scale.set(7,1.75,1); schoolLabel.position.set(46,18,23); scene.add(schoolLabel);
 const schoolLogoTexture=new THREE.TextureLoader().load('./assets/ectv-school-logo.jpg');
 schoolLogoTexture.colorSpace=THREE.SRGBColorSpace;
 // Mount the supplied logo on the south end wall of the southwest classroom wing.
 const schoolLogo=new THREE.Mesh(new THREE.PlaneGeometry(3.8,3.8),new THREE.MeshBasicMaterial({map:schoolLogoTexture,side:THREE.DoubleSide}));
-schoolLogo.position.set(34,7.6,28.015);scene.add(schoolLogo);
+schoolLogo.position.set(34,12.6,34.015);scene.add(schoolLogo);
 
 function groundSurface(x,z) {
   for(let y=32;y>=-8;y--) if(isSolid(Math.floor(x),y,Math.floor(z))) return y+1;
@@ -796,6 +809,176 @@ const eddieTag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('Eddie
 eddie.position.set(42,groundSurface(42,29),29);eddie.rotation.y=Math.PI/4;scene.add(eddie);
 let eddiePhase=0;
 function updateEddie(dt){eddiePhase+=dt;wingLeft.rotation.z=.45+Math.sin(eddiePhase*2)*.12;wingRight.rotation.z=-wingLeft.rotation.z;}
+
+// Automatic glass entrance leaves, hinged at the sides of the three-block opening.
+const entranceDoors=[];
+for(const side of [-1,1]){
+  const hinge=new THREE.Group();hinge.position.set(side<0?45:48,5,24.025);
+  const leaf=new THREE.Mesh(new THREE.BoxGeometry(1.5,3.7,.08),new THREE.MeshLambertMaterial({color:0xafdced,transparent:true,opacity:.52}));
+  leaf.position.set(-side*.75,1.85,0);hinge.add(leaf);
+  const handle=new THREE.Mesh(new THREE.BoxGeometry(.08,.65,.15),new THREE.MeshLambertMaterial({color:0x244a60}));
+  handle.position.set(-side*1.25,1.6,.08);hinge.add(handle);hinge.userData.side=side;
+  scene.add(hinge);entranceDoors.push(hinge);
+}
+
+// Navigation uses real solid blocks on both floors, including player edits.
+// A walk node stores foot height, so a roof cannot be mistaken for the room below it.
+const campusBounds={minX:29,maxX:63,minZ:-25,maxZ:43};
+const worldBounds={minX:-SIZE+1,maxX:SIZE-1,minZ:-SIZE+1,maxZ:SIZE-1};
+const insideBounds=(x,z,b)=>x>=b.minX&&x<=b.maxX&&z>=b.minZ&&z<=b.maxZ;
+function walkFeet(x,z,nearY){
+  for(const y of [Math.round(nearY),Math.round(nearY)+1,Math.round(nearY)-1]){
+    if(isSolid(x,y-1,z)&&!getBlock(x,y,z)&&!getBlock(x,y+1,z))return y;
+  }
+  return null;
+}
+function walkTransition(from,to){
+  if(to.y>from.y && getBlock(from.x,from.y+2,from.z))return false;
+  if(to.y<from.y && getBlock(to.x,from.y+1,to.z))return false;
+  return true;
+}
+function nearestWalkPoint(target,bounds){
+  for(let r=0;r<=3;r++)for(let dx=-r;dx<=r;dx++)for(let dz=-r;dz<=r;dz++){
+    if(Math.max(Math.abs(dx),Math.abs(dz))!==r)continue;
+    const x=Math.floor(target.x)+dx,z=Math.floor(target.z)+dz;
+    if(!insideBounds(x,z,bounds))continue;
+    const y=walkFeet(x,z,target.y);if(y!==null)return {x,y,z};
+  }
+  return null;
+}
+function walkingPath(position,target,bounds){
+  const start=nearestWalkPoint(position,bounds),goal=nearestWalkPoint(target,bounds);
+  if(!start||!goal)return [];
+  const id=p=>key(p.x,p.y,p.z),goalId=id(goal),startId=id(start);
+  const queue=[start],parents=new Map([[startId,null]]),nodes=new Map([[startId,start]]);
+  for(let i=0;i<queue.length&&i<14000;i++){
+    const p=queue[i],pid=id(p);
+    if(pid===goalId){
+      const result=[];let cur=pid;
+      while(cur!==startId){result.push(nodes.get(cur));cur=parents.get(cur);}
+      return result.reverse();
+    }
+    for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const x=p.x+dx,z=p.z+dz;if(!insideBounds(x,z,bounds))continue;
+      const y=walkFeet(x,z,p.y);if(y===null)continue;
+      const next={x,y,z},nid=id(next);if(parents.has(nid)||!walkTransition(p,next))continue;
+      parents.set(nid,pid);nodes.set(nid,next);queue.push(next);
+    }
+  }
+  return [];
+}
+function faceForPerson(style){
+  return makeTexture(ctx=>{
+    ctx.fillStyle='#e5b993';ctx.fillRect(0,0,16,16);
+    ctx.fillStyle='#4a352a';
+    if(style==='sir'){ctx.fillRect(0,0,16,3);ctx.fillRect(1,10,14,6);ctx.fillStyle='#b47b60';ctx.fillRect(5,11,6,2);}
+    else {ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillRect(5,14,6,2);}
+    ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
+    ctx.fillStyle='#303b44';ctx.fillRect(4,7,2,2);ctx.fillRect(10,7,2,2);
+    ctx.fillStyle='#704431';ctx.fillRect(6,12,4,1);
+  });
+}
+function stylePerson(npc,style){
+  npc.head.material[4].map=faceForPerson(style);
+  const shirt=makeTexture(ctx=>{
+    ctx.fillStyle=style==='sir'?'#14191e':'#191c22';ctx.fillRect(0,0,16,16);
+    if(style==='macek')for(let y=1;y<16;y+=4){ctx.fillStyle='#e8e5df';ctx.fillRect(0,y,16,1);ctx.fillStyle='#aa3942';ctx.fillRect(0,y+1,16,1);}
+  });
+  npc.body.material.forEach(m=>m.map=shirt);
+  for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=style==='sir'?makeFlatTex(24,130,207):skinTex);
+  for(const leg of [npc.legL,npc.legR])leg.children[0].material.forEach(m=>m.map=makeFlatTex(25,29,33));
+  const part=(w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);npc.group.add(m);return m;};
+  if(style==='sir'){
+    part(.58,.18,.58,0x171c24,0,1.84,0);part(.55,.05,.3,0x171c24,0,1.78,.36);
+    part(.38,.07,.07,0x606f7b,0,1.91,.29);part(.12,.23,.1,0x303940,-.16,1.13,.18);
+    part(.08,.1,.04,0x6cb6e2,.16,1.12,.16);
+  } else {
+    part(.04,.5,.035,0xd1a65f,-.09,1.02,.15);part(.04,.5,.035,0xd1a65f,.09,1.02,.15);
+    part(.2,.22,.04,0xdce8ed,0,.74,.17);npc.group.scale.x=.9;
+  }
+}
+class CampusActor extends NPC {
+  constructor(name,x,y,z,style,bounds=campusBounds){
+    super(name,{x:x+.5,y,z:z+.5});this.bounds=bounds;this.route=[];this.planTimer=0;this.patrolIndex=0;this.speed=1.8;
+    this.goalKey='';stylePerson(this,style);
+    if(name==='KaY'){this.group.scale.setScalar(.58);this.speed=2.15;}
+    const saved=saveState.campus?.find?.(p=>p.name===name);
+    if(saved&&[saved.x,saved.y,saved.z].every(Number.isFinite)&&insideBounds(saved.x,saved.z,bounds)){
+      const spot=nearestWalkPoint(saved,bounds);if(spot)this.pos.set(spot.x+.5,spot.y,spot.z+.5);
+      this.patrolIndex=Math.max(0,Math.floor(saved.patrolIndex||0));
+    }
+    this.group.position.copy(this.pos);
+  }
+  go(dt,target){
+    this.planTimer-=dt;
+    const goal=nearestWalkPoint(target,this.bounds);if(!goal)return;
+    const goalKey=key(goal.x,goal.y,goal.z);
+    if(this.planTimer<=0&&(goalKey!==this.goalKey||!this.route.length)){
+      this.route=walkingPath(this.pos,goal,this.bounds);this.goalKey=goalKey;this.planTimer=1.5;
+    }
+    let moving=false;
+    if(this.route.length){
+      const next=this.route[0],ground=walkFeet(next.x,next.z,next.y);
+      if(ground!==next.y){this.route=[];this.planTimer=0;}
+      else {
+        const dx=next.x+.5-this.pos.x,dz=next.z+.5-this.pos.z,d=Math.hypot(dx,dz),step=this.speed*dt;
+        if(d<=step){this.pos.set(next.x+.5,next.y,next.z+.5);this.route.shift();}
+        else {this.pos.x+=dx/d*step;this.pos.z+=dz/d*step;this.pos.y+=(next.y-this.pos.y)*Math.min(1,dt*12);}
+        this.yaw=Math.atan2(dx,dz);moving=d>.01;
+      }
+    }
+    this.walkPhase+=dt*6;this.group.position.copy(this.pos);this.group.rotation.y=this.yaw;
+    if(this.dogLegs){
+      this.dogLegs.forEach((leg,i)=>leg.rotation.x=moving?Math.sin(this.walkPhase+(i%2)*Math.PI)*.5:0);
+      this.tail.rotation.z=Math.sin(this.walkPhase*1.7)*.45;
+    } else {
+      const swing=moving?Math.sin(this.walkPhase)*.6:0;
+      this.armL.rotation.x=swing;this.armR.rotation.x=-swing;this.legL.rotation.x=-swing;this.legR.rotation.x=swing;
+    }
+  }
+  patrol(dt,points){
+    this.patrolIndex%=points.length;const [x,y,z]=points[this.patrolIndex];
+    const destination=nearestWalkPoint({x,y,z},this.bounds);
+    if(!destination || Math.hypot(this.pos.x-(destination.x+.5),this.pos.z-(destination.z+.5))<.7&&Math.abs(this.pos.y-destination.y)<.5)this.patrolIndex=(this.patrolIndex+1)%points.length;
+    const p=points[this.patrolIndex];this.go(dt,{x:p[0],y:p[1],z:p[2]});
+  }
+}
+function makeRetriever(actor,collarColor){
+  scene.remove(actor.group);actor.group=new THREE.Group();actor.dogLegs=[];
+  const gold=new THREE.MeshLambertMaterial({color:0xdca64e}),light=new THREE.MeshLambertMaterial({color:0xf0cf80}),dark=new THREE.MeshLambertMaterial({color:0x282218});
+  const part=(w,h,d,mat,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;actor.group.add(m);return m;};
+  part(.62,.58,1.15,gold,0,.67,0);part(.54,.55,.54,light,0,.98,.61);part(.35,.25,.38,light,0,.83,.94);part(.2,.14,.08,dark,0,.88,1.14);
+  for(const x of [-.31,.31]){part(.18,.45,.32,gold,x,.81,.57);part(.08,.09,.07,dark,x*.65,1.07,.88);}
+  for(const x of [-.2,.2])for(const z of [-.35,.35])actor.dogLegs.push(part(.16,.45,.2,gold,x,.25,z));
+  actor.tail=part(.17,.18,.7,light,0,.84,-.78);actor.tail.rotation.x=-.55;
+  part(.6,.12,.18,new THREE.MeshLambertMaterial({color:collarColor}),0,.76,.42);
+  const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(actor.name),depthTest:true}));tag.scale.set(1.5,.38,1);tag.position.y=1.7;actor.group.add(tag);scene.add(actor.group);actor.speed=2.5;
+}
+const sirD=new CampusActor('Sir D',46,5,26,'sir');
+const macek=new CampusActor('MaCEk',47,5,29,'macek',worldBounds);
+const kay=new CampusActor('KaY',44,5,26,'sir');
+const ellie=new CampusActor('Ellie',47,5,31,'macek',worldBounds);makeRetriever(ellie,0xb55696);
+const percy=new CampusActor('Percy',45,5,31,'macek',worldBounds);makeRetriever(percy,0x247dd5);
+const campusActors=[sirD,macek,kay,ellie,percy];
+const sirPatrol=[[46,5,18],[50,5,6],[43,11,9],[46,11,18],[46,5,26],[55,5,38]];
+const macekPatrol=[[46,5,18],[47,11,16],[46,5,29],[25,heightAt(25,12)+1,12],[15,heightAt(15,12)+1,12]];
+let greetedAtSunset=false;
+function updateCampus(dt){
+  const meeting=dayTime>=.43&&dayTime<=.56;
+  if(meeting){
+    sirD.go(dt,{x:45,y:5,z:26});macek.go(dt,{x:47,y:5,z:26});
+    if(sirD.pos.distanceTo(macek.pos)<3.1&&!sirD.route.length&&!macek.route.length){
+      sirD.group.rotation.y=Math.PI/2;macek.group.rotation.y=-Math.PI/2;
+      if(!greetedAtSunset){showBubble(macek,'Sunset check-in. Great day, Sir D!');greetedAtSunset=true;}
+    }
+  } else {greetedAtSunset=false;sirD.patrol(dt,sirPatrol);macek.patrol(dt,macekPatrol);}
+  kay.go(dt,{x:sirD.pos.x-1.3,y:sirD.pos.y,z:sirD.pos.z+1.3});
+  ellie.go(dt,{x:macek.pos.x+1.3,y:macek.pos.y,z:macek.pos.z+1.6});
+  percy.go(dt,{x:macek.pos.x-1.3,y:macek.pos.y,z:macek.pos.z+1.6});
+  const atDoor=p=>Math.hypot(p.x-46.5,p.z-24)<5&&p.y<10;
+  const open=atDoor(player.pos)||campusActors.some(a=>atDoor(a.pos));
+  entranceDoors.forEach(h=>{const target=open?h.userData.side*Math.PI*.48:0;h.rotation.y+=(target-h.rotation.y)*Math.min(1,dt*6);});
+}
 
 // ---------- clouds ----------
 const cloudGroup = new THREE.Group();
@@ -1110,6 +1293,21 @@ function collideAxis(axis, delta) {
         return;
       }
 }
+function canStandAt(pos){
+  for(let x=Math.floor(pos.x-player.radius);x<=Math.floor(pos.x+player.radius);x++)
+    for(let z=Math.floor(pos.z-player.radius);z<=Math.floor(pos.z+player.radius);z++)
+      for(let y=Math.floor(pos.y-player.height+.01);y<=Math.floor(pos.y+.1);y++)if(isSolid(x,y,z))return false;
+  return true;
+}
+function moveHorizontal(axis,delta){
+  const before=player.pos.clone();collideAxis(axis,delta);
+  if(!player.onGround||player.flying||Math.abs(player.pos[axis]-before[axis]-delta)<.001)return;
+  const blocked=player.pos.clone(),raised=before.clone();raised.y+=1.001;
+  if(!canStandAt(raised))return;
+  raised[axis]+=delta;
+  if(canStandAt(raised)){player.pos.copy(raised);player.vel.y=Math.min(0,player.vel.y);}
+  else player.pos.copy(blocked);
+}
 
 // ---------- main loop ----------
 const SKY_DAY = new THREE.Color(0x87ceeb);
@@ -1157,7 +1355,7 @@ function tick(now) {
   updateHighlight();
   updateParticles(dt);
   updateCoordHUD();
-  if(started){ npcs.forEach(n=>n.update(dt,player.pos));animals.forEach(a=>a.update(dt));updateEddie(dt); }
+  if(started){ npcs.forEach(n=>n.update(dt,player.pos));animals.forEach(a=>a.update(dt));updateEddie(dt);updateCampus(dt); }
   updateBubble();
 
   // movement vector (yaw only)
@@ -1190,9 +1388,9 @@ function tick(now) {
 
   const fallSpeed=player.vel.y;
   if(started){
+    moveHorizontal('x', player.vel.x * dt);
+    moveHorizontal('z', player.vel.z * dt);
     player.onGround = false;
-    collideAxis('x', player.vel.x * dt);
-    collideAxis('z', player.vel.z * dt);
     collideAxis('y', player.vel.y * dt);
     player.pos.x=Math.max(-SIZE+.5,Math.min(SIZE+.5,player.pos.x));
     player.pos.z=Math.max(-SIZE+.5,Math.min(SIZE+.5,player.pos.z));
@@ -1358,7 +1556,8 @@ function updateCoordHUD() {
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
     `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}` +
-    (gameMode==='survival'?` (${inventory[BLOCK_KEYS[selected]]})<br>Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative');
+    (gameMode==='survival'?` (${inventory[BLOCK_KEYS[selected]]})<br>Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
+    (dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'');
 }
 
 // ---------- touch controls (iPhone / iPad) ----------

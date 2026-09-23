@@ -28,14 +28,15 @@ const context=vm.createContext({THREE:{...Three,WebGLRenderer:Renderer,TextureLo
 const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1].replace("import * as THREE from 'three';",'');
 const instrumented=script+`\n globalThis.api={WORLD,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,tick,isSolid,isExposed,
  get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
- select(i){selected=i;},pause(){started=false;},modeTo(v){gameMode=v;},get keys(){return BLOCK_KEYS;},getBlock,setBlock};`;
+ select(i){selected=i;},pause(){started=false;},modeTo(v){gameMode=v;},get keys(){return BLOCK_KEYS;},getBlock,setBlock,campusActors,sirD,macek,kay,ellie,percy,walkingPath,campusBounds,insideBounds,updateCampus,entranceDoors,moveHorizontal,canStandAt,
+ setTime(t){dayTime=t;}};`;
 vm.runInContext(instrumented,context);
 const a=context.api;
 assert.equal(a.getBlock(25,20,25),'snow','legacy edits survive');
 assert.equal(a.selected,8,'selection survives');
 assert(a.getBlock(64,0,64),'larger world reaches edge');
 assert.equal(a.getBlock(0,0,0),'water');assert.equal(a.isSolid(0,0,0),false);
-assert.equal(a.getBlock(34,10,-15),'snow','white school roof');assert.equal(a.getBlock(46,6,11),undefined,'school entrance open');
+assert.equal(a.getBlock(34,16,-19),'snow','white school roof');assert.equal(a.getBlock(46,6,23),undefined,'school entrance open');
 assert.equal(a.hotbar.children.length,14);
 const event={preventDefault(){}};
 a.startGame();
@@ -59,6 +60,26 @@ assert(a.npcs.some((n,i)=>n.pos.distanceTo(positions[i])>.1),'NPCs walk');
 const animalPositions=a.animals.map(n=>n.pos.clone());
 for(let i=0;i<200;i++)for(const n of a.animals)n.update(.05);
 assert(a.animals.some((n,i)=>n.pos.distanceTo(animalPositions[i])>.1),'animals walk');
+// The upper floor is reachable on foot from outside, through the main entrance and stairs.
+const stairs=a.walkingPath({x:46.5,y:5,z:26.5},{x:47,y:11,z:16},a.campusBounds);
+assert(stairs.length>0,'route through main door to upper floor');assert(stairs.some(p=>p.y===11),'second-floor route');
+assert(a.walkingPath({x:47.5,y:11,z:16.5},{x:45,y:5,z:26},a.campusBounds).length>0,'route down stairs');
+// Grounded players step up the real staircase without having to fly.
+a.player.pos.set(41.5,6.7001,2.7);a.player.onGround=true;a.player.flying=false;a.moveHorizontal('z',.2);
+assert(a.player.pos.y>7.6,'player can climb first stair');
+a.setTime(.2);
+let highestSirD=0;
+for(let i=0;i<500;i++){a.updateCampus(.2);highestSirD=Math.max(highestSirD,a.sirD.pos.y);for(const actor of [a.sirD,a.kay])assert(a.insideBounds(actor.pos.x,actor.pos.z,a.campusBounds),'campus boundary');}
+assert(highestSirD>=10.9,'Sir D patrols upstairs');
+for(let i=0;i<420;i++){a.setTime(.43+i*.2/1200);a.updateCampus(.2);}
+assert(a.sirD.pos.distanceTo(a.macek.pos)<3.1,'sunset rendezvous');
+assert(Math.abs(a.sirD.pos.z-26.5)<1,'meeting at entrance');
+assert(a.ellie.pos.distanceTo(a.macek.pos)<4,'Ellie follows MaCEk');
+assert(a.percy.pos.distanceTo(a.macek.pos)<4,'Percy follows MaCEk');
+assert(a.kay.pos.distanceTo(a.sirD.pos)<4,'KaY follows Sir D');
+assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,MaCEk,KaY,Ellie,Percy');
+a.player.pos.set(46.5,6.7,24);a.updateCampus(.2);assert(Math.abs(a.entranceDoors[0].rotation.y)>.1,'main doors open nearby');
+a.setTime(.12);
 let before=a.time;a.tick(50);assert(Math.abs(a.time-before-.05/1200)<1e-9,'20 minute cycle');
 a.pause();before=a.time;const pos=a.player.pos.clone();a.tick(100);assert.equal(a.time,before);assert.equal(a.player.pos.distanceTo(pos),0,'paused movement');
 a.player.pos.set(46.5,32.25,31.5);a.player.yaw=.42;a.player.pitch=-.2;a.player.flying=true;a.select(8);
@@ -68,4 +89,4 @@ assert.equal(resumeContext.api.player.pos.y,32.25);assert.equal(resumeContext.ap
 assert.equal(resumeContext.api.player.yaw,.42);assert.equal(resumeContext.api.player.pitch,-.2);assert.equal(resumeContext.api.player.flying,true);assert.equal(resumeContext.api.selected,8);
 
 a.resetBtn.events.click[0]();assert(reloaded);assert.equal(saved,null);a.persistSave();assert.equal(saved,null,'exit handler cannot resurrect reset world');
-console.log('PASS: legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, pause, exact save/resume position and flight, and reset.');
+console.log('PASS: legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, pause, exact save/resume position and flight, reset, two-floor navigation, stairs, campus boundaries, sunset meeting, companion following and doors.');
