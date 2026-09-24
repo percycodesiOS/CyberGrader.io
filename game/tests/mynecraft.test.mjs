@@ -30,7 +30,7 @@ const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,playe
  get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
  select(i){selected=i;},pause(){started=false;},modeTo(v){modeSelect.value=v;for(const change of modeSelect.events.change)change();},get keys(){return BLOCK_KEYS;},getBlock,setBlock,campusActors,sirD,macek,kay,ellie,percy,walkingPath,campusBounds,insideBounds,updateCampus,entranceDoors,moveHorizontal,canStandAt,
  micco,campusAreas,believeBanner,floorLogo,campusDetails,cloudGroup,cloudMesh,clouds,updateClouds,spawnParticles,updateParticles,particles,shardMaterial,setMacekOutfit,patternedSleeve,updateBlockMeshes,faceSlots,faceDirections,faceVisible,travelTo,setGraphics,graphicsBtn,graphicsSelect,renderer,schoolLogo,CampusActor,createWalkingSearch,PATH_STEP_NODES,
- shields,unicorn,unicornPatrol,shieldsSeated,SHIELDS_CYCLE,SHIELDS_SIT,updateShields,schoolInteriorBounds,schoolFootprint,skinTex,
+ shields,unicorn,unicornPatrol,shieldsSeated,SHIELDS_CYCLE,SHIELDS_SIT,updateShields,schoolInteriorBounds,schoolFootprint,skinTex,SCHOOL_STAIRS,rampCells,
  eddie,eddieRoost,eddiePerch,eddieFacing,updateEddie,EDDIE_ROCK,EDDIE_ROOF,EDDIE_DUSK,EDDIE_DAWN,
  buses,updateBuses,busRouteDistance,busRoutePoint,busAtKerb,busStopDistances,BUS_ARRIVE,BUS_COUNT,BUS_STAGGER,BUS_DRIVE_IN,BUS_DWELL,BUS_DRIVE_OUT,BUS_VISIT,BUS_LOOP,busRouteLength,BUS_ROUTE,
  playerAvatar,viewArms,viewModel,macekBodies,macekClothes,outfitPolo,outfitBlack,identityStatus,worldClockEl,setView,refreshOutfitPreview,updatePlayerAvatar,viewSelect,viewBtn,groundSurface,inBusYard,
@@ -220,10 +220,15 @@ assert(a.walkingPath({x:47.5,y:11,z:16.5},{x:45,y:5,z:26},a.campusBounds).length
 assert(a.walkingPath({x:46.5,y:5,z:26.5},{x:86,y:5,z:30},a.campusBounds).length>0,'walk from entrance to basketball court');
 assert(a.walkingPath({x:46.5,y:5,z:26.5},{x:78,y:5,z:-9},a.campusBounds).length>0,'walk from entrance to outdoor classroom');
 assert(a.walkingPath({x:65.5,y:5,z:24.5},{x:69,y:8,z:25},a.campusBounds).length>0,'playground steps reach tower deck');
-// Removing the first stair makes upstairs unreachable. Actors must spread that
-// search across frames and wait before retrying the same blocked destination.
-const stairBlocks=[40,41,42].map(x=>[x,a.getBlock(x,5,3)]);
-for(const [x] of stairBlocks)a.setBlock(x,5,3,null);
+// Remove both independent rises while preserving the upper destination floor.
+// A failed route must still be sliced across frames and use its retry backoff.
+const riseColumns=[...a.rampCells];
+for(let x=a.SCHOOL_STAIRS.x0;x<=a.SCHOOL_STAIRS.x1;x++)
+ for(let z=a.SCHOOL_STAIRS.z0;z<=a.SCHOOL_STAIRS.z1;z++)riseColumns.push({x,z});
+const stairBlocks=[];
+for(const {x,z}of riseColumns)for(let y=5;y<10;y++){
+ stairBlocks.push([x,y,z,a.getBlock(x,y,z)]);a.setBlock(x,y,z,null);
+}
 const routeActor=new a.CampusActor('Route test',46,5,26,'macek'),upstairs={x:47,y:11,z:16};
 routeActor.go(1/60,upstairs);
 const blockedSearch=routeActor.navigationSearch;
@@ -239,12 +244,12 @@ assert.equal(routeActor.route.length,0);assert.equal(routeActor.planFailures,1);
 assert(routeActor.planTimer>=8,'failed route waits at least eight seconds before retrying');
 for(let i=0;i<7*60;i++){routeActor.go(1/60,upstairs);assert.equal(routeActor.navigationSearch,null,'no busy retry during failed-route backoff');}
 planningTimes.sort((a,b)=>a-b);console.log('Blocked-route slice CPU median/p95 ms:',planningTimes[Math.floor(planningTimes.length*.5)].toFixed(3),planningTimes[Math.floor(planningTimes.length*.95)].toFixed(3));
-for(const [x,type] of stairBlocks)a.setBlock(x,5,3,type);
+for(const [x,y,z,type] of stairBlocks)a.setBlock(x,y,z,type);
 for(let i=0;i<600;i++)routeActor.go(1/60,upstairs);
 assert(routeActor.route.length>0||routeActor.pos.y>5,'actor retries successfully once the staircase is repaired');
 assert.equal(routeActor.planFailures,0,'successful route clears failed-route backoff');
 // Grounded players step up the real staircase without having to fly.
-a.player.pos.set(41.5,6.7001,2.7);a.player.onGround=true;a.player.flying=false;a.moveHorizontal('z',.2);
+a.player.pos.set(54.5,6.7001,11.35);a.player.onGround=true;a.player.flying=false;a.moveHorizontal('z',-.2);
 assert(a.player.pos.y>7.6,'player can climb first stair');
 // A diagonal step into two blocks must leave the player outside both of them.
 a.setBlock(10,20,10,'stone');a.setBlock(11,20,10,'stone');a.setBlock(10,20,11,'stone');
