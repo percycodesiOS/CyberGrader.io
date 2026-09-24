@@ -386,11 +386,15 @@ html body #start .outfit-option:focus-within {
 }
 
 /* Keep gameplay hints clear of the longer tablet control bar. */
+#challengeProgress { position: fixed; left: 12px; top: 128px; max-width: calc(100vw - 48px); padding: 8px 12px; background: #171615dc; color: #fff; font: 12px/1.5 ui-monospace, monospace; pointer-events: none; }
+#challengeProgress[hidden] { display: none; }
 @media (max-width: 1250px) {
   #info { display: none; }
   #status { top: 74px; max-width: calc(100vw - 40px); }
 }
 @media (max-width: 600px) {
+  #challengeProgress { top: 164px; font-size: 11px; }
+  #coordinates { bottom: 260px !important; font-size: 10px !important; }
   #controls { left: 8px; right: 8px; top: 8px; gap: 4px !important; }
   #controls > div { display: none; }
   #controls button, #controls a { font-size: 12px; padding: 8px !important; }

@@ -191,31 +191,32 @@
         <p id="modeHelp">Your existing build stays here when you change modes.</p>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see Mr. Macek</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
-        <p>Creative gives you unlimited blocks and flight. Embrace the Challenge is peaceful: collect blocks and watch your health around heights and deep water.</p>
+        <p>Creative: unlimited blocks and flight. Challenge: gather, build, and find CIRC. Watch your health around heights and deep water.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
         <p class="start-tip">Keyboard + mouse or touch controls. Your world saves automatically in this browser.</p>
       </section>
     </div>
-    <section class="start-actions" aria-label="Explore the school">
+    <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
       <button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button>
       <button id="overview" type="button">School from above · Creative</button>
       <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr. B in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. A full game day lasts 20 minutes.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
-    </section>
-    <section class="start-save" aria-labelledby="saveTitle">
+    </section></details>
+    <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
       <h2 id="saveTitle" class="start-wide">Keep your world</h2>
       <p class="start-wide"><strong>Download World</strong> keeps a backup file of your build, position, outfit and settings. <strong>Load World</strong> opens a backup you choose and replaces this device's current world after you confirm. Download your current world first if you want to keep it. Worlds do not merge or sync between devices.</p>
       <button id="downloadWorld" type="button">Download World</button>
       <button id="loadWorld" type="button">Load World</button>
       <input id="worldFile" type="file" accept=".json,application/json" hidden>
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
-    </section>
+    </section></details>
     <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>XYZ shows your position. X and Z move across the map; Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-63" max="95" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-63" max="63" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −63 to 95, Z −63 to 63.</p></details>
     <details class="start-advanced"><summary>How to play</summary><p>WASD to move · Drag to look · Space to jump or swim up · Shift to sprint · F to fly in Creative · Left click to break · Right click to place · Number keys or scroll to select blocks · Esc for the menu. On a tablet, use the on-screen stick and buttons.</p></details>
   </div>
 </div>
 
 <div id="status" role="status" aria-live="polite">Loading your world…</div>
+<div id="challengeProgress" aria-label="Challenge progress" hidden></div>
 
 <script type="importmap">
 { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
@@ -709,6 +710,11 @@ if (!saveState || typeof saveState !== 'object' || Array.isArray(saveState)) sav
 saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveState.edits : {};
 const requestedMode=new URLSearchParams(location.search).get('mode');
 let gameMode = requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
+// Landing-page selection applies once. A reload or imported backup must use its
+// saved mode instead of being forced back by a stale query string.
+if((requestedMode==='creative'||requestedMode==='survival')&&typeof history!=='undefined'&&location.href){
+  try{const cleanURL=new URL(location.href);cleanURL.searchParams.delete('mode');history.replaceState(history.state,'',cleanURL.href);}catch{}
+}
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
 // The clock the world was saved at. Eddie's perch and the bus loop are both pure
 // functions of it, so they are placed correctly the instant the world loads.
@@ -735,6 +741,27 @@ setGraphics(graphics);
 graphicsSelect.addEventListener('change',()=>{setGraphics(graphicsSelect.value);persistSave();});
 let health = Number.isFinite(saveState.health) ? Math.max(1,Math.min(20,saveState.health)) : 20;
 const inventory = Object.fromEntries(BLOCK_KEYS.map(k=>[k, Math.max(0,Math.floor(Number(saveState.inventory?.[k])||0))]));
+// Small, persistent goals. Creative actions never count toward a challenge.
+function normalizeChallenge(value){
+  const count=(v,max)=>Number.isSafeInteger(v)&&v>=0?Math.min(v,max):0;
+  return {wood:count(value?.wood,10),placed:count(value?.placed,12),circ:value?.circ===true};
+}
+const challenge=normalizeChallenge(saveState.challenge);
+let challengeLabel='';
+function refreshChallenge(){
+  const el=document.getElementById('challengeProgress');
+  el.hidden=gameMode!=='survival';
+  for(const id of ['btnFly','btnDown'])document.getElementById(id).style.display=gameMode==='creative'?'flex':'none';
+  const finished=challenge.wood===10&&challenge.placed===12&&challenge.circ;
+  const label=finished?'Challenge complete! Keep building.':`CHALLENGE · Wood ${challenge.wood}/10 · Place ${challenge.placed}/12 · CIRC ${challenge.circ?'✓':'find it'}`;
+  if(label!==challengeLabel){el.textContent=label;challengeLabel=label;}
+}
+function updateChallenge(){
+  if(started&&gameMode==='survival'&&!challenge.circ&&Math.hypot(player.pos.x-54,player.pos.z+11)<7&&player.pos.y<10&&player.onGround){
+    challenge.circ=true;refreshChallenge();persistSave();
+  }
+}
+refreshChallenge();
 let breath = 10;
 // re-apply the player's saved block changes on top of the procedural world
 for (const [id, k] of Object.entries(saveState.edits)) {
@@ -752,6 +779,7 @@ function persistSave(){
   if (resetting) return false;
   try {
     saveState.mode = gameMode; saveState.health = health; saveState.inventory = inventory;
+    saveState.challenge = {...challenge};
     saveState.dayTime = dayTime;
     saveState.macekOutfit = macekOutfit;
     saveState.view = view;
@@ -800,7 +828,8 @@ function readWorldBackup(text){
   // choice; they load as first person rather than being rejected.
   if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
   if(s.graphics!==undefined&&!['smooth','detailed'].includes(s.graphics))throw new Error('This backup has an invalid graphics setting. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth'};
+  if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',challenge:normalizeChallenge(s.challenge)};
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
@@ -2144,7 +2173,7 @@ const modeSelect=document.getElementById('mode'); modeSelect.value=gameMode;
 modeSelect.addEventListener('change',()=>{
   gameMode=modeSelect.value;player.flying=false;player.vel.set(0,0,0);health=20;breath=10;
   document.getElementById('modeHelp').textContent=gameMode==='survival'?'Break blocks to collect them. No flying; falls and deep water can hurt.':'Unlimited blocks and flight. Your build stays here.';
-  refreshHotbar();persistSave();
+  refreshHotbar();refreshChallenge();persistSave();
 });
 renderer.domElement.addEventListener('click', () => {
   if (!started) { startGame(); return; }
@@ -2290,7 +2319,7 @@ function doBreak() {
   if (!hit) return;
   const brokenKey = getBlock(hit.x, hit.y, hit.z);
   if(hit.y<=-8){ document.getElementById('status').textContent='The bottom layer keeps our world safe to build on.';return; }
-  if(gameMode==='survival'){inventory[brokenKey]++;refreshHotbar();}
+  if(gameMode==='survival'){inventory[brokenKey]++;if(brokenKey==='wood')challenge.wood=Math.min(10,challenge.wood+1);refreshHotbar();refreshChallenge();}
   setBlock(hit.x, hit.y, hit.z, null);
   recordEdit(hit.x, hit.y, hit.z, null);
   spawnParticles(hit.x, hit.y, hit.z, brokenKey);
@@ -2315,7 +2344,7 @@ function doPlace() {
     nz + 1 > pz - player.radius && nz < pz + player.radius &&
     ny + 1 > py - player.height && ny < py + 0.2;
   if (overlap) return;
-  if(gameMode==='survival'){inventory[block]--;refreshHotbar();}
+  if(gameMode==='survival'){inventory[block]--;challenge.placed=Math.min(12,challenge.placed+1);refreshHotbar();refreshChallenge();}
   setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
   recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
   sndPlace();
@@ -2402,13 +2431,19 @@ function updatePlayerAvatar(dt){
   // Pull the camera back behind Mr. Macek, stopping short of whatever is behind him
   // so the view never ends up inside a wall.
   camera.getWorldDirection(_viewDir);
-  let back=THIRD_PERSON_RANGE;
-  for(let s=.6;s<=THIRD_PERSON_RANGE;s+=.6){
-    if(isSolid(Math.floor(player.pos.x-_viewDir.x*s),Math.floor(player.pos.y-_viewDir.y*s+.35),Math.floor(player.pos.z-_viewDir.z*s))){
-      back=Math.max(.9,s-.6);break;
-    }
+  let back=0;
+  for(let s=.1;s<=THIRD_PERSON_RANGE+.001;s+=.1){
+    const cx=player.pos.x-_viewDir.x*s,cy=player.pos.y-_viewDir.y*s+.35*s/THIRD_PERSON_RANGE,cz=player.pos.z-_viewDir.z*s;
+    let blocked=false;
+    for(let x=Math.floor(cx-.16);x<=Math.floor(cx+.16);x++)
+    for(let y=Math.floor(cy-.16);y<=Math.floor(cy+.16);y++)
+    for(let z=Math.floor(cz-.16);z<=Math.floor(cz+.16);z++)if(isSolid(x,y,z))blocked=true;
+    if(blocked)break;
+    back=s;
   }
-  camera.position.set(player.pos.x-_viewDir.x*back,player.pos.y-_viewDir.y*back+.35,player.pos.z-_viewDir.z*back);
+  camera.position.set(player.pos.x-_viewDir.x*back,player.pos.y-_viewDir.y*back+.35*back/THIRD_PERSON_RANGE,player.pos.z-_viewDir.z*back);
+  // At a wall the camera can approach the eyes; hide the head instead of looking through it.
+  playerAvatar.group.visible=back>.65;
 }
 
 // ---------- main loop ----------
@@ -2520,6 +2555,7 @@ function tick(now) {
   // eye at top of bounding box
   camera.position.y = player.pos.y + 0.0;
   updatePlayerAvatar(dt);
+  updateChallenge();
 
   renderer.render(scene, camera);
   recordFrame(now,frameInterval);
@@ -2603,7 +2639,7 @@ resetBtn.style.cssText = `
   border-radius: 6px; padding: 7px 10px; font: inherit; box-shadow: 2px 2px 0 #0006;
 `;
 resetBtn.addEventListener('click', () => {
-  if (!confirm('Reset the world back to the original? Your saved blocks will be erased.')) return;
+  if (!confirm('Reset this browser’s world to the original campus? This clears your build, inventory and challenge progress. Download World first to keep a backup.')) return;
   resetting=true; clearTimeout(_saveTimer);
   try { localStorage.removeItem(SAVE_KEY); } catch(e){resetting=false;document.getElementById('status').textContent='Could not reset storage. Your world was kept.';return;}
   location.reload();
