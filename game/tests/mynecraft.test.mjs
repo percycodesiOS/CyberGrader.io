@@ -137,6 +137,16 @@ for(let i=0;i<growthBlocks;i++){
 }
 assert.notEqual(a.instMeshes[glowKey],glowMesh,'isolated edits force capacity growth');
 assert(a.instMeshes[glowKey].instanceMatrix.count>glowMesh.instanceMatrix.count,'grown bucket preserves spare capacity');
+// Existing backups permit edits beyond the normal build height. Culling must
+// still enclose those accepted blocks after import or incremental edits.
+for(const y of [-90,120]){
+ const backup=JSON.parse(a.worldBackupText());backup.state.edits[`-40,${y},-40`]='glow';
+ assert.equal(a.readWorldBackup(JSON.stringify(backup)).edits[`-40,${y},-40`],'glow');
+ a.setBlock(-40,y,-40,'glow');a.updateBlockMeshes(-40,y,-40);
+ const rec=a.faceSlots.get(`-40,${y},-40,0`),sphere=a.instMeshes[rec.bucketKey].boundingSphere;
+ for(const dx of [0,1])for(const dy of [0,1])for(const dz of [0,1])
+  assert(sphere.containsPoint(new Three.Vector3(-40+dx,y+dy,-40+dz)),'chunk bounds contain accepted backup edits outside normal build height');
+}
 // Swap removal and growth must preserve actual instance transforms, not only IDs.
 function assertFaceBuffers(){
  const occupied=new Set(),matrix=new Three.Matrix4(),position=new Three.Vector3(),normal=new Three.Vector3();

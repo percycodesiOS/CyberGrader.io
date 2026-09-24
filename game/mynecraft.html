@@ -512,26 +512,32 @@ function faceBucketKey(type,face,x,z){
   const [cx,cz]=faceChunk(x,z);
   return type+':'+materialIndex+':'+cx+':'+cz;
 }
+function updateFaceBucketBounds(mesh,bucket,cx,cz){
+  const yMid=(bucket.minY+bucket.maxY)/2,yHalf=(bucket.maxY-bucket.minY)/2+1;
+  mesh.boundingSphere??=new THREE.Sphere();
+  mesh.boundingSphere.center.set(Number(cx)*FACE_CHUNK+FACE_CHUNK/2,yMid,Number(cz)*FACE_CHUNK+FACE_CHUNK/2);
+  mesh.boundingSphere.radius=Math.hypot(FACE_CHUNK/2+1,yHalf,FACE_CHUNK/2+1);
+}
 function growFaceBucket(bucketKey,capacity){
   const bucket=faceBuckets.get(bucketKey),[type,index,cx,cz]=bucketKey.split(':');
   const previous=instMeshes[bucketKey];
   const mesh=new THREE.InstancedMesh(voxelGeometry,BLOCKS[type].mats[Number(index)],capacity);
   mesh.count=bucket.ids.length;mesh.castShadow=type!=='water'&&type!=='glass';mesh.receiveShadow=true;
   mesh.userData.blockKey=type;
-  // The sphere covers the whole column, including later edits, so culling stays correct.
-  const yMid=27,yHalf=36;
-  mesh.boundingSphere=new THREE.Sphere(
-    new THREE.Vector3(Number(cx)*FACE_CHUNK+FACE_CHUNK/2,yMid,Number(cz)*FACE_CHUNK+FACE_CHUNK/2),
-    Math.hypot(FACE_CHUNK/2+1,yHalf,FACE_CHUNK/2+1)
-  );
+  // Keep accepted legacy/imported edits outside the normal build height visible.
+  updateFaceBucketBounds(mesh,bucket,cx,cz);
   mesh.frustumCulled=true;mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   if(previous){mesh.instanceMatrix.array.set(previous.instanceMatrix.array);scene.remove(previous);previous.dispose();}
   scene.add(mesh);instMeshes[bucketKey]=mesh;
 }
 function addVoxelFace(x,y,z,face,type){
   const bucketKey=faceBucketKey(type,face,x,z),id=key(x,y,z)+','+face;
-  if(!faceBuckets.has(bucketKey)){faceBuckets.set(bucketKey,{ids:[]});growFaceBucket(bucketKey,256);}
+  if(!faceBuckets.has(bucketKey)){faceBuckets.set(bucketKey,{ids:[],minY:-8,maxY:61});growFaceBucket(bucketKey,256);}
   const bucket=faceBuckets.get(bucketKey),slot=bucket.ids.length;
+  if(y<bucket.minY||y+1>bucket.maxY){
+    bucket.minY=Math.min(bucket.minY,y);bucket.maxY=Math.max(bucket.maxY,y+1);
+    const [cx,cz]=faceChunk(x,z);updateFaceBucketBounds(instMeshes[bucketKey],bucket,cx,cz);
+  }
   if(slot===instMeshes[bucketKey].instanceMatrix.count)growFaceBucket(bucketKey,slot*2);
   const mesh=instMeshes[bucketKey],[dx,dy,dz,rx,ry]=faceDirections[face];
   faceDummy.position.set(x+.5+dx*.5,y+.5+dy*.5,z+.5+dz*.5);faceDummy.rotation.set(rx,ry,0);faceDummy.updateMatrix();
