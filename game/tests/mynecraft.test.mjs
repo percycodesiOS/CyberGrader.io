@@ -26,7 +26,7 @@ const context=vm.createContext({THREE:{...Three,WebGLRenderer:Renderer,TextureLo
  performance:{now:()=>0},setTimeout:()=>1,clearTimeout(){},setInterval(){},requestAnimationFrame(){},console,
  addEventListener(k,f){(events[k]??=[]).push(f);},localStorage:{getItem:()=>saved,setItem:(k,v)=>saved=v,removeItem:()=>{saved=null;}},location:{reload(){reloaded=true;}},confirm:()=>true});
 const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1].replace("import * as THREE from 'three';",'');
-const instrumented=script+`\n globalThis.api={WORLD,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,tick,isSolid,isExposed,
+const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,tick,isSolid,isExposed,
  get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
  select(i){selected=i;},pause(){started=false;},modeTo(v){gameMode=v;},get keys(){return BLOCK_KEYS;},getBlock,setBlock,campusActors,sirD,macek,kay,ellie,percy,walkingPath,campusBounds,insideBounds,updateCampus,entranceDoors,moveHorizontal,canStandAt,
  setTime(t){dayTime=t;}};`;
@@ -37,6 +37,21 @@ assert.equal(a.selected,8,'selection survives');
 assert(a.getBlock(64,0,64),'larger world reaches edge');
 assert.equal(a.getBlock(0,0,0),'water');assert.equal(a.isSolid(0,0,0),false);
 assert.equal(a.getBlock(34,16,-19),'snow','white school roof');assert.equal(a.getBlock(46,6,23),undefined,'school entrance open');
+assert.equal(a.getBlock(25,16,-28),'snow','expanded north-west wing');
+assert.equal(a.getBlock(41,16,18),'glass','wider glass gallery');
+const terrainTriangles=Object.values(a.instMeshes).reduce((n,m)=>n+m.count*m.geometry.index.count/3,0);
+assert(terrainTriangles<150000,'exposed-face renderer keeps enlarged world below 150k terrain triangles');
+// An isolated block must keep every outward-facing quad after the mesh rewrite.
+a.setBlock(80,30,80,'blue');a.buildMeshes();
+const planes=[];
+for(const mesh of Object.values(a.instMeshes))if(mesh.userData.blockKey==='blue')for(let i=0;i<mesh.count;i++){
+ const matrix=new Three.Matrix4();mesh.getMatrixAt(i,matrix);const pos=new Three.Vector3().setFromMatrixPosition(matrix);
+ if(pos.x>=80&&pos.x<=81&&pos.y>=30&&pos.y<=31&&pos.z>=80&&pos.z<=81){
+  const normal=new Three.Vector3(0,0,1).transformDirection(matrix);
+  assert(normal.dot(pos.clone().sub(new Three.Vector3(80.5,30.5,80.5)))>.49,'face points outward');planes.push(pos);
+ }
+}
+assert.equal(planes.length,6,'all six isolated faces remain visible');a.setBlock(80,30,80,null);
 assert.equal(a.hotbar.children.length,14);
 const event={preventDefault(){}};
 a.startGame();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>MYnecraft 3.2</title>
+<title>MYnecraft 3.3</title>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
   canvas { display: block; touch-action: none; }
@@ -134,7 +134,7 @@
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block
 </div>
 <div id="start">
-  <h1>MYNECRAFT 3.2</h1>
+  <h1>MYNECRAFT 3.3</h1>
   <p>Build, explore, and make something yours.<br/>A bigger world, a central lake, friendly animals, and a school to discover.<br/>20-minute days · Click + drag to look · ESC for this menu</p>
   <label>Play your way <select id="mode"><option value="creative">Creative — unlimited blocks + flight</option><option value="survival">Survival — collect blocks + watch your health</option></select></label>
   <p id="modeHelp">Your existing build stays here when you change modes.</p>
@@ -168,7 +168,7 @@ document.body.appendChild(renderer.domElement);
 const sun = new THREE.DirectionalLight(0xfff4d6, 1.0);
 sun.position.set(40, 80, 30);
 sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.mapSize.set(1024, 1024);
 sun.shadow.camera.left = -60; sun.shadow.camera.right = 60;
 sun.shadow.camera.top = 60; sun.shadow.camera.bottom = -60;
 sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 200;
@@ -305,7 +305,7 @@ function setBlock(x,y,z,k) {
 function getBlock(x,y,z) { return WORLD.get(key(x,y,z)); }
 function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water'; }
 const inLake = (x,z) => (x/10)**2 + (z/8)**2 < 1;
-const inSchool = (x,z) => x >= 29 && x <= 63 && z >= -26 && z <= 44;
+const inSchool = (x,z) => x >= 17 && x <= 64 && z >= -35 && z <= 44;
 
 // terrain: smooth-ish heightmap via stacked sine noise
 function heightAt(x, z) {
@@ -362,16 +362,16 @@ for (let i = 0; i < 90; i++) {
 
 // Block-built interpretation of Kenny's ECMS aerial photo: four branching wings,
 // a central entrance, orange/blue facade panels, white roofs and a loop driveway.
-const wingEnds=[[34,-19],[58,-19],[34,29],[58,29]];
-const inGallery=(x,z)=>x>=43&&x<=49&&z>=12&&z<=23;
+const wingEnds=[[25,-28],[57,-28],[25,30],[57,30]];
+const inGallery=(x,z)=>x>=41&&x<=51&&z>=12&&z<=23;
 function schoolFootprint(x,z){
   if(Math.hypot(x-46,z-5)<=8 || inGallery(x,z))return true;
   return wingEnds.some(([ex,ez])=>{
     const dx=ex-46,dz=ez-5,t=Math.max(0,Math.min(1,((x-46)*dx+(z-5)*dz)/(dx*dx+dz*dz)));
-    return Math.hypot(x-46-t*dx,z-5-t*dz)<=4;
+    return Math.hypot(x-46-t*dx,z-5-t*dz)<=5;
   });
 }
-for(let x=30;x<=62;x++)for(let z=-24;z<=43;z++){
+for(let x=18;x<=63;x++)for(let z=-34;z<=43;z++){
   if(schoolFootprint(x,z)){
     const wall=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz])=>!schoolFootprint(x+dx,z+dz));
     setBlock(x,4,z,'planks');setBlock(x,16,z,inGallery(x,z)?'glass':'snow');
@@ -400,51 +400,47 @@ for(let x=44;x<=48;x++)for(let z=23;z<=25;z++)setBlock(x,9,z,'snow');
 // A few classroom tables and roof lights; the interiors stay walkable.
 for(const [x,z] of wingEnds)for(const y of [5,11]){setBlock(x,y,z,'planks');setBlock(x,y+4,z,'glow');}
 
-// ---------- meshing: instanced per-block-type ----------
-// Simple approach: one InstancedMesh per block type, only for blocks with ≥1 exposed face.
-const instMeshes = {}; // key -> InstancedMesh
-const instIndex = new Map(); // "x,y,z" -> { key, i }
-
-function isExposed(x,y,z) {
-  const type = getBlock(x,y,z);
-  return [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].some(([dx,dy,dz])=>{
-    const n = getBlock(x+dx,y+dy,z+dz);
-    return !n || (n !== type && (n==='water' || n==='glass'));
-  });
+// ---------- meshing: draw only exposed faces ----------
+// One instanced quad per visible face. Buried sides are never sent to the GPU.
+// Faces sharing a texture share one draw, including the six sides of plain blocks.
+const instMeshes = {};
+const faceDirections = [
+  [1,0,0,0,Math.PI/2],[-1,0,0,0,-Math.PI/2],
+  [0,1,0,-Math.PI/2,0],[0,-1,0,Math.PI/2,0],
+  [0,0,1,0,0],[0,0,-1,0,Math.PI]
+];
+function faceVisible(type,neighbor){
+  return !neighbor || (neighbor!==type && (neighbor==='water'||neighbor==='glass'));
 }
-const voxelGeometry = new THREE.BoxGeometry(1,1,1);
-
-function buildMeshes() {
-  // tear down old
-  for (const k in instMeshes) { scene.remove(instMeshes[k]); instMeshes[k].dispose?.(); }
-  for (const k in instMeshes) delete instMeshes[k];
-  instIndex.clear();
-
-  // bucket exposed blocks per type
-  const buckets = {};
-  for (const [id, k] of WORLD) {
-    const [x,y,z] = id.split(',').map(Number);
-    if (!isExposed(x,y,z)) continue;
-    (buckets[k] ||= []).push([x,y,z]);
+function isExposed(x,y,z){
+  const type=getBlock(x,y,z);
+  return faceDirections.some(([dx,dy,dz])=>faceVisible(type,getBlock(x+dx,y+dy,z+dz)));
+}
+const voxelGeometry = new THREE.PlaneGeometry(1,1);
+function buildMeshes(){
+  for(const k in instMeshes){scene.remove(instMeshes[k]);instMeshes[k].dispose?.();delete instMeshes[k];}
+  const buckets=new Map();
+  for(const [id,type] of WORLD){
+    const [x,y,z]=id.split(',').map(Number);
+    for(let face=0;face<6;face++){
+      const [dx,dy,dz]=faceDirections[face];
+      if(!faceVisible(type,getBlock(x+dx,y+dy,z+dz)))continue;
+      const materialIndex=type==='grass'?(face===2?2:face===3?3:0):type==='wood'?(face===2||face===3?2:0):0;
+      const bucketKey=type+':'+materialIndex;
+      if(!buckets.has(bucketKey))buckets.set(bucketKey,{type,material:BLOCKS[type].mats[materialIndex],faces:[]});
+      buckets.get(bucketKey).faces.push([x,y,z,face]);
+    }
   }
-
-  const geo = voxelGeometry;
-  const dummy = new THREE.Object3D();
-  for (const k of BLOCK_KEYS) {
-    const list = buckets[k] || [];
-    const mesh = new THREE.InstancedMesh(geo, BLOCKS[k].mats, Math.max(list.length, 1));
-    mesh.castShadow = k !== 'water' && k !== 'glass'; mesh.receiveShadow = true;
-    mesh.userData.blockKey = k;
-    mesh.count = list.length;
-    list.forEach(([x,y,z], i) => {
-      dummy.position.set(x+0.5, y+0.5, z+0.5);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
-      instIndex.set(key(x,y,z), { key: k, i });
+  const dummy=new THREE.Object3D();
+  for(const [bucketKey,{type,material,faces}] of buckets){
+    const mesh=new THREE.InstancedMesh(voxelGeometry,material,faces.length);
+    mesh.castShadow=type!=='water'&&type!=='glass';mesh.receiveShadow=true;mesh.userData.blockKey=type;
+    faces.forEach(([x,y,z,face],i)=>{
+      const [dx,dy,dz,rx,ry]=faceDirections[face];
+      dummy.position.set(x+.5+dx*.5,y+.5+dy*.5,z+.5+dz*.5);
+      dummy.rotation.set(rx,ry,0);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
     });
-    mesh.instanceMatrix.needsUpdate = true;
-    scene.add(mesh);
-    instMeshes[k] = mesh;
+    mesh.instanceMatrix.needsUpdate=true;scene.add(mesh);instMeshes[bucketKey]=mesh;
   }
 }
 
@@ -823,7 +819,7 @@ for(const side of [-1,1]){
 
 // Navigation uses real solid blocks on both floors, including player edits.
 // A walk node stores foot height, so a roof cannot be mistaken for the room below it.
-const campusBounds={minX:29,maxX:63,minZ:-25,maxZ:43};
+const campusBounds={minX:17,maxX:63,minZ:-35,maxZ:43};
 const worldBounds={minX:-SIZE+1,maxX:SIZE-1,minZ:-SIZE+1,maxZ:SIZE-1};
 const insideBounds=(x,z,b)=>x>=b.minX&&x<=b.maxX&&z>=b.minZ&&z<=b.maxZ;
 function walkFeet(x,z,nearY){
@@ -850,9 +846,23 @@ function walkingPath(position,target,bounds){
   const start=nearestWalkPoint(position,bounds),goal=nearestWalkPoint(target,bounds);
   if(!start||!goal)return [];
   const id=p=>key(p.x,p.y,p.z),goalId=id(goal),startId=id(start);
-  const queue=[start],parents=new Map([[startId,null]]),nodes=new Map([[startId,start]]);
-  for(let i=0;i<queue.length&&i<14000;i++){
-    const p=queue[i],pid=id(p);
+  // A* searches toward the destination instead of flooding the entire world.
+  // Manhattan distance stays admissible: each walk edge moves one x/z cell.
+  const heuristic=p=>Math.abs(p.x-goal.x)+Math.abs(p.z-goal.z);
+  const heap=[],parents=new Map([[startId,null]]),nodes=new Map([[startId,start]]),costs=new Map([[startId,0]]);
+  const push=entry=>{
+    heap.push(entry);let i=heap.length-1;
+    while(i>0){const p=(i-1)>>1;if(heap[p].f<=entry.f)break;heap[i]=heap[p];i=p;}
+    heap[i]=entry;
+  };
+  const pop=()=>{
+    const first=heap[0],last=heap.pop();
+    if(heap.length){let i=0;while(i*2+1<heap.length){let c=i*2+1;if(c+1<heap.length&&heap[c+1].f<heap[c].f)c++;if(heap[c].f>=last.f)break;heap[i]=heap[c];i=c;}heap[i]=last;}
+    return first;
+  };
+  push({p:start,g:0,f:heuristic(start)});
+  for(let i=0;heap.length&&i<14000;i++){
+    const entry=pop(),p=entry.p,pid=id(p);if(entry.g!==costs.get(pid))continue;
     if(pid===goalId){
       const result=[];let cur=pid;
       while(cur!==startId){result.push(nodes.get(cur));cur=parents.get(cur);}
@@ -861,8 +871,8 @@ function walkingPath(position,target,bounds){
     for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
       const x=p.x+dx,z=p.z+dz;if(!insideBounds(x,z,bounds))continue;
       const y=walkFeet(x,z,p.y);if(y===null)continue;
-      const next={x,y,z},nid=id(next);if(parents.has(nid)||!walkTransition(p,next))continue;
-      parents.set(nid,pid);nodes.set(nid,next);queue.push(next);
+      const next={x,y,z},nid=id(next),g=entry.g+1;if(g>=(costs.get(nid)??Infinity)||!walkTransition(p,next))continue;
+      parents.set(nid,pid);nodes.set(nid,next);costs.set(nid,g);push({p:next,g,f:g+heuristic(next)});
     }
   }
   return [];
@@ -913,7 +923,8 @@ class CampusActor extends NPC {
     this.planTimer-=dt;
     const goal=nearestWalkPoint(target,this.bounds);if(!goal)return;
     const goalKey=key(goal.x,goal.y,goal.z);
-    if(this.planTimer<=0&&(goalKey!==this.goalKey||!this.route.length)){
+    const atGoal=Math.hypot(this.pos.x-goal.x-.5,this.pos.z-goal.z-.5)<.15&&Math.abs(this.pos.y-goal.y)<.15;
+    if(!atGoal&&this.planTimer<=0&&(goalKey!==this.goalKey||!this.route.length)){
       this.route=walkingPath(this.pos,goal,this.bounds);this.goalKey=goalKey;this.planTimer=1.5;
     }
     let moving=false;
@@ -944,6 +955,9 @@ class CampusActor extends NPC {
   }
 }
 function makeRetriever(actor,collarColor){
+  // Companions have no health/damage/death state. Player tools target voxels
+  // only; survival damage applies solely to the player, never Ellie or Percy.
+  actor.invulnerable=true;
   scene.remove(actor.group);actor.group=new THREE.Group();actor.dogLegs=[];
   const gold=new THREE.MeshLambertMaterial({color:0xdca64e}),light=new THREE.MeshLambertMaterial({color:0xf0cf80}),dark=new THREE.MeshLambertMaterial({color:0x282218});
   const part=(w,h,d,mat,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;actor.group.add(m);return m;};
