@@ -26,7 +26,7 @@ const context=vm.createContext({THREE:{...Three,WebGLRenderer:Renderer,TextureLo
  performance:{now:()=>0},setTimeout:()=>1,clearTimeout(){},setInterval(){},requestAnimationFrame(){},console,
  addEventListener(k,f){(events[k]??=[]).push(f);},localStorage:{getItem:()=>saved,setItem:(k,v)=>saved=v,removeItem:()=>{saved=null;}},location:{reload(){reloaded=true;}},confirm:()=>true});
 const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1].replace("import * as THREE from 'three';",'');
-const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,tick,isSolid,isExposed,
+const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,worldBackupText,readWorldBackup,restoreWorldBackup,tick,isSolid,isExposed,
  get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
  select(i){selected=i;},pause(){started=false;},modeTo(v){gameMode=v;},get keys(){return BLOCK_KEYS;},getBlock,setBlock,campusActors,sirD,macek,kay,ellie,percy,walkingPath,campusBounds,insideBounds,updateCampus,entranceDoors,moveHorizontal,canStandAt,
  setTime(t){dayTime=t;}};`;
@@ -102,6 +102,24 @@ a.persistSave();assert.equal(JSON.parse(saved).edits['25,20,25'],'snow');
 const resumeContext=vm.createContext({...context,api:undefined});vm.runInContext(instrumented,resumeContext);
 assert.equal(resumeContext.api.player.pos.y,32.25);assert.equal(resumeContext.api.player.pos.x,46.5);assert.equal(resumeContext.api.player.pos.z,31.5);
 assert.equal(resumeContext.api.player.yaw,.42);assert.equal(resumeContext.api.player.pitch,-.2);assert.equal(resumeContext.api.player.flying,true);assert.equal(resumeContext.api.selected,8);
+
+// Portable backup safety: round trip, bad data, cancellation, storage failure, unload race.
+const portable=a.worldBackupText(), decoded=a.readWorldBackup(portable);
+assert.equal(decoded.player.x,a.player.pos.x);assert.equal(decoded.player.y,a.player.pos.y);
+assert.equal(decoded.edits['25,20,25'],'snow');
+const beforeImport=saved;
+for(const invalid of ['not json','{}',portable.replace('"version":1','"version":9'),portable.replace('"snow"','"unknown block"')]){
+ assert.throws(()=>a.restoreWorldBackup(invalid));assert.equal(saved,beforeImport);
+}
+context.confirm=()=>false;assert.equal(a.restoreWorldBackup(portable),false);assert.equal(saved,beforeImport);
+context.confirm=()=>true;const write=context.localStorage.setItem;
+context.localStorage.setItem=()=>{throw new Error('quota');};
+assert.throws(()=>a.restoreWorldBackup(portable));assert.equal(saved,beforeImport);
+assert.equal(JSON.parse(a.worldBackupText()).format,'mynecraft-world','download can rescue an in-memory world when storage fails');
+context.localStorage.setItem=write;
+assert.equal(a.restoreWorldBackup(portable),true);assert(reloaded);
+const importedSave=saved;a.persistSave();assert.equal(saved,importedSave,'unload cannot overwrite imported world');
+// End portable backup safety.
 
 a.resetBtn.events.click[0]();assert(reloaded);assert.equal(saved,null);a.persistSave();assert.equal(saved,null,'exit handler cannot resurrect reset world');
 console.log('PASS: legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, pause, exact save/resume position and flight, reset, two-floor navigation, stairs, campus boundaries, sunset meeting, companion following and doors.');

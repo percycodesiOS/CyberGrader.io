@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>MYnecraft 3.3</title>
+<title>MYnecraft: EC Edition</title>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
   canvas { display: block; touch-action: none; }
@@ -104,6 +104,10 @@
   .touch-device #hotbar { bottom: 180px !important; }
   #status { position: fixed; top: 86px; left: 12px; z-index: 8; color: white; background: #163347e8; padding: 8px; border-radius: 6px; font-size: 12px; pointer-events: none; }
   #start button, #start select { font: inherit; padding: 10px; border-radius: 6px; }
+  #start { overflow-y: auto; box-sizing: border-box; padding: 24px 12px; }
+  #start .edition { font-weight: 900; font-size: 22px; letter-spacing: 3px; }
+  #backupStatus { max-width: 540px; }
+  @media (max-height: 700px) { #start { justify-content: flex-start; gap: 12px; } }
   @media (max-width: 900px) {
     #info { top: 58px; font-size: 10px; max-width: 90vw; }
     #status { top: 108px; }
@@ -134,13 +138,16 @@
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block
 </div>
 <div id="start">
-  <h1>MYNECRAFT 3.3</h1>
+  <h1>MYNECRAFT</h1>
+  <p class="edition">EC EDITION</p>
   <p>Build, explore, and make something yours.<br/>A bigger world, a central lake, friendly animals, and a school to discover.<br/>20-minute days · Click + drag to look · ESC for this menu</p>
   <label>Play your way <select id="mode"><option value="creative">Creative — unlimited blocks + flight</option><option value="survival">Survival — collect blocks + watch your health</option></select></label>
   <p id="modeHelp">Your existing build stays here when you change modes.</p>
   <button class="btn" id="enter" type="button">▶ ENTER WORLD</button>
   <div><button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button> <button id="overview" type="button">School from above · Creative</button></div>
   <p>Two-floor ECMS · glass gallery · Sir D, KaY &amp; MaCEk<br/>Ellie and Percy follow MaCEk. Meet everyone at the entrance at sunset.<br/>Swim with SPACE / JUMP. Survival is peaceful: falls and deep water can hurt.</p>
+  <div><button id="downloadWorld" type="button">Download World</button> <button id="loadWorld" type="button">Load World</button><input id="worldFile" type="file" accept=".json,application/json" hidden></div>
+  <p id="backupStatus" role="status">Autosave stays on this device. Download your world to keep a backup.<br/>On another device, choose Load World and open that file.</p>
 </div>
 <div id="status" role="status" aria-live="polite">Loading your world…</div>
 
@@ -468,7 +475,7 @@ function recordEdit(x,y,z,k){
   _saveTimer = setTimeout(persistSave, 350);
 }
 function persistSave(){
-  if (resetting) return;
+  if (resetting) return false;
   try {
     saveState.mode = gameMode; saveState.health = health; saveState.inventory = inventory;
     saveState.dayTime = dayTime;
@@ -476,8 +483,60 @@ function persistSave(){
     saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
     flashSaved();
-  } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open to keep playing; progress could not be saved.'; }
+    return true;
+  } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open and use Menu > Download World to keep your progress.'; return false; }
 }
+
+// Portable backups contain game state only. Never evaluate imported file contents.
+const MAX_WORLD_FILE_BYTES = 5 * 1024 * 1024;
+function worldBackupText(){
+  persistSave(); // Also refreshes the in-memory snapshot if browser storage is full.
+  return JSON.stringify({format:'mynecraft-world',version:1,state:saveState});
+}
+function readWorldBackup(text){
+  if (text.length > MAX_WORLD_FILE_BYTES) throw new Error('This file is too large. Choose a MYnecraft world backup.');
+  let data; try { data=JSON.parse(text); } catch { throw new Error('That file is not a readable world backup.'); }
+  const s=data?.state;
+  const object=v=>v!==null && typeof v==='object' && !Array.isArray(v);
+  const finite=v=>typeof v==='number' && Number.isFinite(v);
+  if(data?.format!=='mynecraft-world'||data.version!==1||!object(s)||!object(s.edits)||!object(s.player)) throw new Error('Choose a backup made with Download World.');
+  const edits=Object.create(null);
+  for(const [id,block] of Object.entries(s.edits)){
+    if(!/^-?\d+,-?\d+,-?\d+$/.test(id)||id.split(',').some(n=>Math.abs(Number(n))>10000)||(block!==null&&!BLOCK_KEYS.includes(block))) throw new Error('This backup contains an invalid block. Your world was kept.');
+    edits[id]=block;
+  }
+  const p=s.player;
+  if(!['x','y','z','yaw','pitch'].every(k=>finite(p[k]))||['x','y','z'].some(k=>Math.abs(p[k])>10000)||!Number.isInteger(p.sel)||p.sel<0||p.sel>=BLOCK_KEYS.length||typeof p.flying!=='boolean') throw new Error('This backup has an invalid player position. Your world was kept.');
+  if(!['creative','survival'].includes(s.mode)||!finite(s.health)||s.health<1||s.health>20||!finite(s.dayTime)||!object(s.inventory)) throw new Error('This backup has invalid game settings. Your world was kept.');
+  const inventory={};
+  for(const k of BLOCK_KEYS){if(!Number.isSafeInteger(s.inventory[k])||s.inventory[k]<0)throw new Error('This backup has an invalid inventory. Your world was kept.');inventory[k]=s.inventory[k];}
+  if(!Array.isArray(s.campus)||s.campus.length>10)throw new Error('This backup has invalid characters. Your world was kept.');
+  const campus=s.campus.map(a=>{
+    if(!object(a)||typeof a.name!=='string'||a.name.length>40||!['x','y','z'].every(k=>finite(a[k])&&Math.abs(a[k])<=10000)||!Number.isSafeInteger(a.patrolIndex)||a.patrolIndex<0)throw new Error('This backup has invalid characters. Your world was kept.');
+    return {name:a.name,x:a.x,y:a.y,z:a.z,patrolIndex:a.patrolIndex};
+  });
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus};
+}
+function restoreWorldBackup(text){
+  const state=readWorldBackup(text); // Validate before confirmation or touching storage.
+  if(!confirm('Load this world instead of the world on this device? Download your current world first if you want to keep both.')) return false;
+  try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); }
+  catch { throw new Error('This device could not save the loaded world. Your current world was kept.'); }
+  resetting=true;clearTimeout(_saveTimer);location.reload();return true;
+}
+document.getElementById('downloadWorld').addEventListener('click',()=>{
+  const url=URL.createObjectURL(new Blob([worldBackupText()],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download=`MYnecraft EC World ${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  document.getElementById('backupStatus').textContent='World file prepared. Keep it in Files or Downloads, or save it to your school OneDrive. Check that it finished downloading.';
+});
+const worldFile=document.getElementById('worldFile');
+document.getElementById('loadWorld').addEventListener('click',()=>{worldFile.value='';worldFile.click();});
+worldFile.addEventListener('change',async()=>{
+  const file=worldFile.files?.[0];if(!file)return;
+  try { if(file.size>MAX_WORLD_FILE_BYTES)throw new Error('This file is too large. Choose a MYnecraft world backup.');restoreWorldBackup(await file.text()); }
+  catch(e){document.getElementById('backupStatus').textContent=e.message;}
+});
 
 buildMeshes();
 
