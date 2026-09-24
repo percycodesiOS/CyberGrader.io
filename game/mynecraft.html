@@ -444,14 +444,21 @@ for (let i = 0; i < 90; i++) {
 // Block-built interpretation of Kenny's ECMS aerial photo: four branching wings,
 // a central entrance, orange/blue facade panels, white roofs and a loop driveway.
 const wingEnds=[[25,-28],[57,-28],[25,30],[57,30]];
+// Front-facing directions: ECES is left (west), ECMS is right (east).
+// Floors keep their original heights, so existing worlds and travel points remain valid.
+const CIRC_ROOM={x:54,z:-11,radius:9};
+const SCHOOL_STAIRS={x0:53,x1:55,z0:5,z1:10};
+const SCHOOL_RAMP={x:43,z:4,inner:3.1,outer:5.5};
+const FLAGPOLE={x:30,z:39};
+const inCirc=(x,z)=>Math.hypot(x-CIRC_ROOM.x,z-CIRC_ROOM.z)<=CIRC_ROOM.radius;
 // Stepped voxel curve follows the concave glass entry in Kenny's front-door photo.
 const galleryFront=x=>23+Math.floor(Math.pow((x-46)/4.5,2));
 const inGallery=(x,z)=>x>=38&&x<=54&&z>=12&&z<=galleryFront(x);
 function schoolFootprint(x,z){
-  if(Math.hypot(x-46,z-5)<=8 || inGallery(x,z))return true;
+  if(Math.hypot(x-46,z-5)<=11 || inGallery(x,z) || inCirc(x,z))return true;
   return wingEnds.some(([ex,ez])=>{
     const dx=ex-46,dz=ez-5,t=Math.max(0,Math.min(1,((x-46)*dx+(z-5)*dz)/(dx*dx+dz*dz)));
-    return Math.hypot(x-46-t*dx,z-5-t*dz)<=5;
+    return Math.hypot(x-46-t*dx,z-5-t*dz)<=6.25;
   });
 }
 for(let x=18;x<=63;x++)for(let z=-34;z<=43;z++){
@@ -467,15 +474,44 @@ for(let x=18;x<=63;x++)for(let z=-34;z<=43;z++){
     if(loop>.70&&loop<1.14)setBlock(x,4,z,'stone');
   }
 }
+const bollardPositions=[34,38,42,51,55,59].map(x=>{
+  let front=24;
+  for(let z=24;z<=43;z++)for(let dx=-1;dx<=1;dx++)if(schoolFootprint(x+dx,z))front=Math.max(front,z);
+  return {x,z:front+2.2};
+});
+for(const {x,z}of bollardPositions)for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++)
+  setBlock(Math.floor(x)+dx,4,Math.floor(z)+dz,'stone');
 // Front doors through the blue central entrance, plus a walkway to the loop.
 for(let x=45;x<=47;x++)for(let z=22;z<=31;z++){
   setBlock(x,4,z,'stone');
   for(let y=5;y<=8;y++)setBlock(x,y,z,null);
 }
-// Three-block-wide staircase joins the actual floors. Keep a full headroom opening.
-for(let x=40;x<=42;x++)for(let z=3;z<=8;z++){
+// Main stair is to the visitor's right, beyond the entrance gallery. Its six
+// one-block risers use the same auto-step collision as the rest of the world.
+for(let x=SCHOOL_STAIRS.x0;x<=SCHOOL_STAIRS.x1;x++)for(let z=5;z<=11;z++){
   for(let y=5;y<=14;y++)setBlock(x,y,z,null);
-  for(let y=5;y<=z+2;y++)setBlock(x,y,z,'stone');
+  if(z<=10)for(let y=5;y<=15-z;y++)setBlock(x,y,z,'stone');
+}
+// A broad curved, block-stepped walkway winds around the central circulation
+// space. Each plateau is several cells long; there are no floating collision
+// meshes. Keep full headroom over every step and join the actual upper floor.
+const rampCells=[];
+for(let x=37;x<=49;x++)for(let z=-2;z<=10;z++){
+  const radius=Math.hypot(x-SCHOOL_RAMP.x,z-SCHOOL_RAMP.z);
+  if(radius<SCHOOL_RAMP.inner||radius>SCHOOL_RAMP.outer)continue;
+  let angle=Math.atan2(x-SCHOOL_RAMP.x,z-SCHOOL_RAMP.z);
+  if(angle<0)angle+=Math.PI*2;
+  const feet=5+Math.min(6,Math.floor(angle/(Math.PI*2)*7));
+  rampCells.push({x,z,y:feet});
+  for(let y=5;y<=14;y++)setBlock(x,y,z,null);
+  for(let y=5;y<feet;y++)setBlock(x,y,z,'snow');
+  // Upper sections bridge the ground corridor instead of filling it with a
+  // solid wall; the deck above remains collision-backed and two cells clear.
+  if(feet>=8){setBlock(x,5,z,null);setBlock(x,6,z,null);}
+}
+// Keep the upper landing open on the high (south-west) end of the curved walk.
+for(let x=38;x<=42;x++)for(let z=9;z<=11;z++)if(schoolFootprint(x,z)){
+  setBlock(x,10,z,'planks');for(let y=11;y<=14;y++)setBlock(x,y,z,null);
 }
 // Main entrance frame and canopy; glass door leaves animate below.
 for(const x of [44,48])for(let y=5;y<=9;y++)setBlock(x,y,23,'blue');
@@ -516,16 +552,36 @@ for(const x of [68,74]){
 }
 for(let x=70;x<=74;x++)setBlock(x,7,25,'planks');
 for(let i=0;i<3;i++){setBlock(65+i,5+i,25,'planks');setBlock(75,7-i,27+i,'blue');}
-// Benches under the outdoor classroom pergola; broad middle aisle stays clear.
-for(const x of [72,77,82])for(const z of [-15,-5])for(let dx=0;dx<3;dx++){setBlock(x+dx,5,z,'planks');setBlock(x+dx,6,z+(z===-15?-1:1),'wood');}
-for(const x of [70,86])for(const z of [-17,-3])for(let y=5;y<=10;y++)setBlock(x,y,z,'wood');
-for(let x=70;x<=86;x+=3)for(let z=-17;z<=-3;z++)setBlock(x,11,z,'planks');
-// A few classroom tables and roof lights; the interiors stay walkable.
-for(const [x,z] of wingEnds)for(const y of [5,11]){setBlock(x,y,z,'planks');setBlock(x,y+4,z,'glow');}
-// CIRC maker room: wood-topped workbenches, blue stools and supply shelving.
-for(const [x,z] of [[24,-23],[28,-19],[31,-14]]){
-  for(let dx=0;dx<3;dx++)for(let dz=0;dz<2;dz++){setBlock(x+dx,5,z+dz,'stone');setBlock(x+dx,6,z+dz,'planks');}
-  for(const dx of [-1,3])setBlock(x+dx,5,z,'blue');
+// The outdoor classroom follows the photos: open sky, stump table/stool
+// clusters on a pale gravel pad and a chalkboard. The centre deck path stays clear.
+for(let x=70;x<=86;x++)for(let z=-17;z<=-3;z++)
+  if(z!==-10&&z!==-9)setBlock(x,4,z,'stone');
+const outdoorStumps=[[73,-14],[82,-14],[73,-5],[82,-5]];
+for(const [x,z] of outdoorStumps){
+  setBlock(x,5,z,'wood');setBlock(x,6,z,'wood');
+  for(const [dx,dz] of [[-2,0],[2,0],[0,-2],[0,2]])
+    if(z+dz!==-10&&z+dz!==-9)setBlock(x+dx,5,z+dz,'wood');
+}
+// No desks in the wing corridors. Furniture lives in rooms, with a wide main
+// aisle linking the entrance, both schools, CIRC and the upstairs circulation.
+for(const [x,z] of wingEnds)for(const y of [9,15])setBlock(x,y,z,'glow');
+// Rounded CIRC space in the first-floor centre/back, slightly right: wood tables,
+// blue stools, library shelves, and a blue wall band like the two room photos.
+const circTables=[[52,-7],[57,-8],[55,-14]];
+for(const [x,z] of circTables){
+  for(let dx=0;dx<2;dx++){setBlock(x+dx,5,z,'stone');setBlock(x+dx,6,z,'planks');}
+  for(const dz of [-2,2])setBlock(x,5,z+dz,'blue');
+}
+for(let x=50;x<=58;x++)for(let y=5;y<=7;y++)setBlock(x,y,-18,'planks');
+for(let x=45;x<=63;x++)for(let z=-20;z<=-2;z++)if(inCirc(x,z)&&
+  [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz])=>!inCirc(x+dx,z+dz))&&
+  Math.hypot(x-46,z-5)>11)setBlock(x,8,z,'blue');
+// Open cafeteria behind the central walkway. Tables sit beside the main route,
+// leaving a clear central aisle and the CIRC doorway open.
+const cafeteriaTables=[[39,-7],[43,-8],[48,-7]];
+for(const [x,z] of cafeteriaTables){
+  setBlock(x,5,z,'planks');setBlock(x+1,5,z,'planks');
+  for(const dz of [-1,1])setBlock(x,5,z+dz,'blue');
 }
 // Rear school-bus loop, its own drive and the sports field beyond it. This stays
 // well clear of the parent drop-off circle in front (centred on z=40), so the two
@@ -1032,8 +1088,16 @@ function spawnNPC(name, x, z) {
 spawnNPC('Steve',  12, 5);
 spawnNPC('Alex',  -12, 5);
 
-const schoolLabel = new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('ECMS'),depthTest:true}));
-schoolLabel.scale.set(7,1.75,1); schoolLabel.position.set(46,18,23); scene.add(schoolLabel);
+const schoolLabel = new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('EHRMAN CREST'),depthTest:true}));
+schoolLabel.scale.set(8.5,1.4,1); schoolLabel.position.set(46,18,23); scene.add(schoolLabel);
+const schoolWayfinding=[];
+for(const [text,x,y,z,width] of [
+  ['ECES · Grades 1–4',25,12,37.1,7],['ECMS · Grades 5–6',57,12,37.1,7],
+  ['Kindergarten · Floor 2',46,13,0,6],['CIRC',54,8,-3.5,4],['Cafeteria',45,8,-6,4]
+]){
+  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(text),depthTest:true}));
+  label.name=text;label.scale.set(width,1,1);label.position.set(x,y,z);scene.add(label);schoolWayfinding.push(label);
+}
 const schoolLogoTexture=new THREE.TextureLoader().load('./assets/sv-school-logo.png');
 schoolLogoTexture.colorSpace=THREE.SRGBColorSpace;
 // Official transparent monogram, flush with the white entry facade at z=23.
@@ -1099,10 +1163,33 @@ for(const x of [39,53]){
   campusBox(.19,3.8,.19,0x4f5b61,x,7,26.7,-.18);campusBox(.19,3.8,.19,0x4f5b61,x+.9,7,26.7,.18);
 }
 campusBox(26,.25,.35,0xadb3b6,46,9.18,26.65);
-const bollardXs=[34,38,42,51,55,59];
-const bollards=new THREE.InstancedMesh(new THREE.SphereGeometry(.52,8,6),new THREE.MeshLambertMaterial({color:0x888e90}),bollardXs.length);
+// Follow the actual facade instead of placing spheres on a straight line that
+// cut through the diagonal wings. Leave the entrance approach four cells wide.
+const bollards=new THREE.InstancedMesh(new THREE.SphereGeometry(.52,8,6),new THREE.MeshLambertMaterial({color:0x888e90}),bollardPositions.length);
 const detailDummy=new THREE.Object3D();
-bollardXs.forEach((x,i)=>{detailDummy.position.set(x,5.45,29+Math.abs(x-46)*.16);detailDummy.updateMatrix();bollards.setMatrixAt(i,detailDummy.matrix);});campusDetails.add(bollards);
+bollardPositions.forEach(({x,z},i)=>{detailDummy.position.set(x,5.52,z);detailDummy.updateMatrix();bollards.setMatrixAt(i,detailDummy.matrix);});campusDetails.add(bollards);
+// American flag by the front approach, visible from the morning-announcement
+// view. Original canvas artwork, one small static panel, no remote photo asset.
+const flagTexture=campusTexture(390,210,ctx=>{
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,390,210);
+  ctx.fillStyle='#b22234';for(let row=0;row<13;row+=2)ctx.fillRect(0,row*210/13,390,210/13);
+  ctx.fillStyle='#3c3b6e';ctx.fillRect(0,0,156,210*7/13);ctx.fillStyle='#fff';
+  for(let row=0;row<9;row++)for(let col=0;col<(row%2?5:6);col++){
+    ctx.beginPath();ctx.arc(13+col*26+(row%2?13:0),7+row*11,2.5,0,Math.PI*2);ctx.fill();
+  }
+});
+campusBox(.15,12,.15,0xb8c0c7,FLAGPOLE.x,11,FLAGPOLE.z);
+campusBox(1.2,.18,1.2,0x879098,FLAGPOLE.x,5.09,FLAGPOLE.z);
+const americanFlag=campusPanel(flagTexture,3.3,1.78,FLAGPOLE.x+1.68,15.8,FLAGPOLE.z);
+americanFlag.name='American flag at the front approach';
+// Curved blue ceiling band and shelves make CIRC recognizable without filling
+// the corridors with extra objects. All accents share instanced box batches.
+for(let i=0;i<28;i++){
+  const angle=i/28*Math.PI*2;
+  campusBox(1.8,.3,.25,0x548db4,CIRC_ROOM.x+7.8*Math.sin(angle),9.65,CIRC_ROOM.z+7.8*Math.cos(angle),0,angle);
+}
+for(let x=50;x<=58;x++)for(const y of [5.6,6.5,7.3])for(let j=0;j<3;j++)
+  campusBox(.18,.55,.12,[0x235f95,0xb57d35,0x92556c][j],x+.18+j*.28,y,-16.96);
 // White markings follow the parent drop-off circle. Parking bays face the loop.
 for(let i=0;i<30;i++){
   const angle=i/30*Math.PI*2,x=46+12.8*Math.cos(angle),z=40+9.7*Math.sin(angle);
@@ -1128,8 +1215,9 @@ for(const z of [21.3,41.7]){
 for(const x of [67.5,76.5])campusBox(.15,3.4,.15,0x275d9b,x,6.7,33.5);
 campusBox(9.15,.16,.17,0x275d9b,72,8.4,33.5);
 for(const x of [70,74]){for(const dx of [-.4,.4])campusBox(.035,2.1,.035,0xc5cbd0,x+dx,7.25,33.5);campusBox(1,.1,.55,0x23363c,x,6.18,33.5);}
-// Outdoor teaching board beneath the open pergola.
-campusBox(4,2,.16,0x243d39,78,7.5,-15.9);
+// Outdoor teaching board beside the open stump classroom.
+campusBox(4,2,.16,0x243d39,78,7.5,-16.8);
+for(const x of [75.9,80.1])campusBox(.2,3,.2,0x806745,x,6.5,-16.8);
 const outdoorLabel=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('OUTDOOR'),depthTest:true}));outdoorLabel.scale.set(4,1,1);outdoorLabel.position.set(78,9.3,-15.7);campusDetails.add(outdoorLabel);
 // Officer Shields' blue front desk and stool, just inside the glass entrance.
 // These are decorative boxes, not voxels, so the lobby stays fully walkable.
