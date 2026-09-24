@@ -34,7 +34,7 @@ const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,playe
  eddie,eddieRoost,eddiePerch,eddieFacing,updateEddie,EDDIE_ROCK,EDDIE_ROOF,EDDIE_DUSK,EDDIE_DAWN,
  buses,updateBuses,busRouteDistance,busRoutePoint,busAtKerb,busStopDistances,BUS_ARRIVE,BUS_COUNT,BUS_STAGGER,BUS_DRIVE_IN,BUS_DWELL,BUS_DRIVE_OUT,BUS_VISIT,BUS_LOOP,busRouteLength,BUS_ROUTE,
  playerAvatar,viewArms,viewModel,macekBodies,macekClothes,outfitPolo,outfitBlack,identityStatus,worldClockEl,setView,refreshOutfitPreview,updatePlayerAvatar,viewSelect,viewBtn,groundSurface,inBusYard,
- bubble,showBubble,SHIELDS_LINES,heightAt,nearestWalkPoint,walkFeet,
+ bubble,showBubble,SHIELDS_LINES,heightAt,nearestWalkPoint,walkFeet,eiler,entranceStaffBounds,
  get view(){return view;},get macekOutfit(){return macekOutfit;},
  setTime(t){dayTime=t;}};`;
 vm.runInContext(instrumented,context);
@@ -267,13 +267,16 @@ assert(highestSirD>=10.9,'Sir D patrols upstairs');
  console.log('Campus frame CPU median/p95 ms:',frames[300].toFixed(3),frames[570].toFixed(3));
  assert(frames[570]<8,'campus simulation stays within its frame budget');
 }
+a.player.pos.set(47.5,6.7,35.5);
 for(let i=0;i<420;i++){a.setTime(.43+i*.2/1200);a.updateCampus(.2);}
 assert(a.sirD.pos.distanceTo(a.macek.pos)<3.1,'sunset rendezvous');
 assert(Math.abs(a.sirD.pos.z-26.5)<1,'meeting at entrance');
-assert(a.ellie.pos.distanceTo(a.macek.pos)<4,'Ellie follows MaCEk');
-assert(a.percy.pos.distanceTo(a.macek.pos)<4,'Percy follows MaCEk');
+for(const dog of [a.ellie,a.percy]){
+ assert(Math.hypot(dog.pos.x-a.player.pos.x,dog.pos.z-a.player.pos.z)<4,dog.name+' follows the player');
+ assert.equal(dog.pos.y,5,'dogs stay on the ground while following the player');
+}
 assert(a.kay.pos.distanceTo(a.sirD.pos)<4,'KaY follows Sir D');
-assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,MaCEk,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr Unicorn 🦄');
+assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,Mr. Macek,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr. B,Mr. Eiler');
 assert(a.insideBounds(a.micco.pos.x,a.micco.pos.z,a.campusBounds),'Ms. Micco stays on campus');
 a.player.pos.set(46.5,6.7,24);a.updateCampus(.2);assert(Math.abs(a.entranceDoors[0].rotation.y)>.1,'main doors open nearby');
 a.setTime(.12);
@@ -522,14 +525,20 @@ assert.equal(a.eddieFacing(.25),Math.PI/4);assert.equal(a.eddieFacing(.52),Math.
 
 // ===== Officer Shields at the front door =====
 assert.equal(a.shields.name,'Officer Shields');
-assert(Math.hypot(a.shields.pos.x-46.5,a.shields.pos.z-24)<7,'Shields is posted at the front door');
+assert(a.insideBounds(a.shields.pos.x,a.shields.pos.z,a.entranceStaffBounds),'Shields is posted at the front door');
 assert(a.schoolFootprint(Math.floor(a.shields.pos.x),Math.floor(a.shields.pos.z)),'his desk is inside the entrance, not out on the drive');
-assert.equal(a.shields.route.length,0);
-{ // He holds his post: no route, no wandering, whatever the clock says.
- const post=a.shields.pos.clone();
- for(const t of [.1,.35,.5,.8]){a.setTime(t);for(let i=0;i<200;i++)a.updateCampus(.2);}
- assert.equal(a.shields.pos.distanceTo(post),0,'Officer Shields never leaves the desk');
- assert.equal(a.shields.navigationSearch,null,'and never plans a route, so he cannot path into a wall');
+{ // Both greeters can walk, but every position and planned step stays near the post.
+ let farthest=0;
+ for(const t of [.1,.35,.5,.8]){a.setTime(t);for(let i=0;i<200;i++){
+  a.updateCampus(.2);
+  farthest=Math.max(farthest,Math.hypot(a.shields.pos.x-50.5,a.shields.pos.z-20.5));
+  for(const actor of [a.shields,a.eiler]){
+   assert(a.insideBounds(actor.pos.x,actor.pos.z,a.entranceStaffBounds),actor.name+' stays at the entrance');
+   for(const step of actor.route)assert(a.insideBounds(step.x,step.z,a.entranceStaffBounds),'staff route never leaves entrance');
+  }
+ }}
+ assert(farthest>1.5,'Officer Shields actually takes a short walk');
+ assert(farthest<6,'his patrol stays near the desk');
 }
 // Seated and standing alternate on a fixed cycle and wrap cleanly in both directions.
 assert.equal(a.shieldsSeated(0),true);assert.equal(a.shieldsSeated(a.SHIELDS_SIT-.01),true);
@@ -547,12 +556,12 @@ assert.equal(a.shieldsSeated(-1),false,'and reads correctly before zero');
  }
  assert(seatedY!==null&&standY!==null,'both poses occur within a few cycles');
  assert(standY-seatedY>.2,'sitting lowers him onto the stool');
- assert(Math.abs(seatedLeg+Math.PI/2)<.05&&Math.abs(standLeg)<.05,'seated legs come forward, standing legs do not');
+ assert(Math.abs(seatedLeg+Math.PI/2)<.05&&Math.abs(standLeg)<.65,'seated legs come forward; standing legs may walk');
 }
 { // He welcomes an arriving player once, does not repeat while they stand there,
   // and greets again only after they have left and the cooldown has run out.
  a.bubble.textContent='';
- a.player.pos.set(49,5,22);
+ a.player.pos.set(a.shields.pos.x,6.7,a.shields.pos.z+1.5);
  a.updateShields(.05,a.player.pos);
  const first=a.bubble.textContent;
  assert(a.SHIELDS_LINES.includes(first),'he welcomes a player who walks up');
@@ -561,14 +570,14 @@ assert.equal(a.shieldsSeated(-1),false,'and reads correctly before zero');
  assert.equal(a.bubble.textContent,'','standing at the desk does not make him repeat himself');
  a.player.pos.set(46.5,6.7,45);            // walk well away
  for(let i=0;i<40;i++)a.updateShields(.8,a.player.pos);   // and let the cooldown expire
- a.player.pos.set(49,5,22);
+ a.player.pos.set(a.shields.pos.x,6.7,a.shields.pos.z+1.5);
  a.updateShields(.05,a.player.pos);
  assert(a.SHIELDS_LINES.includes(a.bubble.textContent),'coming back later earns a fresh welcome');
  assert.notEqual(a.bubble.textContent,first,'and it is not the same line twice running');
 }
 
 // ===== Mr. Unicorn walks the hallways only =====
-assert.equal(a.unicorn.name,'Mr Unicorn 🦄');
+assert.equal(a.unicorn.name,'Mr. B');
 assert.equal(a.unicorn.bounds,a.schoolInteriorBounds);
 assert.equal(a.schoolInteriorBounds.filter,a.schoolFootprint,'his bounds are filtered by the building footprint');
 assert.equal(a.insideBounds(46,26,a.schoolInteriorBounds),false,'the entrance walkway is outside his world');
@@ -586,15 +595,19 @@ for(let i=0;i<a.unicornPatrol.length;i++){
  assert(route.length>0,`there is an indoor route from ${from} to ${to}`);
  for(const step of route)assert(a.schoolFootprint(step.x,step.z),`route node ${step.x},${step.z} stays indoors`);
 }
-{ // Walking for several in-game minutes never takes him outside, and both hands
-  // stay on the laptop instead of swinging.
+{ // Walking for several in-game minutes never takes him outside. The carrying arm
+  // supports the laptop while his free arm swings naturally.
+ let freeArmMoved=false;
  for(let i=0;i<4000;i++){
   a.unicorn.patrol(1/30,a.unicornPatrol);
   assert(a.schoolFootprint(Math.floor(a.unicorn.pos.x),Math.floor(a.unicorn.pos.z)),'Mr. Unicorn stays inside the school');
-  assert.equal(a.unicorn.armL.rotation.x,a.unicorn.armLock);
-  assert.equal(a.unicorn.armR.rotation.x,a.unicorn.armLock);
+  assert.equal(a.unicorn.armL.rotation.x,a.unicorn.armLockL);
+  assert(Math.abs(a.unicorn.armR.rotation.x)<=.6);
+  freeArmMoved ||= Math.abs(a.unicorn.armR.rotation.x)>.1;
  }
  assert(a.unicorn.patrolIndex>0||a.unicorn.route.length>0,'he actually works his way round the route');
+ assert(freeArmMoved,'the free arm really swings while walking');
+ assert.equal(a.unicorn.laptop.rotation.y,Math.PI,'screen faces the wearer');
 }
 
 // ===== MaCEk's outfits dress every MaCEk body =====
@@ -653,4 +666,4 @@ assert.equal(a.playerAvatar.group.visible,false);assert.equal(a.viewModel.visibl
 assert.match(a.worldClockEl.textContent,/World clock: .+School buses reach the rear loop at 3:00 PM/);
 
 a.resetBtn.events.click[0]();assert(reloaded);assert.equal(saved,null);a.persistSave();assert.equal(saved,null,'exit handler cannot resurrect reset world');
-console.log('PASS: Officer Shields (post, seated/standing cycle, one welcome per visit), Mr. Unicorn (indoor-only routes, laptop), MaCEk outfits on every body, play-as-MaCEk first/third person, Eddie rock-to-roof with day wrapping, SV floor logo, rear bus yard + 3 PM bus loop with no duplicate spawning, zero per-frame allocation, incremental face buffers/growth, no world scans on block actions, graphics modes, coordinate travel, paused rendering, safe/exact save restoration, legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, reset, two-floor navigation, stairs, campus boundaries, sunset meeting, companion following and doors.');
+console.log('PASS: Officer Shields and Mr. Eiler (bounded entrance patrol), seated/standing cycle and arrival greetings, Mr. B (indoor-only routes, one-arm inward laptop), Mr. Macek outfits on every body, first/third person, Eddie rock-to-roof with day wrapping, SV floor logo, rear bus yard + 3 PM bus loop with no duplicate spawning, zero per-frame allocation, incremental face buffers/growth, no world scans on block actions, graphics modes, coordinate travel, paused rendering, safe/exact save restoration, legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, reset, two-floor navigation, stairs, campus boundaries, sunset meeting, companion following and doors.');
