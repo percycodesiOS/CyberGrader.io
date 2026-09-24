@@ -29,7 +29,7 @@ const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1].replace
 const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,worldBackupText,readWorldBackup,restoreWorldBackup,tick,isSolid,isExposed,
  get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
  select(i){selected=i;},pause(){started=false;},modeTo(v){modeSelect.value=v;for(const change of modeSelect.events.change)change();},get keys(){return BLOCK_KEYS;},getBlock,setBlock,campusActors,sirD,macek,kay,ellie,percy,walkingPath,campusBounds,insideBounds,updateCampus,entranceDoors,moveHorizontal,canStandAt,
- micco,campusAreas,believeBanner,believeMat,campusDetails,cloudGroup,cloudMesh,clouds,updateClouds,spawnParticles,updateParticles,particles,shardMaterial,setMacekOutfit,patternedSleeve,updateBlockMeshes,faceSlots,faceDirections,faceVisible,travelTo,setGraphics,renderer,schoolLogo,CampusActor,createWalkingSearch,PATH_STEP_NODES,
+ micco,campusAreas,believeBanner,believeMat,campusDetails,cloudGroup,cloudMesh,clouds,updateClouds,spawnParticles,updateParticles,particles,shardMaterial,setMacekOutfit,patternedSleeve,updateBlockMeshes,faceSlots,faceDirections,faceVisible,travelTo,setGraphics,graphicsBtn,graphicsSelect,renderer,schoolLogo,CampusActor,createWalkingSearch,PATH_STEP_NODES,
  setTime(t){dayTime=t;}};`;
 vm.runInContext(instrumented,context);
 const a=context.api;
@@ -66,6 +66,18 @@ assert.equal(a.renderer.shadowMap.enabled,false,'smooth graphics is default');
 assert.equal(a.renderer.pixelRatio,1,'smooth graphics caps resolution on high-density displays');
 a.setGraphics('detailed');assert.equal(a.renderer.shadowMap.enabled,true);assert.equal(a.renderer.pixelRatio,1.5);
 a.setGraphics('smooth');assert.equal(a.renderer.shadowMap.enabled,false);assert.equal(a.renderer.pixelRatio,1);
+assert.equal(a.graphicsBtn.textContent,'Graphics: Smooth');
+a.graphicsBtn.events.click[0]();
+assert.equal(a.renderer.shadowMap.enabled,true,'in-game toggle enables detailed shadows');
+assert.equal(a.graphicsSelect.value,'detailed','menu list follows the in-game toggle');
+assert.equal(JSON.parse(saved).graphics,'detailed','graphics toggle is saved with the world');
+a.graphicsSelect.value='smooth';a.graphicsSelect.events.change[0]();
+assert.equal(a.graphicsBtn.textContent,'Graphics: Smooth','in-game toggle follows the menu list');
+assert.equal(a.renderer.pixelRatio,1);
+context.navigator.maxTouchPoints=5;a.setGraphics('detailed');
+assert.equal(a.renderer.pixelRatio,1,'a tablet keeps pixel ratio 1 when shadows are on');
+assert.equal(a.renderer.shadowMap.enabled,true);
+context.navigator.maxTouchPoints=0;a.setGraphics('smooth');
 assert.equal(a.getBlock(-55,2,0),'stone','highway west of campus');
 assert.equal(a.believeBanner.name,'BELIEVE entrance banner');assert.equal(a.believeMat.name,'BELIEVE welcome mat');
 assert.equal(a.believeMat.rotation.x,-Math.PI/2,'welcome mat still lies on the lobby floor');
