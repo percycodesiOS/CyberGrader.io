@@ -3,51 +3,90 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#132920">
-<meta name="description" content="Your ideas. Your world. Build, explore, and visit Ehrman Crest in MYnecraft.">
-<title>MYnecraft: EC Edition | Your world starts here</title>
+<meta name="theme-color" content="#272524">
+<meta name="description" content="Build your own world and explore the EC campus. Choose Creative or Embrace the Challenge in MYnecraft: EC Edition.">
+<title>MYnecraft: EC Edition</title>
 <link rel="icon" type="image/svg+xml" href="game/assets/mynecraft-icon.svg">
+<link rel="preload" href="game/assets/bungee/Bungee-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <style>
-:root{color-scheme:dark;--ink:#f6f5df;--muted:#b5c8b9;--lime:#caf27b;--deep:#101f19;--line:#344b3c}
-*{box-sizing:border-box}body{margin:0;background:var(--deep);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit}a:focus-visible,summary:focus-visible{outline:3px solid #fff;outline-offset:6px}header,main,footer{max-width:1180px;margin:auto;padding-left:32px;padding-right:32px}header{display:flex;align-items:center;justify-content:space-between;padding-top:26px;padding-bottom:26px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:850;letter-spacing:.03em}.brand img{width:32px;height:32px;image-rendering:pixelated}.edition{font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.hero{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;padding:65px 0 45px}.eyebrow{display:flex;align-items:center;gap:9px;color:var(--lime);font:700 12px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.13em}.eyebrow:before{content:"";width:7px;height:7px;background:var(--lime)}h1{font:950 clamp(46px,5.7vw,76px)/1.08 "Courier New",monospace;letter-spacing:-.065em;margin:24px 0;text-shadow:3px 4px 0 #030b07}h1 span{display:block;color:var(--lime);letter-spacing:-.04em;font-size:.63em;margin-top:12px}.intro{max-width:440px;font-size:18px;line-height:1.65;color:#d4dfd4}.play{display:inline-flex;align-items:center;justify-content:center;gap:24px;margin:17px 0 15px;padding:19px 29px;background:var(--lime);color:#142318;border:2px solid #172513;box-shadow:5px 5px 0 #060e09;font:900 17px ui-monospace,monospace;text-decoration:none;min-height:60px;transition:transform .12s}.play:hover{background:#dafb9b;transform:translateY(-2px)}.play:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #060e09}.small{color:var(--muted);font-size:12px;line-height:1.7;margin:7px 0}.scene{position:relative;border:1px solid #536247;background:#94bfbb;box-shadow:12px 12px 0 #08140e;overflow:hidden}.scene svg{display:block;width:100%;height:auto}.scene-caption{position:absolute;bottom:0;left:0;right:0;background:#112319ed;padding:15px 18px;font:700 11px ui-monospace,monospace;letter-spacing:.08em;display:flex;justify-content:space-between;color:#e2eccc}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:22px 0 30px}.feature{padding:27px 25px 28px 0}.feature+.feature{padding-left:25px;border-left:1px solid var(--line)}.number{font:700 12px ui-monospace,monospace;color:var(--lime)}h2{font-size:17px;letter-spacing:-.02em;margin:10px 0}.feature p{color:var(--muted);font-size:14px;line-height:1.7;margin:0}details{border:1px solid var(--line);background:#172a20;margin:0 0 35px;padding:0 20px}summary{cursor:pointer;padding:18px 0;font-weight:750;font-size:14px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:25px;padding:0 0 20px;font-size:14px;line-height:1.9;color:#cfddcf}.controls p{margin:0}kbd{font:700 12px ui-monospace,monospace;background:#293c2e;padding:3px 6px;border:1px solid #537050;border-radius:3px}footer{padding-bottom:26px;color:#96ac9d;font-size:12px;line-height:1.8;display:flex;justify-content:space-between;gap:25px}footer p{margin:0}.saves{max-width:620px}
-@media(max-width:760px){header,main,footer{padding-left:22px;padding-right:22px}.edition{font-size:9px}.hero{grid-template-columns:1fr;padding-top:32px;gap:30px}h1{font-size:clamp(42px,11vw,66px)}.intro{font-size:16px}.play{width:100%;margin-top:13px}.scene{max-width:580px;width:100%;margin-bottom:12px}.feature-grid{grid-template-columns:1fr}.feature,.feature+.feature{border-left:0;padding:20px 0}.feature+.feature{border-top:1px solid var(--line)}.controls{grid-template-columns:1fr}footer{flex-direction:column;gap:10px}.scene-caption{font-size:9px}}
-@media(prefers-reduced-motion:reduce){.play{transition:none}}
+@font-face{font-family:Bungee;src:url('game/assets/bungee/Bungee-Regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+:root{color-scheme:dark;--background:#171615;--surface:#272524;--raised:#34312f;--line:#4a4643;--text:#f8f6f2;--muted:#c4c0bc;--blue:#71b7e4;--blue-hover:#9ed1f1}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:var(--background);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}a{color:inherit}button,input{font:inherit}a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid white;outline-offset:5px}.skip-link{position:absolute;left:20px;top:-80px;z-index:5;background:var(--blue);color:#101e28;padding:12px 18px}.skip-link:focus{top:14px}.site-header{background:var(--surface);border-bottom:3px solid #0b0a0a}.header-inner,.page,footer{width:min(1240px,calc(100% - 64px));margin-inline:auto}.header-inner{min-height:92px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{text-decoration:none;font-family:Bungee,Impact,sans-serif;font-size:27px;line-height:1.1;white-space:nowrap}.brand span{display:block;color:var(--blue);font:700 10px/1.5 system-ui,sans-serif;letter-spacing:.2em;margin-top:5px}nav{display:flex;gap:34px}nav a{font-size:13px;font-weight:750;text-decoration:none;text-transform:uppercase;padding:14px 0;border-bottom:2px solid transparent}nav a:hover{color:var(--blue);border-bottom-color:var(--blue)}.product{display:grid;grid-template-columns:minmax(0,56fr) minmax(0,40fr);gap:32px;align-items:center;padding:42px 0 54px}.cover-card{margin:0;padding:16px 16px 23px;background:var(--surface);border:3px solid var(--line);border-left-color:#070707;border-bottom-color:#070707;box-shadow:2px 2px 0 #070707}.cover-card img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#202d35}.cover-card figcaption{padding:20px 4px 0}h1,h2,h3,.mode-title{font-family:Bungee,Impact,sans-serif;font-weight:400;line-height:1.2}h1{font-size:clamp(28px,3.4vw,43px);margin:0 0 12px;letter-spacing:-.035em}h1 span{display:block;color:var(--blue);font-size:.48em;letter-spacing:.035em;margin-top:9px}.cover-description{font-size:15px;color:var(--muted);max-width:47ch;margin:0}.device-note{font-size:12px;font-weight:650;color:var(--text);margin:17px 0 0}.mode-picker{min-width:0}.mode-picker fieldset{border:0;padding:0;margin:0}.mode-picker legend{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-bottom:13px}.mode-card{display:block;position:relative;background:var(--surface);border:3px solid var(--line);border-bottom-color:#0a0909;cursor:pointer;padding:21px 20px 17px;margin-bottom:15px;transition:border-color .15s,background .15s}.mode-card:has(input:checked){border-color:var(--blue);background:var(--raised)}.mode-card:hover{background:#393633}.mode-card:has(input:focus-visible){outline:3px solid #fff;outline-offset:4px}.mode-title{display:block;font-size:25px;margin:0 0 11px}.mode-copy{display:block;color:var(--muted);font-size:14px;line-height:1.65}.mode-features{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 16px}.mode-features span{font-size:11px;font-weight:650;background:#1d1b1a;padding:3px 7px}.mode-choice{display:flex;align-items:center;gap:10px;padding-top:13px;border-top:2px solid #141313;font-size:13px;font-weight:700}.mode-choice input{accent-color:var(--blue);width:21px;height:21px;margin:0;flex-shrink:0}.play-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;margin-top:20px;padding:15px;background:var(--blue);color:#102431;border:2px solid #a7d4f0;border-bottom:5px solid #376884;text-decoration:none;font-family:Bungee,Impact,sans-serif;font-size:20px;line-height:1.2;transition:background .15s,transform .15s}.play-button:hover{background:var(--blue-hover)}.play-button:active{transform:translateY(2px)}.play-note{text-align:center;color:var(--muted);font-size:12px;margin:12px 0 0}.section{padding:34px 0 40px;border-top:1px solid var(--line)}.section-heading{font-size:24px;margin:0 0 24px}.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}.feature{border-top:3px solid var(--blue);padding-top:18px}.feature h3{font-size:17px;margin:0 0 12px}.crew-avatar{display:block;width:150px;max-width:45%;height:auto;float:right;margin:0 0 10px 12px}.feature p{color:var(--muted);font-size:14px;margin:0;line-height:1.8}.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}.controls-grid h3{font-family:inherit;font-size:16px;font-weight:750;margin:0 0 12px}.controls-grid p{margin:0;color:var(--muted);font-size:14px;line-height:1.9}kbd{display:inline-block;min-width:23px;text-align:center;font:700 12px ui-monospace,monospace;background:var(--raised);border:1px solid #625c57;border-bottom-width:3px;padding:2px 5px;margin-bottom:4px}.menu-note{margin:25px 0 0;padding:17px 20px;background:var(--surface);border-left:3px solid var(--blue);font-size:13px;color:var(--muted);line-height:1.85}.save-section{display:grid;grid-template-columns:1fr 2fr;gap:32px}.save-section h2{font-size:21px;margin:0}.save-section p{font-size:14px;color:var(--muted);margin:0;line-height:1.85}footer{display:flex;justify-content:space-between;gap:24px;border-top:1px solid var(--line);padding:24px 0 30px;font-size:12px;color:#aaa49f}footer p{margin:0}footer a{text-underline-offset:4px}
+@media(max-width:1050px){.header-inner,.page,footer{width:calc(100% - 48px)}.product{gap:25px}.mode-card{padding:18px 16px 15px}.mode-title{font-size:22px}.mode-copy{font-size:13px}.mode-features{gap:5px}.cover-card{padding:12px 12px 21px}.features{gap:22px}}
+@media(max-width:720px){.header-inner,.page,footer{width:calc(100% - 36px)}.header-inner{min-height:108px;align-items:flex-start;justify-content:center;flex-direction:column;gap:10px;padding:17px 0 10px}.brand{font-size:24px}.brand span{font-size:9px;margin-top:3px}nav{gap:27px;width:100%}nav a{font-size:11px;padding:6px 0}.product{grid-template-columns:1fr;gap:30px;padding:24px 0 35px}.cover-card{padding:10px 10px 19px}.cover-card figcaption{padding-top:17px}h1{font-size:34px}.cover-description{font-size:14px}.cover-card img{aspect-ratio:16/9}.mode-card{padding:20px 18px 17px}.mode-title{font-size:24px}.mode-copy{font-size:14px}.mode-picker legend{margin-bottom:12px}.play-button{min-height:59px}.section{padding:28px 0 32px}.section-heading{font-size:22px}.features,.controls-grid,.save-section{grid-template-columns:1fr;gap:26px}.feature{padding-top:14px}.feature h3{font-size:18px}.save-section{gap:15px}footer{flex-direction:column;gap:10px;padding-top:22px}.menu-note{padding:15px 17px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
-<header><a class="brand" href="index.html" aria-label="MYnecraft home"><img src="game/assets/mynecraft-icon.svg" alt="">MYnecraft</a><span class="edition">EC Edition</span></header>
-<main>
-<section class="hero" aria-labelledby="welcome">
-<div><div class="eyebrow">A little imagination. A whole world.</div><h1 id="welcome">MYnecraft<span>Make it your world.</span></h1><p class="intro">Build something wild. Explore beyond the lake. Meet Eddie and the crew at Ehrman Crest. What will you create today?</p><a class="play" href="game/mynecraft.html">LET'S PLAY <span aria-hidden="true">&#8594;</span></a><p class="small">No account needed. Choose Creative or Survival inside.</p></div>
-<div class="scene">
-<svg viewBox="0 0 600 510" role="img" aria-label="Block-style illustration of a school with a glass entrance, trees, and a lake at sunset" xmlns="http://www.w3.org/2000/svg">
-<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#87b7bd"/><stop offset="1" stop-color="#e8d59a"/></linearGradient><pattern id="windows" width="21" height="29" patternUnits="userSpaceOnUse"><rect width="21" height="29" fill="#d68048"/><rect x="4" y="3" width="11" height="21" fill="#244e5a"/><rect x="5" y="3" width="3" height="20" fill="#74b7c6"/></pattern></defs>
-<path fill="url(#sky)" d="M0 0h600v510H0z"/>
-<path fill="#f7e6ad" d="M443 55h65v65h-65z"/><path fill="#ffffff66" d="M33 70h40V54h77v16h32v20H33zM288 118h30v-13h62v13h33v18H288z"/>
-<path fill="#749278" d="M0 185h53v-22h83v35h58v-40h79v-22h64v43h74v-30h49v37h73v-20h67v344H0z"/>
-<path fill="#426f50" d="M0 218h71v-30h62v33h68v-19h73v23h84v-28h83v22h69v-17h90v308H0z"/>
-<path fill="#91ac63" d="M0 284l267-92 333 105v213H0z"/>
-<path fill="#4d8494" d="M0 381l80-31 91 20 48 57-80 57L0 470z"/><path fill="#65b5c3" d="M0 385l80-25 85 18 39 47-70 48L0 460z"/><path fill="#addbd0" d="M15 411h66v5H15zM105 443h48v4h-48zM70 386h47v4H70z"/>
-<path fill="#3b4b45" d="M225 338l57-26 192 86 126-45v24l-128 54-195-87-50 22z"/><path fill="#e5dcaa" d="M350 368l15 7-3 4-15-7zM403 392l16 7-3 4-16-7zM509 398l17-6 2 4-17 7z"/>
-<path fill="#a96738" d="M136 251l94-33 228 72v69l-92 33-230-79z"/><path fill="url(#windows)" d="M136 251l230 74v67l-230-79z"/><path fill="#425c5a" d="M366 325l92-35v69l-92 33z"/>
-<path fill="#e6e8dc" d="M128 248l103-37 235 76-100 39z"/><path fill="#faf9e7" d="M128 248v9l238 77v-8z"/>
-<path fill="#60a5b8" d="M249 279l49 16v74l-49-17z"/><path fill="#c3e4da" d="M247 279h5v75l-5-2zM271 287h4v73l-4-1zM296 295h4v75l-4-1z"/><path fill="#bed5cb" d="M248 314l50 17v4l-50-17z"/>
-<path fill="#263d3d" d="M263 337l22 7v22l-22-7z"/><path fill="#c5e4df" d="M273 340l2 1v21l-2-1z"/>
-<path fill="#e7e5d7" d="M247 359l51 17-9 9-51-18z"/>
-<path fill="#cf7842" d="M378 277l45-17 135 42v69l-45 17-135-44z"/><path fill="url(#windows)" d="M378 277l135 44v67l-135-44z"/><path fill="#365052" d="M513 321l45-19v69l-45 17z"/><path fill="#e6e8dc" d="M369 274l55-21 143 46-54 24z"/>
-<path fill="#315c3c" d="M54 274h50v49H54zM40 243h78v49H40zM51 219h54v35H51z"/><path fill="#654c35" d="M73 292h14v47H73z"/><path fill="#548846" d="M40 243h33v38H40zM51 219h28v25H51z"/>
-<path fill="#315c3c" d="M523 195h57v61h-57zM511 180h77v43h-77zM525 158h50v35h-50z"/><path fill="#654c35" d="M543 231h13v45h-13z"/><path fill="#548846" d="M511 180h33v32h-33zM525 158h22v22h-22z"/>
-<path fill="#497046" d="M244 417h31v21h-31zM291 455h26v17h-26zM553 434h31v18h-31z"/>
-</svg><div class="scene-caption"><span>BUILD &#183; EXPLORE &#183; IMAGINE</span><span>YOUR NEXT ADVENTURE</span></div>
-</div>
-</section>
-<section class="feature-grid" aria-label="What will you try first?">
-<div class="feature"><span class="number">01 / BUILD</span><h2>Start with one block.</h2><p>Try Creative for unlimited building and flying. Switch to Survival to collect your materials.</p></div>
-<div class="feature"><span class="number">02 / EXPLORE</span><h2>Find a familiar place.</h2><p>Visit the two-story school, walk the glass hallway, and see who is out by the lake.</p></div>
-<div class="feature"><span class="number">03 / MEET THE CREW</span><h2>Look for Eddie.</h2><p>Say hello to Sir D, MaCEk, and KaY. Ellie and Percy follow MaCEk on his adventures.</p></div>
-</section>
-<details><summary>First time? Here are your controls.</summary><div class="controls"><p><strong>Keyboard &amp; mouse</strong><br><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> to move. Mouse to look.<br><kbd>Space</kbd> to jump. <kbd>F</kbd> to fly in Creative.<br>Left click to break. Right click to place.<br>Scroll or tap the block bar to choose a block.</p><p><strong>iPad &amp; touch</strong><br>Use the joystick to move and drag the screen to look.<br>Tap the block bar to choose your material.<br>Use the on-screen buttons to jump, place, or break.<br>Open <strong>Menu</strong> to visit the school or change modes.</p></div></details>
+<a class="skip-link" href="#play">Skip to game</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#play" aria-label="MYnecraft: EC Edition">MYnecraft<span>EC EDITION</span></a>
+    <nav aria-label="Main navigation"><a href="#play">Play</a><a href="#explore">Explore</a><a href="#how-to-play">How to Play</a></nav>
+  </div>
+</header>
+<main class="page">
+  <section class="product" id="play" aria-labelledby="game-title">
+    <figure class="cover-card">
+      <img src="game/assets/ec-world-cover.png" width="1672" height="941" fetchpriority="high" alt="Block-built EC campus with a glass entrance, a landscaped drive, and two golden retrievers">
+      <figcaption>
+        <h1 id="game-title">MYnecraft<span>EC Edition</span></h1>
+        <p class="cover-description">Start with a block. Build something new. Explore a world with a familiar school at its heart.</p>
+        <p class="device-note">Play in your browser · Keyboard, mouse, or touch</p>
+      </figcaption>
+    </figure>
+    <div class="mode-picker">
+      <fieldset>
+        <legend>Choose your mode</legend>
+        <label class="mode-card">
+          <span class="mode-title">Creative</span>
+          <span class="mode-copy">Make room for your biggest ideas. Build freely and fly above your world.</span>
+          <span class="mode-features"><span>Unlimited blocks</span><span>Flying</span><span>Coordinate travel</span></span>
+          <span class="mode-choice"><input type="radio" name="mode" value="creative" checked><span>Build without limits</span></span>
+        </label>
+        <label class="mode-card">
+          <span class="mode-title">Embrace the Challenge</span>
+          <span class="mode-copy">Collect your materials, explore on foot, and make every block count.</span>
+          <span class="mode-features"><span>Collect &amp; build</span><span>Health &amp; air</span><span>Peaceful world</span></span>
+          <span class="mode-choice"><input type="radio" name="mode" value="survival"><span>Gather as you go</span></span>
+        </label>
+      </fieldset>
+      <a class="play-button" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">PLAY</a>
+      <p class="play-note">No account needed. Saves stay in this browser.</p>
+    </div>
+  </section>
+  <section class="section" id="explore" aria-labelledby="explore-title">
+    <h2 class="section-heading" id="explore-title">A world to explore</h2>
+    <div class="features">
+      <article class="feature"><h3>Make it yours</h3><p>Build beside the lake or head beyond the campus to find your next project. Choose your blocks, start small, and see where your ideas take you.</p></article>
+      <article class="feature"><h3>Visit EC</h3><p>Walk through the glass entrance and find BELIEVE. Follow the drop-off circle to the playground, basketball court, and outdoor classroom.</p></article>
+      <article class="feature"><h3>Meet the crew</h3><img class="crew-avatar" src="game/assets/macek-avatar-lanyard.png" width="1086" height="1448" loading="lazy" alt="Block-style MaCEk with SV arm sleeve, Florida Gators lanyard and ID badge"><p>Look for Eddie, Sir D, Ms. Micco, MaCEk, and KaY. Ellie and Percy follow MaCEk around the world. Catch the sunset check-in by the entrance.</p></article>
+    </div>
+  </section>
+  <section class="section" id="how-to-play" aria-labelledby="controls-title">
+    <h2 class="section-heading" id="controls-title">How to play</h2>
+    <div class="controls-grid">
+      <div><h3>Keyboard &amp; mouse</h3><p><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> to move. Mouse or click and drag to look.<br><kbd>Space</kbd> to jump. <kbd>F</kbd> toggles flight in Creative.<br>While flying: <kbd>Space</kbd> up, <kbd>Shift</kbd> down.<br>Left click to break. Right click to place.<br>Scroll or select the block bar to choose a material.</p></div>
+      <div><h3>iPad &amp; touch</h3><p>Use the joystick to move. Drag the screen to look.<br>Tap the block bar to choose your material.<br>Use the on-screen buttons to jump, place, or break.<br>Open Menu whenever you want to pause.<br>Embrace the Challenge is peaceful; falls and deep water can hurt.</p></div>
+    </div>
+    <p class="menu-note"><strong>Find your way:</strong> Open the game menu to visit ECMS, change outfits, or travel to coordinates in Creative. Choose <strong>Smooth</strong> graphics for faster play. You can switch modes without clearing your build.</p>
+  </section>
+  <section class="section save-section" aria-labelledby="save-title">
+    <h2 id="save-title">Keep your world</h2>
+    <p>Your world saves in this browser on this device. In the game menu, choose <strong>Download World</strong> to keep a backup. Choose <strong>Load World</strong> to continue from that file on another device. Clearing browser data can erase the local save, so keep a downloaded copy of builds you want to keep.</p>
+  </section>
 </main>
-<footer><p class="saves">Your world saves in this browser on this device. In the game menu, choose Download World to keep a backup, or Load World to continue from that file on another device. Clearing browser data can erase your local save.</p><p>Made for curious minds.<br>MYnecraft: EC Edition &#183; PercyCodes</p></footer>
+<footer><p>MYnecraft: EC Edition</p><a href="#play">Back to play</a></footer>
+<script>
+const playButton=document.getElementById('play-button');
+for(const mode of document.querySelectorAll('input[name="mode"]')){
+  mode.addEventListener('change',()=>{
+    if(!mode.checked)return;
+    const selection=mode.value==='survival'?'survival':'creative';
+    playButton.href='game/mynecraft.html?mode='+selection;
+    playButton.setAttribute('aria-label','Play '+(selection==='survival'?'Embrace the Challenge':'Creative')+' mode');
+  });
+}
+</script>
 </body>
 </html>
