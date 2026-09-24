@@ -39,10 +39,24 @@ html body #start {
   transition: opacity .3s;
 }
 
+html body #start * { box-sizing: border-box; }
+
 html body #start.hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
+
+html body #start .start-home { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 8px; color: #71b7e4; text-decoration: none; font-size: 14px; }
+html body #start .start-home:hover { text-decoration: underline; }
+html body #start .start-wide { flex-basis: 100%; }
+html body #start .character-note { margin-bottom: 12px; }
+html body #start .outfit-option span { display: flex; gap: 7px; align-items: center; }
+html body #start .outfit-option small { font-weight: 400; color: #c4c0bc; }
+html body #start #macekOutfit[hidden] { display: none; }
+html body #start .start-settings #modeHelp { margin: 0 0 14px; }
+html body #start #identityStatus { color: #a7d4f0; font-size: 12px; }
+html body #start #worldClock { color: #a7d4f0; }
 
 html body #start > h1,
 html body #start > :last-child {
@@ -369,4 +383,16 @@ html body #start .outfit-option:focus-within {
   html body #start button {
     transition: none;
   }
+}
+
+/* Keep gameplay hints clear of the longer tablet control bar. */
+@media (max-width: 1250px) {
+  #info { display: none; }
+  #status { top: 74px; max-width: calc(100vw - 40px); }
+}
+@media (max-width: 600px) {
+  #controls { left: 8px; right: 8px; top: 8px; gap: 4px !important; }
+  #controls > div { display: none; }
+  #controls button, #controls a { font-size: 12px; padding: 8px !important; }
+  #status { top: 116px; font-size: 11px; }
 }

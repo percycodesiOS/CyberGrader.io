@@ -124,6 +124,12 @@
   #start > :last-child { margin-bottom: auto; }
   #start .edition { color: #71b7e4; font-weight: 900; font-size: 22px; letter-spacing: 3px; }
   #backupStatus { max-width: 540px; }
+  /* Outfit preview and identity line. Layout only, so the menu restyling that
+     lives in separate files stays free to move this block wherever it wants. */
+  #macekIdentity { display: flex; align-items: center; gap: 12px; max-width: 540px; text-align: left; }
+  #macekPreview { width: 88px; height: 88px; object-fit: contain; border: 2px solid #000; border-radius: 6px; background: #0d1a2c; flex: 0 0 auto; }
+  #identityStatus { margin: 0; font-size: 12px; line-height: 1.6; opacity: .92; }
+  #worldClock { font-size: 12px; opacity: .85; }
   @media (max-height: 700px) { #start { justify-content: flex-start; gap: 12px; } }
   @media (max-width: 900px) {
     #info { top: 58px; font-size: 10px; max-width: 90vw; }
@@ -137,6 +143,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
+<link rel="stylesheet" href="start-menu.css">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -160,20 +167,54 @@
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block
 </div>
 <div id="start">
-  <h1>MYNECRAFT</h1>
-  <p class="edition">EC EDITION</p>
-  <p>Build, explore, and make something yours.<br/>A bigger world, a central lake, friendly animals, and a school to discover.<br/>20-minute days · Click + drag to look · ESC for this menu</p>
-  <label>Play your way <select id="mode"><option value="creative">Creative — unlimited blocks + flight</option><option value="survival">Embrace the Challenge — collect blocks + watch your health</option></select></label>
-  <label>MaCEk’s outfit <select id="macekOutfit"><option value="polo">SV blue polo + patterned sleeve</option><option value="black">Black SV shirt + patterned sleeve</option></select></label>
-  <label>Graphics <select id="graphics"><option value="smooth">Smooth</option><option value="detailed">Detailed shadows</option></select></label>
-  <p id="modeHelp">Your existing build stays here when you change modes.</p>
-  <button class="btn" id="enter" type="button">▶ ENTER WORLD</button>
-  <div><button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button> <button id="overview" type="button">School from above · Creative</button></div>
-  <p>ECMS glass entrance · BELIEVE · playground · basketball · outdoor classroom<br/>Ellie and Percy follow MaCEk. Meet everyone at the entrance at sunset.<br/>Swim with SPACE / JUMP. Embrace the Challenge is peaceful: falls and deep water can hurt.</p>
-  <details class="travel"><summary>Go to coordinates · Creative</summary><p>XYZ shows your position. Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-63" max="95" value="46.5" required></label> <label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label> <label>Z <input id="travelZ" type="number" step="any" min="-63" max="63" value="31.5" required></label> <button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −63 to 95, Z −63 to 63.</p></details>
-  <div><button id="downloadWorld" type="button">Download World</button> <button id="loadWorld" type="button">Load World</button><input id="worldFile" type="file" accept=".json,application/json" hidden></div>
-  <p id="backupStatus" role="status">Autosave stays on this device. Download your world to keep a backup.<br/>On another device, choose Load World and open that file.</p>
+  <div class="start-shell">
+    <header class="start-header">
+      <a class="start-home" href="../index.html">← Back to MYnecraft</a>
+      <h1 class="start-brand">MYNECRAFT</h1>
+      <p class="edition">EC EDITION</p>
+      <p>Your school. Your character. Your next adventure.</p>
+    </header>
+    <div class="start-grid">
+      <section class="start-character-panel" aria-labelledby="characterTitle">
+        <h2 id="characterTitle">Play as MaCEk</h2>
+        <p class="character-note">Florida Gators lanyard. School ID. Pick your outfit.</p>
+        <div class="outfit-options" role="group" aria-label="Choose MaCEk's outfit">
+          <label class="outfit-option"><img class="outfit-preview" src="./assets/macek-avatar-lanyard.png" width="1086" height="1448" alt="MaCEk in a blue polo, patterned arm sleeve and Gators lanyard"><span><input type="radio" name="outfitPreview" id="outfitPolo" value="polo" checked> Blue polo</span><small>One patterned SV sleeve</small></label>
+          <label class="outfit-option"><img class="outfit-preview" src="./assets/macek-avatar-black.png" width="1024" height="1536" alt="MaCEk in a black SV shirt, two patterned sleeves and Gators lanyard"><span><input type="radio" name="outfitPreview" id="outfitBlack" value="black"> Black SV shirt</span><small>Two patterned SV sleeves</small></label>
+        </div>
+        <select id="macekOutfit" aria-label="MaCEk's outfit" hidden><option value="polo">Blue polo + one sleeve</option><option value="black">Black SV shirt + two sleeves</option></select>
+        <p id="identityStatus" role="status">You play as MaCEk.</p>
+      </section>
+      <section class="start-settings" aria-labelledby="settingsTitle">
+        <h2 id="settingsTitle">Choose your adventure</h2>
+        <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option></select></label>
+        <p id="modeHelp">Your existing build stays here when you change modes.</p>
+        <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see MaCEk</option></select></label>
+        <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
+        <p>Creative gives you unlimited blocks and flight. Embrace the Challenge is peaceful: collect blocks and watch your health around heights and deep water.</p>
+        <button class="btn" id="enter" type="button">▶ PLAY AS MACEK</button>
+        <p class="start-tip">Keyboard + mouse or touch controls. Your world saves automatically in this browser.</p>
+      </section>
+    </div>
+    <section class="start-actions" aria-label="Explore the school">
+      <button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button>
+      <button id="overview" type="button">School from above · Creative</button>
+      <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr Unicorn in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. A full game day lasts 20 minutes.</p>
+      <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
+    </section>
+    <section class="start-save" aria-labelledby="saveTitle">
+      <h2 id="saveTitle" class="start-wide">Keep your world</h2>
+      <p class="start-wide"><strong>Download World</strong> keeps a backup file of your build, position, outfit and settings. <strong>Load World</strong> opens a backup you choose and replaces this device's current world after you confirm. Download your current world first if you want to keep it. Worlds do not merge or sync between devices.</p>
+      <button id="downloadWorld" type="button">Download World</button>
+      <button id="loadWorld" type="button">Load World</button>
+      <input id="worldFile" type="file" accept=".json,application/json" hidden>
+      <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
+    </section>
+    <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>XYZ shows your position. X and Z move across the map; Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-63" max="95" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-63" max="63" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −63 to 95, Z −63 to 63.</p></details>
+    <details class="start-advanced"><summary>How to play</summary><p>WASD to move · Drag to look · Space to jump or swim up · Shift to sprint · F to fly in Creative · Left click to break · Right click to place · Number keys or scroll to select blocks · Esc for the menu. On a tablet, use the on-screen stick and buttons.</p></details>
+  </div>
 </div>
+
 <div id="status" role="status" aria-live="polite">Loading your world…</div>
 
 <script type="importmap">
@@ -341,12 +382,15 @@ function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water'
 const inHighway = x => x>=-57 && x<=-43;
 const inLake = (x,z) => (x/10)**2 + (z/8)**2 < 1;
 const inSchool = (x,z) => x >= 17 && x <= 96 && z >= -35 && z <= 55;
+// Rear yard north of the school: bus loop nearer the building, sports field beyond.
+// It reuses the school's flat pad height so the drive, loop and field all line up.
+const inBusYard = (x,z) => x >= 18 && x <= 94 && z >= -60 && z < -35;
 
 // terrain: smooth-ish heightmap via stacked sine noise
 function heightAt(x, z) {
   if (inHighway(x)) return 2;
   if (inLake(x,z)) return -2;
-  if (inSchool(x,z)) return 3;
+  if (inSchool(x,z) || inBusYard(x,z)) return 3;
   const h =
     Math.sin(x*0.18)*1.2 +
     Math.cos(z*0.21)*1.2 +
@@ -373,7 +417,7 @@ for (let x = -SIZE; x <= EAST_EDGE; x++) {
 // scatter trees
 function plantTree(x, z) {
   const h = heightAt(x, z);
-  if (h < 1 || (x>=-60&&x<=-40) || inSchool(x,z) || Math.abs(x)<3 && z>8 && z<17) return;
+  if (h < 1 || (x>=-60&&x<=-40) || inSchool(x,z) || inBusYard(x,z) || Math.abs(x)<3 && z>8 && z<17) return;
   const treeRandom = () => { treeSeed = (Math.imul(treeSeed,1664525)+1013904223)>>>0; return treeSeed/4294967296; };
   let treeSeed = ((x*73856093) ^ (z*19349663))>>>0;
   const trunk = 4 + (treeRandom()*2|0);
@@ -483,6 +527,27 @@ for(const [x,z] of [[24,-23],[28,-19],[31,-14]]){
   for(let dx=0;dx<3;dx++)for(let dz=0;dz<2;dz++){setBlock(x+dx,5,z+dz,'stone');setBlock(x+dx,6,z+dz,'planks');}
   for(const dx of [-1,3])setBlock(x+dx,5,z,'blue');
 }
+// Rear school-bus loop, its own drive and the sports field beyond it. This stays
+// well clear of the parent drop-off circle in front (centred on z=40), so the two
+// never share a lane. Buses reach it along the existing rear service drive.
+const BUS_LOOP={cx:52,cz:-44,rx:16,rz:6,laneX:13.4,laneZ:5};
+for(let x=BUS_LOOP.cx-BUS_LOOP.rx-2;x<=BUS_LOOP.cx+BUS_LOOP.rx+2;x++)
+  for(let z=-52;z<=-36;z++){
+    if(schoolFootprint(x,z))continue;
+    const ring=Math.hypot((x-BUS_LOOP.cx)/BUS_LOOP.rx,(z-BUS_LOOP.cz)/BUS_LOOP.rz);
+    if(ring>.55&&ring<1.10)setBlock(x,4,z,'stone');
+    else if(ring<=.55)setBlock(x,4,z,'grass');
+  }
+// Connector drive: the rear service lane, paved from the south campus edge all the
+// way north to the loop, so buses never share the parents' circle at the front.
+for(let x=64;x<=66;x++)for(let z=-46;z<=54;z++)if(!schoolFootprint(x,z))setBlock(x,4,z,'stone');
+for(let x=64;x<=70;x++)for(let z=-46;z<=-42;z++)setBlock(x,4,z,'stone');
+// Sports field north of the loop, with sideline and halfway markings.
+for(let x=28;x<=76;x++)for(let z=-59;z<=-53;z++)setBlock(x,4,z,'grass');
+// Eddie's sunning rock on the front lawn, clear of the drop-off ring and the
+// canopy bollards. He roosts here by day and flies to the roof after sunset.
+for(let x=41;x<=43;x++)for(let z=26;z<=28;z++)setBlock(x,5,z,'stone');
+for(const [x,z] of [[42,27],[41,27],[43,27],[42,26],[42,28]])setBlock(x,6,z,'stone');
 
 // ---------- meshing: draw only exposed faces ----------
 // One instanced quad per visible face. Buried sides are never sent to the GPU.
@@ -589,6 +654,9 @@ saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveS
 const requestedMode=new URLSearchParams(location.search).get('mode');
 let gameMode = requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
+// The clock the world was saved at. Eddie's perch and the bus loop are both pure
+// functions of it, so they are placed correctly the instant the world loads.
+const LOADED_DAY_TIME = Number.isFinite(saveState.dayTime) ? ((saveState.dayTime % 1) + 1) % 1 : 0.12;
 let graphics=saveState.graphics==='detailed'?'detailed':'smooth';
 let graphicsBtn=null;
 const graphicsSelect=document.getElementById('graphics');
@@ -630,6 +698,7 @@ function persistSave(){
     saveState.mode = gameMode; saveState.health = health; saveState.inventory = inventory;
     saveState.dayTime = dayTime;
     saveState.macekOutfit = macekOutfit;
+    saveState.view = view;
     saveState.graphics = graphics;
     saveState.campus = campusActors.map(a=>({name:a.name,x:a.pos.x,y:a.pos.y,z:a.pos.z,patrolIndex:a.patrolIndex||0}));
     saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
@@ -668,7 +737,11 @@ function readWorldBackup(text){
     return {name:a.name,x:a.x,y:a.y,z:a.z,patrolIndex:a.patrolIndex};
   });
   if(s.macekOutfit!==undefined&&!['polo','black'].includes(s.macekOutfit))throw new Error('This backup has an invalid outfit. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo'};
+  // Backups written before the playable MaCEk identity simply have no camera
+  // choice; they load as first person rather than being rejected.
+  if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
+  if(s.graphics!==undefined&&!['smooth','detailed'].includes(s.graphics))throw new Error('This backup has an invalid graphics setting. Your world was kept.');
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth'};
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
@@ -746,7 +819,9 @@ function makeNameTag(text, color='#fff') {
   x.fillStyle = 'rgba(0,0,0,0.55)';
   const padX = 24;
   x.font = 'bold 64px ui-monospace, monospace';
-  const w = x.measureText(text).width;
+  const measured=x.measureText(text).width;
+  if(measured>c.width-padX*2)x.font=`bold ${Math.floor(64*(c.width-padX*2)/measured)}px ui-monospace, monospace`;
+  const w=x.measureText(text).width;
   const bx = (c.width - w)/2 - padX, by = 28;
   x.fillRect(bx, by, w + padX*2, 72);
   x.fillStyle = color;
@@ -1007,7 +1082,11 @@ const believeTexture=campusTexture(1024,384,ctx=>{
 const BANNER_Z=25.8,BANNER_W=4.5,BANNER_H=1.68,BANNER_TOP=8.8;
 const believeBanner=campusPanel(believeTexture,BANNER_W,BANNER_H,46.5,BANNER_TOP-BANNER_H/2,BANNER_Z);
 believeBanner.name='BELIEVE entrance banner';
-const believeMat=campusPanel(believeTexture,6.2,2.35,46.5,5.015,19.5,true);believeMat.name='BELIEVE welcome mat';
+// The lobby floor now carries the school's own SV monogram instead of a second
+// BELIEVE mat; the hanging BELIEVE banner above the doors is unchanged. Both the
+// wall monogram and the floor inlay share one loaded texture and one draw call each.
+const floorLogo=campusPanel(schoolLogoTexture,4.3,4.81,46.5,5.015,19.5,true);
+floorLogo.name='SV floor logo';floorLogo.material.alphaTest=.05;
 // Short hanger rods tie the banner to the canopy soffit so it never looks floated.
 for(const x of [46.5-BANNER_W/2+.2,46.5+BANNER_W/2-.2])campusBox(.07,9-BANNER_TOP,.07,0x4a5660,x,(9+BANNER_TOP)/2,BANNER_Z);
 // Photo-based canopy fascia, V supports, mullions and concrete ball bollards.
@@ -1052,6 +1131,23 @@ for(const x of [70,74]){for(const dx of [-.4,.4])campusBox(.035,2.1,.035,0xc5cbd
 // Outdoor teaching board beneath the open pergola.
 campusBox(4,2,.16,0x243d39,78,7.5,-15.9);
 const outdoorLabel=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('OUTDOOR'),depthTest:true}));outdoorLabel.scale.set(4,1,1);outdoorLabel.position.set(78,9.3,-15.7);campusDetails.add(outdoorLabel);
+// Officer Shields' blue front desk and stool, just inside the glass entrance.
+// These are decorative boxes, not voxels, so the lobby stays fully walkable.
+campusBox(4.6,1.05,.75,0x1f5f9b,50.4,5.52,21.6);
+campusBox(4.8,.12,.95,0xd8e2ea,50.4,6.09,21.6);
+campusBox(4.4,.1,.06,0x7fb7e0,50.4,5.9,21.99);
+const SHIELDS_SEAT=5.30;
+campusBox(.52,.1,.52,0x2b7fc4,50.5,SHIELDS_SEAT-.05,20.5);
+campusBox(.13,.25,.13,0x33444f,50.5,SHIELDS_SEAT-.22,20.5);
+campusBox(.44,.06,.44,0x33444f,50.5,SHIELDS_SEAT-.37,20.5);
+// Bus loop kerb markings and the sports-field lines on the rear yard.
+for(let i=0;i<28;i++){
+  const angle=i/28*Math.PI*2,x=BUS_LOOP.cx+BUS_LOOP.laneX*Math.cos(angle),z=BUS_LOOP.cz+BUS_LOOP.laneZ*Math.sin(angle);
+  campusBox(.14,.035,.8,0xf3efe0,x,5.025,z,0,-angle);
+}
+for(const z of [-59,-53])campusBox(48,.035,.14,0xf1ede0,52,5.025,z);
+for(const x of [28,76])campusBox(.14,.035,6,0xf1ede0,x,5.025,-56);
+campusBox(.14,.035,6,0xf1ede0,52,5.025,-56);
 // I-79-inspired divided highway along the west side of the campus.
 for(let z=-62;z<=62;z+=6){
   for(const x of [-54.5,-45.5])campusBox(.13,.03,2.5,0xf1ede0,x,3.025,z);
@@ -1119,9 +1215,152 @@ const eyeWhite=new THREE.MeshLambertMaterial({color:0xffffff});
 for(const x of [-.39,.39]){eddiePart(.1,.32,.32,eyeWhite,x,1.12,1.28);eddiePart(.12,.19,.19,eddieDark,x*1.02,1.1,1.33);}
 eddiePart(1.1,.1,.95,hatMat,0,1.39,1.03);eddiePart(.67,.32,.56,hatMat,0,1.59,1.03);eddiePart(.7,.1,.59,eddieDark,0,1.46,1.03);
 const eddieTag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('Eddie'),depthTest:true}));eddieTag.scale.set(2,.5,1);eddieTag.position.set(0,2.2,0);eddie.add(eddieTag);
-eddie.position.set(42,groundSurface(42,29),29);eddie.rotation.y=Math.PI/4;scene.add(eddie);
+scene.add(eddie);
+// Eddie keeps two perches: the lawn rock by day and the white roof after sunset.
+// Both ends, the cruise height and the easing are constants, so the whole flight
+// is a pure function of the day clock. Nothing is allocated or rebuilt per frame,
+// and loading a save at any hour drops him exactly where that hour says he is.
+const EDDIE_ROCK=new THREE.Vector3(42,groundSurface(42,27),27);
+const EDDIE_ROOF=new THREE.Vector3(42.5,17,8.5);
+const EDDIE_CRUISE=20;                       // clears the roof ridge on the way over
+const EDDIE_DUSK=.50,EDDIE_DAWN=.96,EDDIE_FLIGHT=.04; // leaves at 6:00 PM, home by 6:00 AM
+const smoothStep=t=>{const c=t<0?0:t>1?1:t;return c*c*(3-2*c);};
+// 0 = on the rock, 1 = on the roof. The clock wraps, so this wraps with it.
+function eddieRoost(time){
+  const t=((time%1)+1)%1;
+  if(t<EDDIE_DUSK)return 0;
+  if(t<EDDIE_DUSK+EDDIE_FLIGHT)return smoothStep((t-EDDIE_DUSK)/EDDIE_FLIGHT);
+  if(t<EDDIE_DAWN)return 1;
+  return 1-smoothStep((t-EDDIE_DAWN)/(1-EDDIE_DAWN));
+}
+// Climb straight up off the perch, cruise across, then settle. Each leg eases in
+// and out, so the joins have matching speed and the whole path stays bounded by
+// the two perches and the cruise height.
+function eddiePerch(blend,out){
+  const b=blend<0?0:blend>1?1:blend;
+  if(b<=.35)out.set(EDDIE_ROCK.x,EDDIE_ROCK.y+(EDDIE_CRUISE-EDDIE_ROCK.y)*smoothStep(b/.35),EDDIE_ROCK.z);
+  else if(b<.75){const t=smoothStep((b-.35)/.4);out.set(EDDIE_ROCK.x+(EDDIE_ROOF.x-EDDIE_ROCK.x)*t,EDDIE_CRUISE,EDDIE_ROCK.z+(EDDIE_ROOF.z-EDDIE_ROCK.z)*t);}
+  else {const t=smoothStep((b-.75)/.25);out.set(EDDIE_ROOF.x,EDDIE_CRUISE+(EDDIE_ROOF.y-EDDIE_CRUISE)*t,EDDIE_ROOF.z);}
+  return out;
+}
+const EDDIE_YAW_ROCK=Math.PI/4,EDDIE_YAW_ROOF=0;
+function eddieFacing(time){
+  const t=((time%1)+1)%1;
+  if(t>=EDDIE_DUSK&&t<EDDIE_DUSK+EDDIE_FLIGHT)return Math.PI;  // heading for the roof
+  if(t>=EDDIE_DAWN)return 0;                                    // heading home to the rock
+  return t<EDDIE_DUSK?EDDIE_YAW_ROCK:EDDIE_YAW_ROOF;
+}
 let eddiePhase=0;
-function updateEddie(dt){eddiePhase+=dt;wingLeft.rotation.z=.45+Math.sin(eddiePhase*2)*.12;wingRight.rotation.z=-wingLeft.rotation.z;}
+const _eddiePos=new THREE.Vector3();
+eddie.position.copy(eddiePerch(eddieRoost(LOADED_DAY_TIME),_eddiePos));
+eddie.rotation.y=eddieFacing(LOADED_DAY_TIME);
+function updateEddie(dt){
+  const blend=eddieRoost(dayTime),flying=blend>0&&blend<1;
+  eddiePhase+=dt*(flying?4:1);
+  wingLeft.rotation.z=.45+Math.sin(eddiePhase*2)*(flying?.42:.12);
+  wingRight.rotation.z=-wingLeft.rotation.z;
+  eddiePerch(blend,_eddiePos);
+  // Ease toward the scripted point instead of snapping, so a paused or resumed
+  // game and a loaded save both settle smoothly rather than teleporting.
+  eddie.position.lerp(_eddiePos,Math.min(1,dt*3.5));
+  const facing=eddieFacing(dayTime);
+  eddie.rotation.y+=(facing-eddie.rotation.y)*Math.min(1,dt*2.5);
+}
+
+// ---------- school buses ----------
+// Three buses run the rear loop once a day at 3:00 PM game time. Position is a
+// pure function of the day clock, so there are no timers to leak, nothing is
+// spawned while the game runs, pausing freezes them with everything else, and a
+// loaded or reset world puts them exactly where its saved hour says they are.
+const BUS_ROUTE=[];
+function busPush(x,z){
+  const last=BUS_ROUTE[BUS_ROUTE.length-1];
+  if(last&&Math.hypot(last.x-x,last.z-z)<1e-6)return;
+  BUS_ROUTE.push({x,z,d:0});
+}
+const BUS_ARC_STEPS=48,BUS_ARC_START=3;
+busPush(65.5,54);busPush(65.5,-38);busPush(66.2,-42);
+for(let i=0;i<=BUS_ARC_STEPS;i++){
+  const a=i/BUS_ARC_STEPS*Math.PI*2;
+  busPush(BUS_LOOP.cx+BUS_LOOP.laneX*Math.cos(a),BUS_LOOP.cz+BUS_LOOP.laneZ*Math.sin(a));
+}
+busPush(66.2,-42);busPush(65.5,-38);busPush(65.5,54);
+let busRouteLength=0;
+for(let i=1;i<BUS_ROUTE.length;i++){
+  busRouteLength+=Math.hypot(BUS_ROUTE[i].x-BUS_ROUTE[i-1].x,BUS_ROUTE[i].z-BUS_ROUTE[i-1].z);
+  BUS_ROUTE[i].d=busRouteLength;
+}
+const _busPoint={x:0,z:0,yaw:0};
+function busRoutePoint(distance,out){
+  const clamped=distance<0?0:distance>busRouteLength?busRouteLength:distance;
+  let i=1;while(i<BUS_ROUTE.length-1&&BUS_ROUTE[i].d<clamped)i++;
+  const a=BUS_ROUTE[i-1],b=BUS_ROUTE[i],span=(b.d-a.d)||1,t=(clamped-a.d)/span;
+  out.x=a.x+(b.x-a.x)*t;out.z=a.z+(b.z-a.z)*t;out.yaw=Math.atan2(b.x-a.x,b.z-a.z);
+  return out;
+}
+// Distance along the route of a point on the loop, given its angle.
+function busLoopDistance(angle){
+  const i=angle/(Math.PI*2)*BUS_ARC_STEPS,lo=Math.floor(i),f=i-lo;
+  const a=BUS_ROUTE[BUS_ARC_START+lo],b=BUS_ROUTE[BUS_ARC_START+Math.min(BUS_ARC_STEPS,lo+1)];
+  return a.d+(b.d-a.d)*f;
+}
+const BUS_COUNT=3;
+const BUS_HOUR=15;                              // buses are due at 3:00 PM game time
+const BUS_ARRIVE=(((BUS_HOUR-6)%24)+24)%24/24;  // the clock reads dayTime*24 + 6 hours
+const BUS_STAGGER=.0020;                        // ~3 game minutes between buses
+const BUS_DRIVE_IN=.0110,BUS_DWELL=.0085,BUS_DRIVE_OUT=.0110;
+const BUS_VISIT=BUS_DRIVE_IN+BUS_DWELL+BUS_DRIVE_OUT;
+// Kerb slots on the south side of the loop, the side that faces the school. The
+// lead bus pulls furthest round, so the queue fills back from it in arrival order.
+const busStopDistances=[];
+for(let i=0;i<BUS_COUNT;i++)busStopDistances.push(busLoopDistance(Math.PI/2+.62-i*.62));
+// Distance along the route right now, or -1 when this bus is parked off campus.
+function busRouteDistance(time,index){
+  const t=((((time-(BUS_ARRIVE+index*BUS_STAGGER))%1)+1)%1);
+  if(t>BUS_VISIT)return -1;
+  const stop=busStopDistances[index];
+  if(t<BUS_DRIVE_IN)return stop*smoothStep(t/BUS_DRIVE_IN);
+  if(t<BUS_DRIVE_IN+BUS_DWELL)return stop;
+  return stop+(busRouteLength-stop)*smoothStep((t-BUS_DRIVE_IN-BUS_DWELL)/BUS_DRIVE_OUT);
+}
+const busAtKerb=(time,index)=>{
+  const t=((((time-(BUS_ARRIVE+index*BUS_STAGGER))%1)+1)%1);
+  return t>=BUS_DRIVE_IN&&t<BUS_DRIVE_IN+BUS_DWELL;
+};
+// Geometry and materials are shared by all three buses and built once.
+const busShapes={
+  body:new THREE.BoxGeometry(2.3,1.5,7.2),cab:new THREE.BoxGeometry(2.1,1.05,2.2),
+  skirt:new THREE.BoxGeometry(2.34,.3,7.2),band:new THREE.BoxGeometry(2.36,.52,6.4),
+  screen:new THREE.BoxGeometry(1.7,.62,.12),wheel:new THREE.BoxGeometry(.34,.86,.86),
+  lamp:new THREE.BoxGeometry(.3,.26,.14)
+};
+const busMats={
+  paint:new THREE.MeshLambertMaterial({color:0xf2b71c}),trim:new THREE.MeshLambertMaterial({color:0x1b1d22}),
+  glass:new THREE.MeshLambertMaterial({color:0x9fc6d8,transparent:true,opacity:.62}),
+  lamp:new THREE.MeshLambertMaterial({color:0xcf3b2f})
+};
+const buses=[];
+for(let i=0;i<BUS_COUNT;i++){
+  const bus=new THREE.Group();
+  const add=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;bus.add(m);return m;};
+  add(busShapes.body,busMats.paint,0,1.55,-.4);
+  add(busShapes.cab,busMats.paint,0,1.32,3.4);
+  add(busShapes.skirt,busMats.trim,0,.82,-.4);
+  add(busShapes.band,busMats.glass,0,2.0,-.6);
+  add(busShapes.screen,busMats.glass,0,1.62,4.42);
+  for(const x of [-1.08,1.08])for(const z of [2.5,-2.6])add(busShapes.wheel,busMats.trim,x,.55,z);
+  for(const x of [-.78,.78])add(busShapes.lamp,busMats.lamp,x,2.44,-3.96);
+  bus.visible=false;scene.add(bus);buses.push(bus);
+}
+function updateBuses(time){
+  for(let i=0;i<buses.length;i++){
+    const distance=busRouteDistance(time,i),bus=buses[i];
+    if(distance<0){bus.visible=false;continue;}
+    busRoutePoint(distance,_busPoint);
+    bus.visible=true;bus.position.set(_busPoint.x,5,_busPoint.z);bus.rotation.y=_busPoint.yaw;
+  }
+}
+updateBuses(LOADED_DAY_TIME);
 
 // Automatic glass entrance leaves, hinged at the sides of the three-block opening.
 const entranceDoors=[];
@@ -1138,7 +1377,11 @@ for(const side of [-1,1]){
 // A walk node stores foot height, so a roof cannot be mistaken for the room below it.
 const campusBounds={minX:17,maxX:95,minZ:-35,maxZ:54};
 const worldBounds={minX:-SIZE+1,maxX:EAST_EDGE-1,minZ:-SIZE+1,maxZ:SIZE-1};
-const insideBounds=(x,z,b)=>x>=b.minX&&x<=b.maxX&&z>=b.minZ&&z<=b.maxZ;
+// A bounds object may add `filter` to carve a non-rectangular area out of the
+// rectangle. Mr. Unicorn uses it to stay inside the building's own footprint, so
+// no route he plans ever steps out of a door or across the car park.
+const insideBounds=(x,z,b)=>x>=b.minX&&x<=b.maxX&&z>=b.minZ&&z<=b.maxZ&&(!b.filter||b.filter(x,z));
+const schoolInteriorBounds={minX:18,maxX:63,minZ:-34,maxZ:43,filter:schoolFootprint};
 function walkFeet(x,z,nearY){
   for(const y of [Math.round(nearY),Math.round(nearY)+1,Math.round(nearY)-1]){
     if(isSolid(x,y-1,z)&&!getBlock(x,y,z)&&!getBlock(x,y+1,z))return y;
@@ -1214,27 +1457,84 @@ function faceForPerson(style){
     if(style==='sir'){ctx.fillRect(0,0,16,3);ctx.fillRect(1,10,14,6);ctx.fillStyle='#b47b60';ctx.fillRect(5,11,6,2);}
     else if(style==='micco'){
       ctx.fillStyle='#79502e';ctx.fillRect(0,0,16,4);ctx.fillRect(0,0,3,16);ctx.fillRect(13,0,3,16);ctx.fillRect(3,3,3,2);
-    } else {ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
+    }
+    // Officer Shields: short light blond crop, sunglasses pushed up onto his head.
+    else if(style==='shields'){
+      ctx.fillStyle='#d8c489';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,2);ctx.fillRect(14,3,2,2);
+      ctx.fillStyle='#e8d7a6';for(let x=1;x<15;x+=3)ctx.fillRect(x,1,2,1);
+    }
+    // Mr. Unicorn: bald, so the skin runs to the crown, with a dark full beard.
+    else if(style==='unicorn'){
+      ctx.fillStyle='#eec6a2';ctx.fillRect(0,0,16,3);
+      ctx.fillStyle='#2b211c';ctx.fillRect(1,10,14,6);ctx.fillRect(0,8,2,6);ctx.fillRect(14,8,2,6);
+      ctx.fillStyle='#4b3a30';ctx.fillRect(5,11,6,2);
+    }
+    else {ctx.fillStyle='#b1986c';ctx.fillRect(0,0,16,3);ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
     ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
-    ctx.fillStyle='#303b44';ctx.fillRect(4,7,2,2);ctx.fillRect(10,7,2,2);
+    ctx.fillStyle=style==='macek'?'#5289b1':'#303b44';ctx.fillRect(4,7,2,2);ctx.fillRect(10,7,2,2);
     ctx.fillStyle=style==='macek'?'#b28b70':'#704431';ctx.fillRect(6,12,4,1);
     if(style==='micco'){ctx.strokeStyle='#44334e';ctx.lineWidth=1;ctx.strokeRect(2.5,6.5,5,4);ctx.strokeRect(8.5,6.5,5,4);ctx.fillRect(7,8,2,1);}
+    // Black rectangular frames with a straight bridge, drawn over the eyes.
+    if(style==='unicorn'){ctx.fillStyle='#14161a';ctx.fillRect(2,6,5,1);ctx.fillRect(2,10,5,1);ctx.fillRect(2,6,1,5);ctx.fillRect(6,6,1,5);ctx.fillRect(9,6,5,1);ctx.fillRect(9,10,5,1);ctx.fillRect(9,6,1,5);ctx.fillRect(13,6,1,5);ctx.fillRect(7,7,2,1);}
+    if(style==='shields'){ctx.fillStyle='#c9a36a';ctx.fillRect(4,13,8,1);} // friendly smile
+    // MaCEk's subtle goatee: a soft chin patch, nothing like Mr. Unicorn's full beard.
+    if(style==='macek'){ctx.fillStyle='rgba(78,56,42,.72)';ctx.fillRect(6,13,4,2);ctx.fillRect(5,14,6,1);ctx.fillStyle='rgba(78,56,42,.4)';ctx.fillRect(5,11,1,2);ctx.fillRect(10,11,1,2);}
   });
 }
 function stylePerson(npc,style){
   npc.head.material[4].map=faceForPerson(style);
   const shirt=makeTexture(ctx=>{
-    ctx.fillStyle=style==='micco'?'#e7e0cb':'#14191e';ctx.fillRect(0,0,16,16);
+    ctx.fillStyle=style==='micco'?'#e7e0cb':style==='unicorn'?'#eae5d8':style==='shields'?'#1b2536':'#14191e';ctx.fillRect(0,0,16,16);
     if(style==='micco'){
       ctx.fillStyle='#565348';ctx.fillRect(0,0,4,16);ctx.fillRect(12,0,4,16);
       ctx.fillStyle='#b3aa8d';for(let y=1;y<16;y+=3){ctx.fillRect(0,y,3,1);ctx.fillRect(13,y+1,2,1);}
+    } else if(style==='unicorn'){
+      // Off-white polo: placket, buttons and a soft collar shadow.
+      ctx.fillStyle='#d8d2c3';ctx.fillRect(0,0,16,2);ctx.fillRect(7,2,2,7);
+      ctx.fillStyle='#f5f1e7';ctx.fillRect(7,3,1,1);ctx.fillRect(7,6,1,1);
+    } else if(style==='shields'){
+      // Navy polo under a black duty vest: dark side panels and a silver star.
+      ctx.fillStyle='#0c1118';ctx.fillRect(0,0,4,16);ctx.fillRect(12,0,4,16);ctx.fillRect(0,9,16,7);
+      ctx.fillStyle='#2b3b52';ctx.fillRect(6,1,4,1);
+      ctx.fillStyle='#d9dde2';ctx.fillRect(4,4,1,3);ctx.fillRect(3,5,3,1);ctx.fillRect(4,3,1,1);
+      ctx.fillStyle='#b9c0c7';ctx.fillRect(10,10,3,1);ctx.fillRect(10,12,3,1);
     }
   });
   npc.body.material.forEach(m=>m.map=shirt);
-  for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=style==='sir'?makeFlatTex(24,130,207):skinTex);
-  for(const leg of [npc.legL,npc.legR])leg.children[0].material.forEach(m=>m.map=makeFlatTex(25,29,33));
+  const sleeve=style==='sir'?makeFlatTex(24,130,207):style==='shields'?makeFlatTex(27,37,54):skinTex;
+  for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=style==='unicorn'?shirt:sleeve);
+  // Mr. Unicorn wears dark green cargo trousers; everyone else keeps dark trousers.
+  const trousers=style==='unicorn'?makeTexture(ctx=>{
+    ctx.fillStyle='#2f4230';ctx.fillRect(0,0,16,16);
+    ctx.fillStyle='#26371f';ctx.fillRect(1,5,5,6);ctx.fillRect(10,5,5,6);   // cargo pockets
+    ctx.fillStyle='#3b5239';ctx.fillRect(1,5,5,1);ctx.fillRect(10,5,5,1);
+    ctx.fillStyle='#1d2a19';ctx.fillRect(0,0,16,1);
+  }):makeFlatTex(25,29,33);
+  for(const leg of [npc.legL,npc.legR])leg.children[0].material.forEach(m=>m.map=trousers);
   const part=(w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);npc.group.add(m);return m;};
-  if(style==='sir'){
+  if(style==='shields'){
+    // Sunglasses parked on top of the head, a star badge and a shoulder mic.
+    // Friendly school officer: no weapon, no holster, nothing to use on anyone.
+    part(.54,.07,.1,0x12151a,0,1.78,-.02);part(.5,.09,.12,0x1b2027,0,1.75,.16);
+    part(.2,.06,.05,0x3d4854,0,1.79,.2);
+    part(.14,.14,.04,0xd7dce1,-.15,1.17,.14);part(.07,.2,.045,0xd7dce1,-.15,1.17,.142);
+    part(.09,.12,.06,0x23282f,.2,1.42,.1);part(.03,.3,.03,0x23282f,.2,1.27,.11);
+    part(.52,.12,.3,0x0c1118,0,.63,0); // vest hem
+  } else if(style==='unicorn'){
+    // ID on a lanyard, and an open laptop carried level in both hands.
+    part(.035,.42,.03,0x1f3f6b,-.085,1.12,.14);part(.035,.42,.03,0x1f3f6b,.085,1.12,.14);
+    part(.22,.26,.03,0xf2f4f6,0,.83,.15);part(.2,.06,.035,0x2b6ea8,0,.92,.156);
+    const laptop=new THREE.Group();laptop.position.set(0,1.13,.58);
+    const shell=new THREE.MeshLambertMaterial({color:0x9aa3ab}),screenMat=new THREE.MeshLambertMaterial({color:0x1d3346});
+    const addTo=(parent,geo,mat,x,y,z,tilt=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.x=tilt;parent.add(m);return m;};
+    addTo(laptop,new THREE.BoxGeometry(.54,.035,.38),shell,0,0,0);            // keyboard deck
+    addTo(laptop,new THREE.BoxGeometry(.46,.02,.28),screenMat,0,.021,.02);    // keys
+    const lid=addTo(laptop,new THREE.BoxGeometry(.54,.36,.03),shell,0,.17,-.2,-.28);
+    addTo(lid,new THREE.BoxGeometry(.46,.29,.01),screenMat,0,0,.021);         // lit display
+    npc.group.add(laptop);npc.laptop=laptop;
+    // Both hands stay under the deck instead of swinging while he walks.
+    npc.armLock=-1.32;
+  } else if(style==='sir'){
     part(.58,.18,.58,0x171c24,0,1.84,0);part(.55,.05,.3,0x171c24,0,1.78,.36);
     part(.38,.07,.07,0x606f7b,0,1.91,.29);part(.12,.23,.1,0x303940,-.16,1.13,.18);
     part(.08,.1,.04,0x6cb6e2,.16,1.12,.16);
@@ -1243,8 +1543,19 @@ function stylePerson(npc,style){
     part(.5,.65,.14,0x69452b,0,1.44,-.27);
     for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=shirt);
   } else {
-    part(.04,.5,.035,0xd1a65f,-.09,1.02,.15);part(.04,.5,.035,0xd1a65f,.09,1.02,.15);
-    part(.2,.22,.04,0xdce8ed,0,.74,.17);npc.group.scale.x=.9;
+    // Short sandy hair and black Gators straps match the approved block portrait.
+    part(.52,.12,.52,0xa88b59,0,1.8,0);
+    part(.51,.35,.045,0xa88b59,0,1.61,-.255);
+    for(const side of [-1,1])part(.035,.2,.5,0xb2986b,side*.252,1.71,0);
+    part(.05,.5,.035,0x15191f,-.09,1.02,.15);part(.05,.5,.035,0x15191f,.09,1.02,.15);
+    part(.22,.24,.04,0xf2f5f7,0,.74,.17);part(.22,.06,.045,0x0021a5,0,.83,.172);
+    part(.22,.04,.045,0xfa4616,0,.64,.172);
+    stylePerson.lanyardMaterial??=new THREE.MeshBasicMaterial({map:campusTexture(96,512,ctx=>{
+      ctx.fillStyle='#15191f';ctx.fillRect(0,0,96,512);ctx.translate(48,256);ctx.rotate(Math.PI/2);
+      ctx.fillStyle='#fa4616';ctx.font='bold 44px sans-serif';ctx.textAlign='center';ctx.fillText('FLORIDA GATORS',0,15);
+    })});
+    for(const x of [-.09,.09]){const strap=new THREE.Mesh(new THREE.PlaneGeometry(.052,.5),stylePerson.lanyardMaterial);strap.position.set(x,1.02,.173);npc.group.add(strap);}
+    npc.group.scale.x=.9;
   }
 }
 class CampusActor extends NPC {
@@ -1297,7 +1608,10 @@ class CampusActor extends NPC {
       this.tail.rotation.z=Math.sin(this.walkPhase*1.7)*.45;
     } else {
       const swing=moving?Math.sin(this.walkPhase)*.6:0;
-      this.armL.rotation.x=swing;this.armR.rotation.x=-swing;this.legL.rotation.x=-swing;this.legR.rotation.x=swing;
+      // Someone carrying an open laptop keeps both hands under it instead of swinging.
+      if(this.armLock===undefined){this.armL.rotation.x=swing;this.armR.rotation.x=-swing;}
+      else {this.armL.rotation.x=this.armLock;this.armR.rotation.x=this.armLock;}
+      this.legL.rotation.x=-swing;this.legR.rotation.x=swing;
     }
   }
   patrol(dt,points){
@@ -1330,7 +1644,15 @@ const kay=new CampusActor('KaY',44,5,26,'sir');
 const ellie=new CampusActor('Ellie',47,5,31,'macek',worldBounds);makeRetriever(ellie,0x38b8b0,0xd9a252,0xf0d09c,.96);
 const percy=new CampusActor('Percy',45,5,31,'macek',worldBounds);makeRetriever(percy,0x253f52,0xba732f,0xd59951,1.1);
 const micco=new CampusActor('Ms. Micco',26,5,-26,'micco');
-const campusActors=[sirD,macek,kay,ellie,percy,micco];
+// Officer Shields keeps the front desk inside the glass entrance. He is a friendly
+// school resource officer: no weapon, nothing to use on anyone, and he never walks
+// off post, so he has no route to plan and cannot wander into a wall.
+const shields=new CampusActor('Officer Shields',50,5,20,'shields');
+// Mr. Unicorn walks the inside hallways only. His bounds are filtered by the
+// building footprint, so every node A* can even consider is interior floor.
+const unicorn=new CampusActor('Mr Unicorn 🦄',46,5,14,'unicorn',schoolInteriorBounds);
+unicorn.speed=1.35; // an unhurried walk, laptop held level
+const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn];
 // Cache both outfits once; switching clothes does not allocate textures per frame.
 function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
@@ -1343,20 +1665,141 @@ const patternedSleeve=outfitTexture(ctx=>{
   for(let y=4;y<55;y+=16)for(let x=3;x<64;x+=20){ctx.save();ctx.translate(x+(y%32?0:7),y);ctx.rotate(-.2);ctx.fillRect(3,0,8,13);ctx.fillRect(0,3,14,5);ctx.fillStyle='#c3e2ee';ctx.fillRect(5,2,2,7);ctx.fillStyle='#7bc4e6';ctx.restore();}
   ctx.fillStyle='#101319';ctx.fillRect(0,55,64,9);ctx.fillStyle='#8098a8';ctx.fillRect(22,56,17,6);
 });
+// Every MaCEk body — the campus NPC, the playable third-person avatar and the
+// first-person sleeves — is registered here, so one outfit choice dresses all of
+// them from the same cached textures. Nothing is allocated when clothes change.
+const macekBodies=[];
+const registerMacekBody=parts=>{macekBodies.push(parts);return parts;};
 function setMacekOutfit(value){
-  macekOutfit=value==='black'?'black':'polo';macek.body.material.forEach(m=>{m.map=macekClothes[macekOutfit];});
-  macek.armR.children[0].material.forEach(m=>m.map=patternedSleeve);
-  macek.armL.children[0].material.forEach(m=>m.map=skinTex);
-  macek.body.userData.outfit=macekOutfit;
+  macekOutfit=value==='black'?'black':'polo';
+  const shirt=macekClothes[macekOutfit];
+  // The blue polo wears the patterned SV sleeve on one arm only; the black SV
+  // shirt wears it on both. That difference is the whole point of the two looks.
+  const leftSleeve=macekOutfit==='black'?patternedSleeve:skinTex;
+  for(const parts of macekBodies){
+    if(parts.body){parts.body.material.forEach(m=>{m.map=shirt;});parts.body.userData.outfit=macekOutfit;}
+    parts.armR.material.forEach(m=>{m.map=patternedSleeve;});
+    parts.armL.material.forEach(m=>{m.map=leftSleeve;});
+  }
+  updateIdentityStatus();
 }
-setMacekOutfit(macekOutfit);
+registerMacekBody({body:macek.body,armL:macek.armL.children[0],armR:macek.armR.children[0]});
+// ---------- playable MaCEk ----------
+// The avatar and the first-person sleeves are built from the same parts and the
+// same style pass as the NPC, so "play as MaCEk" shows the approved character
+// rather than a re-dressed wanderer. No real photograph is used anywhere.
+function buildPlayerAvatar(){
+  const avatar={group:new THREE.Group()};
+  avatar.head=bodyPart(.5,.5,.5,skinTex,faceTex);avatar.head.position.y=1.55;
+  avatar.body=bodyPart(.5,.75,.25,shirtTex);avatar.body.position.y=.925;
+  for(const [name,side] of [['armL',-1],['armR',1]]){
+    const pivot=new THREE.Group(),limb=bodyPart(.25,.75,.25,shirtTex);
+    limb.position.y=-.375;pivot.add(limb);pivot.position.set(side*.375,1.275,0);avatar[name]=pivot;
+  }
+  for(const [name,side] of [['legL',-1],['legR',1]]){
+    const pivot=new THREE.Group(),limb=bodyPart(.25,.7,.25,pantsTex);
+    limb.position.y=-.35;pivot.add(limb);pivot.position.set(side*.125,.55,0);avatar[name]=pivot;
+  }
+  avatar.group.add(avatar.head,avatar.body,avatar.armL,avatar.armR,avatar.legL,avatar.legR);
+  stylePerson(avatar,'macek');
+  return avatar;
+}
+const playerAvatar=buildPlayerAvatar();
+playerAvatar.group.visible=false;scene.add(playerAvatar.group);
+registerMacekBody({body:playerAvatar.body,armL:playerAvatar.armL.children[0],armR:playerAvatar.armR.children[0]});
+// Sleeves and hands carried on the camera, so the chosen outfit is visible even
+// when the view is first person. They are built once and never re-created.
+const viewModel=new THREE.Group();
+const viewArms={};
+for(const [name,side] of [['armL',-1],['armR',1]]){
+  const limb=bodyPart(.17,.48,.17,shirtTex);
+  limb.position.set(side*.37,-.43,-.72);limb.rotation.set(-.55,0,side*.12);
+  limb.castShadow=false;limb.receiveShadow=false;
+  viewModel.add(limb);viewArms[name]=limb;
+}
+camera.add(viewModel);scene.add(camera);
+registerMacekBody({armL:viewArms.armL,armR:viewArms.armR});
+// Both original-style portraits stay visible while selection dresses the player.
+const identityStatus=document.getElementById('identityStatus');
+const outfitPolo=document.getElementById('outfitPolo'),outfitBlack=document.getElementById('outfitBlack');
+function refreshOutfitPreview(){
+  outfitPolo.checked=macekOutfit==='polo';outfitBlack.checked=macekOutfit==='black';
+  updateIdentityStatus();
+}
+let view=saveState.view==='third'?'third':'first';
+let viewBtn=null;
+const viewSelect=document.getElementById('playerView');
+function updateIdentityStatus(){
+  if(!identityStatus)return;
+  const outfit=macekOutfit==='black'
+    ?'black SV shirt with both patterned sleeves'
+    :'blue SV polo with one patterned SV sleeve';
+  const lens=view==='third'?'third person, so you can see him':'first person, so you see his sleeves and hands';
+  identityStatus.textContent=`MaCEk · ${outfit}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press V while playing to switch views.`;
+}
+function setView(value){
+  view=value==='third'?'third':'first';
+  playerAvatar.group.visible=view==='third';
+  viewModel.visible=view==='first';
+  if(viewSelect)viewSelect.value=view;
+  if(viewBtn){viewBtn.textContent=view==='third'?'View: 3rd':'View: 1st';viewBtn.setAttribute('aria-pressed',String(view==='third'));}
+  updateIdentityStatus();
+}
+setMacekOutfit(macekOutfit);setView(view);refreshOutfitPreview();
 const outfitSelect=document.getElementById('macekOutfit');outfitSelect.value=macekOutfit;
-outfitSelect.addEventListener('change',()=>{setMacekOutfit(outfitSelect.value);persistSave();});
+outfitSelect.addEventListener('change',()=>{setMacekOutfit(outfitSelect.value);refreshOutfitPreview();persistSave();});
+for(const [choice,value] of [[outfitPolo,'polo'],[outfitBlack,'black']]){
+  choice.addEventListener('change',()=>{
+    if(!choice.checked)return;
+    outfitSelect.value=value;setMacekOutfit(value);refreshOutfitPreview();persistSave();
+  });
+}
+viewSelect.addEventListener('change',()=>{setView(viewSelect.value);persistSave();});
 const sirPatrol=[[46,5,18],[50,5,6],[43,11,9],[46,11,18],[46,5,26],[55,5,38]];
 const macekPatrol=[[46,5,18],[47,11,16],[46,5,29],[25,heightAt(25,12)+1,12],[15,heightAt(15,12)+1,12]];
+// Every stop is interior floor inside the building footprint: lobby, main hub,
+// the west hallway and maker room, and the east wing.
+const unicornPatrol=[[46,5,15],[40,5,2],[35,5,-11],[27,5,-24],[38,5,-4],[52,5,-12],[50,5,8]];
+// Officer Shields alternates between his stool and standing at the desk on a fixed
+// cycle of played seconds, so the pose is deterministic and pauses with the game.
+const SHIELDS_CYCLE=54,SHIELDS_SIT=34,SHIELDS_YAW=-.55,SHIELDS_DROP=.25;
+const shieldsSeated=elapsed=>(((elapsed%SHIELDS_CYCLE)+SHIELDS_CYCLE)%SHIELDS_CYCLE)<SHIELDS_SIT;
+const SHIELDS_LINES=[
+  'Welcome to ECMS! Sign in at the desk and have a great day.',
+  'Morning! Walking feet in the hallway, please.',
+  'Good to see you. Need directions to the gym?',
+  'Hi there — the office is just past the glass.',
+  'Have a good one. I am right here if you need me.'
+];
+let shieldsClock=0,shieldsGreetTimer=0,shieldsWasNear=false,shieldsLastLine='';
+shields.poseBlend=shieldsSeated(0)?1:0;
+shields.group.rotation.y=SHIELDS_YAW;
+function updateShields(dt,playerPos){
+  shieldsClock+=dt;shieldsGreetTimer-=dt;
+  // Ease between poses so he never snaps upright in the middle of a sentence.
+  shields.poseBlend+=((shieldsSeated(shieldsClock)?1:0)-shields.poseBlend)*Math.min(1,dt*3);
+  const blend=shields.poseBlend;
+  shields.group.position.set(shields.pos.x,shields.pos.y-SHIELDS_DROP*blend,shields.pos.z);
+  shields.group.rotation.y=SHIELDS_YAW;
+  shields.legL.rotation.x=shields.legR.rotation.x=-Math.PI/2*blend;
+  shields.armL.rotation.x=shields.armR.rotation.x=-.5*blend;
+  shields.head.position.y=1.55-.03*blend;
+  // One welcome per visit. He greets when you arrive, then waits either for you to
+  // walk away and come back or for a long cooldown, and never repeats a line twice.
+  const range=Math.hypot(playerPos.x-shields.pos.x,playerPos.z-shields.pos.z);
+  const near=range<6.5&&Math.abs(playerPos.y-shields.pos.y)<4;
+  if(near&&!shieldsWasNear&&shieldsGreetTimer<=0){
+    let line;do{line=SHIELDS_LINES[Math.random()*SHIELDS_LINES.length|0];}while(line===shieldsLastLine&&SHIELDS_LINES.length>1);
+    shieldsLastLine=line;showBubble(shields,line);shieldsGreetTimer=22;
+  }
+  if(near)shieldsWasNear=true;else if(range>9)shieldsWasNear=false;
+}
 let greetedAtSunset=false;
 function updateCampus(dt){
   micco.patrol(dt,[[26,5,-26],[32,5,-12],[46,5,17],[72,5,-9],[46,5,26]]);
+  unicorn.patrol(dt,unicornPatrol);
+  updateShields(dt,player.pos);
+  updateBuses(dayTime);
   const meeting=dayTime>=.43&&dayTime<=.56;
   if(meeting){
     sirD.go(dt,{x:45,y:5,z:26});macek.go(dt,{x:47,y:5,z:26});
@@ -1544,7 +1987,13 @@ addEventListener('keydown', e => {
     Object.keys(keys).forEach(k=>keys[k]=false);
     document.exitPointerLock?.();
     startEl.classList.remove('hidden');
+    refreshMenuStatus();
   }
+});
+
+// V swaps between MaCEk's own eyes and a view from just behind him.
+addEventListener('keydown', e => {
+  if (e.code === 'KeyV' && started) { setView(view==='third'?'first':'third'); persistSave(); }
 });
 
 // F toggles creative flight (press SPACE to rise, SHIFT to descend while flying)
@@ -1640,8 +2089,9 @@ function updateParticles(dt) {
 const _castDir=new THREE.Vector3(),_castNormal=new THREE.Vector3();
 const _cell=[0,0,0],_o=[0,0,0],_d=[0,0,0],_step=[0,0,0],_delta=[0,0,0],_next=[0,0,0];
 function castVoxel() {
-  // Walk the crossed voxels, not every instance in the large world.
-  const origin=camera.position,dir=camera.getWorldDirection(_castDir);
+  // Walk the crossed voxels, not every instance in the large world. The ray starts
+  // at MaCEk's own eye, not the camera, so third person aims exactly like first.
+  const origin=player.pos,dir=camera.getWorldDirection(_castDir);
   _o[0]=origin.x;_o[1]=origin.y;_o[2]=origin.z;
   _d[0]=dir.x;_d[1]=dir.y;_d[2]=dir.z;
   for(let i=0;i<3;i++){
@@ -1758,12 +2208,42 @@ function moveHorizontal(axis,delta){
   else player.pos.copy(blocked);
 }
 
+// ---------- playable MaCEk body ----------
+// Keeps the avatar under the camera and swings its limbs from the player's own
+// speed. Scratch vectors are module scope, so a frame allocates nothing here.
+const THIRD_PERSON_RANGE=4.2;
+const _viewDir=new THREE.Vector3();
+let avatarPhase=0;
+function avatarStride(phase,moving){return moving?Math.sin(phase)*.6:0;}
+function updatePlayerAvatar(dt){
+  const speed=Math.hypot(player.vel.x,player.vel.z),moving=speed>.2;
+  avatarPhase=moving?avatarPhase+dt*6:avatarPhase*.9;
+  const swing=avatarStride(avatarPhase,moving);
+  playerAvatar.armL.rotation.x=swing;playerAvatar.armR.rotation.x=-swing;
+  playerAvatar.legL.rotation.x=-swing;playerAvatar.legR.rotation.x=swing;
+  playerAvatar.group.position.set(player.pos.x,player.pos.y-player.height,player.pos.z);
+  // The block models face +Z, and the player walks toward -Z at yaw 0.
+  playerAvatar.group.rotation.y=player.yaw+Math.PI;
+  viewArms.armL.rotation.x=-.55+swing*.15;viewArms.armR.rotation.x=-.55-swing*.15;
+  if(view!=='third')return;
+  // Pull the camera back behind MaCEk, stopping short of whatever is behind him
+  // so the view never ends up inside a wall.
+  camera.getWorldDirection(_viewDir);
+  let back=THIRD_PERSON_RANGE;
+  for(let s=.6;s<=THIRD_PERSON_RANGE;s+=.6){
+    if(isSolid(Math.floor(player.pos.x-_viewDir.x*s),Math.floor(player.pos.y-_viewDir.y*s+.35),Math.floor(player.pos.z-_viewDir.z*s))){
+      back=Math.max(.9,s-.6);break;
+    }
+  }
+  camera.position.set(player.pos.x-_viewDir.x*back,player.pos.y-_viewDir.y*back+.35,player.pos.z-_viewDir.z*back);
+}
+
 // ---------- main loop ----------
 const SKY_DAY = new THREE.Color(0x87ceeb);
 const SKY_NOON = new THREE.Color(0x9fd8ff);
 const SKY_DUSK = new THREE.Color(0xff9e5a);
 const SKY_NIGHT = new THREE.Color(0x0b1430);
-let dayTime = Number.isFinite(saveState.dayTime) ? saveState.dayTime % 1 : 0.12;
+let dayTime = LOADED_DAY_TIME;
 const _tmpSky = new THREE.Color();
 // Frame scratch objects. The loop runs 60x a second on a school tablet, so it
 // reuses these instead of handing four new objects per frame to the collector.
@@ -1866,6 +2346,7 @@ function tick(now) {
   camera.position.copy(player.pos);
   // eye at top of bounding box
   camera.position.y = player.pos.y + 0.0;
+  updatePlayerAvatar(dt);
 
   renderer.render(scene, camera);
   recordFrame(now,frameInterval);
@@ -1955,13 +2436,18 @@ resetBtn.addEventListener('click', () => {
   location.reload();
 });
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
-menuBtn.addEventListener('click',()=>{started=false;Object.keys(keys).forEach(k=>keys[k]=false);document.exitPointerLock?.();startEl.classList.remove('hidden');persistSave();});
+menuBtn.addEventListener('click',()=>{started=false;Object.keys(keys).forEach(k=>keys[k]=false);document.exitPointerLock?.();startEl.classList.remove('hidden');refreshMenuStatus();persistSave();});
 const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
 graphicsBtn=document.createElement('button');
 graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
 graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detailed':'smooth');persistSave();});
 setGraphics(graphics);
-ctrlPanel.append(backLink, saveTag, saveBtn, menuBtn, graphicsBtn, resetBtn);
+// Tablet-friendly twin of the V key, so play-as-MaCEk is reachable without a keyboard.
+viewBtn=document.createElement('button');
+viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
+viewBtn.addEventListener('click',()=>{setView(view==='third'?'first':'third');persistSave();});
+setView(view);
+ctrlPanel.append(backLink, saveTag, saveBtn, menuBtn, viewBtn, graphicsBtn, resetBtn);
 document.body.appendChild(ctrlPanel);
 
 function flashSaved(){
@@ -2009,6 +2495,18 @@ function timeLabel() {
   const isDay = Math.sin(dayTime * Math.PI * 2) > 0;
   return `${h12}:${String(m).padStart(2,'0')} ${ampm} ${isDay ? '\u2600\ufe0f' : '\u{1f319}'}`;
 }
+// The start menu shows the same clock the HUD does, plus when the buses are due,
+// so a player who pauses can still see where the school day has got to.
+const busClockLabel=(()=>{const h=BUS_HOUR%12||12;return `${h}:00 ${BUS_HOUR<12?'AM':'PM'}`;})();
+const worldClockEl=document.getElementById('worldClock');
+function busStatusLine(){
+  for(let i=0;i<BUS_COUNT;i++)if(busRouteDistance(dayTime,i)>=0)
+    return busAtKerb(dayTime,i)?'Buses are at the rear loop now.':'Buses are on the rear loop drive.';
+  return `School buses reach the rear loop at ${busClockLabel}.`;
+}
+function refreshMenuStatus(){
+  if(worldClockEl)worldClockEl.textContent=`World clock: ${timeLabel()} · ${busStatusLine()}`;
+}
 let nextHudUpdate=0, frameFps=0, frameWindowStart=0, frameCount=0;
 function recordFrame(now,interval){
   if(interval>1000){frameWindowStart=now;frameCount=0;return;}
@@ -2022,6 +2520,7 @@ function recordFrame(now,interval){
 }
 function updateCoordHUD() {
   const now=performance.now();if(now<nextHudUpdate)return;nextHudUpdate=now+200;
+  refreshMenuStatus();
   const bk = BLOCKS[BLOCK_KEYS[selected]];
   coordHUD.innerHTML =
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
@@ -2157,7 +2656,8 @@ if (IS_TOUCH) {
 
 addEventListener('beforeunload', persistSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) persistSave(); });
-document.getElementById('status').textContent='Ready. Lake at the center · school to the east · Menu changes your mode.';
+refreshMenuStatus();
+document.getElementById('status').textContent='Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
 setInterval(()=>{if(started)persistSave();},5000);
 </script>
 </body>
