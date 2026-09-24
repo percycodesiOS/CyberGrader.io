@@ -1,0 +1,372 @@
+/* MYnecraft: EC Edition start menu.
+   Link this after the game's own style block:
+   <link rel="stylesheet" href="start-menu.css">
+   Parent markup wraps #start in .start-shell and uses the section classes below.
+   Control IDs stay #mode, #macekOutfit, #graphics, #modeHelp, #enter,
+   #visitSchool, #overview, #travelForm, #travelX, #travelY, #travelZ,
+   #travelStatus, #downloadWorld, #loadWorld, #worldFile, #backupStatus.
+   Outfit previews: ./assets/macek-avatar-lanyard.png and ./assets/macek-avatar-black.png. */
+@font-face {
+  font-family: Bungee;
+  src: url("assets/bungee/Bungee-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+html body #start {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  margin: 0;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  background: #171615;
+  color: #f8f6f2;
+  cursor: default;
+  text-align: left;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.45;
+  transition: opacity .3s;
+}
+
+html body #start.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html body #start > h1,
+html body #start > :last-child {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+html body #start .start-shell {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+html body #start .start-header,
+html body #start .start-brand {
+  min-width: 0;
+}
+
+html body #start h1,
+html body #start .start-brand {
+  font-family: Bungee, Impact, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+}
+
+html body #start h1 {
+  margin: 0;
+  font-size: clamp(28px, 8vw, 52px);
+  color: #f8f6f2;
+  text-shadow: 4px 4px 0 #070707;
+  overflow-wrap: anywhere;
+}
+
+html body #start .edition {
+  margin: 6px 0 0;
+  color: #71b7e4;
+  font-family: Bungee, Impact, sans-serif;
+  font-size: clamp(16px, 4vw, 22px);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  opacity: 1;
+}
+
+html body #start .start-header p:not(.edition) {
+  max-width: 62ch;
+  margin: 10px 0 0;
+  color: #c4c0bc;
+  font-size: 14px;
+  text-align: left;
+}
+
+html body #start .start-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 14px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+html body #start .start-character-panel,
+html body #start .start-settings,
+html body #start .start-actions,
+html body #start .start-save,
+html body #start .start-advanced,
+html body #start .travel {
+  min-width: 0;
+  background: #272524;
+  border: 3px solid #4a4643;
+  border-left-color: #070707;
+  border-bottom-color: #070707;
+  box-shadow: 2px 2px 0 #070707;
+  padding: 14px;
+}
+
+html body #start .start-character-panel h2,
+html body #start .start-settings h2,
+html body #start .start-save h2 {
+  margin: 0 0 10px;
+  font-family: Bungee, Impact, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+html body #start .outfit-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+html body #start .outfit-option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px;
+  background: #34312f;
+  border: 3px solid #4a4643;
+  color: #f8f6f2;
+  cursor: pointer;
+}
+
+html body #start .outfit-option:has(input:checked),
+html body #start .outfit-option:has(input:focus-visible) {
+  border-color: #71b7e4;
+}
+
+html body #start .outfit-preview {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  object-position: center bottom;
+  background: #1d1b1a;
+}
+
+html body #start .outfit-option input {
+  width: 21px;
+  height: 21px;
+  min-height: 21px;
+  accent-color: #71b7e4;
+}
+
+html body #start label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+  margin: 0 0 12px;
+  color: #f8f6f2;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: left;
+}
+
+html body #start .outfit-option {
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+html body #start .start-settings label:last-child,
+html body #start label:last-child {
+  margin-bottom: 0;
+}
+
+html body #start select,
+html body #start button,
+html body #start summary,
+html body #start input[type="number"] {
+  box-sizing: border-box;
+  min-height: 44px;
+  border-radius: 0;
+  font-size: 16px;
+}
+
+html body #start select,
+html body #start input[type="number"] {
+  width: 100%;
+  max-width: 100%;
+  padding: 8px 10px;
+  background: #171615;
+  color: #f8f6f2;
+  border: 2px solid #4a4643;
+}
+
+html body #start button {
+  padding: 10px 14px;
+  background: #34312f;
+  color: #f8f6f2;
+  border: 2px solid #a7d4f0;
+  border-bottom: 4px solid #376884;
+  font-family: Bungee, Impact, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+html body #start button:hover {
+  background: #3d3a37;
+}
+
+html body #start button:active {
+  transform: translateY(1px);
+}
+
+html body #start #enter {
+  width: 100%;
+  min-height: 52px;
+  background: #71b7e4;
+  color: #102431;
+  border: 2px solid #a7d4f0;
+  border-bottom: 5px solid #376884;
+  font-size: clamp(16px, 4vw, 22px);
+}
+
+html body #start #enter:hover {
+  background: #9ed1f1;
+}
+
+html body #start .start-actions,
+html body #start .start-save,
+html body #start > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: stretch;
+}
+
+html body #start .start-actions button,
+html body #start .start-save button,
+html body #start > div button {
+  flex: 1 1 180px;
+}
+
+html body #start #modeHelp,
+html body #start #backupStatus,
+html body #start #travelStatus,
+html body #start p {
+  margin: 8px 0 0;
+  color: #c4c0bc;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  opacity: 1;
+  overflow-wrap: anywhere;
+}
+
+html body #start .start-save #backupStatus,
+html body #start #backupStatus {
+  flex: 1 1 100%;
+  max-width: none;
+}
+
+html body #start #worldFile {
+  display: none;
+  min-height: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+}
+
+html body #start .travel,
+html body #start .start-advanced {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: none;
+  margin: 0;
+}
+
+html body #start .travel summary,
+html body #start .start-advanced summary {
+  color: #71b7e4;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+html body #start #travelForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+  margin-top: 10px;
+}
+
+html body #start #travelForm label {
+  flex: 1 1 90px;
+  width: auto;
+  margin: 0;
+}
+
+html body #start #travelForm input {
+  width: 100%;
+  max-width: none;
+}
+
+html body #start button:focus-visible,
+html body #start select:focus-visible,
+html body #start input:focus-visible,
+html body #start summary:focus-visible,
+html body #start .outfit-option:focus-within {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 800px) {
+  html body #start .start-grid {
+    grid-template-columns: 1fr;
+  }
+  html body #start .outfit-preview {
+    height: 140px;
+  }
+}
+
+@media (max-width: 390px) {
+  html body #start {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+  html body #start .start-actions button,
+  html body #start .start-save button,
+  html body #start > div button {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-height: 700px) and (orientation: landscape) {
+  html body #start .outfit-preview {
+    height: 96px;
+  }
+  html body #start .start-grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #start,
+  html body #start button {
+    transition: none;
+  }
+}
