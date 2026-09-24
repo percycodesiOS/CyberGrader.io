@@ -1175,10 +1175,10 @@ function faceForPerson(style){
     if(style==='sir'){ctx.fillRect(0,0,16,3);ctx.fillRect(1,10,14,6);ctx.fillStyle='#b47b60';ctx.fillRect(5,11,6,2);}
     else if(style==='micco'){
       ctx.fillStyle='#79502e';ctx.fillRect(0,0,16,4);ctx.fillRect(0,0,3,16);ctx.fillRect(13,0,3,16);ctx.fillRect(3,3,3,2);
-    } else {ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillRect(5,14,6,2);}
+    } else {ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
     ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
     ctx.fillStyle='#303b44';ctx.fillRect(4,7,2,2);ctx.fillRect(10,7,2,2);
-    ctx.fillStyle='#704431';ctx.fillRect(6,12,4,1);
+    ctx.fillStyle=style==='macek'?'#b28b70':'#704431';ctx.fillRect(6,12,4,1);
     if(style==='micco'){ctx.strokeStyle='#44334e';ctx.lineWidth=1;ctx.strokeRect(2.5,6.5,5,4);ctx.strokeRect(8.5,6.5,5,4);ctx.fillRect(7,8,2,1);}
   });
 }
