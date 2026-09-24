@@ -29,7 +29,7 @@ const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1].replace
 const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,player,camera,npcs,animals,hotbar,resetBtn,modeSelect,startGame,doPlace,doBreak,castVoxel,persistSave,worldBackupText,readWorldBackup,restoreWorldBackup,tick,isSolid,isExposed,
  get time(){return dayTime;},get health(){return health;},get mode(){return gameMode;},get inventory(){return inventory;},get selected(){return selected;},
  select(i){selected=i;},pause(){started=false;},modeTo(v){modeSelect.value=v;for(const change of modeSelect.events.change)change();},get keys(){return BLOCK_KEYS;},getBlock,setBlock,campusActors,sirD,macek,kay,ellie,percy,walkingPath,campusBounds,insideBounds,updateCampus,entranceDoors,moveHorizontal,canStandAt,
- micco,campusAreas,believeBanner,believeMat,campusDetails,cloudGroup,cloudMesh,clouds,updateClouds,spawnParticles,updateParticles,particles,shardMaterial,setMacekOutfit,patternedSleeve,updateBlockMeshes,faceSlots,faceDirections,faceVisible,travelTo,setGraphics,renderer,schoolLogo,CampusActor,createWalkingSearch,PATH_STEP_NODES,
+ micco,campusAreas,believeBanner,believeMat,campusDetails,cloudGroup,cloudMesh,clouds,updateClouds,spawnParticles,updateParticles,particles,shardMaterial,setMacekOutfit,patternedSleeve,updateBlockMeshes,faceSlots,faceDirections,faceVisible,travelTo,setGraphics,graphicsBtn,graphicsSelect,renderer,schoolLogo,CampusActor,createWalkingSearch,PATH_STEP_NODES,
  setTime(t){dayTime=t;}};`;
 vm.runInContext(instrumented,context);
 const a=context.api;
@@ -66,6 +66,18 @@ assert.equal(a.renderer.shadowMap.enabled,false,'smooth graphics is default');
 assert.equal(a.renderer.pixelRatio,1,'smooth graphics caps resolution on high-density displays');
 a.setGraphics('detailed');assert.equal(a.renderer.shadowMap.enabled,true);assert.equal(a.renderer.pixelRatio,1.5);
 a.setGraphics('smooth');assert.equal(a.renderer.shadowMap.enabled,false);assert.equal(a.renderer.pixelRatio,1);
+assert.equal(a.graphicsBtn.textContent,'Graphics: Smooth');
+a.graphicsBtn.events.click[0]();
+assert.equal(a.renderer.shadowMap.enabled,true,'in-game toggle enables detailed shadows');
+assert.equal(a.graphicsSelect.value,'detailed','menu list follows the in-game toggle');
+assert.equal(JSON.parse(saved).graphics,'detailed','graphics toggle is saved with the world');
+a.graphicsSelect.value='smooth';a.graphicsSelect.events.change[0]();
+assert.equal(a.graphicsBtn.textContent,'Graphics: Smooth','in-game toggle follows the menu list');
+assert.equal(a.renderer.pixelRatio,1);
+context.navigator.maxTouchPoints=5;a.setGraphics('detailed');
+assert.equal(a.renderer.pixelRatio,1,'a tablet keeps pixel ratio 1 when shadows are on');
+assert.equal(a.renderer.shadowMap.enabled,true);
+context.navigator.maxTouchPoints=0;a.setGraphics('smooth');
 assert.equal(a.getBlock(-55,2,0),'stone','highway west of campus');
 assert.equal(a.believeBanner.name,'BELIEVE entrance banner');assert.equal(a.believeMat.name,'BELIEVE welcome mat');
 assert.equal(a.believeMat.rotation.x,-Math.PI/2,'welcome mat still lies on the lobby floor');
@@ -113,14 +125,28 @@ assert.equal(planes.length,6,'all six isolated faces remain visible');a.setBlock
 for(let i=0;i<90;i++){a.setBlock(-25+i%15,28+Math.floor(i/15),-20,'blue');a.updateBlockMeshes(-25+i%15,28+Math.floor(i/15),-20);}
 for(const [x,y,z,type] of [[-24,29,-20,'glass'],[-25,29,-20,'water'],[-23,29,-20,null]]){a.setBlock(x,y,z,type);a.updateBlockMeshes(x,y,z);}
 a.updateBlockMeshes(80,30,80);
-const glowMesh=a.instMeshes['glow:0'];
+a.setBlock(-40,40,-40,'glow');a.updateBlockMeshes(-40,40,-40);
+let glowKey,glowMesh;
+for(const [id,rec] of a.faceSlots)if(id.startsWith('-40,40,-40,')){glowKey=rec.bucketKey;glowMesh=a.instMeshes[glowKey];break;}
+assert.equal(glowMesh.frustumCulled,true,'chunk meshes can be frustum-culled');
+assert(glowMesh.boundingSphere.radius>16&&glowMesh.boundingSphere.radius<50,'chunk bounds cover the column without spanning the world');
 const growthBlocks=Math.floor((glowMesh.instanceMatrix.count-glowMesh.count)/6)+1;
 for(let i=0;i<growthBlocks;i++){
- const x=-40+(i%10)*2,y=40+Math.floor(i/10)*2;
- a.setBlock(x,y,-40,'glow');a.updateBlockMeshes(x,y,-40);
+ const x=-62+(i%8)*2,z=-62+Math.floor(i/8)*2;
+ a.setBlock(x,40,z,'glow');a.updateBlockMeshes(x,40,z);
 }
-assert.notEqual(a.instMeshes['glow:0'],glowMesh,'isolated edits force capacity growth');
-assert(a.instMeshes['glow:0'].instanceMatrix.count>glowMesh.instanceMatrix.count,'grown bucket preserves spare capacity');
+assert.notEqual(a.instMeshes[glowKey],glowMesh,'isolated edits force capacity growth');
+assert(a.instMeshes[glowKey].instanceMatrix.count>glowMesh.instanceMatrix.count,'grown bucket preserves spare capacity');
+// Existing backups permit edits beyond the normal build height. Culling must
+// still enclose those accepted blocks after import or incremental edits.
+for(const y of [-90,120]){
+ const backup=JSON.parse(a.worldBackupText());backup.state.edits[`-40,${y},-40`]='glow';
+ assert.equal(a.readWorldBackup(JSON.stringify(backup)).edits[`-40,${y},-40`],'glow');
+ a.setBlock(-40,y,-40,'glow');a.updateBlockMeshes(-40,y,-40);
+ const rec=a.faceSlots.get(`-40,${y},-40,0`),sphere=a.instMeshes[rec.bucketKey].boundingSphere;
+ for(const dx of [0,1])for(const dy of [0,1])for(const dz of [0,1])
+  assert(sphere.containsPoint(new Three.Vector3(-40+dx,y+dy,-40+dz)),'chunk bounds contain accepted backup edits outside normal build height');
+}
 // Swap removal and growth must preserve actual instance transforms, not only IDs.
 function assertFaceBuffers(){
  const occupied=new Set(),matrix=new Three.Matrix4(),position=new Three.Vector3(),normal=new Three.Vector3();
@@ -204,6 +230,12 @@ assert.equal(routeActor.planFailures,0,'successful route clears failed-route bac
 // Grounded players step up the real staircase without having to fly.
 a.player.pos.set(41.5,6.7001,2.7);a.player.onGround=true;a.player.flying=false;a.moveHorizontal('z',.2);
 assert(a.player.pos.y>7.6,'player can climb first stair');
+// A diagonal step into two blocks must leave the player outside both of them.
+a.setBlock(10,20,10,'stone');a.setBlock(11,20,10,'stone');a.setBlock(10,20,11,'stone');
+a.player.pos.set(10.9,21.8,10.9);a.player.flying=false;a.player.onGround=false;a.player.vel.set(.4,0,.4);
+a.moveHorizontal('x',.4);a.moveHorizontal('z',.4);
+assert(a.canStandAt(a.player.pos),'corner collision does not leave the player inside a block');
+a.setBlock(10,20,10,null);a.setBlock(11,20,10,null);a.setBlock(10,20,11,null);
 a.setTime(.2);
 let highestSirD=0;
 for(let i=0;i<500;i++){a.updateCampus(.2);highestSirD=Math.max(highestSirD,a.sirD.pos.y);for(const actor of [a.sirD,a.kay])assert(a.insideBounds(actor.pos.x,actor.pos.z,a.campusBounds),'campus boundary');}

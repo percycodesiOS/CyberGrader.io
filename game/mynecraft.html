@@ -103,7 +103,18 @@
   #hotbar button { flex: 0 0 auto; cursor: pointer; }
   .touch-device #hotbar { bottom: 180px !important; }
   #status { position: fixed; top: 86px; left: 12px; z-index: 8; color: white; background: #163347e8; padding: 8px; border-radius: 6px; font-size: 12px; pointer-events: none; }
-  #start button, #start select { font: inherit; padding: 10px; border-radius: 6px; }
+  #start button, #start select { font: inherit; padding: 10px; border-radius: 6px; max-width: 92vw; }
+  #controls {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    flex-wrap: wrap; justify-content: flex-end;
+    max-width: calc(100vw - 24px);
+  }
+  #controls button, #controls a { min-height: 44px; box-sizing: border-box; }
+  @media (pointer: coarse), (max-width: 900px) {
+    #start select, #start button { min-height: 44px; font-size: 16px; }
+    #controls button, #controls a { padding: 10px 12px; font-size: 14px; }
+  }
   /* A centred flex column clips its own top once the menu is taller than the
      screen, and the clipped part cannot be scrolled back. Start from the top
      and let auto margins do the centring when everything does fit, so an iPad
@@ -178,7 +189,9 @@ scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb, 40, 110);
 
 const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 500);
-const renderer = new THREE.WebGLRenderer({ antialias: false });
+// high-performance asks Windows to use the discrete GPU instead of the
+// integrated one. Antialiasing stays off; iPad fill rate is the tighter limit.
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = false;
@@ -490,25 +503,41 @@ function isExposed(x,y,z){
 const voxelGeometry = new THREE.PlaneGeometry(1,1);
 const faceBuckets=new Map(),faceSlots=new Map();
 const faceDummy=new THREE.Object3D(),swapMatrix=new THREE.Matrix4();
-function faceBucketKey(type,face){
+// One texture bucket per 32-block column. A bucket that spans the whole campus
+// can never be frustum-culled, so the GPU shaded every exposed face each frame.
+const FACE_CHUNK=32;
+function faceChunk(x,z){return [Math.floor(x/FACE_CHUNK),Math.floor(z/FACE_CHUNK)];}
+function faceBucketKey(type,face,x,z){
   const materialIndex=type==='grass'?(face===2?2:face===3?3:0):type==='wood'?(face===2||face===3?2:0):0;
-  return type+':'+materialIndex;
+  const [cx,cz]=faceChunk(x,z);
+  return type+':'+materialIndex+':'+cx+':'+cz;
+}
+function updateFaceBucketBounds(mesh,bucket,cx,cz){
+  const yMid=(bucket.minY+bucket.maxY)/2,yHalf=(bucket.maxY-bucket.minY)/2+1;
+  mesh.boundingSphere??=new THREE.Sphere();
+  mesh.boundingSphere.center.set(Number(cx)*FACE_CHUNK+FACE_CHUNK/2,yMid,Number(cz)*FACE_CHUNK+FACE_CHUNK/2);
+  mesh.boundingSphere.radius=Math.hypot(FACE_CHUNK/2+1,yHalf,FACE_CHUNK/2+1);
 }
 function growFaceBucket(bucketKey,capacity){
-  const bucket=faceBuckets.get(bucketKey),[type,index]=bucketKey.split(':');
+  const bucket=faceBuckets.get(bucketKey),[type,index,cx,cz]=bucketKey.split(':');
   const previous=instMeshes[bucketKey];
   const mesh=new THREE.InstancedMesh(voxelGeometry,BLOCKS[type].mats[Number(index)],capacity);
   mesh.count=bucket.ids.length;mesh.castShadow=type!=='water'&&type!=='glass';mesh.receiveShadow=true;
   mesh.userData.blockKey=type;
-  // Each texture bucket spans the world. Avoid stale bounds after block edits.
-  mesh.frustumCulled=false;mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  // Keep accepted legacy/imported edits outside the normal build height visible.
+  updateFaceBucketBounds(mesh,bucket,cx,cz);
+  mesh.frustumCulled=true;mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   if(previous){mesh.instanceMatrix.array.set(previous.instanceMatrix.array);scene.remove(previous);previous.dispose();}
   scene.add(mesh);instMeshes[bucketKey]=mesh;
 }
 function addVoxelFace(x,y,z,face,type){
-  const bucketKey=faceBucketKey(type,face),id=key(x,y,z)+','+face;
-  if(!faceBuckets.has(bucketKey)){faceBuckets.set(bucketKey,{ids:[]});growFaceBucket(bucketKey,256);}
+  const bucketKey=faceBucketKey(type,face,x,z),id=key(x,y,z)+','+face;
+  if(!faceBuckets.has(bucketKey)){faceBuckets.set(bucketKey,{ids:[],minY:-8,maxY:61});growFaceBucket(bucketKey,256);}
   const bucket=faceBuckets.get(bucketKey),slot=bucket.ids.length;
+  if(y<bucket.minY||y+1>bucket.maxY){
+    bucket.minY=Math.min(bucket.minY,y);bucket.maxY=Math.max(bucket.maxY,y+1);
+    const [cx,cz]=faceChunk(x,z);updateFaceBucketBounds(instMeshes[bucketKey],bucket,cx,cz);
+  }
   if(slot===instMeshes[bucketKey].instanceMatrix.count)growFaceBucket(bucketKey,slot*2);
   const mesh=instMeshes[bucketKey],[dx,dy,dz,rx,ry]=faceDirections[face];
   faceDummy.position.set(x+.5+dx*.5,y+.5+dy*.5,z+.5+dz*.5);faceDummy.rotation.set(rx,ry,0);faceDummy.updateMatrix();
@@ -527,7 +556,7 @@ function refreshVoxelFaces(x,y,z){
     const id=key(x,y,z)+','+face,[dx,dy,dz]=faceDirections[face];
     const visible=type&&!(y===-8&&face===3)&&faceVisible(type,getBlock(x+dx,y+dy,z+dz));
     const current=faceSlots.get(id);
-    if(current&&(!visible||current.bucketKey!==faceBucketKey(type,face)))removeVoxelFace(id);
+    if(current&&(!visible||current.bucketKey!==faceBucketKey(type,face,x,z)))removeVoxelFace(id);
     if(visible&&!faceSlots.has(id))addVoxelFace(x,y,z,face,type);
   }
 }
@@ -561,14 +590,24 @@ const requestedMode=new URLSearchParams(location.search).get('mode');
 let gameMode = requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
 let graphics=saveState.graphics==='detailed'?'detailed':'smooth';
+let graphicsBtn=null;
+const graphicsSelect=document.getElementById('graphics');
 function setGraphics(value){
   graphics=value==='detailed'?'detailed':'smooth';
   renderer.shadowMap.enabled=graphics==='detailed';
-  renderer.setPixelRatio(Math.min(devicePixelRatio,graphics==='detailed'?1.5:1));
+  // Detailed shadows on a tablet stay at pixel ratio 1. A 1.5x framebuffer
+  // plus the shadow map is what makes Play stall on an iPad.
+  const touchScreen=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+  const cap=graphics==='detailed'&&!touchScreen?1.5:1;
+  renderer.setPixelRatio(Math.min(devicePixelRatio,cap));
   scene.traverse(o=>{if(o.material)for(const m of [].concat(o.material))m.needsUpdate=true;});
+  graphicsSelect.value=graphics;
+  if(graphicsBtn){
+    graphicsBtn.textContent=graphics==='detailed'?'Graphics: Detailed':'Graphics: Smooth';
+    graphicsBtn.setAttribute('aria-pressed',String(graphics==='detailed'));
+  }
 }
 setGraphics(graphics);
-const graphicsSelect=document.getElementById('graphics');graphicsSelect.value=graphics;
 graphicsSelect.addEventListener('change',()=>{setGraphics(graphicsSelect.value);persistSave();});
 let health = Number.isFinite(saveState.health) ? Math.max(1,Math.min(20,saveState.health)) : 20;
 const inventory = Object.fromEntries(BLOCK_KEYS.map(k=>[k, Math.max(0,Math.floor(Number(saveState.inventory?.[k])||0))]));
@@ -1676,26 +1715,32 @@ function collideAxis(axis, delta) {
   if (axis === 'y') p.y += delta;
   if (axis === 'z') p.z += delta;
   const r = player.radius;
-  const minX = Math.floor(p.x - r), maxX = Math.floor(p.x + r);
-  const minY = Math.floor(p.y - player.height), maxY = Math.floor(p.y + 0.1);
-  const minZ = Math.floor(p.z - r), maxZ = Math.floor(p.z + r);
-  for (let x = minX; x <= maxX; x++)
-    for (let y = minY; y <= maxY; y++)
-      for (let z = minZ; z <= maxZ; z++) {
-        if (!isSolid(x,y,z)) continue;
-        // overlap → push back
-        if (axis === 'x') {
-          if (delta > 0) p.x = x - r - 0.0001;
-          else if (delta < 0) p.x = x + 1 + r + 0.0001;
-        } else if (axis === 'y') {
-          if (delta > 0) { p.y = y - 0.0001; player.vel.y = 0; }
-          else if (delta < 0) { p.y = y + 1 + player.height + 0.0001; player.vel.y = 0; player.onGround = true; }
-        } else if (axis === 'z') {
-          if (delta > 0) p.z = z - r - 0.0001;
-          else if (delta < 0) p.z = z + 1 + r + 0.0001;
+  // A push out of one block can land inside the block beside it. Repeat against
+  // the updated box so a corner does not leave the player stuck inside a voxel.
+  for (let pass = 0; pass < 3; pass++) {
+    const minX = Math.floor(p.x - r), maxX = Math.floor(p.x + r);
+    const minY = Math.floor(p.y - player.height), maxY = Math.floor(p.y + 0.1);
+    const minZ = Math.floor(p.z - r), maxZ = Math.floor(p.z + r);
+    let hit = false;
+    for (let x = minX; x <= maxX; x++)
+      for (let y = minY; y <= maxY; y++)
+        for (let z = minZ; z <= maxZ; z++) {
+          if (!isSolid(x,y,z)) continue;
+          if (axis === 'x') {
+            if (delta > 0) p.x = Math.min(p.x, x - r - 0.0001);
+            else if (delta < 0) p.x = Math.max(p.x, x + 1 + r + 0.0001);
+          } else if (axis === 'y') {
+            if (delta > 0) p.y = Math.min(p.y, y - 0.0001);
+            else if (delta < 0) p.y = Math.max(p.y, y + 1 + player.height + 0.0001);
+          } else if (axis === 'z') {
+            if (delta > 0) p.z = Math.min(p.z, z - r - 0.0001);
+            else if (delta < 0) p.z = Math.max(p.z, z + 1 + r + 0.0001);
+          }
+          hit = true;
         }
-        return;
-      }
+    if (!hit) return;
+    if (axis === 'y') { player.vel.y = 0; if (delta < 0) player.onGround = true; }
+  }
 }
 function canStandAt(pos){
   for(let x=Math.floor(pos.x-player.radius);x<=Math.floor(pos.x+player.radius);x++)
@@ -1876,8 +1921,9 @@ addEventListener('keydown', e => {
 
 // ---------- top-right controls: back to app, autosave indicator, reset ----------
 const ctrlPanel = document.createElement('div');
+ctrlPanel.id='controls';
 ctrlPanel.style.cssText = `
-  position: fixed; top: 12px; right: 12px; z-index: 9;
+  position: fixed; z-index: 9;
   display: flex; gap: 8px; align-items: center;
   font: 700 12px ui-monospace, monospace;
 `;
@@ -1911,7 +1957,11 @@ resetBtn.addEventListener('click', () => {
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
 menuBtn.addEventListener('click',()=>{started=false;Object.keys(keys).forEach(k=>keys[k]=false);document.exitPointerLock?.();startEl.classList.remove('hidden');persistSave();});
 const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
-ctrlPanel.append(backLink, saveTag, saveBtn, menuBtn, resetBtn);
+graphicsBtn=document.createElement('button');
+graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
+graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detailed':'smooth');persistSave();});
+setGraphics(graphics);
+ctrlPanel.append(backLink, saveTag, saveBtn, menuBtn, graphicsBtn, resetBtn);
 document.body.appendChild(ctrlPanel);
 
 function flashSaved(){
