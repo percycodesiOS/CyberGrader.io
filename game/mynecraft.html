@@ -259,6 +259,7 @@ function makeTexture(draw) {
   const ctx = c.getContext('2d');
   draw(ctx);
   const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
   t.magFilter = THREE.NearestFilter;
   t.minFilter = THREE.NearestFilter;
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -1831,7 +1832,7 @@ const eiler=new CampusActor('Mr. Eiler',53,5,18,'eiler',entranceStaffBounds);eil
 const eilerPatrol=[[53,5,18],[52,5,16],[49,5,18],[53,5,21]];
 const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler];
 // Cache both outfits once; switching clothes does not allocate textures per frame.
-function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
+function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
   ctx.fillStyle=style==='polo'?'#1685d1':'#171b22';ctx.fillRect(0,0,64,64);
   for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){ctx.fillStyle=style==='polo'?((x+y)%24?'#1688d5':'#127bc6'):((x+y)%24?'#1d2027':'#24272e');ctx.fillRect(x,y,8,8);}
@@ -1891,14 +1892,19 @@ registerMacekBody({body:playerAvatar.body,armL:playerAvatar.armL.children[0],arm
 // when the view is first person. They are built once and never re-created.
 const viewModel=new THREE.Group();
 const viewArms={};
+const viewShoulders=[];
 for(const [name,side] of [['armL',-1],['armR',1]]){
   const limb=bodyPart(.17,.48,.17,shirtTex);
   limb.position.set(side*.37,-.43,-.72);limb.rotation.set(-.55,0,side*.12);
   limb.castShadow=false;limb.receiveShadow=false;
+  const hand=bodyPart(.17,.13,.17,skinTex);hand.position.y=.275;
+  hand.castShadow=false;hand.receiveShadow=false;limb.add(hand);limb.userData.hand=hand;
+  const cap=bodyPart(.19,.15,.19,shirtTex);cap.position.y=-.2;
+  cap.castShadow=false;cap.receiveShadow=false;limb.add(cap);viewShoulders.push(cap);
   viewModel.add(limb);viewArms[name]=limb;
 }
 camera.add(viewModel);scene.add(camera);
-registerMacekBody({armL:viewArms.armL,armR:viewArms.armR});
+registerMacekBody({armL:viewArms.armL,armR:viewArms.armR,shoulderCaps:viewShoulders});
 // Both original-style portraits stay visible while selection dresses the player.
 const identityStatus=document.getElementById('identityStatus');
 const outfitPolo=document.getElementById('outfitPolo'),outfitBlack=document.getElementById('outfitBlack');
@@ -2570,25 +2576,47 @@ addEventListener('resize', () => {
 });
 
 // ---------- hotbar ----------
+// Draw once from the same textures used in the world. No per-frame thumbnail work.
+function blockThumbnail(k){
+  const c=document.createElement('canvas');c.width=c.height=40;
+  c.setAttribute('aria-hidden','true');
+  c.style.cssText='position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none';
+  const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;
+  const face=(matrix,material,shade)=>{
+    ctx.save();ctx.setTransform(...matrix);
+    if(material.map?.image)ctx.drawImage(material.map.image,0,0,16,16);
+    else{ctx.fillStyle=BLOCKS[k].swatch;ctx.fillRect(0,0,16,16);}
+    if(shade){ctx.fillStyle=`rgba(0,0,0,${shade})`;ctx.fillRect(0,0,16,16);}
+    ctx.restore();
+  };
+  face([1,.5,-1,.5,20,3],BLOCKS[k].mats[2],0);
+  face([1,.5,0,1,4,11],BLOCKS[k].mats[4],.12);
+  face([1,-.5,0,1,20,19],BLOCKS[k].mats[0],.3);
+  return c;
+}
 const hotbar = document.createElement('div');
 hotbar.id='hotbar';
 hotbar.setAttribute('aria-label','Choose a block');
 hotbar.style.cssText = `
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   display: flex; gap: 6px; padding: 6px;
-  background: #0007; border: 2px solid #000; border-radius: 6px;
+  background: #383735; border: 3px solid #141414; border-radius: 0;
+  box-shadow: inset 2px 2px #aaa69e, inset -2px -2px #222, 0 4px 0 #0007;
   pointer-events: auto;
 `;
 BLOCK_KEYS.forEach((k, i) => {
   const slot = document.createElement('button');
   slot.type='button';slot.title=BLOCKS[k].name;slot.setAttribute('aria-label',BLOCKS[k].name);
   slot.style.cssText = `
-    width: 44px; height: 44px; background: ${BLOCKS[k].swatch};
+    position: relative; flex: 0 0 44px; width: 44px; height: 44px; background: #65635f;
     border: 3px solid #222; display: flex; align-items: flex-end; justify-content: flex-end;
     color: #fff; font: 700 11px ui-monospace; padding: 2px;
-    box-shadow: inset 0 0 0 1px #fff3;
+    box-shadow: inset 2px 2px #292826, inset -2px -2px #aaa69e;
   `;
-  slot.textContent = i<9 ? (i+1).toString() : i===9?'0':BLOCKS[k].name;
+  slot.appendChild(blockThumbnail(k));
+  const count=document.createElement('span');
+  count.style.cssText='position:relative;z-index:1;text-shadow:1px 1px #000,-1px -1px #000;font-size:11px;line-height:1';
+  slot.appendChild(count);
   slot.dataset.k = k;
   slot.addEventListener('click',()=>{selected=i;refreshHotbar();});
   hotbar.appendChild(slot);
@@ -2599,7 +2627,7 @@ function refreshHotbar() {
     el.style.outline = i === selected ? '3px solid #fff' : 'none';
     el.style.outlineOffset = i === selected ? '2px' : '0';
     el.setAttribute('aria-pressed',String(i===selected));
-    el.textContent=gameMode==='survival' ? String(inventory[BLOCK_KEYS[i]]) : (i<9?String(i+1):i===9?'0':BLOCKS[BLOCK_KEYS[i]].name);
+    el.children[1].textContent=gameMode==='survival' ? String(inventory[BLOCK_KEYS[i]]) : (i<9?String(i+1):i===9?'0':'');
     el.style.opacity=gameMode==='survival'&&inventory[BLOCK_KEYS[i]]===0?'.55':'1';
   });
 }

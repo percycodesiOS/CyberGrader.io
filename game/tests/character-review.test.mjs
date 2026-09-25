@@ -54,6 +54,9 @@ assert.equal(restored.campus.length,9);assert.equal(a.getBlock(25,20,25),'snow')
 // NPC and player use the exact same cached face, shirt and sleeves, including the collar details.
 assert.equal(a.macek.head.material[4].map,a.playerAvatar.head.material[4].map);
 assert.equal(a.macek.head.geometry.parameters.width,a.playerAvatar.head.geometry.parameters.width);
+assert.equal(a.macek.head.material[4].map.colorSpace,Three.SRGBColorSpace);
+for(const arm of Object.values(a.viewArms))assert.equal(arm.userData.hand.material[4].map,a.skinTex,'first-person hands keep skin when outfits change');
+for(const slot of a.hotbar.children)assert.equal(slot.children.length,2,'textured block thumbnail survives separate quantity updates');
 assert.equal(a.macek.group.userData.portrait,'Gators lanyard');
 for(const look of ['polo','black']){
  a.setMacekOutfit(look);
