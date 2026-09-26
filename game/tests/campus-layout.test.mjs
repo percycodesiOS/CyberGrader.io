@@ -84,5 +84,5 @@ assert(a.schoolWayfinding.some(l=>l.name==='Kindergarten · Floor 2'&&l.position
 assert(a.schoolWayfinding.some(l=>l.name==='CIRC'&&l.position.y<10));
 for(const [x,y,z] of a.unicornPatrol)assert.equal(a.walkFeet(x,z,y),y,`Mr B patrol ${x},${z} retains clear floor`);
 for(let x=47;x<=54;x++)for(let z=17;z<=22;z++)assert(a.canStandAt(new Three.Vector3(x+.5,6.7001,z+.5)),`front lobby remains clear at ${x},${z}`);
-const triangles=Object.values(a.instMeshes).reduce((n,m)=>n+m.count*m.geometry.index.count/3,0);assert(triangles<150000,'campus remains within terrain triangle budget');
+const triangles=Object.values(a.instMeshes).reduce((n,m)=>n+m.count*m.geometry.index.count/3,0);assert(triangles<200000,'campus remains within the enlarged terrain triangle budget');
 console.log(`PASS campus layout: independent stairs and circular walkway, full collision clearance, CIRC/cafeteria/wings/flag/outdoor routes, exterior bollards, wayfinding, NPC stops. Terrain triangles: ${triangles}`);

@@ -13,7 +13,7 @@ try{await fs.access(cache);}catch{const res=await fetch(threeURL);assert(res.ok)
 const Three=await import(pathToFileURL(cache));
 const events={};
 class Element{
- constructor(){this.style={};this.children=[];this.dataset={};this.events={};this.classList={add(){},remove(){}};this.textContent='';}
+ constructor(){this.style={};this.children=[];this.dataset={};this.events={};this.classList={add(){},remove(){}};this.textContent='';this.getBoundingClientRect=()=>({left:0,top:0,width:132,height:132,right:132,bottom:132});}
  appendChild(e){this.children.push(e);} append(...es){this.children.push(...es);}
  addEventListener(k,f){(this.events[k]??=[]).push(f);} setAttribute(k,v){this[k]=v;}
  getContext(){return new Proxy({measureText:t=>({width:t.length*15})},{get:(o,k)=>o[k]??(()=>{})});}
@@ -36,7 +36,7 @@ const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,playe
  playerAvatar,viewArms,viewModel,macekBodies,macekClothes,outfitPolo,outfitBlack,identityStatus,worldClockEl,setView,refreshOutfitPreview,updatePlayerAvatar,viewSelect,viewBtn,groundSurface,inBusYard,
  bubble,showBubble,SHIELDS_LINES,heightAt,nearestWalkPoint,walkFeet,eiler,entranceStaffBounds,
  get view(){return view;},get macekOutfit(){return macekOutfit;},
- setTime(t){dayTime=t;}};`;
+ setTime(t){dayTime=t;},get movement(){return keys;},releaseInput,setControlsLayout,controlsSelect,controlsMenu,lookLayer,stick,btnJump,btnDown,btnFly,btnBreak,btnPlace,touchUI,travelLimits,SIZE,EAST_EDGE,ORIGIN_SIZE,ORIGIN_EAST,inPlay,worldEdgeText,menuBtn};`;
 vm.runInContext(instrumented,context);
 const a=context.api;
 if(process.env.MYNE_BENCH==='1'){
@@ -52,7 +52,7 @@ assert.equal(a.getBlock(34,16,-19),'snow','white school roof');assert.equal(a.ge
 assert.equal(a.getBlock(25,16,-28),'snow','expanded north-west wing');
 assert.equal(a.getBlock(41,16,18),'glass','wider glass gallery');
 const terrainTriangles=Object.values(a.instMeshes).reduce((n,m)=>n+m.count*m.geometry.index.count/3,0);
-assert(terrainTriangles<150000,'exposed-face renderer keeps enlarged world below 150k terrain triangles');
+assert(terrainTriangles<200000,'stored terrain stays near the measured 181k after the larger footprint');
 console.log('Campus terrain triangles:',terrainTriangles);
 assert(a.getBlock(92,0,42),'terrain reaches rear basketball court');
 assert.equal(a.getBlock(80,4,30),'stone','court has real collision ground');
@@ -666,4 +666,101 @@ assert.equal(a.playerAvatar.group.visible,false);assert.equal(a.viewModel.visibl
 assert.match(a.worldClockEl.textContent,/World clock: .+School buses reach the rear loop at 3:00 PM/);
 
 a.resetBtn.events.click[0]();assert(reloaded);assert.equal(saved,null);a.persistSave();assert.equal(saved,null,'exit handler cannot resurrect reset world');
+// Larger traversable ring around the original campus. Old columns were x -64..96 (161)
+// and z -64..64 (129): 20,769. New columns are x -96..128 (225) and z -96..96 (193): 43,425.
+assert.equal(a.ORIGIN_SIZE,64);assert.equal(a.ORIGIN_EAST,96);
+assert.equal(a.SIZE,96);assert.equal(a.EAST_EDGE,128);
+assert.equal(a.travelLimits.minX,-95);assert.equal(a.travelLimits.maxX,127);assert.equal(a.travelLimits.minZ,-95);assert.equal(a.travelLimits.maxZ,95);assert.equal(a.travelLimits.minY,-6);assert.equal(a.travelLimits.maxY,60);
+assert.match(a.worldEdgeText(),/X −95 to 127, Z −95 to 95/);
+assert(a.getBlock(-96,-8,0),'west edge column is generated');
+assert(a.getBlock(128,-8,96),'far corner column is generated');
+assert.equal(a.getBlock(129,-8,0),undefined,'east of the new edge stays empty');
+assert.equal(a.getBlock(0,-8,97),undefined,'north of the new edge stays empty');
+function terrainSurface(x,z){for(let y=24;y>=-8;y--){const b=a.getBlock(x,y,z);if(b&&b!=='water'&&b!=='leaves')return y;}return null;}
+for(const [x,z] of [[-64,40],[-65,40],[96,70],[97,70],[-96,0],[128,-96]])assert(terrainSurface(x,z)!==null,`terrain exists at ${x},${z}`);
+assert(Math.abs(terrainSurface(-64,40)-terrainSurface(-65,40))<=1,'height continues past the old west edge');
+assert(Math.abs(terrainSurface(96,70)-terrainSurface(97,70))<=1,'height continues past the old east edge');
+assert.equal(a.getBlock(46,6,23),undefined,'school entrance stays open');
+assert.equal(a.getBlock(-55,2,0),'stone','highway stays on its original line');
+let originalTrunks=0;
+for(let i=0;i<90;i++){
+ const tx=((i*7+3)%124)-62,tz=((i*13+5)%124)-62;
+ for(let y=1;y<24;y++)if(a.getBlock(tx,y,tz)==='wood'){originalTrunks++;break;}
+}
+assert(originalTrunks>20,'original tree scatter still stands inside the old footprint');
+a.modeTo('creative');assert.equal(a.travelTo(110,30,80),'');
+assert.equal(a.player.pos.x,110);assert.equal(a.player.pos.z,80);
+assert.match(a.travelTo(128,30,0),/limits/);assert.match(a.travelTo(-96,30,0),/limits/);
+assert.equal(a.player.pos.x,110,'rejected travel past the new edge keeps the last valid position');
+a.startGame();a.player.flying=true;a.player.pos.set(127.5,30,.5);a.player.yaw=-Math.PI/2;a.movement.KeyD=true;
+for(let i=0;i<40;i++)a.tick(5000+i);
+assert(a.player.pos.x<=a.EAST_EDGE+.5,'walking stops at the east terrain edge');
+a.movement.KeyD=false;a.releaseInput();
+a.setBlock(128,20,0,'stone');
+a.player.pos.set(129.4,20.5,.5);a.camera.position.copy(a.player.pos);
+a.camera.quaternion.setFromEuler(new Three.Euler(0,Math.PI/2,0,'YXZ'));
+assert.equal(a.castVoxel().x,128);
+a.select(0);a.doPlace();
+assert.equal(a.getBlock(129,20,0),undefined,'placement stops at the new east edge');
+a.player.pos.set(118.5,20.5,70.5);a.camera.position.copy(a.player.pos);
+a.camera.quaternion.setFromEuler(new Three.Euler(0,-Math.PI/2,0,'YXZ'));
+a.setBlock(120,20,70,'stone');a.doPlace();
+assert.equal(a.getBlock(119,20,70),a.keys[0],'new land accepts a placed block');
+// Controls layout is saved on its own and does not reload or stack listeners.
+const lookListeners=a.lookLayer.events.touchstart.length, stickListeners=a.stick.events.touchstart.length;
+assert(lookListeners>=1&&stickListeners>=1,'touch listeners are attached once at startup');
+a.setGraphics('detailed');
+a.setControlsLayout('touch',true);
+assert.equal(a.touchUI.style.display,'block');
+assert.equal(a.controlsSelect.value,'touch');
+assert.equal(a.controlsMenu.value,'touch');
+assert.equal(JSON.parse(a.worldBackupText()).state.controls,'touch');
+assert.equal(JSON.parse(a.worldBackupText()).state.graphics,'detailed','controls choice does not overwrite graphics');
+assert.equal(a.renderer.shadowMap.enabled,true);
+a.setControlsLayout('desktop',true);
+a.setControlsLayout('touch',true);
+assert.equal(a.lookLayer.events.touchstart.length,lookListeners,'switching layout does not add look listeners');
+assert.equal(a.stick.events.touchstart.length,stickListeners,'switching layout does not add stick listeners');
+context.navigator.maxTouchPoints=5;a.setControlsLayout('auto',true);
+assert.equal(a.touchUI.style.display,'block','auto follows a touch device');
+context.navigator.maxTouchPoints=0;a.setControlsLayout('auto',true);
+assert.equal(a.touchUI.style.display,'none','auto follows a desktop device');
+a.setControlsLayout('touch',true);a.setView('first');
+assert.equal(a.viewModel.visible,true,'first person keeps sleeves and hands');
+assert.equal(a.playerAvatar.group.visible,false);
+const yawBefore=a.player.yaw;
+a.lookLayer.events.touchstart[0]({changedTouches:[{identifier:1,clientX:80,clientY:80}],preventDefault(){}});
+a.lookLayer.events.touchmove[0]({changedTouches:[{identifier:1,clientX:130,clientY:90}],preventDefault(){}});
+a.stick.events.touchstart[0]({changedTouches:[{identifier:2,clientX:66,clientY:8}],preventDefault(){}});
+assert.notEqual(a.player.yaw,yawBefore,'look drag turns the camera');
+assert.equal(a.movement.KeyW,true,'the stick can move while the look finger is down');
+a.stick.events.pointercancel[0]({});
+assert.equal(a.movement.KeyW,false,'a cancelled stick does not leave movement held');
+assert.notEqual(a.player.yaw,yawBefore);
+a.btnJump.events.touchstart[0]({preventDefault(){}});
+assert.equal(a.movement.Space,true);
+a.btnJump.events.touchcancel[0]();
+assert.equal(a.movement.Space,false,'jump releases on touch cancel');
+a.player.flying=true;
+a.btnDown.events.touchstart[0]({preventDefault(){}});
+assert.equal(a.movement.ShiftLeft,true,'down is available while flying');
+a.btnDown.events.pointercancel[0]();
+assert.equal(a.movement.ShiftLeft,false);
+a.movement.KeyW=true;a.movement.Space=true;
+for(const f of events.blur)f();
+assert.equal(a.movement.KeyW,false);assert.equal(a.movement.Space,false,'leaving the page clears held controls');
+a.startGame();a.movement.KeyD=true;
+for(const f of events.keydown)f({code:'Escape',preventDefault(){}});
+assert.equal(a.movement.KeyD,false,'pause clears held movement');
+context.document.hidden=true;a.movement.KeyA=true;
+for(const f of events.visibilitychange||[])f();
+assert.equal(a.movement.KeyA,false,'hiding the app clears held movement');
+const invalidControls=JSON.parse(a.worldBackupText());invalidControls.state.controls='joystick';
+assert.throws(()=>a.readWorldBackup(JSON.stringify(invalidControls)));
+const legacyControls=JSON.parse(a.worldBackupText());delete legacyControls.state.controls;
+assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'auto','older backups default to auto');
+legacyControls.state.controls='desktop';
+assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'desktop');
+a.setGraphics('smooth');context.navigator.maxTouchPoints=0;a.setControlsLayout('auto',true);
+
 console.log('PASS: Officer Shields and Mr. Eiler (bounded entrance patrol), seated/standing cycle and arrival greetings, Mr. B (indoor-only routes, one-arm inward laptop), Mr. Macek outfits on every body, first/third person, Eddie rock-to-roof with day wrapping, SV floor logo, rear bus yard + 3 PM bus loop with no duplicate spawning, zero per-frame allocation, incremental face buffers/growth, no world scans on block actions, graphics modes, coordinate travel, paused rendering, safe/exact save restoration, legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, reset, two-floor navigation, stairs, campus boundaries, sunset meeting, companion following and doors.');

@@ -64,7 +64,9 @@
   }
   /* on-screen movement thumbstick, lower-left */
   #touchStick {
-    position: absolute; left: 24px; bottom: 24px;
+    position: absolute;
+    left: max(16px, env(safe-area-inset-left));
+    bottom: max(16px, env(safe-area-inset-bottom));
     width: 132px; height: 132px; border-radius: 50%;
     background: #0005; border: 2px solid #fff4;
     box-shadow: inset 0 0 0 1px #fff2, 2px 2px 0 #0006;
@@ -80,7 +82,9 @@
   }
   /* action buttons, lower-right */
   #touchActions {
-    position: absolute; right: 20px; bottom: 28px;
+    position: absolute;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
     display: flex; flex-direction: column; gap: 12px; align-items: flex-end;
     pointer-events: none;
   }
@@ -101,16 +105,38 @@
   #btnBreak:active { background: #ff9ec2; color: #2a1118; }
   #hotbar { z-index: 8; max-width: 94vw; overflow-x: auto; touch-action: pan-x; }
   #hotbar button { flex: 0 0 auto; cursor: pointer; }
-  .touch-device #hotbar { bottom: 180px !important; }
+  body.touch-device #hotbar { bottom: max(168px, calc(env(safe-area-inset-bottom) + 150px)) !important; }
+  body.touch-device #coordinates {
+    left: 50%; right: auto; top: auto; transform: translateX(-50%);
+    bottom: max(236px, calc(env(safe-area-inset-bottom) + 218px));
+    text-align: center; max-width: 92vw;
+  }
+  body.touch-device #info { display: none; }
+  @media (max-height: 520px) {
+    body.touch-device #touchStick { width: 104px; height: 104px; }
+    body.touch-device #touchStickNub { width: 44px; height: 44px; }
+    body.touch-device .touchBtn { min-width: 48px; min-height: 48px; padding: 0 8px; font-size: 11px; }
+    body.touch-device #touchActions, body.touch-device #touchActions .row { gap: 8px; }
+    body.touch-device #hotbar { bottom: max(112px, calc(env(safe-area-inset-bottom) + 100px)) !important; }
+    body.touch-device #coordinates { bottom: max(168px, calc(env(safe-area-inset-bottom) + 156px)); font-size: 11px; }
+  }
   #status { position: fixed; top: 86px; left: 12px; z-index: 8; color: white; background: #163347e8; padding: 8px; border-radius: 6px; font-size: 12px; pointer-events: none; }
   #start button, #start select { font: inherit; padding: 10px; border-radius: 6px; max-width: 92vw; }
   #controls {
-    top: max(12px, env(safe-area-inset-top));
-    right: max(12px, env(safe-area-inset-right));
-    flex-wrap: wrap; justify-content: flex-end;
-    max-width: calc(100vw - 24px);
+    top: max(8px, env(safe-area-inset-top));
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    flex-wrap: nowrap; justify-content: flex-start;
+    overflow-x: auto; overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    max-width: none; pointer-events: auto;
+    padding-bottom: 2px;
   }
-  #controls button, #controls a { min-height: 44px; box-sizing: border-box; }
+  #controls button, #controls a, #controls select { min-height: 44px; box-sizing: border-box; flex: 0 0 auto; }
+  #controls select {
+    background: #171615; color: #f8f6f2; border: 2px solid #000; border-radius: 0;
+    font: 700 13px ui-monospace, monospace; padding: 8px 10px;
+  }
   @media (pointer: coarse), (max-width: 900px) {
     #start select, #start button { min-height: 44px; font-size: 16px; }
     #controls button, #controls a { padding: 10px 12px; font-size: 14px; }
@@ -134,7 +160,7 @@
   @media (max-width: 900px) {
     #info { top: 58px; font-size: 10px; max-width: 90vw; }
     #status { top: 108px; }
-    #hotbar { bottom: 180px !important; }
+    #hotbar { bottom: 20px; }
     #start h1 { font-size: 36px; }
   }
 .travel{font:13px system-ui;max-width:600px;margin:12px auto}
@@ -191,6 +217,7 @@
         <p id="modeHelp">Your existing build stays here when you change modes.</p>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see Mr. Macek</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
+        <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · on-screen buttons</option><option value="desktop">Desktop · keyboard and mouse</option></select></label>
         <p>Creative: unlimited blocks and flight. Challenge: gather, build, and find CIRC. Watch your health around heights and deep water.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
         <p class="start-tip">Keyboard + mouse or touch controls. Your world saves automatically in this browser.</p>
@@ -210,7 +237,7 @@
       <input id="worldFile" type="file" accept=".json,application/json" hidden>
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
     </section></details>
-    <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>XYZ shows your position. X and Z move across the map; Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-63" max="95" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-63" max="63" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −63 to 95, Z −63 to 63.</p></details>
+    <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>XYZ shows your position. X and Z move across the map; Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
     <details class="start-advanced"><summary>How to play</summary><p>WASD to move · Drag to look · Space to jump or swim up · Shift to sprint · F to fly in Creative · Left click to break · Right click to place · Number keys or scroll to select blocks · Esc for the menu. On a tablet, use the on-screen stick and buttons.</p></details>
   </div>
 </div>
@@ -228,7 +255,7 @@ import * as THREE from 'three';
 // ---------- scene ----------
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb, 40, 110);
+scene.fog = new THREE.Fog(0x87ceeb, 40, 140);
 
 const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 500);
 // high-performance asks Windows to use the discrete GPU instead of the
@@ -401,8 +428,13 @@ function heightAt(x, z) {
   return Math.round(2 + h);
 }
 
-const SIZE = 64; // 129 x 129, room to keep building
-const EAST_EDGE = 96; // Add the rear campus without moving the existing school or saves.
+// The original campus footprint stays put. Extra land is a 32-block ring, one face chunk
+// on every side, so saved edits and the school keep their coordinates.
+const ORIGIN_SIZE = 64, ORIGIN_EAST = 96;
+const SIZE = 96;
+const EAST_EDGE = 128;
+const travelLimits = {minX:-SIZE+1, maxX:EAST_EDGE-1, minZ:-SIZE+1, maxZ:SIZE-1, minY:-6, maxY:60};
+function inPlay(x,z){return x>-SIZE+2 && x<EAST_EDGE-2 && z>-SIZE+2 && z<SIZE-2;}
 for (let x = -SIZE; x <= EAST_EDGE; x++) {
   for (let z = -SIZE; z <= SIZE; z++) {
     const h = heightAt(x, z);
@@ -437,10 +469,22 @@ function plantTree(x, z) {
       }
 }
 // deterministic-ish placement
+// Freeze the original scatter. Changing SIZE must not move trees that existing worlds already have.
 for (let i = 0; i < 90; i++) {
-  const tx = ((i*7 + 3) % (SIZE*2-4)) - (SIZE-2);
-  const tz = ((i*13 + 5) % (SIZE*2-4)) - (SIZE-2);
+  const tx = ((i*7 + 3) % (ORIGIN_SIZE*2-4)) - (ORIGIN_SIZE-2);
+  const tz = ((i*13 + 5) % (ORIGIN_SIZE*2-4)) - (ORIGIN_SIZE-2);
   plantTree(tx, tz);
+}
+function outsideOriginal(x,z){return x<-ORIGIN_SIZE || x>ORIGIN_EAST || Math.abs(z)>ORIGIN_SIZE;}
+for (let i = 0, planted = 0; planted < 24 && i < 500; i++) {
+  const tx = ((i*17 + 11) % (EAST_EDGE+SIZE-10)) - (SIZE-5);
+  const tz = ((i*19 + 7) % (SIZE*2-10)) - (SIZE-5);
+  let clear = true;
+  for (let dx = -2; dx <= 2 && clear; dx++) for (let dz = -2; dz <= 2; dz++) if (!outsideOriginal(tx+dx, tz+dz)) clear = false;
+  if (!clear) continue;
+  const before = WORLD.size;
+  plantTree(tx, tz);
+  if (WORLD.size > before) planted++;
 }
 
 // Block-built interpretation of Kenny's ECMS aerial photo: four branching wings,
@@ -740,6 +784,31 @@ function setGraphics(value){
 }
 setGraphics(graphics);
 graphicsSelect.addEventListener('change',()=>{setGraphics(graphicsSelect.value);persistSave();});
+let controlsLayout=['auto','touch','desktop'].includes(saveState.controls)?saveState.controls:'auto';
+let controlsSelect=null;
+let releaseTouch=()=>{};
+function environmentWantsTouch(){
+  return ('ontouchstart' in window)||navigator.maxTouchPoints>0||!!window.matchMedia?.('(pointer: coarse)')?.matches;
+}
+function touchLayoutOn(){return controlsLayout==='touch'||(controlsLayout==='auto'&&environmentWantsTouch());}
+function setControlsLayout(value,save){
+  controlsLayout=value==='touch'||value==='desktop'?value:'auto';
+  const on=touchLayoutOn();
+  if(on)document.body.classList.add('touch-device'); else document.body.classList.remove('touch-device');
+  const ui=document.getElementById('touchUI');
+  if(ui)ui.style.display=on?'block':'none';
+  if(!on)releaseTouch();
+  const menu=document.getElementById('controlsLayout');
+  if(menu&&menu.value!==controlsLayout)menu.value=controlsLayout;
+  if(controlsSelect&&controlsSelect.value!==controlsLayout)controlsSelect.value=controlsLayout;
+  saveState.controls=controlsLayout;
+  if(save)persistSave();
+}
+const controlsMenu=document.getElementById('controlsLayout');
+if(controlsMenu){
+  controlsMenu.value=controlsLayout;
+  controlsMenu.addEventListener('change',()=>setControlsLayout(controlsMenu.value,true));
+}
 let health = Number.isFinite(saveState.health) ? Math.max(1,Math.min(20,saveState.health)) : 20;
 const inventory = Object.fromEntries(BLOCK_KEYS.map(k=>[k, Math.max(0,Math.floor(Number(saveState.inventory?.[k])||0))]));
 // Small, persistent goals. Creative actions never count toward a challenge.
@@ -785,6 +854,7 @@ function persistSave(){
     saveState.macekOutfit = macekOutfit;
     saveState.view = view;
     saveState.graphics = graphics;
+    saveState.controls = controlsLayout;
     saveState.campus = campusActors.map(a=>({name:a.name,x:a.pos.x,y:a.pos.y,z:a.pos.z,patrolIndex:a.patrolIndex||0}));
     saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
@@ -829,8 +899,9 @@ function readWorldBackup(text){
   // choice; they load as first person rather than being rejected.
   if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
   if(s.graphics!==undefined&&!['smooth','detailed'].includes(s.graphics))throw new Error('This backup has an invalid graphics setting. Your world was kept.');
+  if(s.controls!==undefined&&!['auto','touch','desktop'].includes(s.controls))throw new Error('This backup has an invalid controls setting. Your world was kept.');
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',challenge:normalizeChallenge(s.challenge)};
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',challenge:normalizeChallenge(s.challenge)};
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
@@ -1027,7 +1098,7 @@ class NPC {
       // make sure we stay on terrain (don't walk off edges into pits > 2 deep)
       const gNow = this.groundY(this.pos.x, this.pos.z);
       const gNxt = this.groundY(nx, nz);
-      if (Math.abs(nx)<SIZE-2 && Math.abs(nz)<SIZE-2 && !inLake(nx,nz) && Math.abs(gNxt - gNow) <= 1) {
+      if (inPlay(nx,nz) && !inLake(nx,nz) && Math.abs(gNxt - gNow) <= 1) {
         this.pos.x = nx; this.pos.z = nz; this.pos.y = gNxt;
       } else {
         // hit edge — turn
@@ -1270,11 +1341,11 @@ for(const z of [-59,-53])campusBox(48,.035,.14,0xf1ede0,52,5.025,z);
 for(const x of [28,76])campusBox(.14,.035,6,0xf1ede0,x,5.025,-56);
 campusBox(.14,.035,6,0xf1ede0,52,5.025,-56);
 // I-79-inspired divided highway along the west side of the campus.
-for(let z=-62;z<=62;z+=6){
+for(let z=-(SIZE-2);z<=SIZE-2;z+=6){
   for(const x of [-54.5,-45.5])campusBox(.13,.03,2.5,0xf1ede0,x,3.025,z);
 }
-for(const x of [-56.8,-43.2])campusBox(.13,.03,128,0xf1ede0,x,3.025,0);
-for(const x of [-51.2,-48.8])campusBox(.13,.03,128,0xe8c448,x,3.025,0);
+for(const x of [-56.8,-43.2])campusBox(.13,.03,SIZE*2,0xf1ede0,x,3.025,0);
+for(const x of [-51.2,-48.8])campusBox(.13,.03,SIZE*2,0xe8c448,x,3.025,0);
 for(const [color,parts] of detailBatches){
   const mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color}),parts.length);
   parts.forEach((p,i)=>{detailDummy.position.set(p.x,p.y,p.z);detailDummy.scale.set(p.w,p.h,p.d);detailDummy.rotation.set(0,p.yaw,p.rotation);detailDummy.updateMatrix();mesh.setMatrixAt(i,detailDummy.matrix);});
@@ -1307,7 +1378,7 @@ class Animal {
     if(this.walking){
       const x=this.pos.x+Math.sin(this.heading)*dt*.85,z=this.pos.z+Math.cos(this.heading)*dt*.85;
       const y=groundSurface(x,z);
-      if(Math.abs(x)<SIZE-2&&Math.abs(z)<SIZE-2&&!inLake(x,z)&&Math.abs(y-this.pos.y)<=1){this.pos.set(x,y,z);walking=true;}
+      if(inPlay(x,z)&&!inLake(x,z)&&Math.abs(y-this.pos.y)<=1){this.pos.set(x,y,z);walking=true;}
       else this.timer=0;
     }
     this.phase+=dt*5;
@@ -2114,9 +2185,11 @@ const player = {
 camera.position.copy(player.pos);
 
 const keys = {};
+function releaseInput(){ for(const k in keys) keys[k]=false; releaseTouch(); }
 addEventListener('keydown', e => { if(started){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
 addEventListener('keyup',   e => { keys[e.code] = false; });
-addEventListener('blur',()=>{Object.keys(keys).forEach(k=>keys[k]=false);});
+addEventListener('blur', releaseInput);
+addEventListener('orientationchange', releaseInput);
 
 let selected = 0; // BLOCK_KEYS index
 // restore saved player position / facing / selected block from a previous session
@@ -2164,9 +2237,17 @@ document.getElementById('overview').addEventListener('click',()=>{
   if(gameMode!=='creative'){document.getElementById('modeHelp').textContent='Choose Creative above for the flying campus tour.';return;}
   player.pos.set(61,32,43);player.yaw=.4;player.pitch=-.6;player.flying=true;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
 });
+function worldEdgeText(){
+  const minus=n=>n<0?'−'+Math.abs(n):String(n);
+  return `Your world has edges: X ${minus(travelLimits.minX)} to ${travelLimits.maxX}, Z ${minus(travelLimits.minZ)} to ${travelLimits.maxZ}.`;
+}
+for(const [id,min,max] of [['travelX',travelLimits.minX,travelLimits.maxX],['travelY',travelLimits.minY,travelLimits.maxY],['travelZ',travelLimits.minZ,travelLimits.maxZ]]){
+  const input=document.getElementById(id); if(!input)continue; input.min=String(min); input.max=String(max);
+}
+const travelStatusEl=document.getElementById('travelStatus'); if(travelStatusEl)travelStatusEl.textContent=worldEdgeText();
 function travelTo(x,y,z){
   if(gameMode!=='creative')return 'Choose Creative to use coordinate travel.';
-  if(![x,y,z].every(Number.isFinite)||x<-63||x>95||z<-63||z>63||y<-6||y>60)return 'Use coordinates within the world limits.';
+  if(![x,y,z].every(Number.isFinite)||x<travelLimits.minX||x>travelLimits.maxX||z<travelLimits.minZ||z>travelLimits.maxZ||y<travelLimits.minY||y>travelLimits.maxY)return 'Use coordinates within the world limits.';
   const target=new THREE.Vector3(x,y,z);
   if(!canStandAt(target))return 'That spot is inside a block. Try a higher Y.';
   player.pos.copy(target);player.vel.set(0,0,0);player.flying=true;camera.position.copy(target);startGame();persistSave();return '';
@@ -2192,7 +2273,7 @@ renderer.domElement.addEventListener('click', () => {
 addEventListener('keydown', e => {
   if (e.code === 'Escape' && started) {
     started = false;
-    Object.keys(keys).forEach(k=>keys[k]=false);
+    releaseInput();
     document.exitPointerLock?.();
     startEl.classList.remove('hidden');
     refreshMenuStatus();
@@ -2569,11 +2650,14 @@ function tick(now) {
 }
 requestAnimationFrame(tick);
 
-addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
+function fitRenderer(){
+  const vv=window.visualViewport;
+  const w=vv?.width||innerWidth, h=Math.max(1,vv?.height||innerHeight);
+  camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);
+}
+addEventListener('resize', fitRenderer);
+if(window.visualViewport) window.visualViewport.addEventListener('resize', fitRenderer);
+fitRenderer();
 
 // ---------- hotbar ----------
 // Draw once from the same textures used in the world. No per-frame thumbnail work.
@@ -2673,18 +2757,25 @@ resetBtn.addEventListener('click', () => {
   location.reload();
 });
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
-menuBtn.addEventListener('click',()=>{started=false;Object.keys(keys).forEach(k=>keys[k]=false);document.exitPointerLock?.();startEl.classList.remove('hidden');refreshMenuStatus();persistSave();});
+menuBtn.addEventListener('click',()=>{started=false;releaseInput();document.exitPointerLock?.();startEl.classList.remove('hidden');refreshMenuStatus();persistSave();});
 const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
 graphicsBtn=document.createElement('button');
 graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
 graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detailed':'smooth');persistSave();});
 setGraphics(graphics);
+controlsSelect=document.createElement('select');
+controlsSelect.id='controlsToggle';controlsSelect.setAttribute('aria-label','Controls layout');
+for(const [value,label] of [['auto','Controls: Auto'],['touch','Controls: Touch'],['desktop','Controls: Desktop']]){
+  const option=document.createElement('option');option.value=value;option.textContent=label;controlsSelect.appendChild(option);
+}
+controlsSelect.style.cssText=backLink.style.cssText+'min-height:44px;border-radius:0;background:#171615;color:#f8f6f2;';
+controlsSelect.addEventListener('change',()=>setControlsLayout(controlsSelect.value,true));
 // Tablet-friendly twin of the V key, so play-as-Mr. Macek is reachable without a keyboard.
 viewBtn=document.createElement('button');
 viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
 viewBtn.addEventListener('click',()=>{setView(view==='third'?'first':'third');persistSave();});
 setView(view);
-ctrlPanel.append(backLink, saveTag, saveBtn, menuBtn, viewBtn, graphicsBtn, resetBtn);
+ctrlPanel.append(menuBtn, saveBtn, controlsSelect, viewBtn, graphicsBtn, backLink, saveTag, resetBtn);
 document.body.appendChild(ctrlPanel);
 
 function flashSaved(){
@@ -2769,19 +2860,16 @@ function updateCoordHUD() {
 }
 
 // ---------- touch controls (iPhone / iPad) ----------
-const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-if (IS_TOUCH) {
-  document.body.classList.add('touch-device');
-  const touchUI    = document.getElementById('touchUI');
-  const lookLayer  = document.getElementById('touchLook');
-  const stick      = document.getElementById('touchStick');
-  const nub        = document.getElementById('touchStickNub');
-  const btnBreak   = document.getElementById('btnBreak');
-  const btnPlace   = document.getElementById('btnPlace');
-  const btnJump    = document.getElementById('btnJump');
-  const btnFly     = document.getElementById('btnFly');
-  const btnDown    = document.getElementById('btnDown');
-  touchUI.style.display = 'block';
+const touchUI    = document.getElementById('touchUI');
+const lookLayer  = document.getElementById('touchLook');
+const stick      = document.getElementById('touchStick');
+const nub        = document.getElementById('touchStickNub');
+const btnBreak   = document.getElementById('btnBreak');
+const btnPlace   = document.getElementById('btnPlace');
+const btnJump    = document.getElementById('btnJump');
+const btnFly     = document.getElementById('btnFly');
+const btnDown    = document.getElementById('btnDown');
+{
 
   const LOOK_SENS = 0.0022; // same feel as the mouse path
 
@@ -2806,25 +2894,29 @@ if (IS_TOUCH) {
     e.preventDefault();
   }, { passive: false });
   function endLook(e) {
-    for (const t of e.changedTouches) if (t.identifier === lookId) lookId = null;
+    const touches=e.changedTouches;
+    if(!touches){lookId=null;return;}
+    for (const t of touches) if (t.identifier === lookId) lookId = null;
   }
   lookLayer.addEventListener('touchend', endLook);
   lookLayer.addEventListener('touchcancel', endLook);
+  lookLayer.addEventListener('pointercancel', endLook);
 
   // --- movement thumbstick: drives the same keys[] flags the game loop reads ---
   let stickId = null, stickCx = 0, stickCy = 0;
-  const STICK_R = 66;   // half of the 132px pad
-  const DEAD = 0.28;    // dead-zone fraction
+  const DEAD = 0.28;    // dead-zone fraction of the pad radius
   function clearMoveKeys() {
     keys['KeyW'] = keys['KeyS'] = keys['KeyA'] = keys['KeyD'] = false;
   }
   function resetNub() { nub.style.transform = 'translate(-50%, -50%)'; }
+  function stickRadius(){ const r=stick.getBoundingClientRect(); return Math.max(44,(r.width||132)/2); }
   function setStick(dx, dy) {
+    const radius=stickRadius();
     const len = Math.hypot(dx, dy) || 1;
-    const cl = Math.min(len, STICK_R);
+    const cl = Math.min(len, radius);
     const ux = dx / len, uy = dy / len;
     nub.style.transform = `translate(calc(-50% + ${ux*cl}px), calc(-50% + ${uy*cl}px))`;
-    const fx = dx / STICK_R, fy = dy / STICK_R; // -1..1
+    const fx = dx / radius, fy = dy / radius; // -1..1
     clearMoveKeys();
     if (Math.hypot(fx, fy) < DEAD) return;
     if (fy < -DEAD) keys['KeyW'] = true;   // up = forward
@@ -2851,12 +2943,15 @@ if (IS_TOUCH) {
     e.preventDefault();
   }, { passive: false });
   function endStick(e) {
-    for (const t of e.changedTouches) {
+    const touches=e.changedTouches;
+    if(!touches){stickId=null;clearMoveKeys();resetNub();return;}
+    for (const t of touches) {
       if (t.identifier === stickId) { stickId = null; clearMoveKeys(); resetNub(); }
     }
   }
   stick.addEventListener('touchend', endStick);
   stick.addEventListener('touchcancel', endStick);
+  stick.addEventListener('pointercancel', endStick);
 
   // --- action buttons ---
   function bindTap(el, fn) {
@@ -2874,11 +2969,12 @@ if (IS_TOUCH) {
     if (!started) { startGame(); return; }
     keys['Space'] = true; e.preventDefault();
   }, { passive: false });
-  function jumpUp(e) { keys['Space'] = false; }
+  function jumpUp() { keys['Space'] = false; }
   btnJump.addEventListener('touchend', jumpUp);
   btnJump.addEventListener('touchcancel', jumpUp);
+  btnJump.addEventListener('pointercancel', jumpUp);
   btnDown.addEventListener('touchstart',e=>{if(started&&player.flying)keys['ShiftLeft']=true;e.preventDefault();},{passive:false});
-  for(const name of ['touchend','touchcancel'])btnDown.addEventListener(name,()=>{keys['ShiftLeft']=false;});
+  for(const name of ['touchend','touchcancel','pointercancel'])btnDown.addEventListener(name,()=>{keys['ShiftLeft']=false;});
 
   // fly: toggle, same as pressing F
   btnFly.addEventListener('touchstart', e => {
@@ -2889,10 +2985,14 @@ if (IS_TOUCH) {
     if (typeof flashFly === 'function') flashFly(player.flying);
     e.preventDefault();
   }, { passive: false });
+  releaseTouch=()=>{lookId=null;stickId=null;clearMoveKeys();resetNub();keys['Space']=false;keys['ShiftLeft']=false;};
+  addEventListener('touchcancel', releaseTouch);
+  addEventListener('pointercancel', releaseTouch);
 }
+setControlsLayout(controlsLayout);
 
 addEventListener('beforeunload', persistSave);
-document.addEventListener('visibilitychange', () => { if (document.hidden) persistSave(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { releaseInput(); persistSave(); } });
 refreshMenuStatus();
 document.getElementById('status').textContent='Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
 setInterval(()=>{if(started)persistSave();},5000);

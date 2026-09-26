@@ -393,10 +393,14 @@ html body #start .outfit-option:focus-within {
   #status { top: 74px; max-width: calc(100vw - 40px); }
 }
 @media (max-width: 600px) {
-  #challengeProgress { top: 164px; font-size: 11px; }
-  #coordinates { bottom: 260px !important; font-size: 10px !important; }
-  #controls { left: 8px; right: 8px; top: 8px; gap: 4px !important; }
+  #challengeProgress { top: auto; bottom: max(300px, calc(env(safe-area-inset-bottom) + 280px)); font-size: 11px; max-width: calc(100vw - 24px); }
+  #controls { left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); top: max(8px, env(safe-area-inset-top)); gap: 4px !important; }
   #controls > div { display: none; }
-  #controls button, #controls a { font-size: 12px; padding: 8px !important; }
-  #status { top: 116px; font-size: 11px; }
+  #controls button, #controls a, #controls select { font-size: 12px; padding: 8px !important; min-height: 44px; }
+  #status { top: 58px; font-size: 11px; max-width: calc(100vw - 24px); }
+}
+@media (max-height: 520px) {
+  html body #start .outfit-preview { height: 72px; }
+  html body #start .start-shell { gap: 8px; }
+  #challengeProgress { top: 58px; bottom: auto; }
 }
