@@ -105,11 +105,16 @@
   #btnBreak:active { background: #ff9ec2; color: #2a1118; }
   #hotbar { z-index: 8; max-width: 94vw; overflow-x: auto; touch-action: pan-x; }
   #hotbar button { flex: 0 0 auto; cursor: pointer; }
-  body.touch-device #hotbar { bottom: max(168px, calc(env(safe-area-inset-bottom) + 150px)) !important; }
+  body.touch-device #hotbar {
+    bottom: max(176px, calc(env(safe-area-inset-bottom) + 158px)) !important;
+    max-width: min(94vw, 720px) !important;
+  }
+  /* The coordinate readout is created with inline left/bottom, so these win with !important. */
   body.touch-device #coordinates {
-    left: 50%; right: auto; top: auto; transform: translateX(-50%);
-    bottom: max(236px, calc(env(safe-area-inset-bottom) + 218px));
-    text-align: center; max-width: 92vw;
+    left: 50% !important; right: auto !important; top: auto !important;
+    transform: translateX(-50%) !important;
+    bottom: max(252px, calc(env(safe-area-inset-bottom) + 234px)) !important;
+    text-align: center; max-width: min(92vw, 320px); z-index: 8;
   }
   body.touch-device #info { display: none; }
   @media (max-height: 520px) {
@@ -117,8 +122,16 @@
     body.touch-device #touchStickNub { width: 44px; height: 44px; }
     body.touch-device .touchBtn { min-width: 48px; min-height: 48px; padding: 0 8px; font-size: 11px; }
     body.touch-device #touchActions, body.touch-device #touchActions .row { gap: 8px; }
-    body.touch-device #hotbar { bottom: max(112px, calc(env(safe-area-inset-bottom) + 100px)) !important; }
-    body.touch-device #coordinates { bottom: max(168px, calc(env(safe-area-inset-bottom) + 156px)); font-size: 11px; }
+    body.touch-device #hotbar {
+      bottom: max(136px, calc(env(safe-area-inset-bottom) + 124px)) !important;
+      max-width: calc(100vw - 390px) !important;
+    }
+    body.touch-device #status { top: 58px; left: max(8px, env(safe-area-inset-left)); max-width: 42vw; }
+    body.touch-device #coordinates {
+      left: auto !important; right: max(8px, env(safe-area-inset-right)) !important;
+      top: 58px !important; bottom: auto !important; transform: none !important;
+      text-align: right; max-width: 46vw; font-size: 11px;
+    }
   }
   #status { position: fixed; top: 86px; left: 12px; z-index: 8; color: white; background: #163347e8; padding: 8px; border-radius: 6px; font-size: 12px; pointer-events: none; }
   #start button, #start select { font: inherit; padding: 10px; border-radius: 6px; max-width: 92vw; }
