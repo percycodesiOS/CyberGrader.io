@@ -818,22 +818,32 @@ assert.equal(a.getBlock(119,20,70),a.keys[0],'new land accepts a placed block');
 const lookListeners=a.lookLayer.events.touchstart.length, stickListeners=a.stick.events.touchstart.length;
 assert(lookListeners>=1&&stickListeners>=1,'touch listeners are attached once at startup');
 a.setGraphics('detailed');
+function mediaQuery(coarse,hover){
+ context.window.matchMedia=query=>({
+  matches:(query.includes('pointer: coarse')&&coarse)||(query.includes('hover: none')&&!hover)||(query.includes('pointer: fine')&&!coarse)||(query.includes('hover: hover')&&hover),
+  addEventListener(){},removeEventListener(){}
+ });
+}
+mediaQuery(true,false);
+context.navigator.maxTouchPoints=5;context.navigator.platform='Linux';context.navigator.userAgent='Mobile';
 a.setControlsLayout('touch',true);
-assert.equal(a.touchUI.style.display,'block');
-assert.equal(a.controlsSelect.value,'touch');
-assert.equal(a.controlsMenu.value,'touch');
-assert.equal(JSON.parse(a.worldBackupText()).state.controls,'touch');
-assert.equal(JSON.parse(a.worldBackupText()).state.graphics,'detailed','controls choice does not overwrite graphics');
+assert.equal(a.touchUI.style.display,'block','coarse pointer and no hover uses touch controls');
+assert.equal(a.controlsSelect.value,'auto','manual Touch and Desktop choices stay on Auto');
+assert.equal(a.controlsMenu.value,'auto');
+assert.equal(JSON.parse(a.worldBackupText()).state.controls,'auto');
+assert.equal(JSON.parse(a.worldBackupText()).state.graphics,'detailed','controls migration does not overwrite graphics');
 assert.equal(a.renderer.shadowMap.enabled,true);
 a.setControlsLayout('desktop',true);
 a.setControlsLayout('touch',true);
+assert.equal(a.controlsSelect.value,'auto');
 assert.equal(a.lookLayer.events.touchstart.length,lookListeners,'switching layout does not add look listeners');
 assert.equal(a.stick.events.touchstart.length,stickListeners,'switching layout does not add stick listeners');
-context.navigator.maxTouchPoints=5;a.setControlsLayout('auto',true);
-assert.equal(a.touchUI.style.display,'block','auto follows a touch device');
+context.navigator.platform='Win32';context.navigator.userAgent='Windows touch laptop';context.navigator.maxTouchPoints=10;
+mediaQuery(false,true);a.setControlsLayout('auto',true);
+assert.equal(a.touchUI.style.display,'none','maxTouchPoints alone does not force touch on a laptop');
 context.navigator.maxTouchPoints=0;a.setControlsLayout('auto',true);
 assert.equal(a.touchUI.style.display,'none','auto follows a desktop device');
-a.setControlsLayout('touch',true);a.setView('first');
+mediaQuery(true,false);context.navigator.maxTouchPoints=5;a.setControlsLayout('auto',true);a.setView('first');
 assert.equal(a.viewModel.visible,true,'first person keeps sleeves and hands');
 assert.equal(a.playerAvatar.group.visible,false);
 const yawBefore=a.player.yaw;
@@ -868,7 +878,12 @@ assert.throws(()=>a.readWorldBackup(JSON.stringify(invalidControls)));
 const legacyControls=JSON.parse(a.worldBackupText());delete legacyControls.state.controls;
 assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'auto','older backups default to auto');
 legacyControls.state.controls='desktop';
-assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'desktop');
-a.setGraphics('smooth');context.navigator.maxTouchPoints=0;a.setControlsLayout('auto',true);
+assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'auto','a forced desktop backup loads as Auto');
+assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).graphics,'detailed','graphics stays independent of that migration');
+legacyControls.state.controls='touch';legacyControls.state.mode='survival';
+assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'auto','a forced touch backup loads as Auto in challenge mode');
+legacyControls.state.mode='creative';
+assert.equal(a.readWorldBackup(JSON.stringify(legacyControls)).controls,'auto','a forced touch backup loads as Auto in creative mode');
+a.setGraphics('smooth');context.navigator.maxTouchPoints=0;context.navigator.platform='Win32';mediaQuery(false,true);a.setControlsLayout('auto',true);
 
 console.log('PASS: Officer Shields and Mr. Eiler (bounded entrance patrol), seated/standing cycle and arrival greetings, Mr. B (indoor-only routes, one-arm inward laptop), Mr. Macek outfits on every body, first/third person, Eddie rock-to-roof with day wrapping, SV floor logo, rear bus yard + 3 PM bus loop with no duplicate spawning, zero per-frame allocation, incremental face buffers/growth, no world scans on block actions, graphics modes, coordinate travel, paused rendering, safe/exact save restoration, legacy saves, 14 block placements, hotbar, survival inventory/flight, NPCs, animals, lake, school entrance, 20-minute clock, reset, two-floor navigation, stairs, campus boundaries, sunset meeting, companion following and doors.');

@@ -45,6 +45,12 @@
     background: #0006; padding: 8px 12px; border-radius: 4px;
     pointer-events: none;
   }
+  #mouseHint {
+    position: fixed; right: 12px; bottom: 12px; z-index: 6; max-width: 260px;
+    color: #fff; background: #000a; border: 2px solid #000; border-radius: 6px;
+    padding: 8px 12px; font: 700 12px/1.4 ui-monospace, monospace; pointer-events: none;
+  }
+  body.touch-device #mouseHint { display: none; }
   .pixel { image-rendering: pixelated; }
 
   /* ---------- touch controls (hidden by default; enabled via JS on touch devices) ---------- */
@@ -116,7 +122,7 @@
     bottom: max(252px, calc(env(safe-area-inset-bottom) + 234px)) !important;
     text-align: center; max-width: min(92vw, 320px); z-index: 8;
   }
-  body.touch-device #info { display: none; }
+  body.touch-device #info, body.touch-device #mouseHint { display: none; }
   @media (max-height: 520px) {
     body.touch-device #touchStick { width: 104px; height: 104px; }
     body.touch-device #touchStickNub { width: 44px; height: 44px; }
@@ -203,8 +209,10 @@
 </div>
 <div id="info">
   WASD move &nbsp;·&nbsp; DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
-  LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block
+  LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block<br/>
+  Press Esc to release the mouse and open the menu
 </div>
+<div id="mouseHint">Press Esc to release the mouse. Drag to look if the cursor stays free.</div>
 <div id="start">
   <div class="start-shell">
     <header class="start-header">
@@ -230,10 +238,10 @@
         <p id="modeHelp">Your existing build stays here when you change modes.</p>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see Mr. Macek</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
-        <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · on-screen buttons</option><option value="desktop">Desktop · keyboard and mouse</option></select></label>
+        <label>Controls <select id="controlsLayout" aria-label="Controls layout" disabled title="Controls follow this device. A phone or tablet never captures the mouse."><option value="auto">Auto · match this device</option></select></label>
         <p>Creative: unlimited blocks and flight. Challenge: gather, build, and find CIRC. Watch your health around heights and deep water.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
-        <p class="start-tip">Keyboard + mouse or touch controls. Your world saves automatically in this browser.</p>
+        <p class="start-tip">Controls match this device. On a computer, Play captures the mouse; press Esc to release it. Drag to look if the cursor stays free. Your world saves automatically in this browser.</p>
       </section>
     </div>
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
@@ -251,7 +259,7 @@
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
     </section></details>
     <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>XYZ shows your position. X and Z move across the map; Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
-    <details class="start-advanced"><summary>How to play</summary><p>WASD to move · Drag to look · Space to jump or swim up · Shift to sprint · F to fly in Creative · Left click to break · Right click to place · Number keys or scroll to select blocks · Esc for the menu. On a tablet, use the on-screen stick and buttons.</p></details>
+    <details class="start-advanced"><summary>How to play</summary><p>WASD to move · Drag to look · Space to jump or swim up · Shift to sprint · F to fly in Creative · Left click to break · Right click to place · Number keys or scroll to select blocks · Esc releases the mouse and opens the menu. On a phone or tablet, use the on-screen stick and buttons. The mouse is never captured there.</p></details>
   </div>
 </div>
 
@@ -797,24 +805,54 @@ function setGraphics(value){
 }
 setGraphics(graphics);
 graphicsSelect.addEventListener('change',()=>{setGraphics(graphicsSelect.value);persistSave();});
-let controlsLayout=['auto','touch','desktop'].includes(saveState.controls)?saveState.controls:'auto';
+// Older saves could force Touch or Desktop. Those choices are migrated to Auto
+// so a phone cannot keep a mouse-capture layout and a touch laptop is not stuck
+// on the on-screen stick. Graphics stays on its own field.
+const migratedControls=saveState.controls==='touch'||saveState.controls==='desktop';
+let controlsLayout='auto';
+if(migratedControls)saveState.controls='auto';
 let controlsSelect=null;
 let releaseTouch=()=>{};
-function environmentWantsTouch(){
-  return ('ontouchstart' in window)||navigator.maxTouchPoints>0||!!window.matchMedia?.('(pointer: coarse)')?.matches;
+let lookActive=false;
+let inputEpoch=0;
+let lastTouchAt=-1e9;
+let releasingInput=false;
+function mediaMatches(query){
+  try{return !!window.matchMedia?.(query)?.matches;}catch{return false;}
 }
-function touchLayoutOn(){return controlsLayout==='touch'||(controlsLayout==='auto'&&environmentWantsTouch());}
+function isIPad(){
+  const ua=navigator.userAgent||'';
+  const platform=navigator.platform||'';
+  if(/iPad/i.test(ua)||platform==='iPad')return true;
+  // iPadOS desktop-mode Safari reports a Mac and a real multitouch screen.
+  return platform==='MacIntel'&&(navigator.maxTouchPoints||0)>1;
+}
+function environmentWantsTouch(){
+  // Coarse pointer with no hover is a phone or tablet. Width and maxTouchPoints
+  // alone are not: a touch laptop has touch points and still has a mouse.
+  if(mediaMatches('(pointer: coarse)')&&mediaMatches('(hover: none)'))return true;
+  return isIPad();
+}
+function touchLayoutOn(){return environmentWantsTouch();}
+function controlsLabel(){return touchLayoutOn()?'Auto · Touch controls':'Auto · Keyboard and mouse';}
+function paintControlsChoice(){
+  for(const el of [document.getElementById('controlsLayout'),controlsSelect]){
+    if(!el)continue;
+    el.value='auto';
+    el.disabled=true;
+    const option=el.children?.[0];
+    if(option)option.textContent=controlsLabel();
+  }
+}
 function setControlsLayout(value,save){
-  controlsLayout=value==='touch'||value==='desktop'?value:'auto';
+  controlsLayout='auto';
+  releaseInput();
   const on=touchLayoutOn();
   if(on)document.body.classList.add('touch-device'); else document.body.classList.remove('touch-device');
   const ui=document.getElementById('touchUI');
   if(ui)ui.style.display=on?'block':'none';
-  if(!on)releaseTouch();
-  const menu=document.getElementById('controlsLayout');
-  if(menu&&menu.value!==controlsLayout)menu.value=controlsLayout;
-  if(controlsSelect&&controlsSelect.value!==controlsLayout)controlsSelect.value=controlsLayout;
-  saveState.controls=controlsLayout;
+  paintControlsChoice();
+  saveState.controls='auto';
   if(save)persistSave();
 }
 const controlsMenu=document.getElementById('controlsLayout');
@@ -913,8 +951,9 @@ function readWorldBackup(text){
   if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
   if(s.graphics!==undefined&&!['smooth','detailed'].includes(s.graphics))throw new Error('This backup has an invalid graphics setting. Your world was kept.');
   if(s.controls!==undefined&&!['auto','touch','desktop'].includes(s.controls))throw new Error('This backup has an invalid controls setting. Your world was kept.');
+  // A backup that forced Touch or Desktop still loads. The choice becomes Auto.
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',challenge:normalizeChallenge(s.challenge)};
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',controls:'auto',challenge:normalizeChallenge(s.challenge)};
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
@@ -2280,11 +2319,25 @@ const player = {
 camera.position.copy(player.pos);
 
 const keys = {};
-function releaseInput(){ for(const k in keys) keys[k]=false; releaseTouch(); }
+function releaseInput(){
+  if(releasingInput)return;
+  releasingInput=true;
+  inputEpoch++;
+  for(const k in keys) keys[k]=false;
+  lookActive=false;
+  releaseTouch();
+  if(document.pointerLockElement){
+    try{document.exitPointerLock?.();}catch{}
+  }
+  releasingInput=false;
+}
+function noteTouch(){lastTouchAt=performance.now();}
+addEventListener('touchstart',noteTouch,{passive:true});
+addEventListener('pointerdown',e=>{if(e.pointerType&&e.pointerType!=='mouse')noteTouch();},{passive:true});
 addEventListener('keydown', e => { if(started){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
 addEventListener('keyup',   e => { keys[e.code] = false; });
 addEventListener('blur', releaseInput);
-addEventListener('orientationchange', releaseInput);
+addEventListener('orientationchange', ()=>setControlsLayout('auto'));
 
 let selected = 0; // BLOCK_KEYS index
 // restore saved player position / facing / selected block from a previous session
@@ -2314,17 +2367,37 @@ addEventListener('wheel', e => {
   refreshHotbar();
 }, { passive: true });
 
-// pointer lock — try, but don't depend on it (iframes often block it)
+// Pointer lock is a desktop mouse gesture only. Touch layout never requests it.
+// A lock that arrives after pause, blur, or a layout change is released at once.
 const startEl = document.getElementById('start');
 let started = false;
+function isMouseGesture(event){
+  if(!event||touchLayoutOn()||!started)return false;
+  if(event.pointerType&&event.pointerType!=='mouse')return false;
+  if(event.sourceCapabilities?.firesTouchEvents)return false;
+  if(performance.now()-lastTouchAt<700)return false;
+  if(typeof event.button==='number'&&event.button!==0)return false;
+  return event.type==='click';
+}
+function requestDesktopLock(event){
+  if(!isMouseGesture(event))return;
+  if(document.pointerLockElement===renderer.domElement)return;
+  const epoch=inputEpoch;
+  let pending;
+  try{pending=renderer.domElement.requestPointerLock?.();}catch{return;}
+  const finish=()=>{
+    if(epoch!==inputEpoch||!started||touchLayoutOn()||document.hidden){
+      try{document.exitPointerLock?.();}catch{}
+    }
+  };
+  if(pending&&typeof pending.then==='function')pending.then(finish,()=>{});
+}
 function startGame() {
   if (started) return;
   started = true;
   startEl.classList.add('hidden');
-  // try pointer lock — silently no-op if blocked
-  try { renderer.domElement.requestPointerLock?.()?.catch?.(()=>{}); } catch {}
 }
-document.getElementById('enter').addEventListener('click', startGame);
+document.getElementById('enter').addEventListener('click', event=>{startGame();requestDesktopLock(event);});
 document.getElementById('visitSchool').addEventListener('click',()=>{
   player.pos.set(46.5,groundSurface(46,31)+player.height+.1,31.5);player.yaw=0;player.pitch=-.06;player.flying=false;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
 });
@@ -2357,11 +2430,9 @@ modeSelect.addEventListener('change',()=>{
   document.getElementById('modeHelp').textContent=gameMode==='survival'?'Break blocks to collect them. No flying; falls and deep water can hurt.':'Unlimited blocks and flight. Your build stays here.';
   refreshHotbar();refreshChallenge();persistSave();
 });
-renderer.domElement.addEventListener('click', () => {
-  if (!started) { startGame(); return; }
-  if (document.pointerLockElement !== renderer.domElement) {
-    try { renderer.domElement.requestPointerLock?.()?.catch?.(()=>{}); } catch {}
-  }
+renderer.domElement.addEventListener('click', event => {
+  if (!started) startGame();
+  requestDesktopLock(event);
 });
 
 // ESC re-shows start
@@ -2369,7 +2440,6 @@ addEventListener('keydown', e => {
   if (e.code === 'Escape' && started) {
     started = false;
     releaseInput();
-    document.exitPointerLock?.();
     startEl.classList.remove('hidden');
     refreshMenuStatus();
   }
@@ -2389,13 +2459,27 @@ addEventListener('keydown', e => {
   }
 });
 
-// look controls — works with OR without pointer lock
-let lookActive = false;
-renderer.domElement.addEventListener('mousedown', () => {
-  if (started && document.pointerLockElement !== renderer.domElement) lookActive = true;
+// Drag-look is the fallback when pointer lock is absent or was released.
+renderer.domElement.addEventListener('mousedown', event => {
+  if(!event||!started||touchLayoutOn())return;
+  if(event.pointerType&&event.pointerType!=='mouse')return;
+  if(event.button!==0&&event.button!==undefined)return;
+  if(document.pointerLockElement!==renderer.domElement)lookActive=true;
 });
 addEventListener('mouseup',   () => { lookActive = false; });
 addEventListener('mouseleave',() => { lookActive = false; });
+document.addEventListener('pointerlockchange', () => {
+  if(document.pointerLockElement===renderer.domElement){
+    if(!started||touchLayoutOn()||document.hidden)releaseInput();
+    return;
+  }
+  lookActive=false;
+  if(!started||releasingInput)return;
+  started=false;
+  releaseInput();
+  startEl.classList.remove('hidden');
+  refreshMenuStatus();
+});
 
 addEventListener('mousemove', e => {
   if (!started) return;
@@ -2852,7 +2936,7 @@ resetBtn.addEventListener('click', () => {
   location.reload();
 });
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
-menuBtn.addEventListener('click',()=>{started=false;releaseInput();document.exitPointerLock?.();startEl.classList.remove('hidden');refreshMenuStatus();persistSave();});
+menuBtn.addEventListener('click',()=>{started=false;releaseInput();startEl.classList.remove('hidden');refreshMenuStatus();persistSave();});
 const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
 graphicsBtn=document.createElement('button');
 graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
@@ -2860,11 +2944,11 @@ graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detai
 setGraphics(graphics);
 controlsSelect=document.createElement('select');
 controlsSelect.id='controlsToggle';controlsSelect.setAttribute('aria-label','Controls layout');
-for(const [value,label] of [['auto','Controls: Auto'],['touch','Controls: Touch'],['desktop','Controls: Desktop']]){
-  const option=document.createElement('option');option.value=value;option.textContent=label;controlsSelect.appendChild(option);
-}
+controlsSelect.title='Controls follow this device. A phone or tablet never captures the mouse.';
+const controlsOption=document.createElement('option');controlsOption.value='auto';controlsOption.textContent='Auto · match this device';controlsSelect.appendChild(controlsOption);
+controlsSelect.disabled=true;
 controlsSelect.style.cssText=backLink.style.cssText+'min-height:44px;border-radius:0;background:#171615;color:#f8f6f2;';
-controlsSelect.addEventListener('change',()=>setControlsLayout(controlsSelect.value,true));
+controlsSelect.addEventListener('change',()=>setControlsLayout('auto',true));
 // Tablet-friendly twin of the V key, so play-as-Mr. Macek is reachable without a keyboard.
 viewBtn=document.createElement('button');
 viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
@@ -3085,7 +3169,10 @@ const btnDown    = document.getElementById('btnDown');
   addEventListener('touchcancel', releaseTouch);
   addEventListener('pointercancel', releaseTouch);
 }
-setControlsLayout(controlsLayout);
+setControlsLayout('auto',migratedControls);
+for(const query of ['(pointer: coarse)','(hover: none)']){
+  try{window.matchMedia?.(query)?.addEventListener?.('change',()=>setControlsLayout('auto'));}catch{}
+}
 
 addEventListener('beforeunload', persistSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) { releaseInput(); persistSave(); } });
