@@ -88,18 +88,34 @@ for(let i=0;i<2600;i++){
 }
 assert(maxShieldsDistance>1.5,'Officer Shields actually takes a short walk');
 assert(maxShieldsDistance<6,'patrol stays near the front desk');assert(sawSeated&&sawStanding);
-// Dogs follow the player rather than the distant campus NPC. They wait safely when he flies.
-a.macek.pos.set(25.5,5,-20.5);a.player.pos.set(47.5,6.7,35.5);a.player.yaw=0;
-for(let i=0;i<1000;i++)a.updateCompanions(.05);
+// Dogs follow the campus Mr. Macek. A distant or flying player does not take them away.
+a.macek.pos.set(25.5,5,-20.5);a.macek.group.rotation.y=Math.PI;a.macek.yaw=Math.PI;
+a.player.pos.set(110,36,70);a.player.yaw=0;a.player.flying=true;
+const before=a.ellie.pos.clone();a.updateCompanions(.05);
+assert(a.ellie.pos.distanceTo(before)<0.4,'one frame walks toward Mr. Macek instead of snapping there');
+let maxStep=0;const samples=[[a.ellie,a.ellie.pos.x,a.ellie.pos.y,a.ellie.pos.z],[a.percy,a.percy.pos.x,a.percy.pos.y,a.percy.pos.z]];
+for(let i=0;i<900;i++){
+ a.updateCompanions(.05);
+ for(const s of samples){maxStep=Math.max(maxStep,Math.hypot(s[0].pos.x-s[1],s[0].pos.y-s[2],s[0].pos.z-s[3]));s[1]=s[0].pos.x;s[2]=s[0].pos.y;s[3]=s[0].pos.z;}
+}
+assert(maxStep<1.2,'the trail stays on walked steps');
 for(const dog of [a.ellie,a.percy]){
- assert(dog.invulnerable);assert(Math.hypot(dog.pos.x-a.player.pos.x,dog.pos.z-a.player.pos.z)<4);
- assert(dog.pos.distanceTo(a.macek.pos)>30,'dog follows player, not the roaming namesake');
+ assert(dog.invulnerable);
+ assert(Math.hypot(dog.pos.x-a.macek.pos.x,dog.pos.z-a.macek.pos.z)<5,dog.name+' reaches the distant Mr. Macek');
+ assert(Math.hypot(dog.pos.x-a.player.pos.x,dog.pos.z-a.player.pos.z)>40,dog.name+' ignores the player');
  assert.equal(a.walkFeet(Math.floor(dog.pos.x),Math.floor(dog.pos.z),dog.pos.y),dog.pos.y);
 }
-const safeAnchor={...a.companionAnchor};a.player.pos.set(70,35,50);
-for(let i=0;i<300;i++)a.updateCompanions(.05);
-assert.equal(a.companionAnchor.x,safeAnchor.x);assert.equal(a.companionAnchor.y,safeAnchor.y);
-for(const dog of [a.ellie,a.percy])assert(dog.pos.y<8,'dogs never rise toward flying player');
-a.player.pos.set(46.5,6.7,30.5);for(let i=0;i<400;i++)a.updateCompanions(.05);
-for(const dog of [a.ellie,a.percy])assert(Math.hypot(dog.pos.x-a.player.pos.x,dog.pos.z-a.player.pos.z)<4,'dogs resume following at landing');
-console.log('PASS: old-name save migration, ten NPCs, shared portrait face and outfit details, one-arm inward laptop, entrance-only patrol and seated transitions, protected player-following dogs and safe flight waiting.');
+assert(Math.hypot(a.ellie.pos.x-a.percy.pos.x,a.ellie.pos.z-a.percy.pos.z)>1,'Ellie and Percy keep different trailing offsets');
+assert(Math.hypot(a.companionAnchor.x-a.macek.pos.x,a.companionAnchor.z-a.macek.pos.z)<.01);
+a.player.pos.set(70,35,50);
+for(let i=0;i<80;i++)a.updateCompanions(.05);
+assert(Math.abs(a.companionAnchor.y-a.macek.pos.y)<.01,'a flying player does not lift the anchor');
+for(const dog of [a.ellie,a.percy])assert(dog.pos.y<8,'dogs stay on Mr. Macek\'s floor while the player is in the air');
+a.macek.pos.set(47.5,11,16.5);a.macek.group.rotation.y=0;
+for(let i=0;i<1200;i++)a.updateCompanions(.05);
+for(const dog of [a.ellie,a.percy]){
+ assert(Math.abs(dog.pos.y-a.macek.pos.y)<2,dog.name+' climbs to Mr. Macek');
+ assert(Math.hypot(dog.pos.x-a.macek.pos.x,dog.pos.z-a.macek.pos.z)<6);
+ assert.equal(a.getBlock(Math.floor(dog.pos.x),Math.round(dog.pos.y),Math.floor(dog.pos.z)),undefined);
+}
+console.log('PASS: old-name save migration, ten NPCs, shared portrait face and outfit details, one-arm inward laptop, entrance-only patrol and seated transitions, protected dogs that follow the Mr. Macek NPC.');

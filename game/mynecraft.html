@@ -2135,20 +2135,20 @@ function updateShields(dt,playerPos){
   if(near)shieldsWasNear=true;else if(range>9)shieldsWasNear=false;
 }
 let greetedAtSunset=false;
-// Companions follow the playable Mr. Macek. When he flies, keep the last safe
-// walking destination rather than dragging the dogs through the air or walls.
-const companionAnchor={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z,yaw:0};
-const companionProbe={x:0,y:0,z:0};
+// Ellie and Percy trail the campus Mr. Macek NPC. His heading is the way he is
+// facing this frame, including the sunset meetup turn. Goals are reused objects.
+const companionAnchor={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z,yaw:macek.group.rotation.y};
+const ellieGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
+const percyGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
 function updateCompanions(dt){
-  companionProbe.x=player.pos.x;companionProbe.y=player.pos.y-player.height;companionProbe.z=player.pos.z;
-  const ground=nearestWalkPoint(companionProbe,worldBounds);
-  if(ground&&Math.abs(ground.y-companionProbe.y)<1.1&&Math.hypot(ground.x+.5-player.pos.x,ground.z+.5-player.pos.z)<2){
-    companionAnchor.x=ground.x+.5;companionAnchor.y=ground.y;companionAnchor.z=ground.z+.5;companionAnchor.yaw=player.yaw;
-  }
-  const sideX=Math.cos(companionAnchor.yaw)*1.3,sideZ=-Math.sin(companionAnchor.yaw)*1.3;
-  const backX=Math.sin(companionAnchor.yaw)*1.6,backZ=Math.cos(companionAnchor.yaw)*1.6;
-  ellie.go(dt,{x:companionAnchor.x+backX+sideX,y:companionAnchor.y,z:companionAnchor.z+backZ+sideZ});
-  percy.go(dt,{x:companionAnchor.x+backX-sideX,y:companionAnchor.y,z:companionAnchor.z+backZ-sideZ});
+  const yaw=macek.group.rotation.y;
+  const facingX=Math.sin(yaw),facingZ=Math.cos(yaw);
+  const rightX=facingZ,rightZ=-facingX;
+  companionAnchor.x=macek.pos.x;companionAnchor.y=macek.pos.y;companionAnchor.z=macek.pos.z;companionAnchor.yaw=yaw;
+  const back=1.7,side=1.15;
+  ellieGoal.x=companionAnchor.x-facingX*back+rightX*side;ellieGoal.y=companionAnchor.y;ellieGoal.z=companionAnchor.z-facingZ*back+rightZ*side;
+  percyGoal.x=companionAnchor.x-facingX*back-rightX*side;percyGoal.y=companionAnchor.y;percyGoal.z=companionAnchor.z-facingZ*back-rightZ*side;
+  ellie.go(dt,ellieGoal);percy.go(dt,percyGoal);
 }
 function updateCookie(dt){
   const on=cookieOnDuty(dayTime);
