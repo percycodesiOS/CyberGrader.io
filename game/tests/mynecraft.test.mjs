@@ -330,6 +330,31 @@ assert(Math.hypot(a.ellie.pos.x-a.percy.pos.x,a.ellie.pos.z-a.percy.pos.z)>0.9,'
  }
 }
 assert(a.kay.pos.distanceTo(a.sirD.pos)<4,'KaY follows Sir D');
+{
+ // A stationary-target test misses dogs choosing the wrong side of a raised
+ // walkway while the NPC keeps moving. Exercise multiple complete patrols,
+ // including both floors and the outdoor path, with the player far away.
+ const patrolSave=JSON.stringify({mode:'creative',dayTime:.22,player:{x:120,y:40,z:80,flying:true}});
+ const patrolContext=vm.createContext({...context,api:undefined,localStorage:{getItem:()=>patrolSave,setItem(){},removeItem(){}}});
+ vm.runInContext(instrumented,patrolContext);
+ const p=patrolContext.api,visited=new Set(),upstairs=new Set();
+ const previous=[p.ellie.pos.clone(),p.percy.pos.clone()];let maxGap=0,maxStep=0;
+ for(let i=0;i<18000;i++){
+  p.updateCampus(1/60);visited.add(p.macek.patrolIndex);
+  for(const [j,dog] of [p.ellie,p.percy].entries()){
+   const gap=dog.pos.distanceTo(p.macek.pos);maxGap=Math.max(maxGap,gap);
+   maxStep=Math.max(maxStep,dog.pos.distanceTo(previous[j]));previous[j].copy(dog.pos);
+   if(dog.pos.y>10)upstairs.add(dog.name);
+   assert(gap<8,`${dog.name} stays with the moving NPC at ${(i/60).toFixed(2)}s (gap ${gap.toFixed(2)})`);
+   assert(dog.pos.distanceTo(p.player.pos)>40,'a far flying player never draws a dog away');
+  }
+ }
+ assert.equal(visited.size,5,'the NPC completes every normal patrol destination');
+ assert.equal(upstairs.size,2,'both companions use the stairs during the moving patrol');
+ assert(maxStep<1.1,'following the recorded trail never teleports a dog across the map');
+ for(const dog of [p.ellie,p.percy])assert(dog.invulnerable);
+ console.log('Moving-NPC companion maximum gap/step:',maxGap.toFixed(3),maxStep.toFixed(3));
+}
 assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,Mr. Macek,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr. B,Mr. Eiler,Cookie Monster');
 assert(a.insideBounds(a.micco.pos.x,a.micco.pos.z,a.campusBounds),'Ms. Micco stays on campus');
 a.player.pos.set(46.5,6.7,24);a.updateCampus(.2);assert(Math.abs(a.entranceDoors[0].rotation.y)>.1,'main doors open nearby');

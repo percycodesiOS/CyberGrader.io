@@ -1945,7 +1945,7 @@ class CampusActor extends NPC {
       if(ground!==next.y){this.route=[];this.planTimer=0;}
       else {
         const dx=next.x+.5-this.pos.x,dz=next.z+.5-this.pos.z,d=Math.hypot(dx,dz),step=this.speed*dt;
-        if(d<=step){this.pos.set(next.x+.5,next.y,next.z+.5);this.route.shift();}
+        if(d<=step){this.pos.set(next.x+.5,next.y,next.z+.5);if(this.onWalkStep)this.onWalkStep(this.pos.x,this.pos.y,this.pos.z);this.route.shift();}
         else {this.pos.x+=dx/d*step;this.pos.z+=dz/d*step;this.pos.y+=(next.y-this.pos.y)*Math.min(1,dt*12);}
         this.yaw=Math.atan2(dx,dz);moving=d>.01;
       }
@@ -2174,19 +2174,35 @@ function updateShields(dt,playerPos){
   if(near)shieldsWasNear=true;else if(range>9)shieldsWasNear=false;
 }
 let greetedAtSunset=false;
-// Ellie and Percy trail the campus Mr. Macek NPC. His heading is the way he is
-// facing this frame, including the sunset meetup turn. Goals are reused objects.
+// Follow cells Mr. Macek actually walked. A sideways offset can land below a
+// raised walkway or across a wall and send a dog on a long detour.
 const companionAnchor={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z,yaw:macek.group.rotation.y};
 const ellieGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
 const percyGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
+const companionTrail=Array.from({length:64},()=>({x:0,y:0,z:0}));
+let companionTrailHead=0,companionTrailCount=0;
+function recordCompanionStep(x,y,z){
+  const last=companionTrail[(companionTrailHead+63)%64];
+  if(companionTrailCount&&last.x===x&&last.y===y&&last.z===z)return;
+  const point=companionTrail[companionTrailHead];point.x=x;point.y=y;point.z=z;
+  companionTrailHead=(companionTrailHead+1)%64;companionTrailCount=Math.min(64,companionTrailCount+1);
+}
+macek.onWalkStep=recordCompanionStep;
+recordCompanionStep(macek.pos.x,macek.pos.y,macek.pos.z);
 function updateCompanions(dt){
   const yaw=macek.group.rotation.y;
   const facingX=Math.sin(yaw),facingZ=Math.cos(yaw);
   const rightX=facingZ,rightZ=-facingX;
   companionAnchor.x=macek.pos.x;companionAnchor.y=macek.pos.y;companionAnchor.z=macek.pos.z;companionAnchor.yaw=yaw;
+  const last=companionTrail[(companionTrailHead+63)%64];
+  if(Math.hypot(last.x-macek.pos.x,last.y-macek.pos.y,last.z-macek.pos.z)>2){
+    companionTrailHead=0;companionTrailCount=0;recordCompanionStep(macek.pos.x,macek.pos.y,macek.pos.z);
+  }
   const back=1.7,side=1.15;
   ellieGoal.x=companionAnchor.x-facingX*back+rightX*side;ellieGoal.y=companionAnchor.y;ellieGoal.z=companionAnchor.z-facingZ*back+rightZ*side;
   percyGoal.x=companionAnchor.x-facingX*back-rightX*side;percyGoal.y=companionAnchor.y;percyGoal.z=companionAnchor.z-facingZ*back-rightZ*side;
+  if(companionTrailCount>1){const p=companionTrail[(companionTrailHead+64-2)%64];ellieGoal.x=p.x;ellieGoal.y=p.y;ellieGoal.z=p.z;}
+  if(companionTrailCount>2){const p=companionTrail[(companionTrailHead+64-3)%64];percyGoal.x=p.x;percyGoal.y=p.y;percyGoal.z=p.z;}
   ellie.go(dt,ellieGoal);percy.go(dt,percyGoal);
 }
 function updateCookie(dt){
@@ -2336,7 +2352,7 @@ addEventListener('touchstart',noteTouch,{passive:true});
 addEventListener('pointerdown',e=>{if(e.pointerType&&e.pointerType!=='mouse')noteTouch();},{passive:true});
 addEventListener('keydown', e => { if(started){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
 addEventListener('keyup',   e => { keys[e.code] = false; });
-addEventListener('blur', releaseInput);
+addEventListener('blur', pauseGame);
 addEventListener('orientationchange', ()=>setControlsLayout('auto'));
 
 let selected = 0; // BLOCK_KEYS index
@@ -2371,6 +2387,12 @@ addEventListener('wheel', e => {
 // A lock that arrives after pause, blur, or a layout change is released at once.
 const startEl = document.getElementById('start');
 let started = false;
+function pauseGame(){
+  started=false;
+  releaseInput();
+  startEl.classList.remove('hidden');
+  refreshMenuStatus();
+}
 function isMouseGesture(event){
   if(!event||touchLayoutOn()||!started)return false;
   if(event.pointerType&&event.pointerType!=='mouse')return false;
@@ -2438,10 +2460,7 @@ renderer.domElement.addEventListener('click', event => {
 // ESC re-shows start
 addEventListener('keydown', e => {
   if (e.code === 'Escape' && started) {
-    started = false;
-    releaseInput();
-    startEl.classList.remove('hidden');
-    refreshMenuStatus();
+    pauseGame();
   }
 });
 
@@ -2475,10 +2494,7 @@ document.addEventListener('pointerlockchange', () => {
   }
   lookActive=false;
   if(!started||releasingInput)return;
-  started=false;
-  releaseInput();
-  startEl.classList.remove('hidden');
-  refreshMenuStatus();
+  pauseGame();
 });
 
 addEventListener('mousemove', e => {
@@ -2936,7 +2952,7 @@ resetBtn.addEventListener('click', () => {
   location.reload();
 });
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
-menuBtn.addEventListener('click',()=>{started=false;releaseInput();startEl.classList.remove('hidden');refreshMenuStatus();persistSave();});
+menuBtn.addEventListener('click',()=>{pauseGame();persistSave();});
 const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
 graphicsBtn=document.createElement('button');
 graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
@@ -3175,7 +3191,7 @@ for(const query of ['(pointer: coarse)','(hover: none)']){
 }
 
 addEventListener('beforeunload', persistSave);
-document.addEventListener('visibilitychange', () => { if (document.hidden) { releaseInput(); persistSave(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { pauseGame(); persistSave(); } });
 refreshMenuStatus();
 document.getElementById('status').textContent='Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
 setInterval(()=>{if(started)persistSave();},5000);

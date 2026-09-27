@@ -144,6 +144,7 @@ for(const fn of events.blur)fn();
 assert.equal(a.movement.KeyW,false);
 assert.equal(a.movement.Space,false);
 assert.equal(a.lookActive,false,'blur clears mouse drag');
+assert.equal(a.started,false,'blur pauses even before a pointerlockchange event');
 assert(exits.length>exitsBeforeBlur,'blur releases pointer lock');
 assert.equal(locks.length>0,true);
 const locksAtBlur=locks.length;
@@ -159,6 +160,7 @@ const exitsBeforeHide=exits.length;
 for(const fn of events.visibilitychange)fn();
 assert.equal(a.movement.KeyA,false);
 assert.equal(a.lookActive,false,'hiding the page clears mouse drag');
+assert.equal(a.started,false,'hiding the page pauses even without a lock-loss event');
 assert(exits.length>exitsBeforeHide,'hiding the page releases pointer lock');
 document.hidden=false;
 
@@ -208,6 +210,37 @@ for(const fn of events.pointerlockchange)fn();
 assert(exits.length>exitsBeforeEvent,'a lock that lands after pause exits from pointerlockchange');
 assert.equal(locks.length,locksBeforeEvent);
 assert.equal(document.pointerLockElement,null);
+
+// Losing focus can happen before the browser grants a requested lock. Older
+// implementations return void, so there may be no Promise callback to reject
+// that late lock. Pausing must not depend on an existing lock-loss event.
+const originalRequestPointerLock=a.renderer.domElement.requestPointerLock;
+for(const resultKind of ['promise','void'])for(const interruption of ['blur','hidden']){
+ apply(desktop);stop();document.hidden=false;document.pointerLockElement=null;
+ let requests=0;
+ a.renderer.domElement.requestPointerLock=function(){
+  requests++;
+  if(resultKind==='promise')return originalRequestPointerLock.call(this);
+ };
+ elements.enter.events.click[0](mouse());
+ a.renderer.domElement.events.mousedown[0]({type:'mousedown',button:0,pointerType:'mouse'});
+ a.movement.KeyW=true;a.movement.Space=true;
+ if(interruption==='hidden'){document.hidden=true;for(const fn of events.visibilitychange)fn();}
+ else for(const fn of events.blur)fn();
+ assert.equal(a.started,false,`${resultKind} pending lock: ${interruption} pauses without a held lock`);
+ assert.equal(a.lookActive,false);
+ assert.equal(a.movement.KeyW,false);assert.equal(a.movement.Space,false);
+ document.hidden=false; // Returning to a visible page does not resume play.
+ document.pointerLockElement=a.renderer.domElement;
+ for(const fn of events.pointerlockchange)fn();
+ if(resultKind==='promise'){
+  lockWaiters.at(-1).resolve();await locks.at(-1);await Promise.resolve();
+ }
+ assert.equal(document.pointerLockElement,null,`${resultKind} late lock after ${interruption} is released`);
+ assert.equal(a.started,false,'late completion never resumes the game');
+ assert.equal(requests,1,'an interruption does not reacquire the mouse');
+}
+a.renderer.domElement.requestPointerLock=originalRequestPointerLock;
 
 apply(desktop);
 a.startGame();
