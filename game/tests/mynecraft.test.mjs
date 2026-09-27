@@ -34,7 +34,7 @@ const instrumented=script+`\n globalThis.api={WORLD,instMeshes,buildMeshes,playe
  eddie,eddieRoost,eddiePerch,eddieFacing,updateEddie,EDDIE_ROCK,EDDIE_ROOF,EDDIE_DUSK,EDDIE_DAWN,
  buses,updateBuses,busRouteDistance,busRoutePoint,busAtKerb,busStopDistances,BUS_ARRIVE,BUS_COUNT,BUS_STAGGER,BUS_DRIVE_IN,BUS_DWELL,BUS_DRIVE_OUT,BUS_VISIT,BUS_LOOP,busRouteLength,BUS_ROUTE,
  playerAvatar,viewArms,viewModel,macekBodies,macekClothes,outfitPolo,outfitBlack,identityStatus,worldClockEl,setView,refreshOutfitPreview,updatePlayerAvatar,viewSelect,viewBtn,groundSurface,inBusYard,
- bubble,showBubble,SHIELDS_LINES,heightAt,nearestWalkPoint,walkFeet,eiler,entranceStaffBounds,
+ bubble,showBubble,SHIELDS_LINES,heightAt,nearestWalkPoint,walkFeet,eiler,entranceStaffBounds,cookie,cookieOnDuty,COOKIE_ARRIVE,COOKIE_DEPART,cookiePatrol,
  get view(){return view;},get macekOutfit(){return macekOutfit;},
  setTime(t){dayTime=t;},get movement(){return keys;},releaseInput,setControlsLayout,controlsSelect,controlsMenu,lookLayer,stick,btnJump,btnDown,btnFly,btnBreak,btnPlace,touchUI,travelLimits,SIZE,EAST_EDGE,ORIGIN_SIZE,ORIGIN_EAST,inPlay,worldEdgeText,menuBtn};`;
 vm.runInContext(instrumented,context);
@@ -276,9 +276,63 @@ for(const dog of [a.ellie,a.percy]){
  assert.equal(dog.pos.y,5,'dogs stay on the ground while following the player');
 }
 assert(a.kay.pos.distanceTo(a.sirD.pos)<4,'KaY follows Sir D');
-assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,Mr. Macek,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr. B,Mr. Eiler');
+assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,Mr. Macek,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr. B,Mr. Eiler,Cookie Monster');
 assert(a.insideBounds(a.micco.pos.x,a.micco.pos.z,a.campusBounds),'Ms. Micco stays on campus');
 a.player.pos.set(46.5,6.7,24);a.updateCampus(.2);assert(Math.abs(a.entranceDoors[0].rotation.y)>.1,'main doors open nearby');
+assert.equal(a.COOKIE_ARRIVE,10/24);assert.equal(a.COOKIE_DEPART,16/24);
+assert.equal(a.campusActors.filter(n=>n.name==='Cookie Monster').length,1);
+assert.equal(a.npcs.map(n=>n.name).join(','),'Steve,Alex');
+assert.equal(a.cookie.broom.parent,a.cookie.armR);assert.equal(a.cookie.dustpan.parent,a.cookie.armL);
+assert(a.cookie.cap&&a.cookie.speaker,'cap and chest speaker are part of the custodian');
+for(const stop of a.cookiePatrol)assert(Math.hypot(stop[0]+.5-46.5,stop[2]+.5-24)>6,'cleaning stops stay clear of the glass doors');
+for(let i=0;i<a.cookiePatrol.length;i++){
+ const from=a.cookiePatrol[i],to=a.cookiePatrol[(i+1)%a.cookiePatrol.length];
+ assert(a.walkingPath({x:from[0],y:from[1],z:from[2]},{x:to[0],y:to[1],z:to[2]},a.campusBounds).length>0,'evening route is walkable');
+}
+const tools={broom:a.cookie.broom,dustpan:a.cookie.dustpan,cap:a.cookie.cap};
+a.setTime(10/24-1/86400);a.updateCampus(1/60);
+assert.equal(a.cookie.group.visible,false,'just before 4 PM he is off duty');
+a.setTime(10/24);a.updateCampus(1/60);
+assert.equal(a.cookie.group.visible,true,'4 PM game time starts the evening sweep');
+assert.equal(a.cookie.broom,tools.broom);assert.equal(a.cookie.dustpan,tools.dustpan);assert.equal(a.cookie.cap,tools.cap);
+assert.equal(a.campusActors.filter(n=>n.name==='Cookie Monster').length,1,'the 4 PM transition does not spawn a second custodian');
+let low=Infinity,high=-Infinity;
+for(let i=0;i<40;i++){a.updateCampus(1/20);low=Math.min(low,a.cookie.armR.rotation.x);high=Math.max(high,a.cookie.armR.rotation.x);assert.equal(a.cookie.group.visible,true);}
+assert(high-low>.2,'broom arm sweeps while he is on duty');
+assert(a.cookie.armLockL>.4,'dustpan stays in the lowered hand');
+a.setTime(16/24);a.updateCampus(1/60);
+assert.equal(a.cookie.group.visible,false,'the evening sweep ends at 10 PM game time');
+assert.equal(a.cookie.navigationSearch,null,'off duty he does not keep pathfinding');
+assert.equal(a.cookie.broom,tools.broom);
+const parked=a.campusActors.map(actor=>({actor,pos:actor.pos.clone(),route:actor.route.slice(),search:actor.navigationSearch,index:actor.patrolIndex}));
+const parkedPlayer=a.player.pos.clone();
+a.player.pos.set(8,8,8);
+for(const actor of a.campusActors)if(actor!==a.cookie)actor.pos.set(80,5,-20);
+a.cookie.pos.set(46.5,5,24);
+for(const door of a.entranceDoors)door.rotation.y=0;
+a.updateCampus(1/60);
+assert.equal(a.cookie.group.visible,false);
+assert(a.entranceDoors.every(door=>Math.abs(door.rotation.y)<.02),'a hidden custodian does not hold the entrance open');
+for(const snap of parked){snap.actor.pos.copy(snap.pos);snap.actor.route=snap.route;snap.actor.navigationSearch=snap.search;snap.actor.patrolIndex=snap.index;snap.actor.group.position.copy(snap.pos);}
+a.player.pos.copy(parkedPlayer);
+{
+ const legacy=JSON.parse(a.worldBackupText());
+ legacy.state.campus=legacy.state.campus.filter(c=>c.name!=='Cookie Monster');
+ legacy.state.dayTime=0.12;
+ assert.equal(legacy.state.campus.length,9);
+ assert.equal(a.readWorldBackup(JSON.stringify(legacy)).campus.length,9,'a save from before Cookie Monster still opens');
+ const legacyContext=vm.createContext({...context,api:undefined,localStorage:{getItem:()=>JSON.stringify(legacy.state),setItem(){},removeItem(){}}});
+ vm.runInContext(instrumented,legacyContext);
+ const loaded=legacyContext.api.campusActors.filter(n=>n.name==='Cookie Monster');
+ assert.equal(loaded.length,1,'an older save gains the one evening custodian from the game, not a duplicate');
+ assert.equal(legacyContext.api.npcs.some(n=>n.name==='Cookie Monster'),false);
+ assert.equal(legacyContext.api.cookie.group.visible,false,'a morning save starts him off duty');
+ assert.equal(legacyContext.api.campusActors[7].name,'Mr. B');
+ assert.equal(legacyContext.api.ellie.invulnerable,true);assert.equal(legacyContext.api.percy.invulnerable,true);
+ legacyContext.api.setTime(10/24);legacyContext.api.updateCampus(1/60);
+ assert.equal(legacyContext.api.cookie.group.visible,true);
+ assert.equal(legacyContext.api.campusActors.filter(n=>n.name==='Cookie Monster').length,1);
+}
 a.setTime(.12);
 let before=a.time;a.tick(50);assert(Math.abs(a.time-before-.05/1200)<1e-9,'20 minute cycle');
 assert.equal(a.renderer.renderCount,1,'active game draws a frame');

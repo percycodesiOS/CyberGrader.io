@@ -239,7 +239,7 @@
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
       <button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button>
       <button id="overview" type="button">School from above · Creative</button>
-      <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr. B in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. A full game day lasts 20 minutes.</p>
+      <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr. B in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. Cookie Monster starts the evening halls at 4 PM game time. A full game day lasts 20 minutes.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
     </section></details>
     <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
@@ -1692,6 +1692,10 @@ function faceForPerson(style){
       ctx.fillStyle=style==='eiler'?'#8d877e':'#2b211c';ctx.fillRect(1,10,14,6);ctx.fillRect(0,8,2,6);ctx.fillRect(14,8,2,6);
       ctx.fillStyle='#4b3a30';ctx.fillRect(5,11,6,2);
     }
+    // Cookie Monster: short dark hair. The blue cap, not this face, is the character cue.
+    else if(style==='cookie'){
+      ctx.fillStyle='#2a2420';ctx.fillRect(0,0,16,4);ctx.fillRect(0,4,2,2);ctx.fillRect(14,4,2,2);
+    }
     else {ctx.fillStyle='#b1986c';ctx.fillRect(0,0,16,3);ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
     ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
     ctx.fillStyle=style==='macek'?'#5289b1':'#303b44';ctx.fillRect(4,7,2,2);ctx.fillRect(10,7,2,2);
@@ -1700,13 +1704,18 @@ function faceForPerson(style){
     // Black rectangular frames with a straight bridge, drawn over the eyes.
     if(style==='unicorn'||style==='eiler'){ctx.fillStyle='#14161a';ctx.fillRect(2,6,5,1);ctx.fillRect(2,10,5,1);ctx.fillRect(2,6,1,5);ctx.fillRect(6,6,1,5);ctx.fillRect(9,6,5,1);ctx.fillRect(9,10,5,1);ctx.fillRect(9,6,1,5);ctx.fillRect(13,6,1,5);ctx.fillRect(7,7,2,1);}
     if(style==='shields'){ctx.fillStyle='#c9a36a';ctx.fillRect(4,13,8,1);} // friendly smile
+    if(style==='cookie'){
+      ctx.fillStyle='#2c2926';ctx.fillRect(3,10,10,2); // mustache
+      ctx.fillStyle='#3e4348';ctx.fillRect(6,12,4,4);  // long dark goatee
+      ctx.fillStyle='#6e726e';ctx.fillRect(7,14,2,2);
+    }
   });
 }
 function stylePerson(npc,style){
   npc.style=style;
   npc.head.material[4].map=faceForPerson(style);
   const shirt=makeTexture(ctx=>{
-    ctx.fillStyle=style==='micco'?'#e7e0cb':style==='unicorn'?'#eae5d8':style==='shields'?'#1b2536':'#14191e';ctx.fillRect(0,0,16,16);
+    ctx.fillStyle=style==='micco'?'#e7e0cb':style==='unicorn'?'#eae5d8':style==='shields'?'#1b2536':style==='cookie'?'#8ec6ea':'#14191e';ctx.fillRect(0,0,16,16);
     if(style==='micco'){
       ctx.fillStyle='#565348';ctx.fillRect(0,0,4,16);ctx.fillRect(12,0,4,16);
       ctx.fillStyle='#b3aa8d';for(let y=1;y<16;y+=3){ctx.fillRect(0,y,3,1);ctx.fillRect(13,y+1,2,1);}
@@ -1729,7 +1738,7 @@ function stylePerson(npc,style){
     }
   });
   npc.body.material.forEach(m=>m.map=shirt);
-  const sleeve=style==='sir'?makeFlatTex(24,130,207):style==='shields'?makeFlatTex(27,37,54):style==='eiler'?makeFlatTex(48,50,56):skinTex;
+  const sleeve=style==='sir'?makeFlatTex(24,130,207):style==='shields'?makeFlatTex(27,37,54):style==='eiler'?makeFlatTex(48,50,56):style==='cookie'?makeFlatTex(142,198,234):skinTex;
   for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=style==='unicorn'?shirt:sleeve);
   // Mr. Unicorn wears dark green cargo trousers; everyone else keeps dark trousers.
   const trousers=style==='unicorn'?makeTexture(ctx=>{
@@ -1737,7 +1746,7 @@ function stylePerson(npc,style){
     ctx.fillStyle='#26371f';ctx.fillRect(1,5,5,6);ctx.fillRect(10,5,5,6);   // cargo pockets
     ctx.fillStyle='#3b5239';ctx.fillRect(1,5,5,1);ctx.fillRect(10,5,5,1);
     ctx.fillStyle='#1d2a19';ctx.fillRect(0,0,16,1);
-  }):makeFlatTex(25,29,33);
+  }):style==='cookie'?makeFlatTex(22,24,27):makeFlatTex(25,29,33);
   for(const leg of [npc.legL,npc.legR])leg.children[0].material.forEach(m=>m.map=trousers);
   const part=(w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);npc.group.add(m);return m;};
   if(style==='shields'){
@@ -1779,6 +1788,45 @@ function stylePerson(npc,style){
       const shoe=new THREE.Mesh(new THREE.BoxGeometry(.25,.14,.34),new THREE.MeshLambertMaterial({color:0x684631}));
       shoe.position.set(0,-.6,.04);leg.add(shoe);
     }
+  } else if(style==='cookie'){
+    // Human evening custodian. The cap is a Cookie Monster hat he always wears.
+    const cap=new THREE.Group();cap.name='cookieCap';
+    const bit=(parent,w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);parent.add(m);return m;};
+    bit(cap,.56,.16,.56,0x1d4e9c,0,1.9,0);
+    bit(cap,.58,.08,.58,0x163e86,0,1.8,0);
+    bit(cap,.46,.05,.16,0x163e86,0,1.76,.3);
+    bit(cap,.13,.13,.05,0xf7f9fc,-.12,1.92,.3);
+    bit(cap,.13,.13,.05,0xf7f9fc,.12,1.92,.3);
+    bit(cap,.05,.05,.03,0x1a1c22,-.12,1.92,.33);
+    bit(cap,.05,.05,.03,0x1a1c22,.12,1.92,.33);
+    bit(cap,.28,.09,.04,0xf7f9fc,0,1.8,.32);
+    bit(cap,.2,.035,.03,0x14161c,0,1.79,.345);
+    npc.group.add(cap);npc.cap=cap;
+    part(.16,.06,.05,0x2c2926,0,1.46,.27);
+    part(.1,.2,.05,0x3e4348,0,1.32,.27);
+    for(const arm of [npc.armL,npc.armR]){
+      const hand=bodyPart(.22,.16,.22,skinTex);hand.position.y=-.78;arm.add(hand);
+    }
+    for(const leg of [npc.legL,npc.legR]){
+      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.26,.12,.34),new THREE.MeshLambertMaterial({color:0x8d9094}));
+      shoe.position.set(0,-.62,.04);leg.add(shoe);
+    }
+    part(.03,.42,.03,0x243044,-.08,1.06,.15);
+    part(.03,.42,.03,0x243044,.08,1.06,.15);
+    part(.16,.18,.03,0xf4f6f8,0,.78,.16);
+    part(.1,.08,.02,0x2a6fbf,0,.8,.178);
+    const speaker=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.04,8),new THREE.MeshLambertMaterial({color:0x1a1c20}));
+    speaker.name='speaker';speaker.rotation.x=Math.PI/2;speaker.position.set(.14,.98,.15);
+    npc.group.add(speaker);npc.speaker=speaker;
+    const wood=new THREE.MeshLambertMaterial({color:0x8a5a32}),bristle=new THREE.MeshLambertMaterial({color:0xc9a15a}),metal=new THREE.MeshLambertMaterial({color:0x6e7378});
+    const broom=new THREE.Group();broom.name='broom';
+    const broomHandle=new THREE.Mesh(new THREE.BoxGeometry(.05,1.05,.05),wood);broomHandle.position.set(0,-.95,.04);broom.add(broomHandle);
+    const broomHead=new THREE.Mesh(new THREE.BoxGeometry(.24,.28,.14),bristle);broomHead.position.set(0,-1.42,.05);broom.add(broomHead);
+    npc.armR.add(broom);npc.broom=broom;
+    const dustpan=new THREE.Group();dustpan.name='dustpan';
+    const panHandle=new THREE.Mesh(new THREE.BoxGeometry(.045,.95,.045),wood);panHandle.position.set(0,-.88,.04);dustpan.add(panHandle);
+    const tray=new THREE.Mesh(new THREE.BoxGeometry(.3,.05,.22),metal);tray.position.set(0,-1.32,.12);dustpan.add(tray);
+    npc.armL.add(dustpan);npc.dustpan=dustpan;
   } else {
     // Shared silhouette from the approved block portrait: broad polo, short sandy
     // hair, warm smile, bare hands, black trousers, V-shaped Gators lanyard and ID.
@@ -1914,7 +1962,22 @@ const unicorn=new CampusActor('Mr. B',46,5,14,'unicorn',schoolInteriorBounds);
 unicorn.speed=1.35; // an unhurried walk, laptop held level
 const eiler=new CampusActor('Mr. Eiler',53,5,18,'eiler',entranceStaffBounds);eiler.speed=1.1;
 const eilerPatrol=[[53,5,18],[52,5,16],[49,5,18],[53,5,21]];
-const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler];
+// Lead evening custodian. 16:00 is dayTime 10/24 because the clock is dayTime*24+6.
+// Arrival is specified; the sweep ends at 22:00 game time so he is not on duty all night.
+const COOKIE_ARRIVE=10/24, COOKIE_DEPART=16/24;
+const cookieOnDuty=time=>{
+  // Whole minutes, so 16:00 and 22:00 land on the hour.
+  const wrapped=((time%1)+1)%1, minutes=Math.floor(wrapped*1440+1e-4);
+  const clock=(minutes+6*60)%(24*60);
+  return clock>=16*60&&clock<22*60;
+};
+const cookiePatrol=[[32,5,-12],[26,5,-26],[72,5,-9],[78,5,-9],[86,5,30],[66,5,8]];
+const cookie=new CampusActor('Cookie Monster',32,5,-12,'cookie',campusBounds);
+cookie.speed=1.35;
+cookie.nameTag.scale.set(2.8,.52,1);
+cookie.group.visible=cookieOnDuty(LOADED_DAY_TIME);
+let cookieOnShift=cookie.group.visible, cookieGreeted=false;
+const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie];
 // Cache both outfits once; switching clothes does not allocate textures per frame.
 function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
@@ -2087,7 +2150,26 @@ function updateCompanions(dt){
   ellie.go(dt,{x:companionAnchor.x+backX+sideX,y:companionAnchor.y,z:companionAnchor.z+backZ+sideZ});
   percy.go(dt,{x:companionAnchor.x+backX-sideX,y:companionAnchor.y,z:companionAnchor.z+backZ-sideZ});
 }
+function updateCookie(dt){
+  const on=cookieOnDuty(dayTime);
+  if(on&&!cookieOnShift){
+    const home=cookiePatrol[0], spot=nearestWalkPoint({x:home[0],y:home[1],z:home[2]},cookie.bounds);
+    if(spot)cookie.pos.set(spot.x+.5,spot.y,spot.z+.5);
+    cookie.route=[];cookie.navigationSearch=null;cookie.goalKey='';cookie.failedGoalKey='';
+    cookie.planFailures=0;cookie.planTimer=0;cookie.patrolIndex=0;cookie.group.position.copy(cookie.pos);
+    if(!cookieGreeted){showBubble(cookie,'Evening halls. Starting the sweep.');cookieGreeted=true;}
+  }
+  if(!on){
+    if(cookieOnShift){cookie.route=[];cookie.navigationSearch=null;cookie.armLockL=undefined;cookie.armLockR=undefined;}
+    cookieOnShift=false;cookie.group.visible=false;cookieGreeted=false;return;
+  }
+  cookieOnShift=true;cookie.group.visible=true;
+  cookie.armLockR=.55+Math.sin(cookie.walkPhase*2)*.35;
+  cookie.armLockL=.7;
+  cookie.patrol(dt,cookiePatrol);
+}
 function updateCampus(dt){
+  updateCookie(dt);
   micco.patrol(dt,[[26,5,-26],[32,5,-12],[46,5,17],[72,5,-9],[46,5,26]]);
   unicorn.patrol(dt,unicornPatrol);
   eiler.patrol(dt,eilerPatrol);
@@ -2104,7 +2186,7 @@ function updateCampus(dt){
   kay.go(dt,{x:sirD.pos.x-1.3,y:sirD.pos.y,z:sirD.pos.z+1.3});
   updateCompanions(dt);
   const atDoor=p=>Math.hypot(p.x-46.5,p.z-24)<5&&p.y<10;
-  const open=atDoor(player.pos)||campusActors.some(a=>atDoor(a.pos));
+  const open=atDoor(player.pos)||campusActors.some(a=>a.group.visible&&atDoor(a.pos));
   entranceDoors.forEach(h=>{const target=open?h.userData.side*Math.PI*.48:0;h.rotation.y+=(target-h.rotation.y)*Math.min(1,dt*6);});
 }
 
@@ -2869,6 +2951,7 @@ function updateCoordHUD() {
     `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}` +
     (gameMode==='survival'?` (${inventory[BLOCK_KEYS[selected]]})<br>Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
     (dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
+    (cookieOnDuty(dayTime)?'<br>Cookie Monster: evening sweep':'') +
     (frameFps?`<br>${frameFps} FPS`:'');
 }
 

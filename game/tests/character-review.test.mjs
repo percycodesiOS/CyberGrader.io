@@ -43,14 +43,14 @@ const a=context.api;
 // Legacy labels are migration aliases; saves and all visible identities use the new names.
 assert.equal(a.macek.name,'Mr. Macek');assert.equal(a.macek.patrolIndex,2);
 assert.equal(a.unicorn.name,'Mr. B');assert.equal(a.unicorn.patrolIndex,3);
-assert.equal(a.eiler.name,'Mr. Eiler');assert.equal(a.campusActors.length,9);
+assert.equal(a.eiler.name,'Mr. Eiler');assert.equal(a.campusActors.length,10);assert.equal(a.campusActors[9].name,'Cookie Monster');assert.equal(a.campusActors[7].name,'Mr. B');
 assert.equal(a.canonicalCampusName('MaCEk'),'Mr. Macek');
 assert.equal(a.canonicalCampusName('Mr Unicorn 🦄'),'Mr. B');
 let backup=JSON.parse(a.worldBackupText());
 backup.state.campus[1].name='MaCEk';backup.state.campus[7].name='Mr Unicorn 🦄';
 const restored=a.readWorldBackup(JSON.stringify(backup));
 assert.equal(restored.campus[1].name,'Mr. Macek');assert.equal(restored.campus[7].name,'Mr. B');
-assert.equal(restored.campus.length,9);assert.equal(a.getBlock(25,20,25),'snow');
+assert.equal(restored.campus.length,10);assert.equal(restored.campus[9].name,'Cookie Monster');assert.equal(a.getBlock(25,20,25),'snow');
 // NPC and player use the exact same cached face, shirt and sleeves, including the collar details.
 assert.equal(a.macek.head.material[4].map,a.playerAvatar.head.material[4].map);
 assert.equal(a.macek.head.geometry.parameters.width,a.playerAvatar.head.geometry.parameters.width);
@@ -102,4 +102,4 @@ assert.equal(a.companionAnchor.x,safeAnchor.x);assert.equal(a.companionAnchor.y,
 for(const dog of [a.ellie,a.percy])assert(dog.pos.y<8,'dogs never rise toward flying player');
 a.player.pos.set(46.5,6.7,30.5);for(let i=0;i<400;i++)a.updateCompanions(.05);
 for(const dog of [a.ellie,a.percy])assert(Math.hypot(dog.pos.x-a.player.pos.x,dog.pos.z-a.player.pos.z)<4,'dogs resume following at landing');
-console.log('PASS: old-name save migration, nine NPCs, shared portrait face and outfit details, one-arm inward laptop, entrance-only patrol and seated transitions, protected player-following dogs and safe flight waiting.');
+console.log('PASS: old-name save migration, ten NPCs, shared portrait face and outfit details, one-arm inward laptop, entrance-only patrol and seated transitions, protected player-following dogs and safe flight waiting.');
