@@ -21,7 +21,7 @@ class Element{
 const elements=Object.fromEntries(['start','enter','mode','modeHelp','status','info'].map(k=>[k,new Element()]));
 const document={body:new Element(),createElement:()=>new Element(),getElementById:id=>elements[id]??=new Element(),addEventListener(k,f){(events[k]??=[]).push(f);},exitPointerLock(){}};
 class Renderer{constructor(){this.domElement=new Element();this.shadowMap={};this.renderCount=0;}setPixelRatio(value){this.pixelRatio=value;}setSize(){}render(){this.renderCount++;}}
-let saved=JSON.stringify({edits:{'25,20,25':'snow'},player:{x:47.5,y:6.7,z:35.5,sel:8},campus:[{name:'MaCEk',x:47.5,y:5,z:29.5,patrolIndex:2},{name:'Mr Unicorn 🦄',x:46.5,y:5,z:14.5,patrolIndex:3}]}),reloaded=false;
+let saved=JSON.stringify({edits:{'25,20,25':'snow'},player:{x:47.5,y:6.7,z:35.5,sel:8},campus:[{name:'MaCEk',x:47.5,y:5,z:29.5,patrolIndex:2},{name:'Mr Unicorn 🦄',x:46.5,y:5,z:14.5,patrolIndex:3},{name:'Cookie Monster',x:32.5,y:5,z:-11.5,patrolIndex:4}]}),reloaded=false;
 const context=vm.createContext({THREE:{...Three,WebGLRenderer:Renderer,TextureLoader:class {load(){return new Three.Texture();}}},document,window:{},navigator:{maxTouchPoints:0},innerWidth:1280,innerHeight:800,devicePixelRatio:2,
  performance:{now:()=>0},setTimeout:()=>1,clearTimeout(){},setInterval(){},requestAnimationFrame(){},console,URLSearchParams,
  addEventListener(k,f){(events[k]??=[]).push(f);},localStorage:{getItem:()=>saved,setItem:(k,v)=>saved=v,removeItem:()=>{saved=null;}},location:{reload(){reloaded=true;}},confirm:()=>true});
@@ -43,14 +43,16 @@ const a=context.api;
 // Legacy labels are migration aliases; saves and all visible identities use the new names.
 assert.equal(a.macek.name,'Mr. Macek');assert.equal(a.macek.patrolIndex,2);
 assert.equal(a.unicorn.name,'Mr. B');assert.equal(a.unicorn.patrolIndex,3);
-assert.equal(a.eiler.name,'Mr. Eiler');assert.equal(a.campusActors.length,10);assert.equal(a.campusActors[9].name,'Cookie Monster');assert.equal(a.campusActors[7].name,'Mr. B');
+assert.equal(a.eiler.name,'Mr. Eiler');assert.equal(a.campusActors.length,10);assert.equal(a.campusActors[9].name,'Cookie Man');assert.equal(a.campusActors[7].name,'Mr. B');
+assert.equal(a.campusActors[9].patrolIndex,4,'the old custodian name restores his saved patrol progress');
+assert.equal(a.canonicalCampusName('Cookie Monster'),'Cookie Man');
 assert.equal(a.canonicalCampusName('MaCEk'),'Mr. Macek');
 assert.equal(a.canonicalCampusName('Mr Unicorn 🦄'),'Mr. B');
 let backup=JSON.parse(a.worldBackupText());
-backup.state.campus[1].name='MaCEk';backup.state.campus[7].name='Mr Unicorn 🦄';
+backup.state.campus[1].name='MaCEk';backup.state.campus[7].name='Mr Unicorn 🦄';backup.state.campus[9].name='Cookie Monster';
 const restored=a.readWorldBackup(JSON.stringify(backup));
 assert.equal(restored.campus[1].name,'Mr. Macek');assert.equal(restored.campus[7].name,'Mr. B');
-assert.equal(restored.campus.length,10);assert.equal(restored.campus[9].name,'Cookie Monster');assert.equal(a.getBlock(25,20,25),'snow');
+assert.equal(restored.campus.length,10);assert.equal(restored.campus[9].name,'Cookie Man');assert.equal(a.getBlock(25,20,25),'snow');
 // NPC and player use the exact same cached face, shirt and sleeves, including the collar details.
 assert.equal(a.macek.head.material[4].map,a.playerAvatar.head.material[4].map);
 assert.equal(a.macek.head.geometry.parameters.width,a.playerAvatar.head.geometry.parameters.width);

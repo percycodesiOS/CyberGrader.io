@@ -355,11 +355,11 @@ assert(a.kay.pos.distanceTo(a.sirD.pos)<4,'KaY follows Sir D');
  for(const dog of [p.ellie,p.percy])assert(dog.invulnerable);
  console.log('Moving-NPC companion maximum gap/step:',maxGap.toFixed(3),maxStep.toFixed(3));
 }
-assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,Mr. Macek,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr. B,Mr. Eiler,Cookie Monster');
+assert.equal(a.campusActors.map(n=>n.name).join(','),'Sir D,Mr. Macek,KaY,Ellie,Percy,Ms. Micco,Officer Shields,Mr. B,Mr. Eiler,Cookie Man');
 assert(a.insideBounds(a.micco.pos.x,a.micco.pos.z,a.campusBounds),'Ms. Micco stays on campus');
 a.player.pos.set(46.5,6.7,24);a.updateCampus(.2);assert(Math.abs(a.entranceDoors[0].rotation.y)>.1,'main doors open nearby');
 assert.equal(a.COOKIE_ARRIVE,10/24);assert.equal(a.COOKIE_DEPART,16/24);
-assert.equal(a.campusActors.filter(n=>n.name==='Cookie Monster').length,1);
+assert.equal(a.campusActors.filter(n=>n.name==='Cookie Man').length,1);
 assert.equal(a.npcs.map(n=>n.name).join(','),'Steve,Alex');
 assert.equal(a.cookie.broom.parent,a.cookie.armR);assert.equal(a.cookie.dustpan.parent,a.cookie.armL);
 assert(a.cookie.cap&&a.cookie.speaker,'cap and chest speaker are part of the custodian');
@@ -374,7 +374,7 @@ assert.equal(a.cookie.group.visible,false,'just before 4 PM he is off duty');
 a.setTime(10/24);a.updateCampus(1/60);
 assert.equal(a.cookie.group.visible,true,'4 PM game time starts the evening sweep');
 assert.equal(a.cookie.broom,tools.broom);assert.equal(a.cookie.dustpan,tools.dustpan);assert.equal(a.cookie.cap,tools.cap);
-assert.equal(a.campusActors.filter(n=>n.name==='Cookie Monster').length,1,'the 4 PM transition does not spawn a second custodian');
+assert.equal(a.campusActors.filter(n=>n.name==='Cookie Man').length,1,'the 4 PM transition does not spawn a second custodian');
 let low=Infinity,high=-Infinity;
 for(let i=0;i<40;i++){a.updateCampus(1/20);low=Math.min(low,a.cookie.armR.rotation.x);high=Math.max(high,a.cookie.armR.rotation.x);assert.equal(a.cookie.group.visible,true);}
 assert(high-low>.2,'broom arm sweeps while he is on duty');
@@ -396,21 +396,21 @@ for(const snap of parked){snap.actor.pos.copy(snap.pos);snap.actor.route=snap.ro
 a.player.pos.copy(parkedPlayer);
 {
  const legacy=JSON.parse(a.worldBackupText());
- legacy.state.campus=legacy.state.campus.filter(c=>c.name!=='Cookie Monster');
+ legacy.state.campus=legacy.state.campus.filter(c=>c.name!=='Cookie Man');
  legacy.state.dayTime=0.12;
  assert.equal(legacy.state.campus.length,9);
- assert.equal(a.readWorldBackup(JSON.stringify(legacy)).campus.length,9,'a save from before Cookie Monster still opens');
+ assert.equal(a.readWorldBackup(JSON.stringify(legacy)).campus.length,9,'a save from before Cookie Man still opens');
  const legacyContext=vm.createContext({...context,api:undefined,localStorage:{getItem:()=>JSON.stringify(legacy.state),setItem(){},removeItem(){}}});
  vm.runInContext(instrumented,legacyContext);
- const loaded=legacyContext.api.campusActors.filter(n=>n.name==='Cookie Monster');
+ const loaded=legacyContext.api.campusActors.filter(n=>n.name==='Cookie Man');
  assert.equal(loaded.length,1,'an older save gains the one evening custodian from the game, not a duplicate');
- assert.equal(legacyContext.api.npcs.some(n=>n.name==='Cookie Monster'),false);
+ assert.equal(legacyContext.api.npcs.some(n=>n.name==='Cookie Man'),false);
  assert.equal(legacyContext.api.cookie.group.visible,false,'a morning save starts him off duty');
  assert.equal(legacyContext.api.campusActors[7].name,'Mr. B');
  assert.equal(legacyContext.api.ellie.invulnerable,true);assert.equal(legacyContext.api.percy.invulnerable,true);
  legacyContext.api.setTime(10/24);legacyContext.api.updateCampus(1/60);
  assert.equal(legacyContext.api.cookie.group.visible,true);
- assert.equal(legacyContext.api.campusActors.filter(n=>n.name==='Cookie Monster').length,1);
+ assert.equal(legacyContext.api.campusActors.filter(n=>n.name==='Cookie Man').length,1);
 }
 a.setTime(.12);
 let before=a.time;a.tick(50);assert(Math.abs(a.time-before-.05/1200)<1e-9,'20 minute cycle');

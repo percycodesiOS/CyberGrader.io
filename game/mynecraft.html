@@ -247,7 +247,7 @@
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
       <button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button>
       <button id="overview" type="button">School from above · Creative</button>
-      <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr. B in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. Cookie Monster starts the evening halls at 4 PM game time. A full game day lasts 20 minutes.</p>
+      <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr. B in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. Cookie Man starts the evening halls at 4 PM game time. A full game day lasts 20 minutes.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
     </section></details>
     <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
@@ -921,7 +921,7 @@ function worldBackupText(){
   return JSON.stringify({format:'mynecraft-world',version:1,state:saveState});
 }
 function canonicalCampusName(name){
-  return name==='MaCEk'||name==='Macek'||name==='Mr. Masek'?'Mr. Macek':name==='Mr Unicorn 🦄'||name==='Mr. Unicorn'?'Mr. B':name;
+  return name==='MaCEk'||name==='Macek'||name==='Mr. Masek'?'Mr. Macek':name==='Mr Unicorn 🦄'||name==='Mr. Unicorn'?'Mr. B':name==='Cookie Monster'?'Cookie Man':name;
 }
 function readWorldBackup(text){
   if (text.length > MAX_WORLD_FILE_BYTES) throw new Error('This file is too large. Choose a MYnecraft world backup.');
@@ -1731,7 +1731,7 @@ function faceForPerson(style){
       ctx.fillStyle=style==='eiler'?'#8d877e':'#2b211c';ctx.fillRect(1,10,14,6);ctx.fillRect(0,8,2,6);ctx.fillRect(14,8,2,6);
       ctx.fillStyle='#4b3a30';ctx.fillRect(5,11,6,2);
     }
-    // Cookie Monster: short dark hair. The blue cap, not this face, is the character cue.
+    // Cookie Man: short dark hair. The blue cap, not this face, is the character cue.
     else if(style==='cookie'){
       ctx.fillStyle='#2a2420';ctx.fillRect(0,0,16,4);ctx.fillRect(0,4,2,2);ctx.fillRect(14,4,2,2);
     }
@@ -1828,7 +1828,7 @@ function stylePerson(npc,style){
       shoe.position.set(0,-.6,.04);leg.add(shoe);
     }
   } else if(style==='cookie'){
-    // Human evening custodian. The cap is a Cookie Monster hat he always wears.
+    // Human evening custodian with his signature blue cap.
     const cap=new THREE.Group();cap.name='cookieCap';
     const bit=(parent,w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);parent.add(m);return m;};
     bit(cap,.56,.16,.56,0x1d4e9c,0,1.9,0);
@@ -2011,7 +2011,7 @@ const cookieOnDuty=time=>{
   return clock>=16*60&&clock<22*60;
 };
 const cookiePatrol=[[32,5,-12],[26,5,-26],[72,5,-9],[78,5,-9],[86,5,30],[66,5,8]];
-const cookie=new CampusActor('Cookie Monster',32,5,-12,'cookie',campusBounds);
+const cookie=new CampusActor('Cookie Man',32,5,-12,'cookie',campusBounds);
 cookie.speed=1.35;
 cookie.nameTag.scale.set(2.8,.52,1);
 cookie.group.visible=cookieOnDuty(LOADED_DAY_TIME);
@@ -3051,7 +3051,7 @@ function updateCoordHUD() {
     `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}` +
     (gameMode==='survival'?` (${inventory[BLOCK_KEYS[selected]]})<br>Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
     (dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
-    (cookieOnDuty(dayTime)?'<br>Cookie Monster: evening sweep':'') +
+    (cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +
     (frameFps?`<br>${frameFps} FPS`:'');
 }
 
