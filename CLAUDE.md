@@ -1,0 +1,1 @@
+Read AGENTS.md. MYnecraft is now developed in percycodesiOS/MYnecraft; this repository preserves its existing public Pages URLs. Use the source repository's release helper and preserve unrelated files.

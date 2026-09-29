@@ -1,5 +1,7 @@
 # CyberGrader.io
 
+> **MYnecraft source moved September 29, 2026:** Develop the game in [percycodesiOS/MYnecraft](https://github.com/percycodesiOS/MYnecraft). This repository continues publishing the [existing landing page](https://percycodesios.github.io/CyberGrader.io/) and [game URL](https://percycodesios.github.io/CyberGrader.io/game/mynecraft.html). Use the source repository's release helper; `mynecraft-release.json` identifies the released source and runtime hashes. The older CyberGrader product documentation follows for reference.
+
 A purpose-built workflow tool for cyber teachers — so you stop copy-pasting the same grading feedback and check-in emails 50 times a day.
 
 Two HTML files. Account required. Your setup syncs to every device automatically. Works on desktop, tablet, and phone.

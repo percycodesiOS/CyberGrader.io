@@ -1,0 +1,18 @@
+{
+  "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
+  "sourceCommit": "0bbf14afc5bfb7d0340c374f4205de468ff064e1",
+  "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
+  "files": {
+    "game/assets/bungee/Bungee-Regular.ttf": "c4f5361ce120af3e6b9156d0bf379fa19cda2ea0cd18ac01fd99596c6bf66e3f",
+    "game/assets/bungee/OFL.txt": "163f61e680f3c9ae18100f9c145de1cb7f8de2993bf9169d85bc8de549cf756b",
+    "game/assets/ec-world-cover.png": "79f083933270400e2d2ad6229905e8ccd1012f63ba546807fe72dda579a35799",
+    "game/assets/ectv-school-logo.jpg": "79191d9d60426394df10b787d22922a0b872ea519e354914a54cd223cea9a256",
+    "game/assets/macek-avatar-black.png": "779d3df7e077985c101419da3d12d98d3e20f09bb2499b3eea7896d68d7451c0",
+    "game/assets/macek-avatar-lanyard.png": "31c8a621bee6b8ba764548c4b65b52a36560c224c0c526400e74653102223c1a",
+    "game/assets/mynecraft-icon.svg": "b869876697beec33c78b158fe518bef88552a24ab94717f1de7244afb0328eb9",
+    "game/assets/sv-school-logo.png": "dc7d2a961c4f4bf80452c7e70ecd1e720c0205b06a7f6c96ac8a4f9e408cc3e2",
+    "game/mynecraft.html": "1cf3de948d565429690f30d626b19c61681d064f65a2aff8edb586595017f18b",
+    "game/start-menu.css": "bf6e4157ea1d662ac7907ce11685010df34f874df3e0c13c242217361e4edec8",
+    "index.html": "a8c861239854782f028707e505a77208039df9f263f68bc05ed6d820d84b1146"
+  }
+}

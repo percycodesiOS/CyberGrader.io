@@ -1,0 +1,6 @@
+---
+description: Route MYnecraft development to its standalone source
+alwaysApply: true
+---
+
+Read AGENTS.md. MYnecraft changes belong in percycodesiOS/MYnecraft. This checkout hosts reviewed releases at the unchanged CyberGrader.io Pages URLs. Preserve unrelated applications and history.
