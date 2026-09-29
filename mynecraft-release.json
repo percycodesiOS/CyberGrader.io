@@ -1,7 +1,9 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "7462483fe6e3e65af42f10ec98fce8b923cc3d1b",
+  "sourceCommit": "2d15960591115afa0c16f9bc7b064f3148b586b9",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
+  "primaryBase": "https://percycodesios.github.io/MYnecraft/",
+  "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
   "files": {
     "game/assets/bungee/Bungee-Regular.ttf": "c4f5361ce120af3e6b9156d0bf379fa19cda2ea0cd18ac01fd99596c6bf66e3f",
     "game/assets/bungee/OFL.txt": "3222aa4c0c12b78dcfd5e52879d7983a3b37e72c9cab4f95e4bbfbab9e3d91da",
@@ -13,6 +15,6 @@
     "game/assets/sv-school-logo.png": "dc7d2a961c4f4bf80452c7e70ecd1e720c0205b06a7f6c96ac8a4f9e408cc3e2",
     "game/mynecraft.html": "fcc1ad58ceb8b5d4141aa0db3014de65ee68e91a2ff31b439f84751f19e3bdea",
     "game/start-menu.css": "9598f14dbb4133a03b6e6c486fca313f2989da6452c3542e801bf45d356a44ff",
-    "index.html": "4b7504bf9fc23a2666f0337f037c3325a1b6ee2e6c7111db6e2c576c6482bf93"
+    "index.html": "f720e622358107d3f7763b78ea6fc1555143f12a2a13d21fbe8a52bd4405810b"
   }
 }
