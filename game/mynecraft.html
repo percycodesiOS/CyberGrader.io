@@ -247,7 +247,7 @@
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
       <button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button>
       <button id="overview" type="button">School from above · Creative</button>
-      <p class="start-wide">Officer Shields welcomes you at the entrance. Find Mr. B in the halls, buses behind the school around 3 PM game time, and Eddie on the roof after sunset. Cookie Man starts the evening halls at 4 PM game time. A full game day lasts 20 minutes.</p>
+      <p class="start-wide">Officer Shields welcomes you at the entrance. The School Officer arrives at the front curb at 8:30 AM game time, walks the cafeteria, and heads home at 3 PM. Find Mr. B in the halls, buses behind the school around 3 PM, and Eddie on the roof after sunset. Cookie Man starts the evening halls at 4 PM. A full game day lasts 20 minutes.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
     </section></details>
     <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
@@ -940,7 +940,7 @@ function readWorldBackup(text){
   if(!['creative','survival'].includes(s.mode)||!finite(s.health)||s.health<1||s.health>20||!finite(s.dayTime)||!object(s.inventory)) throw new Error('This backup has invalid game settings. Your world was kept.');
   const inventory={};
   for(const k of BLOCK_KEYS){if(!Number.isSafeInteger(s.inventory[k])||s.inventory[k]<0)throw new Error('This backup has an invalid inventory. Your world was kept.');inventory[k]=s.inventory[k];}
-  if(!Array.isArray(s.campus)||s.campus.length>10)throw new Error('This backup has invalid characters. Your world was kept.');
+  if(!Array.isArray(s.campus)||s.campus.length>11)throw new Error('This backup has invalid characters. Your world was kept.');
   const campus=s.campus.map(a=>{
     if(!object(a)||typeof a.name!=='string'||a.name.length>40||!['x','y','z'].every(k=>finite(a[k])&&Math.abs(a[k])<=10000)||!Number.isSafeInteger(a.patrolIndex)||a.patrolIndex<0)throw new Error('This backup has invalid characters. Your world was kept.');
     return {name:canonicalCampusName(a.name),x:a.x,y:a.y,z:a.z,patrolIndex:a.patrolIndex};
@@ -1720,6 +1720,9 @@ function faceForPerson(style){
     else if(style==='micco'){
       ctx.fillStyle='#79502e';ctx.fillRect(0,0,16,4);ctx.fillRect(0,0,3,16);ctx.fillRect(13,0,3,16);ctx.fillRect(3,3,3,2);
     }
+    else if(style==='schoolOfficer'){
+      ctx.fillStyle='#815131';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,6);ctx.fillRect(14,3,2,6);ctx.fillRect(2,2,4,2);
+    }
     // Officer Shields: short light blond crop, sunglasses pushed up onto his head.
     else if(style==='shields'){
       ctx.fillStyle='#d8c489';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,2);ctx.fillRect(14,3,2,2);
@@ -1741,7 +1744,8 @@ function faceForPerson(style){
     ctx.fillStyle=style==='macek'?'#b28b70':'#704431';ctx.fillRect(6,12,4,1);
     if(style==='micco'){ctx.strokeStyle='#44334e';ctx.lineWidth=1;ctx.strokeRect(2.5,6.5,5,4);ctx.strokeRect(8.5,6.5,5,4);ctx.fillRect(7,8,2,1);}
     // Black rectangular frames with a straight bridge, drawn over the eyes.
-    if(style==='unicorn'||style==='eiler'){ctx.fillStyle='#14161a';ctx.fillRect(2,6,5,1);ctx.fillRect(2,10,5,1);ctx.fillRect(2,6,1,5);ctx.fillRect(6,6,1,5);ctx.fillRect(9,6,5,1);ctx.fillRect(9,10,5,1);ctx.fillRect(9,6,1,5);ctx.fillRect(13,6,1,5);ctx.fillRect(7,7,2,1);}
+    if(style==='unicorn'||style==='eiler'||style==='schoolOfficer'){ctx.fillStyle='#14161a';ctx.fillRect(2,6,5,1);ctx.fillRect(2,10,5,1);ctx.fillRect(2,6,1,5);ctx.fillRect(6,6,1,5);ctx.fillRect(9,6,5,1);ctx.fillRect(9,10,5,1);ctx.fillRect(9,6,1,5);ctx.fillRect(13,6,1,5);ctx.fillRect(7,7,2,1);}
+    if(style==='schoolOfficer'){ctx.fillStyle='#8d4f3c';ctx.fillRect(5,12,6,2);ctx.fillStyle='#fff0db';ctx.fillRect(6,12,4,1);}
     if(style==='shields'){ctx.fillStyle='#c9a36a';ctx.fillRect(4,13,8,1);} // friendly smile
     if(style==='cookie'){
       ctx.fillStyle='#2c2926';ctx.fillRect(3,10,10,2); // mustache
@@ -1754,7 +1758,7 @@ function stylePerson(npc,style){
   npc.style=style;
   npc.head.material[4].map=faceForPerson(style);
   const shirt=makeTexture(ctx=>{
-    ctx.fillStyle=style==='micco'?'#e7e0cb':style==='unicorn'?'#eae5d8':style==='shields'?'#1b2536':style==='cookie'?'#8ec6ea':'#14191e';ctx.fillRect(0,0,16,16);
+    ctx.fillStyle=style==='micco'?'#e7e0cb':style==='unicorn'?'#eae5d8':style==='shields'?'#1b2536':style==='schoolOfficer'?'#111419':style==='cookie'?'#8ec6ea':'#14191e';ctx.fillRect(0,0,16,16);
     if(style==='micco'){
       ctx.fillStyle='#565348';ctx.fillRect(0,0,4,16);ctx.fillRect(12,0,4,16);
       ctx.fillStyle='#b3aa8d';for(let y=1;y<16;y+=3){ctx.fillRect(0,y,3,1);ctx.fillRect(13,y+1,2,1);}
@@ -1768,6 +1772,11 @@ function stylePerson(npc,style){
       ctx.fillStyle='#616775';ctx.fillRect(7,1,2,10);
       ctx.fillStyle='#b5b8be';for(let y=2;y<10;y+=3)ctx.fillRect(7,y,2,1);
       ctx.fillStyle='#454950';ctx.fillRect(4,0,2,7);ctx.fillRect(10,0,2,7);
+    } else if(style==='schoolOfficer'){
+      // Black uniform and duty vest from the approved reference.
+      ctx.fillStyle='#20252b';ctx.fillRect(1,1,5,13);ctx.fillRect(10,1,5,13);
+      ctx.fillStyle='#101216';ctx.fillRect(2,8,4,5);ctx.fillRect(10,8,4,5);ctx.fillRect(7,0,2,16);
+      ctx.fillStyle='#3d4248';ctx.fillRect(2,8,4,1);ctx.fillRect(10,8,4,1);
     } else if(style==='shields'){
       // Navy polo under a black duty vest: dark side panels and a silver star.
       ctx.fillStyle='#0c1118';ctx.fillRect(0,0,4,16);ctx.fillRect(12,0,4,16);ctx.fillRect(0,9,16,7);
@@ -1777,7 +1786,7 @@ function stylePerson(npc,style){
     }
   });
   npc.body.material.forEach(m=>m.map=shirt);
-  const sleeve=style==='sir'?makeFlatTex(24,130,207):style==='shields'?makeFlatTex(27,37,54):style==='eiler'?makeFlatTex(48,50,56):style==='cookie'?makeFlatTex(142,198,234):skinTex;
+  const sleeve=style==='sir'?makeFlatTex(24,130,207):style==='schoolOfficer'?makeTexture(ctx=>{ctx.fillStyle='#e5b993';ctx.fillRect(0,0,16,16);ctx.fillStyle='#111419';ctx.fillRect(0,0,16,7);}):style==='shields'?makeFlatTex(27,37,54):style==='eiler'?makeFlatTex(48,50,56):style==='cookie'?makeFlatTex(142,198,234):skinTex;
   for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=style==='unicorn'?shirt:sleeve);
   // Mr. Unicorn wears dark green cargo trousers; everyone else keeps dark trousers.
   const trousers=style==='unicorn'?makeTexture(ctx=>{
@@ -1785,10 +1794,29 @@ function stylePerson(npc,style){
     ctx.fillStyle='#26371f';ctx.fillRect(1,5,5,6);ctx.fillRect(10,5,5,6);   // cargo pockets
     ctx.fillStyle='#3b5239';ctx.fillRect(1,5,5,1);ctx.fillRect(10,5,5,1);
     ctx.fillStyle='#1d2a19';ctx.fillRect(0,0,16,1);
-  }):style==='cookie'?makeFlatTex(22,24,27):makeFlatTex(25,29,33);
+  }):style==='schoolOfficer'?makeTexture(ctx=>{ctx.fillStyle='#111419';ctx.fillRect(0,0,16,16);ctx.fillStyle='#1c2026';ctx.fillRect(1,0,1,16);ctx.fillRect(14,0,1,16);}):style==='cookie'?makeFlatTex(22,24,27):makeFlatTex(25,29,33);
   for(const leg of [npc.legL,npc.legR])leg.children[0].material.forEach(m=>m.map=trousers);
   const part=(w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);npc.group.add(m);return m;};
-  if(style==='shields'){
+  if(style==='schoolOfficer'){
+    // Tied-back auburn hair, glasses, black vest, badge and radio.
+    // No weapon or holster. The photo itself is not part of the public game.
+    npc.group.userData.appearance='black duty vest, glasses, tied-back hair';
+    const detail=(name,w,h,d,color,x,y,z)=>{const m=part(w,h,d,color,x,y,z);m.name=name;return m;};
+    detail('hair crown',.56,.15,.55,0x815131,0,1.82,-.025);
+    detail('tied-back hair',.24,.37,.22,0x6e4129,0,1.55,-.34);
+    detail('hair tie',.25,.06,.23,0x14161a,0,1.68,-.34);
+    detail('black duty vest',.53,.64,.055,0x171b20,0,1.02,.15);
+    detail('vest left panel',.23,.47,.025,0x24292f,-.14,1.055,.19);
+    detail('vest right panel',.23,.47,.025,0x24292f,.14,1.055,.19);
+    detail('badge',.14,.14,.035,0xd7dce1,-.15,1.18,.225);
+    detail('badge star',.07,.2,.04,0xd7dce1,-.15,1.18,.226);
+    detail('shoulder radio',.09,.12,.075,0x101317,.19,1.27,.235);
+    detail('radio clip',.07,.02,.08,0x626970,.19,1.285,.24);
+    detail('vest pouch left',.17,.18,.07,0x0d1014,-.14,.86,.235);
+    detail('vest pouch right',.17,.18,.07,0x0d1014,.14,.86,.235);
+    detail('duty belt',.53,.1,.3,0x090c10,0,.655,0);
+    detail('belt buckle',.09,.075,.025,0x555d66,0,.655,.165);
+  } else if(style==='shields'){
     // Sunglasses parked on top of the head, a star badge and a shoulder mic.
     // Friendly school officer: no weapon, no holster, nothing to use on anyone.
     part(.54,.07,.1,0x12151a,0,1.78,-.02);part(.5,.09,.12,0x1b2027,0,1.75,.16);
@@ -2016,7 +2044,168 @@ cookie.speed=1.35;
 cookie.nameTag.scale.set(2.8,.52,1);
 cookie.group.visible=cookieOnDuty(LOADED_DAY_TIME);
 let cookieOnShift=cookie.group.visible, cookieGreeted=false;
-const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie];
+// A fictional game-clock routine. It is not a real person's work schedule.
+// This officer is separate from Officer Shields, who keeps his entrance post.
+const SCHOOL_OFFICER_ARRIVE=8*60+30, SCHOOL_OFFICER_LEAVE=15*60;
+const SCHOOL_OFFICER_DRIVE_MINUTES=10;
+const officerGroundFloor=(x,z)=>isSolid(x,4,z)&&!getBlock(x,5,z)&&!getBlock(x,6,z);
+const officerEntranceBounds={minX:38,maxX:52,minZ:-12,maxZ:32,
+  filter:(x,z)=>officerGroundFloor(x,z)&&(schoolFootprint(x,z)||(x>=45&&x<=47&&z>=22&&z<=32))};
+const officerCafeteriaBounds={minX:38,maxX:49,minZ:-12,maxZ:-3,
+  filter:(x,z)=>officerGroundFloor(x,z)&&schoolFootprint(x,z)};
+const officerEntryStops=[[46,5,28],[46,5,24],[46,5,17],[46,5,-5]];
+const officerExitStops=officerEntryStops.slice().reverse();
+const officerCafeteriaStops=[[46,5,-5],[45,5,-9],[41,5,-9],[41,5,-5]];
+const schoolOfficer=new CampusActor('School Officer',46,5,28,'schoolOfficer',officerEntranceBounds);
+schoolOfficer.speed=1.8;schoolOfficer.invulnerable=true;
+const schoolOfficerCar=new THREE.Group();schoolOfficerCar.name='School Officer car';
+const officerCarPaint=new THREE.MeshLambertMaterial({color:0x25394f});
+const officerCarTrim=new THREE.MeshLambertMaterial({color:0xe1e8eb});
+const officerCarGlass=new THREE.MeshLambertMaterial({color:0x78b2cd});
+const officerCarRubber=new THREE.MeshLambertMaterial({color:0x171d25});
+function officerCarPart(w,h,d,mat,x,y,z){
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  mesh.position.set(x,y,z);mesh.castShadow=true;schoolOfficerCar.add(mesh);return mesh;
+}
+officerCarPart(2.1,.65,4.1,officerCarPaint,0,.8,0);
+officerCarPart(1.85,.7,2.1,officerCarGlass,0,1.4,-.2);
+officerCarPart(1.94,.13,2.25,officerCarPaint,0,1.8,-.2);
+officerCarPart(2.12,.35,1.5,officerCarTrim,0,.94,-.1);
+for(const x of [-1.02,1.02])for(const z of [-1.3,1.3])officerCarPart(.25,.72,.72,officerCarRubber,x,.4,z);
+officerCarPart(.55,.14,.3,new THREE.MeshLambertMaterial({color:0x356dd4}),-.3,1.93,-.2);
+officerCarPart(.55,.14,.3,new THREE.MeshLambertMaterial({color:0xb8444e}),.3,1.93,-.2);
+for(const x of [-.7,.7])officerCarPart(.35,.2,.08,officerCarTrim,x,.91,2.07);
+scene.add(schoolOfficerCar);
+// Reuse the paved parent loop; no blocks, roads, or player builds are changed.
+function officerPolyline(points){
+  let distance=0;
+  return points.map((p,i)=>{
+    if(i)distance+=Math.hypot(p.x-points[i-1].x,p.y-points[i-1].y,p.z-points[i-1].z);
+    return {...p,d:distance};
+  });
+}
+function officerPathThrough(stops,bounds){
+  const first=nearestWalkPoint({x:stops[0][0],y:stops[0][1],z:stops[0][2]},bounds);
+  if(!first)return {points:[],stops:[]};
+  const points=[{x:first.x+.5,y:first.y,z:first.z+.5}],ends=[0];
+  for(let i=1;i<stops.length;i++){
+    const target={x:stops[i][0],y:stops[i][1],z:stops[i][2]};
+    const route=walkingPath(points[points.length-1],target,bounds);
+    if(!route.length)return {points:[],stops:[]};
+    for(const p of route)points.push({x:p.x+.5,y:p.y,z:p.z+.5});
+    ends.push(points.length-1);
+  }
+  const polyline=officerPolyline(points);
+  return {points:polyline,stops:ends.map(i=>polyline[i].d)};
+}
+const officerEntryPath=officerPathThrough(officerEntryStops,officerEntranceBounds);
+const officerExitPath=officerPathThrough(officerExitStops,officerEntranceBounds);
+const officerPatrolPath=officerPathThrough([...officerCafeteriaStops,officerCafeteriaStops[0]],officerCafeteriaBounds);
+const officerWalkMinutes=(officerEntryPath.points.at(-1)?.d||40)/schoolOfficer.speed*1.2;
+const officerDriveInPoints=[{x:58,y:5,z:54},{x:58,y:5,z:40}];
+const officerDriveOutPoints=[];
+for(let i=0;i<=24;i++){
+  // The north-east wing interrupts that side of the oval. Follow its open
+  // south/west arc to the curb, keeping the car outside the building.
+  let angle=Math.PI*1.5*i/24;
+  officerDriveInPoints.push({x:46+12*Math.cos(angle),y:5,z:40+9*Math.sin(angle)});
+  angle=-Math.PI/2-Math.PI*1.5*i/24;
+  officerDriveOutPoints.push({x:46+12*Math.cos(angle),y:5,z:40+9*Math.sin(angle)});
+}
+officerDriveOutPoints.push({x:58,y:5,z:54});
+const officerDriveInPath=officerPolyline(officerDriveInPoints),officerDriveOutPath=officerPolyline(officerDriveOutPoints);
+const officerSample={x:0,y:5,z:0,yaw:0};
+function officerPathPoint(points,distance,out){
+  if(!points.length)return false;
+  let i=1;while(i<points.length-1&&points[i].d<distance)i++;
+  const a=points[i-1]||points[0],b=points[i]||a;
+  const t=Math.max(0,Math.min(1,(distance-a.d)/((b.d-a.d)||1)));
+  out.x=a.x+(b.x-a.x)*t;out.y=a.y+(b.y-a.y)*t;out.z=a.z+(b.z-a.z)*t;
+  out.yaw=Math.atan2(b.x-a.x,b.z-a.z);return true;
+}
+const officerClockMinutes=time=>((((time%1)+1)%1)*1440+360)%1440;
+function schoolOfficerSchedule(time){
+  const minute=officerClockMinutes(time)+1e-7;
+  if(minute<SCHOOL_OFFICER_ARRIVE-SCHOOL_OFFICER_DRIVE_MINUTES||minute>=SCHOOL_OFFICER_LEAVE+officerWalkMinutes+SCHOOL_OFFICER_DRIVE_MINUTES)return 'offsite';
+  if(minute<SCHOOL_OFFICER_ARRIVE)return 'drivingIn';
+  if(minute<SCHOOL_OFFICER_ARRIVE+officerWalkMinutes)return 'walkingIn';
+  if(minute<SCHOOL_OFFICER_LEAVE)return 'patrol';
+  return minute<SCHOOL_OFFICER_LEAVE+officerWalkMinutes?'walkingOut':'drivingOut';
+}
+const officerRoutine={phase:'offsite',lastMinute:null,waypoint:0,driveStarted:0};
+function resetOfficerNavigation(){
+  schoolOfficer.route=[];schoolOfficer.navigationSearch=null;schoolOfficer.goalKey='';
+  schoolOfficer.failedGoalKey='';schoolOfficer.planFailures=0;schoolOfficer.planTimer=0;
+}
+function positionOfficerOnPath(path,distance,bounds){
+  if(!officerPathPoint(path.points,distance,officerSample)){
+    officerSample.x=46.5;officerSample.y=5;officerSample.z=bounds===officerCafeteriaBounds?-4.5:28.5;
+  }
+  // A loaded edited world can remove or obstruct any route. Recover only to an
+  // actual walkable cell, then use the normal incremental navigator from there.
+  const point=nearestWalkPoint(officerSample,bounds);
+  if(point)schoolOfficer.pos.set(point.x+.5,point.y,point.z+.5);
+  schoolOfficer.bounds=bounds;schoolOfficer.yaw=officerSample.yaw;
+  schoolOfficer.group.position.copy(schoolOfficer.pos);schoolOfficer.group.rotation.y=schoolOfficer.yaw;
+}
+function syncSchoolOfficer(time){
+  const minute=officerClockMinutes(time),phase=schoolOfficerSchedule(time);
+  officerRoutine.phase=phase;officerRoutine.lastMinute=minute;officerRoutine.waypoint=0;
+  officerRoutine.driveStarted=SCHOOL_OFFICER_LEAVE+officerWalkMinutes;resetOfficerNavigation();
+  if(phase==='walkingIn'||phase==='walkingOut'){
+    const path=phase==='walkingIn'?officerEntryPath:officerExitPath;
+    const since=minute-(phase==='walkingIn'?SCHOOL_OFFICER_ARRIVE:SCHOOL_OFFICER_LEAVE);
+    const distance=Math.max(0,since/1.2*schoolOfficer.speed);
+    positionOfficerOnPath(path,distance,officerEntranceBounds);
+    while(officerRoutine.waypoint<path.stops.length-1&&path.stops[officerRoutine.waypoint]<=distance)officerRoutine.waypoint++;
+  } else if(phase==='patrol'){
+    const length=officerPatrolPath.points.at(-1)?.d||1;
+    const distance=((minute-SCHOOL_OFFICER_ARRIVE-officerWalkMinutes)/1.2*schoolOfficer.speed)%length;
+    positionOfficerOnPath(officerPatrolPath,distance,officerCafeteriaBounds);
+    schoolOfficer.patrolIndex=Math.max(0,officerPatrolPath.stops.findIndex(d=>d>distance))%officerCafeteriaStops.length;
+  }
+  schoolOfficer.group.visible=phase==='walkingIn'||phase==='patrol'||phase==='walkingOut';
+  schoolOfficerCar.visible=phase!=='offsite';
+}
+function updateSchoolOfficer(dt,time=dayTime){
+  const minute=officerClockMinutes(time),previous=officerRoutine.lastMinute;
+  // Explicit clock jumps and day wraps reset the routine once, never spawn it.
+  const jumped=previous===null||minute<previous-1e-6||Math.abs(minute-previous-dt*1.2)>1.5;
+  if(jumped)syncSchoolOfficer(time);
+  officerRoutine.lastMinute=minute;
+  if(!jumped&&officerRoutine.phase==='offsite'&&previous<SCHOOL_OFFICER_ARRIVE-SCHOOL_OFFICER_DRIVE_MINUTES&&minute>=SCHOOL_OFFICER_ARRIVE-SCHOOL_OFFICER_DRIVE_MINUTES)syncSchoolOfficer(time);
+  if(officerRoutine.phase==='drivingIn'&&minute+1e-7>=SCHOOL_OFFICER_ARRIVE){
+    officerRoutine.phase='walkingIn';officerRoutine.waypoint=1;resetOfficerNavigation();
+    positionOfficerOnPath(officerEntryPath,0,officerEntranceBounds);
+  }
+  if((officerRoutine.phase==='walkingIn'||officerRoutine.phase==='patrol')&&minute+1e-7>=SCHOOL_OFFICER_LEAVE){
+    officerRoutine.phase='walkingOut';officerRoutine.waypoint=0;schoolOfficer.bounds=officerEntranceBounds;resetOfficerNavigation();
+  }
+  if(!jumped&&(officerRoutine.phase==='walkingIn'||officerRoutine.phase==='walkingOut')){
+    const stops=officerRoutine.phase==='walkingIn'?officerEntryStops:officerExitStops;
+    const stop=stops[officerRoutine.waypoint];
+    schoolOfficer.go(dt,{x:stop[0],y:stop[1],z:stop[2]});
+    if(Math.hypot(schoolOfficer.pos.x-stop[0]-.5,schoolOfficer.pos.z-stop[2]-.5)<.2&&Math.abs(schoolOfficer.pos.y-stop[1])<.2){
+      if(++officerRoutine.waypoint>=stops.length){
+        if(officerRoutine.phase==='walkingIn'){
+          officerRoutine.phase='patrol';schoolOfficer.bounds=officerCafeteriaBounds;schoolOfficer.patrolIndex=0;resetOfficerNavigation();
+        } else {officerRoutine.phase='drivingOut';officerRoutine.driveStarted=minute;resetOfficerNavigation();}
+      }
+    }
+  } else if(!jumped&&officerRoutine.phase==='patrol')schoolOfficer.patrol(dt,officerCafeteriaStops);
+  if(officerRoutine.phase==='drivingOut'&&minute-officerRoutine.driveStarted>=SCHOOL_OFFICER_DRIVE_MINUTES)officerRoutine.phase='offsite';
+  const phase=officerRoutine.phase;
+  schoolOfficer.group.visible=phase==='walkingIn'||phase==='patrol'||phase==='walkingOut';
+  schoolOfficerCar.visible=phase!=='offsite';
+  const path=phase==='drivingOut'?officerDriveOutPath:officerDriveInPath;
+  let progress=1;
+  if(phase==='drivingIn')progress=(minute-SCHOOL_OFFICER_ARRIVE+SCHOOL_OFFICER_DRIVE_MINUTES)/SCHOOL_OFFICER_DRIVE_MINUTES;
+  if(phase==='drivingOut')progress=(minute-officerRoutine.driveStarted)/SCHOOL_OFFICER_DRIVE_MINUTES;
+  officerPathPoint(path,path.at(-1).d*smoothStep(progress),officerSample);
+  schoolOfficerCar.position.set(officerSample.x,officerSample.y,officerSample.z);schoolOfficerCar.rotation.y=officerSample.yaw;
+}
+updateSchoolOfficer(0,LOADED_DAY_TIME);
+const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie,schoolOfficer];
 // Cache both outfits once; switching clothes does not allocate textures per frame.
 function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
@@ -2225,6 +2414,7 @@ function updateCookie(dt){
 }
 function updateCampus(dt){
   updateCookie(dt);
+  updateSchoolOfficer(dt);
   micco.patrol(dt,[[26,5,-26],[32,5,-12],[46,5,17],[72,5,-9],[46,5,26]]);
   unicorn.patrol(dt,unicornPatrol);
   eiler.patrol(dt,eilerPatrol);

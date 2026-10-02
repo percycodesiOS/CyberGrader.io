@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "2c56d6406c3ec8c5fe0c7e44eef2320e72835f9c",
+  "sourceCommit": "6e6fba82c2675a47c0f5e3cbebbe1afe1848e111",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -13,7 +13,7 @@
     "game/assets/macek-avatar-lanyard.png": "31c8a621bee6b8ba764548c4b65b52a36560c224c0c526400e74653102223c1a",
     "game/assets/mynecraft-icon.svg": "44c67c239e151cdfd5430079c7741a7561aa67f04fd72bd7d014f9cbb43defe5",
     "game/assets/sv-school-logo.png": "dc7d2a961c4f4bf80452c7e70ecd1e720c0205b06a7f6c96ac8a4f9e408cc3e2",
-    "game/mynecraft.html": "79dcc6eb5c7dfabcfb394f524a94f1abd7485a61c93941ffd630441f6f334fa8",
+    "game/mynecraft.html": "edea0760bde0c8ede8c73bcbc00f3fe49bac4c366d8adc3a1b7779c81d48527a",
     "game/start-menu.css": "9598f14dbb4133a03b6e6c486fca313f2989da6452c3542e801bf45d356a44ff",
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
