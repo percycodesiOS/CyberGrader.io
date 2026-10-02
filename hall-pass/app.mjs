@@ -130,4 +130,3 @@ window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY||event.key=
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&mode!=='temporary'&&!busy)load();});
 setInterval(updateTimers,15000);
 load();
-

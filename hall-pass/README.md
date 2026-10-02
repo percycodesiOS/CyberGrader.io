@@ -31,4 +31,3 @@ node --test hall-pass/model.test.mjs
 ```
 
 No dependency install or build step is needed. Claude Code authored the model and model tests; Codex authored the interface and browser storage controls and performed the independent verification. Release details are kept in the task's private receipt folder.
-
