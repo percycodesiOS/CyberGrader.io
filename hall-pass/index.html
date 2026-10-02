@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Sample-only CIRC reusable hall-pass prototype. Practice issuing and returning numbered passes in this browser.">
+<title>CIRC Pass Desk · Demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23176556'/%3E%3Cpath d='M17 32h30m-10-10 10 10-10 10' stroke='%23fff' stroke-width='5' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./style.css"><script type="module" src="./app.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#pass-number">Skip to issue a pass</a>
+<div class="demo-strip"><span class="demo-dot" aria-hidden="true"></span><strong>DEMO · SAMPLE STUDENTS ONLY</strong><span>Practice first. No real student records.</span></div>
+<main class="shell">
+<header class="masthead">
+<div><div class="eyebrow"><span class="brandmark" aria-hidden="true">↗</span>CIRC / TEACHER TOOLS</div><h1>Pass desk<span>.</span></h1><p class="intro">Issue a numbered card. See who is out. Welcome it back.</p></div>
+<div class="date-stamp"><span>YOUR BROWSER’S DATE</span><strong id="today"></strong><small>Prototype · 100 reusable passes</small></div>
+</header>
+<div class="storage-note"><span aria-hidden="true">◉</span><div><strong>Saved on this browser only.</strong> No sign-in or cross-device sync. This public prototype is not approved for actual student tracking.</div></div>
+<div id="storage-status" class="notice" role="status" aria-live="polite">Checking this browser’s storage…</div>
+<div id="recovery" class="recovery" hidden><button id="retry-storage" class="secondary" type="button">Retry saved data</button><button id="temporary-mode" class="secondary" type="button">Use temporary demo</button><span>Temporary mode keeps changes only until this page closes or reloads.</span></div>
+<div id="message" class="feedback" role="status" aria-live="polite" aria-atomic="true"></div>
+<div class="desk-grid">
+<section class="issue-card" aria-labelledby="issue-heading">
+<div class="section-heading"><span class="step">01</span><div><h2 id="issue-heading">Issue a pass</h2><p>One card, one sample student.</p></div></div>
+<form id="issue-form" novalidate>
+<label for="pass-number">Pass number <span class="field-hint">001–100</span></label>
+<div class="pass-input-wrap"><span aria-hidden="true">#</span><input id="pass-number" name="pass" placeholder="Scan CIRC-001 or type 1" autocomplete="off" spellcheck="false" maxlength="30" aria-describedby="scan-hint"></div>
+<p id="scan-hint" class="hint">Scanner + Enter selects the card. You still choose Issue or Return.</p>
+<div id="selected-pass" class="selected-pass" hidden></div>
+<label for="student">Sample student</label><select id="student" required><option value="">Choose a sample student</option></select>
+<label for="destination">Destination</label><select id="destination"><option value="CIRC">CIRC classroom</option><option value="ECTV">ECTV studio</option></select>
+<label class="approval"><input type="checkbox" id="approval"><span>Demo teacher approval confirmed<small>A simulated check for this test, not school authorization.</small></span></label>
+<button id="issue-button" class="primary" type="submit" disabled>Issue pass <span aria-hidden="true">↗</span></button>
+</form>
+</section>
+<section class="active-section" aria-labelledby="active-heading">
+<div class="active-top"><div><div class="eyebrow">02 / RETURN WHEN BACK</div><h2 id="active-heading">Out now <span id="active-count" class="count">0</span></h2></div><div class="available"><strong id="available-count">100</strong><span>available</span></div></div>
+<div id="active-list"></div>
+</section>
+</div>
+<details class="history-panel" open><summary>Recent returns <span id="history-count" class="small-count">0</span></summary><p class="hint">The latest 100 completed trips. Returning a card makes it available again.</p><div id="history-list"></div></details>
+<section class="bottom-grid">
+<details class="how-to"><summary>Tomorrow’s test <span aria-hidden="true">↗</span></summary>
+<ol><li>Type <strong>1</strong>, choose a sample student and destination, check the demo approval, then <strong>Issue pass</strong>.</li><li>Reload. The same trip should still appear under <strong>Out now</strong>.</li><li>Click <strong>Return</strong>, then issue <strong>CIRC-001</strong> again. A reusable card starts a new trip.</li><li>Try the physical scanner in the pass-number field. It should type the code and Enter; it must not issue or return a card by itself.</li><li>Open a second tab in this same browser and try the same card. Only one active trip is allowed. Use <strong>Reset demo</strong> when finished.</li></ol>
+<p>Use sample students only. This test does not establish scanner compatibility, school approval, or shared access from another device.</p></details>
+<div class="reset-card"><div><h3>Ready for a fresh practice?</h3><p>Reset this demo only. Other apps’ browser data stays in place.</p></div><button id="reset-demo" type="button" class="secondary" disabled>Reset demo</button></div>
+</section>
+<footer><strong>CIRC Pass Desk</strong><span>Reusable cards. Explicit issue and return. Sample data only.</span></footer>
+</main>
+<noscript>This demo needs JavaScript to issue and return sample passes.</noscript>
+</body></html>
+
