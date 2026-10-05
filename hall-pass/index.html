@@ -2,51 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="description" content="Sample-only CIRC reusable hall-pass prototype. Practice issuing and returning numbered passes in this browser.">
-<title>CIRC Pass Desk · Demo</title>
+<meta name="color-scheme" content="light"><meta name="description" content="CIRC PassDesk: approve, activate, arrive and return reusable cards on one supervised device.">
+<meta name="referrer" content="no-referrer"><title>CIRC PassDesk</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23176556'/%3E%3Cpath d='M17 32h30m-10-10 10 10-10 10' stroke='%23fff' stroke-width='5' fill='none'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="./style.css"><script type="module" src="./app.mjs"></script>
+<link rel="stylesheet" href="./style.css?v=2"><script type="module" src="./app.mjs?v=2"></script>
 </head>
 <body>
-<a class="skip" href="#pass-number">Skip to issue a pass</a>
-<div class="demo-strip"><span class="demo-dot" aria-hidden="true"></span><strong>DEMO · SAMPLE STUDENTS ONLY</strong><span>Practice first. No real student records.</span></div>
+<a class="skip" href="#scan-number">Skip to scan</a>
 <main class="shell">
-<header class="masthead">
-<div><div class="eyebrow"><span class="brandmark" aria-hidden="true">↗</span>CIRC / TEACHER TOOLS</div><h1>Pass desk<span>.</span></h1><p class="intro">Issue a numbered card. See who is out. Welcome it back.</p></div>
-<div class="date-stamp"><span>YOUR BROWSER’S DATE</span><strong id="today"></strong><small>Prototype · 100 reusable passes</small></div>
-</header>
-<div class="storage-note"><span aria-hidden="true">◉</span><div><strong>Saved on this browser only.</strong> No sign-in or cross-device sync. This public prototype is not approved for actual student tracking.</div></div>
-<div id="storage-status" class="notice" role="status" aria-live="polite">Checking this browser’s storage…</div>
-<div id="recovery" class="recovery" hidden><button id="retry-storage" class="secondary" type="button">Retry saved data</button><button id="temporary-mode" class="secondary" type="button">Use temporary demo</button><span>Temporary mode keeps changes only until this page closes or reloads.</span></div>
-<div id="message" class="feedback" role="status" aria-live="polite" aria-atomic="true"></div>
-<div class="desk-grid">
-<section class="issue-card" aria-labelledby="issue-heading">
-<div class="section-heading"><span class="step">01</span><div><h2 id="issue-heading">Issue a pass</h2><p>One card, one sample student.</p></div></div>
-<form id="issue-form" novalidate>
-<label for="pass-number">Pass number <span class="field-hint">001–100</span></label>
-<div class="pass-input-wrap"><span aria-hidden="true">#</span><input id="pass-number" name="pass" placeholder="Scan CIRC-001 or type 1" autocomplete="off" spellcheck="false" maxlength="30" aria-describedby="scan-hint"></div>
-<p id="scan-hint" class="hint">Scanner + Enter selects the card. You still choose Issue or Return.</p>
-<div id="selected-pass" class="selected-pass" hidden></div>
-<label for="student">Sample student</label><select id="student" required><option value="">Choose a sample student</option></select>
-<label for="destination">Destination</label><select id="destination"><option value="CIRC">CIRC classroom</option><option value="ECTV">ECTV studio</option></select>
-<label class="approval"><input type="checkbox" id="approval"><span>Demo teacher approval confirmed<small>A simulated check for this test, not school authorization.</small></span></label>
-<button id="issue-button" class="primary" type="submit" disabled>Issue pass <span aria-hidden="true">↗</span></button>
-</form>
+<header class="masthead"><div><div class="eyebrow">CIRC / ECTV · REUSABLE CARDS</div><h1>Pass desk<span>.</span></h1><p class="intro">Approved for today. Every trip accounted for.</p></div><div class="header-right"><strong id="today"></strong><button id="staff-toggle" class="secondary" type="button">Staff access</button></div></header>
+<div id="storage-status" class="notice" role="status">Opening this device’s records…</div>
+<div id="message" class="feedback scan-feedback" role="status" aria-live="assertive" aria-atomic="true">Choose what this scan should record.</div>
+<section class="scan-card" aria-labelledby="scan-title"><div class="section-heading"><span class="step">↗</span><div><h2 id="scan-title">Ready for a card</h2><p>Choose a step, then scan. The step stays selected.</p></div></div>
+<div class="scan-modes" role="group" aria-label="Action for the next scan"><button type="button" data-mode="depart" aria-pressed="true"><strong>1 · Depart</strong><span>Activate an approved trip</span></button><button type="button" data-mode="arrive" aria-pressed="false"><strong>2 · Arrive</strong><span>Check in at the destination</span></button><button type="button" data-mode="return" aria-pressed="false"><strong>3 · Return</strong><span>Close the trip; reuse the card</span></button></div>
+<form id="scan-form" class="scan-entry"><label for="scan-number">Scan a card or enter 1–100</label><div><input id="scan-number" type="text" inputmode="numeric" autocomplete="off" maxlength="30" placeholder="CIRC-001 or 1"><button id="scan-submit" class="primary" type="submit" disabled>Record departure</button></div></form>
+<p class="hint">Scan a CIRC card + Enter or Tab from this desk, or type its number. Staff editing fields do not record trip scans. Scanning never approves a card. Use this desk’s device for each step.</p>
 </section>
-<section class="active-section" aria-labelledby="active-heading">
-<div class="active-top"><div><div class="eyebrow">02 / RETURN WHEN BACK</div><h2 id="active-heading">Out now <span id="active-count" class="count">0</span></h2></div><div class="available"><strong id="available-count">100</strong><span>available</span></div></div>
-<div id="active-list"></div>
+<section id="staff-access" class="staff-access" hidden aria-labelledby="access-title"><h2 id="access-title">Staff access</h2><p id="pin-help">Unlock approvals and private history on this device.</p><form id="pin-form"><label for="pin">Staff PIN</label><input id="pin" type="password" inputmode="numeric" pattern="[0-9]{6,12}" autocomplete="off" minlength="6" maxlength="12" required><div id="pin-confirm-wrap" hidden><label for="pin-confirm">Confirm PIN</label><input id="pin-confirm" type="password" inputmode="numeric" autocomplete="off" maxlength="12"></div><button id="pin-submit" class="primary" type="submit">Unlock staff controls</button></form><p class="hint">This local PIN prevents casual kiosk clicks. It is not district sign-in or protection against someone changing the browser’s data. Keep the iPad supervised and use its own screen lock.</p></section>
+<section id="staff-panel" class="staff-panel" hidden aria-labelledby="approval-title"><div class="section-heading"><span class="step">✓</span><div><h2 id="approval-title">Approve a card</h2><p>One approval, one trip. Staff controls lock after 3 minutes.</p></div></div>
+<form id="approval-form" class="approval-grid"><div><label for="approval-pass">Card number</label><input id="approval-pass" inputmode="numeric" autocomplete="off" placeholder="1–100" required maxlength="12"></div><div><label for="student-code">Student code or initials</label><input id="student-code" autocomplete="off" maxlength="40" placeholder="Your short, unique identifier" required></div><div><label for="destination">Destination</label><select id="destination"><option value="CIRC">CIRC classroom</option><option value="ECTV">ECTV studio</option></select></div><div><label for="valid-for">Valid for</label><select id="valid-for"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="120">2 hours</option><option value="day">Rest of today</option></select></div><label class="approval"><input id="approval-confirm" type="checkbox" required><span>I confirm teacher permission for this trip.</span></label><button id="approve-button" class="primary" type="submit">Approve for today</button></form>
+<p class="hint">All approvals end by midnight in America/New_York, even if a longer window was selected. Use a short code; no roster upload is needed.</p>
 </section>
-</div>
-<details class="history-panel" open><summary>Recent returns <span id="history-count" class="small-count">0</span></summary><p class="hint">The latest 100 completed trips. Returning a card makes it available again.</p><div id="history-list"></div></details>
-<section class="bottom-grid">
-<details class="how-to"><summary>Tomorrow’s test <span aria-hidden="true">↗</span></summary>
-<ol><li>Type <strong>1</strong>, choose a sample student and destination, check the demo approval, then <strong>Issue pass</strong>.</li><li>Reload. The same trip should still appear under <strong>Out now</strong>.</li><li>Click <strong>Return</strong>, then issue <strong>CIRC-001</strong> again. A reusable card starts a new trip.</li><li>Try the physical scanner in the pass-number field. It should type the code and Enter; it must not issue or return a card by itself.</li><li>Open a second tab in this same browser and try the same card. Only one active trip is allowed. Use <strong>Reset demo</strong> when finished.</li></ol>
-<p>Use sample students only. This test does not establish scanner compatibility, school approval, or shared access from another device.</p></details>
-<div class="reset-card"><div><h3>Ready for a fresh practice?</h3><p>Reset this demo only. Other apps’ browser data stays in place.</p></div><button id="reset-demo" type="button" class="secondary" disabled>Reset demo</button></div>
-</section>
-<footer><strong>CIRC Pass Desk</strong><span>Reusable cards. Explicit issue and return. Sample data only.</span></footer>
-</main>
-<noscript>This demo needs JavaScript to issue and return sample passes.</noscript>
-</body></html>
+<section class="board" aria-labelledby="board-title"><div class="active-top"><div><div class="eyebrow">TODAY’S DESK</div><h2 id="board-title">Open cards <span id="active-count" class="count">—</span></h2></div><div class="available"><strong id="available-count">—</strong><span>cards available</span></div></div><div id="active-list" class="board-grid"></div></section>
+<section id="staff-history" hidden><details class="history-panel" open><summary>Recent trips <span id="history-count" class="small-count">0</span></summary><p class="hint">Up to 200 closed trips, plus every open trip. Times are shown in New York time.</p><div id="history-list"></div></details><div class="staff-tools"><button id="export-data" class="secondary" type="button">Download private backup</button><label class="secondary restore-button">Restore private backup<input id="restore-file" type="file" accept=".json,application/json"></label><button id="print-cards" class="secondary" type="button">Print numbered cards</button><button id="retry-storage" class="secondary" type="button">Retry saved records</button></div><p class="hint">Records stay in this browser profile. Clearing website data, private browsing or switching devices can lose access. Keep downloaded backups somewhere private. Old demo records remain separate.</p></section>
+<details class="how-to setup"><summary>Using this desk</summary><ol><li>Open staff access and set a PIN on this iPad. Approve the card and choose how long the trip may run.</li><li>Select <strong>Depart</strong> and scan the approved card when the trip begins.</li><li>Select <strong>Arrive</strong> and scan when the student reaches the destination. Select <strong>Return</strong> when the trip is finished.</li><li>A repeated scan in the same step makes no duplicate. An expired, unused approval cannot start a trip. A late arrival or return is still recorded so the student stays accounted for.</li><li>Use <strong>Return</strong> to close an open trip even if an arrival was missed. Approve the card again for its next user.</li></ol><p>Pair a keyboard-style Bluetooth/USB scanner with the iPad and configure it to end with Enter or Tab. Printed cards use Code 39 text <strong>CIRC-001</strong> through <strong>CIRC-100</strong>. Until the hardware is checked, type the number and tap Record. All steps use this one device; another classroom device does not share these records. This tool does not replace official attendance.</p></details>
+<footer><strong>CIRC PassDesk</strong><span>On this device · no account or student-data uploads</span></footer>
+<div id="print-sheet" aria-hidden="true"></div>
+</main><noscript>JavaScript is required for PassDesk.</noscript></body></html>
