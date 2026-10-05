@@ -219,12 +219,12 @@
       <a class="start-home" href="../index.html">← Back to MYnecraft</a>
       <h1 class="start-brand">MYNECRAFT</h1>
       <p class="edition">EC EDITION</p>
-      <p>Your school. Your character. Your next adventure.</p>
+      <p>Build your world, explore ECMS, and meet the campus crew as Mr. Macek.</p>
     </header>
     <div class="start-grid">
       <section class="start-character-panel" aria-labelledby="characterTitle">
         <h2 id="characterTitle">Play as Mr. Macek</h2>
-        <p class="character-note">Florida Gators lanyard. School ID. Pick your outfit.</p>
+        <p class="character-note">Florida Gators lanyard. School ID. Choose an outfit for your character and first-person sleeves.</p>
         <div class="outfit-options" role="group" aria-label="Choose Mr. Macek's outfit">
           <label class="outfit-option"><img class="outfit-preview" src="./assets/macek-avatar-lanyard.png" width="1086" height="1448" alt="Mr. Macek in a blue polo, patterned arm sleeve and Gators lanyard"><span><input type="radio" name="outfitPreview" id="outfitPolo" value="polo" checked> Blue polo</span><small>One patterned SV sleeve</small></label>
           <label class="outfit-option"><img class="outfit-preview" src="./assets/macek-avatar-black.png" width="1024" height="1536" alt="Mr. Macek in a black SV shirt, two patterned sleeves and Gators lanyard"><span><input type="radio" name="outfitPreview" id="outfitBlack" value="black"> Black SV shirt</span><small>Two patterned SV sleeves</small></label>
@@ -235,31 +235,44 @@
       <section class="start-settings" aria-labelledby="settingsTitle">
         <h2 id="settingsTitle">Choose your adventure</h2>
         <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option></select></label>
-        <p id="modeHelp">Your existing build stays here when you change modes.</p>
+        <p id="modeHelp">Changing modes keeps your build and saved challenge progress.</p>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see Mr. Macek</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
         <label>Controls <select id="controlsLayout" aria-label="Controls layout" disabled title="Controls follow this device. A phone or tablet never captures the mouse."><option value="auto">Auto · match this device</option></select></label>
-        <p>Creative: unlimited blocks and flight. Challenge: gather, build, and find CIRC. Watch your health around heights and deep water.</p>
+        <p><strong>Creative:</strong> unlimited blocks, flight, and coordinate travel. <strong>Embrace the Challenge:</strong> collect 10 wood blocks, place 12 blocks, and find CIRC on foot. It is a peaceful world; falls and deep water can hurt.</p>
+        <p>Use <strong>Smooth</strong> for lighter graphics. <strong>Detailed</strong> adds shadows. Switch camera views here or with the in-game View button.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
-        <p class="start-tip">Controls match this device. On a computer, Play captures the mouse; press Esc to release it. Drag to look if the cursor stays free. Your world saves automatically in this browser.</p>
+        <p class="start-tip">Play resumes your current world and position. On a computer, Play requests mouse capture; press Esc or Menu to pause. If the cursor stays free, drag to look. Phones and tablets use touch controls automatically.</p>
       </section>
     </div>
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
-      <button id="visitSchool" type="button">Visit ECMS &amp; Eddie</button>
-      <button id="overview" type="button">School from above · Creative</button>
-      <p class="start-wide">Officer Shields welcomes you at the entrance. Meet Sleeves in his number 28 jersey on the front lawn. The School Officer arrives at the front curb at 8:30 AM game time, walks the cafeteria, and heads home at 3 PM. Find Mr. B in the halls, buses behind the school around 3 PM, and Eddie on the roof after sunset. Cookie Man starts the evening halls at 4 PM. A full game day lasts 20 minutes.</p>
+      <button id="visitSchool" type="button">Visit the ECMS entrance</button>
+      <button id="overview" type="button">Fly above ECMS · Creative</button>
+      <p class="start-wide"><strong>Choose a starting point:</strong> Visit the ECMS entrance moves you to the front approach in either mode. Fly above ECMS starts a flying view in Creative. Neither shortcut changes the world clock or clears your build.</p>
+      <p class="start-wide"><strong>Front lawn and entrance:</strong> Find Sleeves in his number 28 jersey, larger than KaY and smaller than the adults. Officer Shields stays by his front desk, and Mr. Eiler walks the entrance area. Eddie perches on the lawn rock during the day.</p>
+      <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy follow the campus Mr. Macek. Sir D and Mr. Macek meet near the entrance around sunset.</p>
+      <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer reaches the front curb at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
+      <p class="start-wide"><strong>Evening:</strong> Cookie Man sweeps the halls from 4:00 PM to 10:00 PM. Eddie starts flying to the roof at 6:00 PM and returns to the lawn by 6:00 AM.</p>
+      <p class="start-wide"><strong>These are game-clock routines.</strong> A full day takes 20 minutes of active play. Opening this menu pauses the world, including the clock, characters, and buses. Your real school day does not set their schedule.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
     </section></details>
     <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
       <h2 id="saveTitle" class="start-wide">Keep your world</h2>
-      <p class="start-wide"><strong>Download World</strong> keeps a backup file of your build, position, outfit and settings. <strong>Load World</strong> opens a backup you choose and replaces this device's current world after you confirm. Download your current world first if you want to keep it. Worlds do not merge or sync between devices.</p>
+      <p class="start-wide"><strong>Save</strong> in the game toolbar saves progress in this browser. Autosave also runs while you play. <strong>Download World</strong> creates a portable JSON backup of your build, position, outfit, settings, world clock, and challenge progress.</p>
+      <p class="start-wide"><strong>Load World</strong> opens a downloaded backup and replaces this browser's current world after you confirm. Worlds do not merge. Download your current world first if you want to keep both, then use Load World on another device to continue there.</p>
+      <p class="start-wide">There is no account or automatic device sync. The school link and primary MYnecraft site share one autosave in the same browser. Clearing browser data can erase it. <strong>Reset World</strong> starts fresh after confirmation, so download a backup first.</p>
       <button id="downloadWorld" type="button">Download World</button>
       <button id="loadWorld" type="button">Load World</button>
       <input id="worldFile" type="file" accept=".json,application/json" hidden>
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
     </section></details>
-    <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>XYZ shows your position. X and Z move across the map; Y is eye height. The center crosshair aims at blocks.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
-    <details class="start-advanced"><summary>How to play</summary><p>WASD to move · Drag to look · Space to jump or swim up · Shift to sprint · F to fly in Creative · Left click to break · Right click to place · Number keys or scroll to select blocks · Esc releases the mouse and opens the menu. On a phone or tablet, use the on-screen stick and buttons. The mouse is never captured there.</p></details>
+    <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>Creative only. X and Z move across the map; Y is eye height. Go starts flight at those coordinates if the spot is clear. If it is inside a block, try a higher Y. The crosshair aims at blocks, and the in-game XYZ readout shows your position.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
+    <details class="start-advanced"><summary>How to play</summary>
+      <p><strong>Keyboard and mouse:</strong> WASD moves. Move the captured mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
+      <p><strong>Creative flight and camera:</strong> F toggles flight. While flying, Space rises and Shift descends. V switches between first and third person; the toolbar's View button does the same.</p>
+      <p><strong>Phone or tablet:</strong> Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight and DOWN descends. Touch controls never capture a mouse.</p>
+      <p><strong>Pause and keep playing:</strong> Esc releases the mouse and opens this menu. The Menu button also pauses. Use Play to continue, Save to keep local progress now, and Download World for a backup you can keep or move.</p>
+    </details>
   </div>
 </div>
 
@@ -3270,7 +3283,7 @@ const worldClockEl=document.getElementById('worldClock');
 function busStatusLine(){
   for(let i=0;i<BUS_COUNT;i++)if(busRouteDistance(dayTime,i)>=0)
     return busAtKerb(dayTime,i)?'Buses are at the rear loop now.':'Buses are on the rear loop drive.';
-  return `School buses reach the rear loop at ${busClockLabel}.`;
+  return `School buses start their rear-loop trip at ${busClockLabel} game time.`;
 }
 function refreshMenuStatus(){
   if(worldClockEl)worldClockEl.textContent=`World clock: ${timeLabel()} · ${busStatusLine()}`;
