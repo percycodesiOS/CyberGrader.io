@@ -250,8 +250,9 @@
       <button id="overview" type="button">Fly above ECMS · Creative</button>
       <p class="start-wide"><strong>Choose a starting point:</strong> Visit the ECMS entrance moves you to the front approach in either mode. Fly above ECMS starts a flying view in Creative. Neither shortcut changes the world clock or clears your build.</p>
       <p class="start-wide"><strong>Front lawn and entrance:</strong> Find Sleeves in his number 28 jersey, larger than KaY and smaller than the adults. Officer Shields stays by his front desk, and Mr. Eiler walks the entrance area. Eddie perches on the lawn rock during the day.</p>
+      <p class="start-wide"><strong>Find your learning community:</strong> Pass through both glass doorways. The main cafeteria and its high ECTV screen are straight ahead; the elementary cafeteria is to your left. Grade 5 is in the right wing with Grade 6 upstairs. Grades 3–4 are in the left wing with Grades 1–2 upstairs. Kindergarten is at the upper landing of the broad curved walkway. Outside, the flag is in the center of the entrance circle and the parking rows are to the left of the approach.</p>
       <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy follow the campus Mr. Macek. Sir D and Mr. Macek meet near the entrance around sunset.</p>
-      <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer reaches the front curb at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
+      <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer parks beyond the far curb near the circle exit at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
       <p class="start-wide"><strong>Evening:</strong> Cookie Man sweeps the halls from 4:00 PM to 10:00 PM. Eddie starts flying to the roof at 6:00 PM and returns to the lawn by 6:00 AM.</p>
       <p class="start-wide"><strong>These are game-clock routines.</strong> A full day takes 20 minutes of active play. Opening this menu pauses the world, including the clock, characters, and buses. Your real school day does not set their schedule.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
@@ -528,14 +529,18 @@ const wingEnds=[[25,-28],[57,-28],[25,30],[57,30]];
 // Floors keep their original heights, so existing worlds and travel points remain valid.
 const CIRC_ROOM={x:54,z:-11,radius:9};
 const SCHOOL_STAIRS={x0:53,x1:55,z0:5,z1:10};
-const SCHOOL_RAMP={x:43,z:4,inner:3.1,outer:5.5};
-const FLAGPOLE={x:30,z:39};
+const SCHOOL_RAMP={x:43,z:4,inner:3.0,outer:6.2};
+const FLAGPOLE={x:46,z:40};
+const PARKING={x0:18,x1:43,z0:46,z1:79};
+const VESTIBULE={x0:44,x1:48,innerZ:18,outerZ:23};
 const inCirc=(x,z)=>Math.hypot(x-CIRC_ROOM.x,z-CIRC_ROOM.z)<=CIRC_ROOM.radius;
 // Stepped voxel curve follows the concave glass entry in Kenny's front-door photo.
 const galleryFront=x=>23+Math.floor(Math.pow((x-46)/4.5,2));
 const inGallery=(x,z)=>x>=38&&x<=54&&z>=12&&z<=galleryFront(x);
 function schoolFootprint(x,z){
-  if(Math.hypot(x-46,z-5)<=11 || inGallery(x,z) || inCirc(x,z))return true;
+  if(Math.hypot(x-46,z-5)<=11 || inGallery(x,z) || inCirc(x,z) ||
+    (x>=37&&x<=49&&z>=-12&&z<=7)||
+    (x>=26&&x<=36&&z>=2&&z<=14)||(x>=33&&x<=39&&z>=7&&z<=10))return true;
   return wingEnds.some(([ex,ez])=>{
     const dx=ex-46,dz=ez-5,t=Math.max(0,Math.min(1,((x-46)*dx+(z-5)*dz)/(dx*dx+dz*dz)));
     return Math.hypot(x-46-t*dx,z-5-t*dz)<=6.25;
@@ -576,7 +581,7 @@ for(let x=SCHOOL_STAIRS.x0;x<=SCHOOL_STAIRS.x1;x++)for(let z=5;z<=11;z++){
 // space. Each plateau is several cells long; there are no floating collision
 // meshes. Keep full headroom over every step and join the actual upper floor.
 const rampCells=[];
-for(let x=37;x<=49;x++)for(let z=-2;z<=10;z++){
+for(let x=36;x<=50;x++)for(let z=-3;z<=11;z++){
   const radius=Math.hypot(x-SCHOOL_RAMP.x,z-SCHOOL_RAMP.z);
   if(radius<SCHOOL_RAMP.inner||radius>SCHOOL_RAMP.outer)continue;
   let angle=Math.atan2(x-SCHOOL_RAMP.x,z-SCHOOL_RAMP.z);
@@ -593,6 +598,38 @@ for(let x=37;x<=49;x++)for(let z=-2;z<=10;z++){
 for(let x=38;x<=42;x++)for(let z=9;z<=11;z++)if(schoolFootprint(x,z)){
   setBlock(x,10,z,'planks');for(let y=11;y<=14;y++)setBlock(x,y,z,null);
 }
+// Two-storey dining atrium and a broad curved rise, based on the October school
+// references. Existing stair/landing coordinates remain stable for saved worlds.
+const rampCellKeys=new Set(rampCells.map(({x,z})=>`${x},${z}`));
+const atriumOpenings=[];
+for(let x=37;x<=51;x++)for(let z=-10;z<=9;z++){
+  if(!schoolFootprint(x,z)||rampCellKeys.has(`${x},${z}`))continue;
+  const open=Math.hypot((x-44)/7,(z+1)/9)<1;
+  // The south bridge joins the two upper learning communities and both stairs.
+  if(open&&z<8){setBlock(x,10,z,null);atriumOpenings.push({x,z});}
+}
+const atriumRailCells=[];
+for(const {x,z}of atriumOpenings)for(const [dx,dz]of [[1,0],[-1,0],[0,1],[0,-1]]){
+  const xx=x+dx,zz=z+dz;
+  if(getBlock(xx,10,zz)&&!rampCellKeys.has(`${xx},${zz}`)&&zz<8){
+    setBlock(xx,11,zz,'glass');setBlock(xx,12,zz,'glass');atriumRailCells.push({x:xx,z:zz});
+  }
+}
+// Collision-backed transparent edge guards retain wide landings at both ends.
+for(const {x,z,y}of rampCells){
+  const radius=Math.hypot(x-SCHOOL_RAMP.x,z-SCHOOL_RAMP.z);
+  let angle=Math.atan2(x-SCHOOL_RAMP.x,z-SCHOOL_RAMP.z);if(angle<0)angle+=Math.PI*2;
+  if(angle>Math.PI*2/7&&angle<Math.PI*12/7&&(radius<SCHOOL_RAMP.inner+.35||radius>SCHOOL_RAMP.outer-.35)){
+    setBlock(x,y,z,'glass');setBlock(x,y+1,z,'glass');
+  }
+}
+// Keep the glass vestibule enclosed at both door lines, with a clear three-cell
+// aisle. The right-hand reception/greeter area is outside this small enclosure.
+for(const x of [VESTIBULE.x0,VESTIBULE.x1])for(let z=18;z<=23;z++)for(let y=5;y<=15;y++)
+  setBlock(x,y,z,y===9||y===15?'snow':'glass');
+for(let x=45;x<=47;x++)for(let z=18;z<=22;z++)setBlock(x,10,z,null);
+for(let x=44;x<=48;x++)for(let y=9;y<=15;y++)setBlock(x,y,18,y===9?'blue':'glass');
+for(let x=45;x<=47;x++)for(let z=18;z<=24;z++)for(let y=5;y<=8;y++)setBlock(x,y,z,null);
 // Main entrance frame and canopy; glass door leaves animate below.
 for(const x of [44,48])for(let y=5;y<=9;y++)setBlock(x,y,23,'blue');
 for(let x=44;x<=48;x++)for(let z=23;z<=25;z++)setBlock(x,9,z,'snow');
@@ -608,6 +645,12 @@ for(let x=32;x<=37;x++)for(let y=5;y<=15;y++){
 // Solid white panel behind the SV monogram (it spans x 32.9-36.1, y 10.8-14.4),
 // so the logo reads against painted facade instead of floating over window glass.
 for(let x=32;x<=36;x++)for(let y=10;y<=14;y++)setBlock(x,y,22,'snow');
+// Blue/cream stripes belong on the visible left facade, not only on the inset
+// logo wall. Keep the long orange window-slot facade on the visitor's right.
+for(let x=18;x<=63;x++)for(let z=15;z<=37;z++)if(schoolFootprint(x,z)&&!schoolFootprint(x,z+1)){
+  for(let y=5;y<=15;y++)if(getBlock(x,y,z)&&getBlock(x,y,z)!=='glass')
+    setBlock(x,y,z,x<=42?(x%4<2?'blue':'snow'):'orange');
+}
 // The landscaped parent drop-off loop has a grass island and an approach lane.
 for(let x=30;x<=63;x++)for(let z=29;z<=54;z++){
   if(schoolFootprint(x,z))continue;
@@ -615,7 +658,31 @@ for(let x=30;x<=63;x++)for(let z=29;z<=54;z++){
   if(ring>.70&&ring<1.14 || x>=56&&x<=61&&z>=41)setBlock(x,4,z,'stone');
   else if(ring<=.70)setBlock(x,4,z,'grass');
 }
-for(let x=22;x<=30;x++)for(let z=33;z<=54;z++)if(!schoolFootprint(x,z))setBlock(x,4,z,'stone');
+// Several parking rows with planted islands sit to the visitor's left. This is
+// a game-scale interpretation of the aerial view, not a surveyed floor plan.
+for(let x=PARKING.x0;x<=PARKING.x1;x++)for(let z=PARKING.z0;z<=PARKING.z1;z++){
+  for(let y=5;y<=12;y++)setBlock(x,y,z,null);
+  for(let y=heightAt(x,z)+1;y<=3;y++)setBlock(x,y,z,'dirt');
+  setBlock(x,4,z,'stone');
+}
+for(const z of [53,65,77])for(let x=22;x<=38;x++){
+  setBlock(x,4,z,'grass');setBlock(x,4,z+1,'grass');
+  if(x===22||x===38)setBlock(x,5,z,'leaves');
+}
+// Approach/exit lane and the parking connector stay clear of the rear bus lane.
+for(let x=56;x<=61;x++)for(let z=50;z<=86;z++){
+  for(let y=5;y<=32;y++)setBlock(x,y,z,null);
+  for(let y=heightAt(x,z)+1;y<=3;y++)setBlock(x,y,z,'dirt');setBlock(x,4,z,'stone');
+}
+for(let x=40;x<=60;x++)for(let z=72;z<=77;z++){
+  for(let y=5;y<=32;y++)setBlock(x,y,z,null);
+  for(let y=heightAt(x,z)+1;y<=3;y++)setBlock(x,y,z,'dirt');setBlock(x,4,z,'stone');
+}
+// The officer parks beyond the far curb near the exit, away from the doors.
+for(let x=45;x<=58;x++)for(let z=47;z<=54;z++)setBlock(x,4,z,'stone');
+for(let x=49;x<=58;x++)for(let z=46;z<=57;z++){
+  for(let y=heightAt(x,z)+1;y<=3;y++)setBlock(x,y,z,'dirt');setBlock(x,4,z,'stone');
+}
 // Rear recreation space and outdoor classroom. Surfaces and furniture are real
 // blocks, so walking, jumping, building and NPC routes use the same collisions.
 const campusAreas={playground:{x0:66,x1:77,z0:20,z1:36},court:{x0:79,x1:92,z0:20,z1:42},outdoor:{x0:70,x1:86,z0:-17,z1:-3}};
@@ -662,6 +729,34 @@ const cafeteriaTables=[[39,-7],[43,-8],[48,-7]];
 for(const [x,z] of cafeteriaTables){
   setBlock(x,5,z,'planks');setBlock(x+1,5,z,'planks');
   for(const dz of [-1,1])setBlock(x,5,z+dz,'blue');
+}
+const elementaryCafeteriaTables=[[30,4],[32,8],[28,11]];
+// A separate elementary dining room branches left from the entrance atrium.
+for(let x=26;x<=36;x++)for(let z=2;z<=14;z++){
+  setBlock(x,4,z,'planks');setBlock(x,10,z,'planks');setBlock(x,16,z,'snow');
+  for(let y=5;y<=15;y++)if(y!==10)setBlock(x,y,z,(x===26||z===2||z===14)&&!(x>=33&&z===14)?(y%6>=1&&y%6<=3?'glass':'snow'):null);
+}
+// Wide, level connections from the elementary dining space to the shared atrium.
+for(let x=33;x<=39;x++)for(let z=7;z<=10;z++){
+  setBlock(x,4,z,'planks');for(let y=5;y<=7;y++)setBlock(x,y,z,null);
+}
+for(const [x,z]of elementaryCafeteriaTables){
+  for(let dx=0;dx<2;dx++)setBlock(x+dx,5,z,'planks');
+  for(const dz of [-1,1])setBlock(x,5,z+dz,'blue');
+}
+// Gray circulation strips, wood floors and generous learning communities on
+// both levels. Floor identities follow the directions given while entering.
+const learningCommunities=[
+  {name:'Grades 3–4',x:28,z:-23,y:5,side:'left'},
+  {name:'Grades 1–2',x:28,z:-23,y:11,side:'left'},
+  {name:'Grade 5',x:55,z:-23,y:5,side:'right'},
+  {name:'Grade 6',x:55,z:-23,y:11,side:'right'}
+];
+for(const [ex,ez]of wingEnds)for(let x=19;x<=63;x++)for(let z=-33;z<=36;z++){
+  if(!schoolFootprint(x,z))continue;
+  const dx=ex-46,dz=ez-5,t=((x-46)*dx+(z-5)*dz)/(dx*dx+dz*dz);
+  const distance=Math.abs((x-46)*dz-(z-5)*dx)/Math.hypot(dx,dz);
+  if(t>.56&&t<1.06&&distance<1.7)for(const y of [4,10])if(getBlock(x,y,z)==='planks')setBlock(x,y,z,'stone');
 }
 // Rear school-bus loop, its own drive and the sports field beyond it. This stays
 // well clear of the parent drop-off circle in front (centred on z=40), so the two
@@ -809,7 +904,10 @@ function setGraphics(value){
   const touchScreen=('ontouchstart' in window)||navigator.maxTouchPoints>0;
   const cap=graphics==='detailed'&&!touchScreen?1.5:1;
   renderer.setPixelRatio(Math.min(devicePixelRatio,cap));
-  scene.traverse(o=>{if(o.material)for(const m of [].concat(o.material))m.needsUpdate=true;});
+  scene.traverse(o=>{
+    if(o.userData.schoolRoomLight!==undefined)o.visible=graphics==='detailed'||o.userData.schoolRoomLight===0;
+    if(o.material)for(const m of [].concat(o.material))m.needsUpdate=true;
+  });
   graphicsSelect.value=graphics;
   if(graphicsBtn){
     graphicsBtn.textContent=graphics==='detailed'?'Graphics: Detailed':'Graphics: Smooth';
@@ -1262,7 +1360,9 @@ schoolLabel.scale.set(8.5,1.4,1); schoolLabel.position.set(46,18,23); scene.add(
 const schoolWayfinding=[];
 for(const [text,x,y,z,width] of [
   ['ECES · Grades 1–4',25,12,37.1,7],['ECMS · Grades 5–6',57,12,37.1,7],
-  ['Kindergarten · Floor 2',46,13,0,6],['CIRC',54,8,-3.5,4],['Cafeteria',45,8,-6,4]
+  ['Kindergarten · Floor 2',40,13,12,6],['CIRC',54,8,-3.5,4],['Main cafeteria',45,8,-6,5],
+  ['Elementary cafeteria',31,8,7,5],
+  ...learningCommunities.map(c=>[c.name+' · '+(c.y===5?'Ground floor':'Upper floor'),c.x,c.y+2.8,c.z,5.5])
 ]){
   const label=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(text),depthTest:true}));
   label.name=text;label.scale.set(width,1,1);label.position.set(x,y,z);scene.add(label);schoolWayfinding.push(label);
@@ -1276,6 +1376,14 @@ schoolLogo.position.set(34.5,12.6,23.015);scene.add(schoolLogo);
 // Small campus details share instanced geometry/materials; no source photos or
 // map screenshots are shipped. The photos guide this original block model.
 const campusDetails=new THREE.Group();scene.add(campusDetails);
+// Small unshadowed room lights keep the photographed light interiors readable.
+// Smooth uses one fill light; the extra three room lights are Detailed-only.
+const schoolLights=[];
+for(const [x,y,z]of [[44,14,1],[29,9,8],[28,12,-23],[55,12,-23]]){
+  const light=new THREE.PointLight(0xfff3db,85,30,2);light.position.set(x,y,z);
+  light.userData.schoolRoomLight=schoolLights.length;light.visible=graphics==='detailed'||schoolLights.length===0;
+  scene.add(light);schoolLights.push(light);
+}
 const detailBatches=new Map();
 function campusBox(w,h,d,color,x,y,z,rotation=0,yaw=0){
   if(!detailBatches.has(color))detailBatches.set(color,[]);
@@ -1337,7 +1445,7 @@ campusBox(26,.25,.35,0xadb3b6,46,9.18,26.65);
 const bollards=new THREE.InstancedMesh(new THREE.SphereGeometry(.52,8,6),new THREE.MeshLambertMaterial({color:0x888e90}),bollardPositions.length);
 const detailDummy=new THREE.Object3D();
 bollardPositions.forEach(({x,z},i)=>{detailDummy.position.set(x,5.52,z);detailDummy.updateMatrix();bollards.setMatrixAt(i,detailDummy.matrix);});campusDetails.add(bollards);
-// American flag by the front approach, visible from the morning-announcement
+// American flag at the centre of the landscaped entrance-circle island.
 // view. Original canvas artwork, one small static panel, no remote photo asset.
 const flagTexture=campusTexture(390,210,ctx=>{
   ctx.fillStyle='#fff';ctx.fillRect(0,0,390,210);
@@ -1351,11 +1459,77 @@ campusBox(.15,12,.15,0xb8c0c7,FLAGPOLE.x,11,FLAGPOLE.z);
 campusBox(1.2,.18,1.2,0x879098,FLAGPOLE.x,5.09,FLAGPOLE.z);
 const americanFlag=campusPanel(flagTexture,3.3,1.78,FLAGPOLE.x+1.68,15.8,FLAGPOLE.z);
 americanFlag.name='American flag at the front approach';
+// Gray guardrails trace the generous curved rise and open upper-floor balcony.
+for(const radius of [SCHOOL_RAMP.inner-.18,SCHOOL_RAMP.outer+.15])for(let i=0;i<48;i++){
+  const angle=i/48*Math.PI*2,next=(i+1)/48*Math.PI*2;
+  if(angle<Math.PI*2/7||angle>Math.PI*12/7)continue;
+  const x=SCHOOL_RAMP.x+radius*Math.sin(angle),z=SCHOOL_RAMP.z+radius*Math.cos(angle);
+  const nx=SCHOOL_RAMP.x+radius*Math.sin(next),nz=SCHOOL_RAMP.z+radius*Math.cos(next);
+  const feet=5+Math.min(6,Math.floor(angle/(Math.PI*2)*7));
+  campusBox(.055,1.1,.055,0xa8b2b9,x,feet+.55,z);
+  campusBox(.07,.07,Math.hypot(nx-x,nz-z)+.08,0xa8b2b9,(x+nx)/2,feet+1.08,(z+nz)/2,0,Math.atan2(nx-x,nz-z));
+  campusBox(.12,.48,Math.hypot(nx-x,nz-z)+.1,0xeeeae0,(x+nx)/2,feet-.25,(z+nz)/2,0,Math.atan2(nx-x,nz-z));
+}
+const atriumKeys=new Set(atriumOpenings.map(({x,z})=>`${x},${z}`));
+for(const {x,z}of atriumOpenings)for(const [dx,dz]of [[1,0],[-1,0],[0,1],[0,-1]]){
+  const xx=x+dx,zz=z+dz;
+  if(atriumKeys.has(`${xx},${zz}`)||rampCellKeys.has(`${xx},${zz}`)||!getBlock(xx,10,zz))continue;
+  campusBox(.07,1.15,.07,0xa8b2b9,x+.5+dx*.5,11.6,z+.5+dz*.5);
+  campusBox(dx?.07:1.03,.08,dz?.07:1.03,0xa8b2b9,x+.5+dx*.5,12.16,z+.5+dz*.5);
+  campusBox(dx?.10:1.04,.44,dz?.10:1.04,0xeeeae0,x+.5+dx*.5,10.78,z+.5+dz*.5);
+}
+for(let z=-8;z<=6;z+=3)campusBox(13,.18,.18,0xe5e5de,44,15.65,z);
+// High cafeteria display is original game artwork, with no live feed or pupil data.
+const cafeteriaTVTexture=campusTexture(640,360,ctx=>{
+  ctx.fillStyle='#143e50';ctx.fillRect(0,0,640,360);
+  ctx.fillStyle='#e9f1d9';ctx.font='bold 76px sans-serif';ctx.textAlign='center';ctx.fillText('ECTV',320,145);
+  ctx.fillStyle='#86caaa';ctx.font='32px sans-serif';ctx.fillText('EHRMAN CREST',320,210);
+  ctx.fillStyle='#fff';ctx.font='24px sans-serif';ctx.fillText('Learn. Create. Belong.',320,265);
+});
+campusBox(6.9,4.0,.23,0x202c35,43.5,12.1,-8.75);
+const cafeteriaTV=campusPanel(cafeteriaTVTexture,6.5,3.66,43.5,12.1,-8.61);
+cafeteriaTV.name='High main cafeteria TV';
+for(const x of [41.2,45.8])campusBox(.09,1.5,.09,0x88959c,x,14.85,-8.75);
+// Tables use thin metal legs and blue circular stools, like the two dining photos.
+const diningStools=[];
+for(const [x,z]of [...cafeteriaTables,...elementaryCafeteriaTables]){
+  campusBox(2.8,.16,1.05,0xc9a471,x+.65,6.04,z+.45);
+  for(const dx of [-.4,1.7])campusBox(.10,.9,.10,0xa8b2b9,x+dx,5.5,z+.45);
+  for(const dz of [-1,1])for(const dx of [-.2,1.4]){
+    campusBox(.09,.62,.09,0xa8b2b9,x+dx,5.31,z+.45+dz);
+    diningStools.push([x+dx,5.7,z+.45+dz]);
+  }
+}
+const diningSeats=new THREE.InstancedMesh(new THREE.CylinderGeometry(.32,.32,.12,8),new THREE.MeshLambertMaterial({color:0x1789c8}),diningStools.length);
+diningStools.forEach(([x,y,z],i)=>{detailDummy.position.set(x,y,z);detailDummy.scale.set(1,1,1);detailDummy.rotation.set(0,0,0);detailDummy.updateMatrix();diningSeats.setMatrixAt(i,detailDummy.matrix);});campusDetails.add(diningSeats);
+// Repeated banks of pale lockers, blue glazed doors, lime classroom surrounds,
+// wood accents and collaborative nooks give each grade its own learning area.
+for(const c of learningCommunities){
+  const dx=c.side==='left'?-21:11,dz=-33,len=Math.hypot(dx,dz),ux=dx/len,uz=dz/len,nx=uz,nz=-ux,yaw=Math.atan2(ux,uz);
+  for(let i=-4;i<=4;i++){
+    const x=c.x+nx*4+ux*i*.67,z=c.z+nz*4+uz*i*.67;
+    campusBox(.48,2.2,.61,0xc5c5ae,x,c.y+1.1,z,0,yaw);
+    campusBox(.50,.035,.34,0x7c8982,x-nx*.02,c.y+1.85,z-nz*.02,0,yaw);
+  }
+  const doorX=c.x-nx*3.9,doorZ=c.z-nz*3.9;
+  campusBox(.20,3.8,5.5,0xc1cf63,doorX,c.y+1.9,doorZ,0,yaw);
+  campusBox(.23,3.1,1.4,0x1684bd,doorX+nx*.04,c.y+1.55,doorZ+nz*.04,0,yaw);
+  campusBox(.25,1.8,.68,0xaed5dd,doorX+nx*.08,c.y+1.75,doorZ+nz*.08,0,yaw);
+  for(const t of [-2.7,2.7]){
+    const x=c.x+ux*t,z=c.z+uz*t;
+    campusBox(1.45,.12,.85,0xc9a471,x-nx*2.55,c.y+.87,z-nz*2.55,0,yaw);
+    campusBox(.13,.82,.13,0xa8b2b9,x-nx*2.55,c.y+.41,z-nz*2.55);
+    campusBox(.7,.58,.7,t<0?0xbacc55:0x398caf,x-nx*3.2+ux*.9,c.y+.29,z-nz*3.2+uz*.9);
+  }
+  for(const offset of [-2,2])campusBox(.13,.08,7.2,0xf7f6dd,c.x+nx*offset,c.y+4.55,c.z+nz*offset,0,yaw);
+}
 // Curved blue ceiling band and shelves make CIRC recognizable without filling
 // the corridors with extra objects. All accents share instanced box batches.
 for(let i=0;i<28;i++){
   const angle=i/28*Math.PI*2;
-  campusBox(1.8,.3,.25,0x548db4,CIRC_ROOM.x+7.8*Math.sin(angle),9.65,CIRC_ROOM.z+7.8*Math.cos(angle),0,angle);
+  const x=CIRC_ROOM.x+7.8*Math.sin(angle),z=CIRC_ROOM.z+7.8*Math.cos(angle);
+  if(x<50)continue; // The new open main cafeteria is west of the CIRC ceiling band.
+  campusBox(1.8,.3,.25,0x548db4,x,9.65,z,0,angle);
 }
 for(let x=50;x<=58;x++)for(const y of [5.6,6.5,7.3])for(let j=0;j<3;j++)
   campusBox(.18,.55,.12,[0x235f95,0xb57d35,0x92556c][j],x+.18+j*.28,y,-16.96);
@@ -1364,9 +1538,11 @@ for(let i=0;i<30;i++){
   const angle=i/30*Math.PI*2,x=46+12.8*Math.cos(angle),z=40+9.7*Math.sin(angle);
   if(!schoolFootprint(Math.floor(x),Math.floor(z)))campusBox(.14,.035,.75,0xf3efe0,x,5.025,z,0,-angle);
 }
-for(let z=33;z<=52;z+=3){
-  campusBox(6,.035,.10,0xece8d6,26,5.025,z);
-}
+for(const z of [47,55,59,67,71])for(let x=20;x<=40;x+=3)campusBox(.09,.035,4.3,0xece8d6,x,5.025,z+1.5);
+for(const z of [53,65,77])for(const side of [0,1.9])campusBox(17,.10,.14,0xd9d8cb,30,5.05,z+side);
+for(let z=57;z<=84;z+=5)campusBox(.13,.035,2.5,0xece8d6,58.5,5.025,z);
+campusBox(.10,.035,4.8,0xece8d6,50.5,5.025,52);
+campusBox(.10,.035,4.8,0xece8d6,53.5,5.025,52);
 // Court lines, keys, halfway circle, backboards and hoops.
 const courtTexture=campusTexture(512,800,ctx=>{
   ctx.fillStyle='#637b89';ctx.fillRect(0,0,512,800);ctx.strokeStyle='#f7f0d9';ctx.lineWidth=5;ctx.strokeRect(20,20,472,760);
@@ -1621,8 +1797,8 @@ updateBuses(LOADED_DAY_TIME);
 
 // Automatic glass entrance leaves, hinged at the sides of the three-block opening.
 const entranceDoors=[];
-for(const side of [-1,1]){
-  const hinge=new THREE.Group();hinge.position.set(side<0?45:48,5,24.025);
+for(const doorZ of [24.025,18.025])for(const side of [-1,1]){
+  const hinge=new THREE.Group();hinge.position.set(side<0?45:48,5,doorZ);
   const leaf=new THREE.Mesh(new THREE.BoxGeometry(1.5,3.7,.08),new THREE.MeshLambertMaterial({color:0xafdced,transparent:true,opacity:.52}));
   leaf.position.set(-side*.75,1.85,0);hinge.add(leaf);
   const handle=new THREE.Mesh(new THREE.BoxGeometry(.08,.65,.15),new THREE.MeshLambertMaterial({color:0x244a60}));
@@ -1632,7 +1808,7 @@ for(const side of [-1,1]){
 
 // Navigation uses real solid blocks on both floors, including player edits.
 // A walk node stores foot height, so a roof cannot be mistaken for the room below it.
-const campusBounds={minX:17,maxX:95,minZ:-35,maxZ:54};
+const campusBounds={minX:17,maxX:95,minZ:-35,maxZ:86};
 const worldBounds={minX:-SIZE+1,maxX:EAST_EDGE-1,minZ:-SIZE+1,maxZ:SIZE-1};
 // A bounds object may add `filter` to carve a non-rectangular area out of the
 // rectangle. Mr. Unicorn uses it to stay inside the building's own footprint, so
@@ -2116,14 +2292,14 @@ let cookieOnShift=cookie.group.visible, cookieGreeted=false;
 const SCHOOL_OFFICER_ARRIVE=8*60+30, SCHOOL_OFFICER_LEAVE=15*60;
 const SCHOOL_OFFICER_DRIVE_MINUTES=10;
 const officerGroundFloor=(x,z)=>isSolid(x,4,z)&&!getBlock(x,5,z)&&!getBlock(x,6,z);
-const officerEntranceBounds={minX:38,maxX:52,minZ:-12,maxZ:32,
-  filter:(x,z)=>officerGroundFloor(x,z)&&(schoolFootprint(x,z)||(x>=45&&x<=47&&z>=22&&z<=32))};
+const officerEntranceBounds={minX:33,maxX:58,minZ:-12,maxZ:53,
+  filter:(x,z)=>officerGroundFloor(x,z)&&(schoolFootprint(x,z)||(x>=33&&x<=58&&z>=22&&z<=53))};
 const officerCafeteriaBounds={minX:38,maxX:49,minZ:-12,maxZ:-3,
   filter:(x,z)=>officerGroundFloor(x,z)&&schoolFootprint(x,z)};
-const officerEntryStops=[[46,5,28],[46,5,24],[46,5,17],[46,5,-5]];
+const officerEntryStops=[[49,5,52],[39,5,48],[35,5,40],[39,5,32],[46,5,28],[46,5,24],[46,5,17],[46,5,-5]];
 const officerExitStops=officerEntryStops.slice().reverse();
 const officerCafeteriaStops=[[46,5,-5],[45,5,-9],[41,5,-9],[41,5,-5]];
-const schoolOfficer=new CampusActor('School Officer',46,5,28,'schoolOfficer',officerEntranceBounds);
+const schoolOfficer=new CampusActor('School Officer',49,5,52,'schoolOfficer',officerEntranceBounds);
 schoolOfficer.speed=1.8;schoolOfficer.invulnerable=true;
 const schoolOfficerCar=new THREE.Group();schoolOfficerCar.name='School Officer car';
 const officerCarPaint=new THREE.MeshLambertMaterial({color:0x25394f});
@@ -2143,7 +2319,7 @@ officerCarPart(.55,.14,.3,new THREE.MeshLambertMaterial({color:0x356dd4}),-.3,1.
 officerCarPart(.55,.14,.3,new THREE.MeshLambertMaterial({color:0xb8444e}),.3,1.93,-.2);
 for(const x of [-.7,.7])officerCarPart(.35,.2,.08,officerCarTrim,x,.91,2.07);
 scene.add(schoolOfficerCar);
-// Reuse the paved parent loop; no blocks, roads, or player builds are changed.
+// Follow the entrance loop to the outer exit-side bay, clear of the flag island.
 function officerPolyline(points){
   let distance=0;
   return points.map((p,i)=>{
@@ -2169,17 +2345,8 @@ const officerEntryPath=officerPathThrough(officerEntryStops,officerEntranceBound
 const officerExitPath=officerPathThrough(officerExitStops,officerEntranceBounds);
 const officerPatrolPath=officerPathThrough([...officerCafeteriaStops,officerCafeteriaStops[0]],officerCafeteriaBounds);
 const officerWalkMinutes=(officerEntryPath.points.at(-1)?.d||40)/schoolOfficer.speed*1.2;
-const officerDriveInPoints=[{x:58,y:5,z:54},{x:58,y:5,z:40}];
-const officerDriveOutPoints=[];
-for(let i=0;i<=24;i++){
-  // The north-east wing interrupts that side of the oval. Follow its open
-  // south/west arc to the curb, keeping the car outside the building.
-  let angle=Math.PI*1.5*i/24;
-  officerDriveInPoints.push({x:46+12*Math.cos(angle),y:5,z:40+9*Math.sin(angle)});
-  angle=-Math.PI/2-Math.PI*1.5*i/24;
-  officerDriveOutPoints.push({x:46+12*Math.cos(angle),y:5,z:40+9*Math.sin(angle)});
-}
-officerDriveOutPoints.push({x:58,y:5,z:54});
+const officerDriveInPoints=[{x:58,y:5,z:60},{x:58,y:5,z:48},{x:52,y:5,z:48},{x:52,y:5,z:52}];
+const officerDriveOutPoints=[{x:52,y:5,z:52},{x:52,y:5,z:56},{x:58,y:5,z:56},{x:58,y:5,z:60}];
 const officerDriveInPath=officerPolyline(officerDriveInPoints),officerDriveOutPath=officerPolyline(officerDriveOutPoints);
 const officerSample={x:0,y:5,z:0,yaw:0};
 function officerPathPoint(points,distance,out){
@@ -2383,7 +2550,7 @@ for(const [choice,value] of [[outfitPolo,'polo'],[outfitBlack,'black']]){
   });
 }
 viewSelect.addEventListener('change',()=>{setView(viewSelect.value);persistSave();});
-const sirPatrol=[[46,5,18],[50,5,6],[43,11,9],[46,11,18],[46,5,26],[55,5,38]];
+const sirPatrol=[[46,5,18],[50,5,6],[42,11,12],[46,11,16],[46,5,26],[55,5,38]];
 const macekPatrol=[[46,5,18],[47,11,16],[46,5,29],[25,heightAt(25,12)+1,12],[15,heightAt(15,12)+1,12]];
 // Every stop is interior floor inside the building footprint: lobby, main hub,
 // the west hallway and maker room, and the east wing.
@@ -2498,9 +2665,11 @@ function updateCampus(dt){
   kay.go(dt,{x:sirD.pos.x-1.3,y:sirD.pos.y,z:sirD.pos.z+1.3});
   sleeves.patrol(dt,sleevesPatrol);
   updateCompanions(dt);
-  const atDoor=p=>Math.hypot(p.x-46.5,p.z-24)<5&&p.y<10;
-  const open=atDoor(player.pos)||campusActors.some(a=>a.group.visible&&atDoor(a.pos));
-  entranceDoors.forEach(h=>{const target=open?h.userData.side*Math.PI*.48:0;h.rotation.y+=(target-h.rotation.y)*Math.min(1,dt*6);});
+  entranceDoors.forEach(h=>{
+    const atDoor=p=>Math.hypot(p.x-46.5,p.z-h.position.z)<5&&p.y<10;
+    const open=atDoor(player.pos)||campusActors.some(a=>a.group.visible&&atDoor(a.pos));
+    const target=open?h.userData.side*Math.PI*.48:0;h.rotation.y+=(target-h.rotation.y)*Math.min(1,dt*6);
+  });
 }
 
 // ---------- clouds ----------
@@ -2621,11 +2790,26 @@ if (saveState.player) {
   player.yaw = sp.yaw || 0; player.pitch = sp.pitch || 0;
   player.flying = gameMode==='creative' && sp.flying===true;
   if (Number.isInteger(sp.sel)) selected = Math.max(0,Math.min(BLOCK_KEYS.length-1,sp.sel));
-  // Preserve exact coordinates unless new terrain occupies the saved position.
+  // New atrium openings and vestibule walls must not strand an old school save.
+  // Keep valid coordinates and all edits. Prefer the nearest clear cell on the
+  // same school floor before the existing last-resort upward escape.
+  recoverSchoolSavePosition(player.pos,player.flying);
   if(!canStandAt(player.pos)){
     for(let rise=1;rise<=70;rise++){const safe=player.pos.clone();safe.y+=rise;if(canStandAt(safe)){player.pos.copy(safe);break;}}
   }
   camera.position.copy(player.pos);
+}
+function recoverSchoolSavePosition(pos,flying=false){
+  const feet=Math.round(pos.y-player.height),x=Math.floor(pos.x),z=Math.floor(pos.z);
+  if(flying||![5,11].includes(feet)||Math.abs(pos.y-player.height-feet)>.25||!schoolFootprint(x,z))return false;
+  if(canStandAt(pos)&&isSolid(x,feet-1,z))return false;
+  let best=null,distance=Infinity;
+  for(let dx=-12;dx<=12;dx++)for(let dz=-12;dz<=12;dz++){
+    const xx=x+dx,zz=z+dz;if(!schoolFootprint(xx,zz)||walkFeet(xx,zz,feet)!==feet)continue;
+    const candidate=new THREE.Vector3(xx+.5,feet+player.height+.0001,zz+.5);
+    const d=candidate.distanceToSquared(pos);if(d<distance&&canStandAt(candidate)){best=candidate;distance=d;}
+  }
+  if(best){pos.copy(best);return true;}return false;
 }
 addEventListener('keydown', e => {
   const m = e.code.match(/^Digit([1-9])$/);
