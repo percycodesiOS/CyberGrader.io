@@ -11,6 +11,33 @@ test('all 100 cards normalize; malformed and out of range codes reject',()=>{
   for(let i=1;i<=100;i++)assert.equal(normalizePass(i),`CIRC-${String(i).padStart(3,'0')}`);
   for(const bad of [0,101,-1,1.5,'1e2','CIRC-000','CIRC-001x','ECTV-001','',null])assert.throws(()=>normalizePass(bad));
 });
+
+test('printed card variants and Code 39 wrappers identify the same existing card',()=>{
+  for(const value of ['CIRC001','circ-001','*CIRC001*','*CIRC-001*',']A0CIRC001',']A0*CIRC-001*',']C0CIRC001',' CIRC001\r\n'])assert.equal(normalizePass(value),'CIRC-001');
+  for(const value of ['*CIRC001','CIRC001*','CIRC 001',']Q0CIRC001','CIRC001CIRC002'])assert.throws(()=>normalizePass(value));
+  const state=scanPass(approved(),'*CIRC001*','depart',NOW+1).state;
+  assert.equal(state.trips[0].pass,'CIRC-001');assert.equal(state.trips.length,1);
+});
+
+test('expected visit time survives reload and a midday registration stays valid for the later visit',()=>{
+  const state=approved({expectedTime:'13:30',minutes:60});
+  assert.equal(state.trips[0].expectedAt,Date.parse('2026-10-05T17:30:00Z'));
+  assert.equal(state.trips[0].expiresAt,Date.parse('2026-10-05T18:30:00Z'));
+  const registered=scanPass(parseState(JSON.stringify(state)),1,'depart',NOW+1).state;
+  assert.equal(registered.trips[0].arrivedAt,null);
+  const arrival=scanPass(registered,1,'arrive',Date.parse('2026-10-05T17:30:00Z'));
+  assert.equal(arrival.trip.arrivedAt,Date.parse('2026-10-05T17:30:00Z'));
+  assert.doesNotMatch(arrival.message,/expiry/);
+});
+
+test('expected visit uses the New York school date in winter and rejects invalid times',()=>{
+  const winter=Date.parse('2026-12-04T14:00:00Z');
+  const state=approvePass(createState(),request({expectedTime:'13:30',minutes:'day'}),winter);
+  assert.equal(state.trips[0].expectedAt,Date.parse('2026-12-04T18:30:00Z'));
+  for(const expectedTime of ['','24:00','13:60','1:30','tomorrow'])assert.throws(()=>approved({expectedTime}));
+  const invalid=structuredClone(state);invalid.trips[0].expectedAt=Date.parse('2026-12-05T18:30:00Z');assert.throws(()=>validateState(invalid));
+  const legacy=approved();assert.deepEqual(parseState(JSON.stringify(legacy)),legacy);
+});
 test('only explicit staff approval can create permission; unknown student/destination rejected',()=>{
   for(const staffApproved of [false,undefined,'true',1])assert.throws(()=>approved({staffApproved}),/staff/i);
   assert.throws(()=>approved({student:''}));assert.throws(()=>approved({destination:'office'}));
@@ -18,14 +45,14 @@ test('only explicit staff approval can create permission; unknown student/destin
 });
 test('approval, departure, arrival, return and reuse preserve separate timestamps',()=>{
   let state=approved();const original=JSON.stringify(state);
-  state=scanPass(state,1,'depart',NOW+1000).state;assert.equal(status(state.trips[0],NOW+1000),'On the way');
+  state=scanPass(state,1,'depart',NOW+1000).state;assert.equal(status(state.trips[0],NOW+1000),'Registered');
   state=scanPass(state,1,'arrive',NOW+2000).state;assert.equal(status(state.trips[0],NOW+2000),'Arrived');
-  state=scanPass(state,1,'return',NOW+3000).state;assert.equal(status(state.trips[0],NOW+3000),'Returned');
+  state=scanPass(state,1,'return',NOW+3000).state;assert.equal(status(state.trips[0],NOW+3000),'Finished / returned');
   assert.equal(JSON.parse(original).trips[0].departedAt,null);
   state=approvePass(state,request({student:'TEST-B'}),NOW+4000);assert.equal(state.trips.length,2);assert.equal(state.trips[1].departedAt,null);
 });
 test('arrival cannot activate a card; return can close a trip with a missed arrival',()=>{
-  assert.throws(()=>scanPass(approved(),1,'arrive',NOW+1),/not been activated/);
+  assert.throws(()=>scanPass(approved(),1,'arrive',NOW+1),/not been registered/);
   const out=scanPass(approved(),1,'depart',NOW+1).state;
   const back=scanPass(out,1,'return',NOW+2).state;assert.equal(back.trips[0].arrivedAt,null);assert.equal(back.trips[0].returnedAt,NOW+2);
 });
@@ -105,6 +132,7 @@ test('inaccessible storage, corrupt JSON and absent locks never silently fall ba
 test('scanner handles prefixed/numeric bursts, Enter/Tab, and ignores slow free typing',()=>{
   function feed(text,delay=10,suffix='Enter'){const s=createScanner();let now=1000;for(const key of text){s.feed(key,now);now+=delay;}return s.feed(suffix,now);}
   assert.equal(feed('CIRC-001'),'CIRC-001');assert.equal(feed('042',10,'Tab'),'042');assert.equal(feed('042',180),null);assert.equal(feed('CIRC-001',180),null);assert.equal(feed('hello'),null);
+  assert.equal(feed('CIRC001'),'CIRC001');assert.equal(feed('*CIRC-001*',10,'Tab'),'*CIRC-001*');assert.equal(feed(']A0CIRC001'),']A0CIRC001');assert.equal(feed(']C0CIRC001'),']C0CIRC001');
 });
 test('printed Code 39 encodes all 100 unique card texts with known CIRC patterns',()=>{
   const expected={'*':0x094,C:0x148,I:0x04c,R:0x106,'-':0x085,'0':0x034,'1':0x121,'2':0x061,'3':0x160,'4':0x031,'5':0x130,'6':0x070,'7':0x025,'8':0x124,'9':0x064};

@@ -1,4 +1,4 @@
-import {STORAGE_KEY,parseState,validateState} from './model.mjs?v=2';
+import {STORAGE_KEY,parseState,validateState} from './model.mjs?v=3';
 // Publish new UI state only after a successful storage write inside a browser lock.
 export function createStore(storage,locks) {
   const lock=operation=>{if(!locks?.request)throw Error('This browser needs Web Locks to save safely. Use an updated Safari, Chrome or Edge.');return locks.request(STORAGE_KEY+':transaction',operation);};

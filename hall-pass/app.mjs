@@ -1,14 +1,14 @@
-import {STORAGE_KEY,STAFF_KEY,createState,parseState,normalizePass,approvePass,scanPass,cancelApproval,status,isOpen,dayKey,ZONE} from './model.mjs?v=2';
-import {createStore} from './storage.mjs?v=2';
-import {createScanner} from './scanner.mjs?v=2';
-import {code39} from './barcode.mjs?v=2';
+import {STORAGE_KEY,STAFF_KEY,createState,parseState,normalizePass,approvePass,scanPass,cancelApproval,status,isOpen,dayKey,ZONE} from './model.mjs?v=3';
+import {createStore} from './storage.mjs?v=3';
+import {createScanner} from './scanner.mjs?v=3';
+import {code39} from './barcode.mjs?v=3';
 const $=id=>document.getElementById(id),node=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 let state=createState(),ready=false,busy=false,unlocked=false,staffUnlockedAt=0,action='depart',store,pinRecord=null,pinError=false,staffTimer=null;
 const clock=ms=>ms===null?'—':new Date(ms).toLocaleTimeString([], {timeZone:ZONE,hour:'numeric',minute:'2-digit'});
 const stamp=ms=>new Date(ms).toLocaleString([], {timeZone:ZONE,month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 const feedback=(message,error=false)=>{$('message').textContent=message;$('message').className='feedback scan-feedback'+(error?' error':'');};
 function controls(){ $('scan-submit').disabled=!ready||busy;$('approve-button').disabled=!ready||busy||!unlocked;document.querySelectorAll('[data-cancel]').forEach(b=>b.disabled=busy||!ready||!unlocked); }
-function lockStaff(){clearTimeout(staffTimer);staffTimer=null;unlocked=false;$('staff-panel').hidden=true;$('staff-history').hidden=true;$('staff-access').hidden=true;$('staff-toggle').textContent='Staff access';$('pin').value='';$('pin-confirm').value='';$('student-code').value='';$('approval-confirm').checked=false;render();}
+function lockStaff(){clearTimeout(staffTimer);staffTimer=null;unlocked=false;$('staff-panel').hidden=true;$('staff-history').hidden=true;$('staff-access').hidden=true;$('staff-toggle').textContent='Staff access';$('pin').value='';$('pin-confirm').value='';$('student-code').value='';$('expected-time').value='';$('approval-confirm').checked=false;render();}
 function showAccess(){
   if(unlocked){lockStaff();feedback('Staff controls locked. Approved cards can still be scanned.');return;}
   $('staff-access').hidden=!$('staff-access').hidden;
@@ -38,23 +38,24 @@ $('pin-form').addEventListener('submit',async event=>{
         await navigator.locks.request(STORAGE_KEY+':transaction',()=>{const raw=localStorage.getItem(STORAGE_KEY);if(raw!==null&&JSON.parse(raw).trips?.length)throw Error('Records exist without their staff setup. Keep a backup; do not replace the staff setup here.');if(raw===null)localStorage.setItem(STORAGE_KEY,JSON.stringify(createState()));});
         localStorage.setItem(STAFF_KEY,JSON.stringify(record));pinRecord=record;}
     });
-    unlocked=true;staffUnlockedAt=Date.now();clearTimeout(staffTimer);staffTimer=setTimeout(lockStaff,180000);$('staff-access').hidden=true;$('staff-panel').hidden=false;$('staff-history').hidden=false;$('staff-toggle').textContent='Lock staff controls';$('pin').value='';$('pin-confirm').value='';feedback('Staff controls open for three minutes. Approve a card before activating departure.');await load();render();
+    unlocked=true;staffUnlockedAt=Date.now();clearTimeout(staffTimer);staffTimer=setTimeout(lockStaff,180000);$('staff-access').hidden=true;$('staff-panel').hidden=false;$('staff-history').hidden=false;$('staff-toggle').textContent='Lock staff controls';$('pin').value='';$('pin-confirm').value='';feedback('Staff controls open for three minutes. Approve the student and expected visit time.');await load();render();$('student-code').focus();
   }catch(error){feedback(error.message,true);}finally{$('pin-submit').disabled=false;}
 });
 function render(){
   const now=Date.now();$('today').textContent=new Date(now).toLocaleDateString([], {timeZone:ZONE,weekday:'long',month:'short',day:'numeric'});
-  const open=state.trips.filter(t=>isOpen(t,now));$('active-count').textContent=ready?String(open.length):'—';$('available-count').textContent=ready?String(100-new Set(open.map(t=>t.pass)).size):'—';
+  const open=state.trips.filter(t=>isOpen(t,now)).sort((a,b)=>(a.expectedAt??a.approvedAt)-(b.expectedAt??b.approvedAt));$('active-count').textContent=ready?String(open.length):'—';$('available-count').textContent=ready?String(100-new Set(open.map(t=>t.pass)).size):'—';
+  $('board-privacy').textContent=unlocked?'Private staff view · student names hide when staff controls lock.':'Unlock Staff access to see student names. Expected times and visit status stay visible.';
   $('active-list').replaceChildren();
-  if(!open.length)$('active-list').append(node('div','empty',ready?'No open cards. Staff can approve the next trip.':'Saved records are unavailable. No new trip will be recorded.'));
+  if(!open.length)$('active-list').append(node('div','empty',ready?'No visits waiting. Open Staff access to approve a student and time.':'Saved records are unavailable. No new visit will be recorded.'));
   for(const trip of open){
-    const card=node('article','trip'),top=node('div','trip-top');top.append(node('strong','pass-id',trip.pass),node('span','out-badge'+(status(trip,now).includes('overdue')?' overdue':''),status(trip,now)));card.append(top,node('div','trip-student',unlocked?trip.student:trip.destination),node('div','trip-meta',`${unlocked?trip.destination+' · ':''}expires ${clock(trip.expiresAt)}`));
-    if(trip.departedAt!==null)card.append(node('div','trip-meta',`Departed ${clock(trip.departedAt)} · arrived ${clock(trip.arrivedAt)}`));
+    const card=node('article','trip'),top=node('div','trip-top');top.append(node('strong','pass-id',trip.pass),node('span','out-badge'+(status(trip,now).includes('overdue')?' overdue':''),status(trip,now)));card.append(top,node('div','trip-student',unlocked?trip.student:trip.destination),node('div','expected-time',trip.expectedAt?`Expected ${clock(trip.expectedAt)}`:'Expected time not set'),node('div','trip-meta',`${unlocked?trip.destination+' · ':''}approval ends ${clock(trip.expiresAt)}`));
+    if(trip.departedAt!==null)card.append(node('div','trip-meta',`Registered ${clock(trip.departedAt)} · arrived ${clock(trip.arrivedAt)}`));
     if(unlocked&&trip.departedAt===null){const cancel=node('button','secondary','Cancel approval');cancel.type='button';cancel.dataset.cancel=trip.id;cancel.addEventListener('click',()=>transact(s=>cancelApproval(s,trip.id,unlocked),'Unused approval cancelled.'));card.append(cancel);}
     $('active-list').append(card);
   }
   $('history-count').textContent=String(state.trips.length);$('history-list').replaceChildren();
   if(unlocked)for(const trip of [...state.trips].reverse()){
-    const row=node('div','history-row'),a=node('div'),b=node('div');a.append(node('strong','',trip.pass),node('span','',`${trip.student} → ${trip.destination}`),node('div','',`${status(trip,now)} · approved ${stamp(trip.approvedAt)}`));b.append(node('div','',`Depart ${clock(trip.departedAt)} · Arrive ${clock(trip.arrivedAt)} · Return ${clock(trip.returnedAt)}`));row.append(a,b);$('history-list').append(row);
+    const row=node('div','history-row'),a=node('div'),b=node('div');a.append(node('strong','',trip.pass),node('span','',`${trip.student} → ${trip.destination}`),node('div','',`${status(trip,now)} · approved ${stamp(trip.approvedAt)}`));b.append(node('div','',`Expected ${trip.expectedAt?clock(trip.expectedAt):'not set'} · Registered ${clock(trip.departedAt)} · Arrived ${clock(trip.arrivedAt)} · Finished ${clock(trip.returnedAt)}`));row.append(a,b);$('history-list').append(row);
   }
   controls();
 }
@@ -70,40 +71,45 @@ async function transact(mutator,success){
   catch(error){feedback(error.message+' Nothing from this attempt was recorded.',true);await load();return false;}
   finally{busy=false;controls();}
 }
-async function recordScan(value){if(!String(value).trim())return;$('scan-number').value='';let card;try{card=normalizePass(value);}catch(error){feedback(error.message,true);return;}await transact(s=>scanPass(s,card,action));}
+function focusScan(){ $('scan-number').focus({preventScroll:true}); }
+function scanReadiness(){const target=document.activeElement;$('scan-readiness').textContent=target===$('scan-number')?'Ready for the scanner. Enter or Tab records the selected step.':target?.closest('#staff-panel,#staff-access')?'Editing staff details. Click Ready to scan when finished.':'Click Ready to scan, or scan while no editing field is selected.';}
+$('focus-scan').addEventListener('click',focusScan);
+document.addEventListener('focusin',scanReadiness);
+document.addEventListener('focusout',()=>queueMicrotask(scanReadiness));
+async function recordScan(value){if(!String(value).trim())return;$('scan-number').value='';const scanAction=action;try{const card=normalizePass(value);await transact(s=>scanPass(s,card,scanAction));}catch(error){feedback(error.message,true);}finally{if(!document.activeElement?.closest('#staff-panel,#staff-access'))focusScan();}}
 $('scan-form').addEventListener('submit',event=>{event.preventDefault();recordScan($('scan-number').value);});
-function selectAction(next,announce=true){action=next;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===action)));$('scan-submit').textContent={depart:'Record departure',arrive:'Record arrival',return:'Record return'}[action];if(announce)feedback(`${{depart:'Depart',arrive:'Arrive',return:'Return'}[action]} selected. Scan a card or type its number.`);}
+function selectAction(next,announce=true){action=next;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===action)));$('scan-submit').textContent={depart:'Record registration',arrive:'Record arrival',return:'Record finish / return'}[action];if(announce)feedback(`${{depart:'Register',arrive:'Arrive',return:'Finish / return'}[action]} selected. Scan the code or type its number.`);focusScan();}
 for(const button of document.querySelectorAll('[data-mode]'))button.addEventListener('click',()=>selectAction(button.dataset.mode));
 $('approval-form').addEventListener('submit',async event=>{
   event.preventDefault();if(!unlocked||Date.now()-staffUnlockedAt>180000){lockStaff();feedback('Unlock staff controls to approve a card.',true);return;}if(!$('approval-confirm').checked){feedback('Confirm teacher permission first.',true);return;}
-  const request={pass:$('approval-pass').value,student:$('student-code').value,destination:$('destination').value,minutes:$('valid-for').value==='day'?'day':Number($('valid-for').value),staffApproved:unlocked};
+  const request={pass:$('approval-pass').value,student:$('student-code').value,destination:$('destination').value,expectedTime:$('expected-time').value,minutes:'day',staffApproved:unlocked};
   let card;try{card=normalizePass(request.pass);}catch(error){feedback(error.message,true);return;}
-  if(await transact(s=>approvePass(s,request),`${card} approved. Staff controls locked. Depart is ready; scan to activate.`)){$('approval-pass').value='';lockStaff();selectAction('depart',false);}
+  if(await transact(s=>approvePass(s,request),`${card} approved. Staff controls locked. Scan to register the visit.`)){$('approval-pass').value='';lockStaff();selectAction('depart',false);}
 });
 // Global capture does not require a spreadsheet cell or one particular field.
-const scanner=createScanner();let editStart=null,lastKey=0;
+const scanner=createScanner();let editStart=null,lastKey=0,lastTarget=null;
 document.addEventListener('keydown',event=>{
-  if(event.ctrlKey||event.metaKey||event.altKey||event.isComposing||event.target.type==='password'){scanner.reset();return;}
+  if(event.ctrlKey||event.metaKey||event.altKey||event.isComposing||event.target.type==='password'||event.target.isContentEditable||event.target instanceof HTMLSelectElement){scanner.reset();editStart=null;lastKey=0;lastTarget=null;return;}
   const now=performance.now(),editable=event.target instanceof HTMLInputElement||event.target instanceof HTMLTextAreaElement;
-  if(now-lastKey>250)editStart=editable?{target:event.target,value:event.target.value}:null;lastKey=now;
+  if(now-lastKey>250||lastTarget!==event.target){scanner.reset();editStart=editable?{target:event.target,value:event.target.value,start:event.target.selectionStart,end:event.target.selectionEnd}:null;}lastKey=now;lastTarget=event.target;
   if(event.target===$('scan-number')&&(event.key==='Enter'||event.key==='Tab')){scanner.reset();if(event.key==='Tab'&&!$('scan-number').value.trim())return;event.preventDefault();recordScan($('scan-number').value);return;}
   if(event.target===$('approval-pass')&&(event.key==='Enter'||event.key==='Tab')){if(!$('approval-pass').value.trim())return;event.preventDefault();scanner.reset();try{$('approval-pass').value=normalizePass($('approval-pass').value);$('student-code').focus();}catch(error){feedback(error.message,true);}return;}
   const value=scanner.feed(event.key,now);
-  if(value&&editable&&!/^CIRC-/i.test(value))return;
-  if(value){event.preventDefault();event.stopPropagation();if(editStart?.target===event.target)event.target.value=editStart.value;if(editable){feedback('Staff field kept unchanged. Use the scan box or finish editing before recording a trip.');return;}recordScan(value);}
+  if(value&&editable&&!/^(?:\][AC]0)?\*?CIRC-?/i.test(value))return;
+  if(value){event.preventDefault();event.stopPropagation();if(editStart?.target===event.target){event.target.value=editStart.value;if(editStart.start!==null)event.target.setSelectionRange(editStart.start,editStart.end);}if(editable){feedback('Staff field kept unchanged. Click Ready to scan before recording a visit.');return;}recordScan(value);}
 },true);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)lockStaff();else load();});
 window.addEventListener('storage',event=>{if(event.key===STAFF_KEY||event.key===null){lockStaff();pinError=false;readPin();}if(event.key===STORAGE_KEY||event.key===null)load();});
 $('retry-storage').addEventListener('click',load);
 $('export-data').addEventListener('click',()=>{
   if(!unlocked)return;
-  try{const raw=localStorage.getItem(STORAGE_KEY);const blob=new Blob([raw??JSON.stringify(createState())],{type:'application/json'});const link=node('a');link.href=URL.createObjectURL(blob);link.download=`PassDesk-private-backup-${dayKey()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);feedback('Private backup downloaded. It contains student codes; keep it private.');}catch(error){feedback('Backup failed: '+error.message,true);}
+  try{const raw=localStorage.getItem(STORAGE_KEY);const blob=new Blob([raw??JSON.stringify(createState())],{type:'application/json'});const link=node('a');link.href=URL.createObjectURL(blob);link.download=`CIRC-Check-In-private-backup-${dayKey()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);feedback('Private backup downloaded. It contains student names; keep it private.');}catch(error){feedback('Backup failed: '+error.message,true);}
 });
 $('restore-file').addEventListener('change',async event=>{
   const file=event.target.files[0];event.target.value='';if(!file||!unlocked||busy)return;
   busy=true;controls();
   try{
-    if(file.size>2000000)throw Error('Choose a PassDesk JSON backup under 2 MB.');
+    if(file.size>2000000)throw Error('Choose a CIRC Check-In JSON backup under 2 MB. Older backups are accepted.');
     const restored=parseState(await file.text());
     if(!unlocked||Date.now()-staffUnlockedAt>180000)throw Error('Unlock staff controls again before restoring.');
     if(!confirm(`Replace this device’s trip records with ${restored.trips.length} trips from this backup? Current approvals and open trips will be replaced. The staff PIN and old demo stay unchanged.`))return;

@@ -1,4 +1,4 @@
-// Local, supervised PassDesk. No student records or network calls in this module.
+// Local, supervised CIRC Check-In. Storage keys stay compatible with prior releases.
 export const STORAGE_KEY = 'circ-passdesk-v2';
 export const STAFF_KEY = 'circ-passdesk-staff-v1';
 export const LEGACY_KEY = 'circ-hall-pass-demo-v1';
@@ -21,21 +21,24 @@ export function nextMidnight(now) {
   midnightCache.set(day,high);return high;
 }
 export function normalizePass(value) {
-  const match=/^(?:CIRC-)?(\d{1,3})$/i.exec(String(value).trim());
+  let text=String(value).trim().replace(/^\][AC]0/i,'');
+  if(text.startsWith('*')&&text.endsWith('*'))text=text.slice(1,-1);
+  const match=/^(?:CIRC-?)?(\d{1,3})$/i.exec(text);
   if(!match||+match[1]<1||+match[1]>100)fail('Use a card number from 1 to 100, such as CIRC-001.');
   return `CIRC-${String(+match[1]).padStart(3,'0')}`;
 }
 export const createState=()=>({version:2,revision:0,trips:[]});
 const fields=['id','pass','student','destination','approvedAt','expiresAt','departedAt','arrivedAt','returnedAt','cancelledAt'];
 export function validateState(raw) {
-  if(!keys(raw,['version','revision','trips'])||raw.version!==2||!Number.isSafeInteger(raw.revision)||raw.revision<0||!Array.isArray(raw.trips)||raw.trips.length>500)fail('Saved PassDesk data is not valid. Keep a backup before resetting it.');
+  if(!keys(raw,['version','revision','trips'])||raw.version!==2||!Number.isSafeInteger(raw.revision)||raw.revision<0||!Array.isArray(raw.trips)||raw.trips.length>500)fail('Saved CIRC Check-In data is not valid. Keep a backup before resetting it.');
   const ids=new Set(),activePasses=new Set();
   const trips=raw.trips.map(t=>{
-    if(!keys(t,fields)||typeof t.id!=='string'||!/^trip-[0-9]+-[0-9]+$/.test(t.id)||ids.has(t.id))fail('Invalid or duplicate saved trip.');
+    if((!keys(t,fields)&&!keys(t,[...fields,'expectedAt']))||typeof t.id!=='string'||!/^trip-[0-9]+-[0-9]+$/.test(t.id)||ids.has(t.id))fail('Invalid or duplicate saved trip.');
     ids.add(t.id);
     if(normalizePass(t.pass)!==t.pass||!cleanText(t.student)||!DESTINATIONS.includes(t.destination))fail('Invalid saved card, student code or destination.');
     time(t.approvedAt);time(t.expiresAt);
     if(t.expiresAt<=t.approvedAt||t.expiresAt>nextMidnight(t.approvedAt))fail('Approval must expire within its New York school date.');
+    if('expectedAt' in t&&(dayKey(time(t.expectedAt))!==dayKey(t.approvedAt)||t.expectedAt>=t.expiresAt))fail('Expected visit must be on the approval date, before its expiry.');
     for(const name of ['departedAt','arrivedAt','returnedAt','cancelledAt'])if(t[name]!==null)time(t[name]);
     if(t.departedAt!==null&&(t.departedAt<t.approvedAt||t.departedAt>=t.expiresAt))fail('Invalid departure time.');
     if(t.arrivedAt!==null&&(t.departedAt===null||t.arrivedAt<t.departedAt))fail('Arrival needs an earlier departure.');
@@ -60,8 +63,8 @@ export function parseState(text) {
 export const isExpired=(trip,now=Date.now())=>now>=trip.expiresAt||dayKey(now)!==dayKey(trip.approvedAt);
 export function status(trip,now=Date.now()) {
   if(trip.cancelledAt!==null)return 'Cancelled';
-  if(trip.returnedAt!==null)return 'Returned';
-  if(trip.departedAt!==null)return `${trip.arrivedAt!==null?'Arrived':'On the way'}${isExpired(trip,now)?' · overdue':''}`;
+  if(trip.returnedAt!==null)return 'Finished / returned';
+  if(trip.departedAt!==null)return `${trip.arrivedAt!==null?'Arrived':'Registered'}${isExpired(trip,now)?' · overdue':''}`;
   return isExpired(trip,now)?'Expired':'Approved';
 }
 export const isOpen=(trip,now)=>trip.cancelledAt===null&&trip.returnedAt===null&&(trip.departedAt!==null||!isExpired(trip,now));
@@ -78,30 +81,43 @@ export function approvePass(state,request,now=Date.now()) {
   const current=validateState(state);time(now);
   if(request?.staffApproved!==true)fail('A staff member must approve this card. Scanning cannot grant permission.');
   const pass=normalizePass(request.pass),student=String(request.student??'').trim();
-  if(!cleanText(student))fail('Enter a short student code or initials (1–40 characters).');
+  if(!cleanText(student))fail('Enter the student name or a unique school identifier (1–40 characters).');
   if(!DESTINATIONS.includes(request.destination))fail('Choose CIRC or ECTV.');
   if(currentTrip(current,pass,now))fail(`${pass} already has an approval or open trip. Return it or cancel its unused approval first.`);
   if(current.trips.some(t=>isOpen(t,now)&&t.student.toLocaleLowerCase()===student.toLocaleLowerCase()))fail('That student code already has an approval or open trip.');
   if(request.minutes!=='day'&&(!Number.isInteger(request.minutes)||request.minutes<5||request.minutes>480))fail('Choose a valid approval window.');
-  const expiresAt=Math.min(nextMidnight(now),request.minutes==='day'?Infinity:now+request.minutes*60000);
+  let expectedAt;
+  if(request.expectedTime!==undefined){
+    if(typeof request.expectedTime!=='string'||!/^([01]\d|2[0-3]):[0-5]\d$/.test(request.expectedTime))fail('Choose an expected visit time for today.');
+    // Resolve the wall-clock time using the school zone, never the computer's zone.
+    const wallClock=new Intl.DateTimeFormat('en-GB',{timeZone:ZONE,hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+    const start=Date.parse(dayKey(now)+'T00:00:00Z');
+    for(let offset=0;offset<30*60;offset++){
+      const candidate=start+offset*60000;
+      if(dayKey(candidate)===dayKey(now)&&wallClock.format(candidate)===request.expectedTime){expectedAt=candidate;break;}
+    }
+    if(expectedAt===undefined)fail('That local time does not exist today. Choose another expected visit time.');
+  }
+  const expiresAt=Math.min(nextMidnight(now),request.minutes==='day'?Infinity:Math.max(now,expectedAt??now)+request.minutes*60000);
   const trip={id:`trip-${now}-${current.revision+1}`,pass,student,destination:request.destination,approvedAt:now,expiresAt,departedAt:null,arrivedAt:null,returnedAt:null,cancelledAt:null};
+  if(expectedAt!==undefined)trip.expectedAt=expectedAt;
   return commit(current,[...current.trips,trip],now);
 }
 export function scanPass(state,pass,action,now=Date.now()) {
   const current=validateState(state);time(now);const card=normalizePass(pass);
-  if(!['depart','arrive','return'].includes(action))fail('Choose Depart, Arrive or Return first.');
+  if(!['depart','arrive','return'].includes(action))fail('Choose Register, Arrive or Finish first.');
   const trip=[...current.trips].reverse().find(t=>t.pass===card);
   if(!trip||trip.cancelledAt!==null)fail(`${card} has no staff approval. Ask the teacher.`);
   const field={depart:'departedAt',arrive:'arrivedAt',return:'returnedAt'}[action];
   if(trip.returnedAt!==null&&action!=='return')fail('This trip is closed. Ask staff for a new approval.');
-  if(trip[field]!==null)return {state:current,trip,message:`${card}: ${action==='depart'?'departure':action==='arrive'?'arrival':'return'} already recorded. No duplicate added.`};
+  if(trip[field]!==null)return {state:current,trip,message:`${card}: ${action==='depart'?'registration':action==='arrive'?'arrival':'finish / return'} already recorded. No duplicate added.`};
   if(trip.returnedAt!==null)fail('This trip is closed. Ask staff for a new approval.');
   if(action==='depart'){if(isExpired(trip,now)||now<trip.approvedAt)fail('This approval has expired or the device clock is wrong. Ask staff for a new approval.');}
-  else if(trip.departedAt===null)fail('Departure has not been activated. An approval alone is not a trip.');
+  else if(trip.departedAt===null)fail('This visit has not been registered. Choose Register and scan the approved code first.');
   if(now<(trip.arrivedAt??trip.departedAt??trip.approvedAt))fail('The device clock moved backwards. Check its date and time.');
   const updated={...trip,[field]:now},next=commit(current,current.trips.map(t=>t.id===trip.id?updated:t),now);
   const late=isExpired(trip,now)&&action!=='depart'?' Recorded after expiry; staff should check in.':'';
-  return {state:next,trip:updated,message:`${card}: ${action==='depart'?'departure activated':action==='arrive'?'arrival recorded':'returned and ready for a new approval'}.${late}`};
+  return {state:next,trip:updated,message:`${card}: ${action==='depart'?'visit registered':action==='arrive'?'arrival recorded':'finished / returned and ready for a new approval'}.${late}`};
 }
 export function cancelApproval(state,id,staffApproved,now=Date.now()) {
   const current=validateState(state);time(now);
