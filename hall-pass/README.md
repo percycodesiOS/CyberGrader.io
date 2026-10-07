@@ -36,6 +36,12 @@ The existing master card files were inspected on October 5, 2026:
 
 The app’s optional printed code cards use Code 39 without an optional check digit. The school scanner must support and enable the barcode type actually printed. The software does not configure the scanner.
 
+## Optional reusable cards
+
+Staff access includes **Print code cards**. The default **Starter 8 cards** prints one Letter page, codes CIRC-001 through CIRC-008. **All 100 cards** prints 13 pages, eight cards per page and four on the last. Cards measure 3.5 × 2.15 inches. Print at **100% / Actual size**, with browser headers and footers off. Color is optional; the barcode remains black on white and the text remains readable in grayscale. Test one code on the actual school scanner before printing a full set.
+
+The design carries a large code, short scan sequence, and the reminder that teacher approval is recorded in CIRC Check-In. There are no dates, signatures or student names to write. A card alone never grants permission. Codes can remain at the supervised desk; the app does not require students to carry or replace paper passes. Existing CIRC-001 through CIRC-100 cards still work, so this redesign does not require reprinting them.
+
 ## Remaining physical school test
 
 Software verification does **not** prove the handheld scanner works on the school computer. Use a fictional test visit and one of the actual printed codes:

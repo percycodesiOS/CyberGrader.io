@@ -120,7 +120,21 @@ $('restore-file').addEventListener('change',async event=>{
     state=restored;await load();lockStaff();feedback('Private backup restored on this device. Check open cards before resuming.');
   }catch(error){feedback('Backup was not restored: '+error.message,true);}finally{busy=false;controls();}
 });
-function barcode(text){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),encoded=code39(text);for(const bar of encoded.bars){const rect=document.createElementNS(svg.namespaceURI,'rect');rect.setAttribute('x',bar.x);rect.setAttribute('y','0');rect.setAttribute('width',bar.width);rect.setAttribute('height','42');svg.append(rect);}svg.setAttribute('viewBox',`0 0 ${encoded.width} 42`);svg.setAttribute('aria-label',text);return svg;}
-$('print-cards').addEventListener('click',()=>{if(!unlocked)return;const sheet=$('print-sheet');sheet.replaceChildren();for(let n=1;n<=100;n++){const pass=normalizePass(n),card=node('div','printed-card');card.append(node('strong','',pass),barcode(pass),node('span','','CIRC / ECTV · reusable card'));sheet.append(card);}window.print();});
+function barcode(text){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),encoded=code39(text);for(const bar of encoded.bars){const rect=document.createElementNS(svg.namespaceURI,'rect');rect.setAttribute('x',bar.x);rect.setAttribute('y','0');rect.setAttribute('width',bar.width);rect.setAttribute('height','42');svg.append(rect);}svg.setAttribute('viewBox',`0 0 ${encoded.width} 42`);svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-label',text);return svg;}
+$('print-cards').addEventListener('click',()=>{
+  if(!unlocked)return;
+  const count=$('print-count').value==='100'?100:8,sheet=$('print-sheet');sheet.replaceChildren();
+  for(let start=1;start<=count;start+=8){
+    const page=node('section','print-page'),heading=node('div','print-heading'),grid=node('div','printed-grid');
+    heading.append(node('strong','','CIRC Check-In'),node('span','',`Reusable codes ${String(start).padStart(3,'0')}–${String(Math.min(start+7,count)).padStart(3,'0')} · Cut on the borders`));
+    for(let n=start;n<=Math.min(start+7,count);n++){
+      const pass=normalizePass(n),card=node('div','printed-card');
+      card.append(node('div','card-brand','CIRC CHECK-IN  /  ECTV'),node('strong','card-code',pass),barcode(pass),node('div','card-steps','Ask first. Register. Arrive. Finish.'),node('div','card-permission','Teacher approval is recorded in CIRC Check-In.\nThis card alone is not permission.'));
+      grid.append(card);
+    }
+    page.append(heading,grid);sheet.append(page);
+  }
+  window.print();
+});
 setInterval(()=>{if(unlocked&&Date.now()-staffUnlockedAt>180000)lockStaff();render();},15000);
 readPin();load();
