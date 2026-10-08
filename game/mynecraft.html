@@ -238,7 +238,7 @@
         <p id="modeHelp">Changing modes keeps your build and saved challenge progress.</p>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see Mr. Macek</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
-        <label>Controls <select id="controlsLayout" aria-label="Controls layout" disabled title="Controls follow this device. A phone or tablet never captures the mouse."><option value="auto">Auto · match this device</option></select></label>
+        <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · show screen buttons</option><option value="desktop">Keyboard and mouse</option></select></label>
         <p><strong>Creative:</strong> unlimited blocks, flight, and coordinate travel. <strong>Embrace the Challenge:</strong> collect 10 wood blocks, place 12 blocks, and find CIRC on foot. It is a peaceful world; falls and deep water can hurt.</p>
         <p>Use <strong>Smooth</strong> for lighter graphics. <strong>Detailed</strong> adds shadows. Switch camera views here or with the in-game View button.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
@@ -268,10 +268,22 @@
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
     </section></details>
     <details class="travel start-advanced"><summary>Travel to coordinates · Creative</summary><p>Creative only. X and Z move across the map; Y is eye height. Go starts flight at those coordinates if the spot is clear. If it is inside a block, try a higher Y. The crosshair aims at blocks, and the in-game XYZ readout shows your position.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
+    <details class="start-advanced" id="areaLabelsPanel"><summary>Name your spaces</summary>
+      <p>Walk to a space, open Menu, then add a short area name. Small signs stay at that spot and show only when you are nearby. Name the space, such as Music Studio or Quiet Corner.</p>
+      <form id="areaLabelForm" class="area-label-form">
+        <label>Choose a sign <select id="areaLabelChoice"><option value="new">New sign at this spot</option></select></label>
+        <label>Area name <input id="areaLabelText" type="text" maxlength="32" placeholder="For example: Art Studio" required></label>
+        <button type="submit">Save sign</button><button type="button" id="removeAreaLabel">Remove selected sign</button>
+      </form><p id="areaLabelStatus" role="status">Up to 40 signs. They save with your world and downloaded backup.</p>
+    </details>
+    <details class="start-advanced"><summary>Build a water elevator</summary>
+      <ol><li>Place one Glowstone block on the ground.</li><li>Build a shaft with Glass around it. Leave a doorway at the bottom and an exit at the top.</li><li>Place Water in every space directly above the Glowstone. A gap stops the lift.</li><li>Turn flight off and walk into the water. It lifts you! Walk out at the top. Hold Shift or DOWN to ride down.</li></ol>
+      <p>This MYnecraft recipe uses Glowstone. Ordinary water still works for swimming. The lift works in both game modes; in Embrace the Challenge, collect the blocks first.</p>
+    </details>
     <details class="start-advanced"><summary>How to play</summary>
       <p><strong>Keyboard and mouse:</strong> WASD moves. Move the captured mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
       <p><strong>Creative flight and camera:</strong> F toggles flight. While flying, Space rises and Shift descends. V switches between first and third person; the toolbar's View button does the same.</p>
-      <p><strong>Phone or tablet:</strong> Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight and DOWN descends. Touch controls never capture a mouse.</p>
+      <p><strong>Phone or tablet:</strong> Choose Touch to show the screen buttons, or Auto to follow your device. Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight. DOWN descends while flying or in a water elevator. Phones and tablets never capture a mouse.</p>
       <p><strong>Pause and keep playing:</strong> Esc releases the mouse and opens this menu. The Menu button also pauses. Use Play to continue, Save to keep local progress now, and Download World for a backup you can keep or move.</p>
     </details>
   </div>
@@ -916,12 +928,9 @@ function setGraphics(value){
 }
 setGraphics(graphics);
 graphicsSelect.addEventListener('change',()=>{setGraphics(graphicsSelect.value);persistSave();});
-// Older saves could force Touch or Desktop. Those choices are migrated to Auto
-// so a phone cannot keep a mouse-capture layout and a touch laptop is not stuck
-// on the on-screen stick. Graphics stays on its own field.
-const migratedControls=saveState.controls==='touch'||saveState.controls==='desktop';
-let controlsLayout='auto';
-if(migratedControls)saveState.controls='auto';
+// Keep the student's choice. Auto still follows the device; input changes never
+// request pointer lock, and phones/tablets never capture a mouse.
+let controlsLayout=['auto','touch','desktop'].includes(saveState.controls)?saveState.controls:'auto';
 let controlsSelect=null;
 let releaseTouch=()=>{};
 let lookActive=false;
@@ -944,26 +953,26 @@ function environmentWantsTouch(){
   if(mediaMatches('(pointer: coarse)')&&mediaMatches('(hover: none)'))return true;
   return isIPad();
 }
-function touchLayoutOn(){return environmentWantsTouch();}
-function controlsLabel(){return touchLayoutOn()?'Auto · Touch controls':'Auto · Keyboard and mouse';}
+function touchLayoutOn(){return controlsLayout==='touch'||(controlsLayout==='auto'&&environmentWantsTouch());}
+function controlsLabel(){return environmentWantsTouch()?'Auto · Touch controls':'Auto · Keyboard and mouse';}
 function paintControlsChoice(){
   for(const el of [document.getElementById('controlsLayout'),controlsSelect]){
     if(!el)continue;
-    el.value='auto';
-    el.disabled=true;
+    el.value=controlsLayout;
+    el.disabled=false;
     const option=el.children?.[0];
     if(option)option.textContent=controlsLabel();
   }
 }
 function setControlsLayout(value,save){
-  controlsLayout='auto';
+  controlsLayout=['auto','touch','desktop'].includes(value)?value:'auto';
   releaseInput();
   const on=touchLayoutOn();
   if(on)document.body.classList.add('touch-device'); else document.body.classList.remove('touch-device');
   const ui=document.getElementById('touchUI');
   if(ui)ui.style.display=on?'block':'none';
   paintControlsChoice();
-  saveState.controls='auto';
+  saveState.controls=controlsLayout;
   if(save)persistSave();
 }
 const controlsMenu=document.getElementById('controlsLayout');
@@ -983,7 +992,8 @@ let challengeLabel='';
 function refreshChallenge(){
   const el=document.getElementById('challengeProgress');
   el.hidden=gameMode!=='survival';
-  for(const id of ['btnFly','btnDown'])document.getElementById(id).style.display=gameMode==='creative'?'flex':'none';
+  document.getElementById('btnFly').style.display=gameMode==='creative'?'flex':'none';
+  document.getElementById('btnDown').style.display='flex';
   const finished=challenge.wood===10&&challenge.placed===12&&challenge.circ;
   const label=finished?'Challenge complete! Keep building.':`CHALLENGE · Wood ${challenge.wood}/10 · Place ${challenge.placed}/12 · CIRC ${challenge.circ?'✓':'find it'}`;
   if(label!==challengeLabel){el.textContent=label;challengeLabel=label;}
@@ -1007,6 +1017,22 @@ function recordEdit(x,y,z,k){
   if (_saveTimer) clearTimeout(_saveTimer);
   _saveTimer = setTimeout(persistSave, 350);
 }
+
+// Area signs contain plain text and fixed world coordinates, never player IDs.
+const MAX_AREA_LABELS=40;
+function readAreaLabels(value){
+  if(value===undefined)return [];
+  if(!Array.isArray(value)||value.length>MAX_AREA_LABELS)throw new Error('This backup has invalid area signs. Your world was kept.');
+  return value.map(v=>{
+    if(!v||typeof v.text!=='string'||!v.text.trim()||v.text.length>32||/[\u0000-\u001f\u007f]/.test(v.text)||
+      !['x','y','z'].every(k=>typeof v[k]==='number'&&Number.isFinite(v[k]))||
+      v.x < -SIZE||v.x>EAST_EDGE+1||Math.abs(v.z)>SIZE+1||v.y < -7||v.y>62)
+      throw new Error('This backup has invalid area signs. Your world was kept.');
+    return {text:v.text.trim(),x:v.x,y:v.y,z:v.z};
+  });
+}
+let areaLabels=[];
+try{areaLabels=readAreaLabels(saveState.areaLabels);}catch{}
 function persistSave(){
   if (resetting) return false;
   try {
@@ -1017,6 +1043,7 @@ function persistSave(){
     saveState.view = view;
     saveState.graphics = graphics;
     saveState.controls = controlsLayout;
+    saveState.areaLabels = areaLabels.map(v=>({...v}));
     saveState.campus = campusActors.map(a=>({name:a.name,x:a.pos.x,y:a.pos.y,z:a.pos.z,patrolIndex:a.patrolIndex||0}));
     saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
@@ -1062,9 +1089,9 @@ function readWorldBackup(text){
   if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
   if(s.graphics!==undefined&&!['smooth','detailed'].includes(s.graphics))throw new Error('This backup has an invalid graphics setting. Your world was kept.');
   if(s.controls!==undefined&&!['auto','touch','desktop'].includes(s.controls))throw new Error('This backup has an invalid controls setting. Your world was kept.');
-  // A backup that forced Touch or Desktop still loads. The choice becomes Auto.
+  const areaLabels=readAreaLabels(s.areaLabels);
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',controls:'auto',challenge:normalizeChallenge(s.challenge)};
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge)};
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
@@ -1213,7 +1240,7 @@ class NPC {
     const tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: makeNameTag(name,name==='Mr. Macek'?'#78bdec':'#fff'), depthTest: false, transparent: true }));
     tag.scale.set(name==='Mr. Macek'?2.5:1.9, name==='Mr. Macek'?.625:.475, 1);
     tag.position.y = 2.25;
-    tag.renderOrder = 999;
+    tag.visible=false;
     this.group.add(tag);
     this.nameTag=tag;
 
@@ -1355,18 +1382,65 @@ function spawnNPC(name, x, z) {
 spawnNPC('Steve',  12, 5);
 spawnNPC('Alex',  -12, 5);
 
-const schoolLabel = new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('EHRMAN CREST'),depthTest:true}));
-schoolLabel.scale.set(8.5,1.4,1); schoolLabel.position.set(46,18,23); scene.add(schoolLabel);
 const schoolWayfinding=[];
 for(const [text,x,y,z,width] of [
-  ['ECES · Grades 1–4',25,12,37.1,7],['ECMS · Grades 5–6',57,12,37.1,7],
-  ['Kindergarten · Floor 2',40,13,12,6],['CIRC',54,8,-3.5,4],['Main cafeteria',45,8,-6,5],
-  ['Elementary cafeteria',31,8,7,5],
-  ...learningCommunities.map(c=>[c.name+' · '+(c.y===5?'Ground floor':'Upper floor'),c.x,c.y+2.8,c.z,5.5])
+  ['ECES · Grades 1–4',25,12,37.1,7],['ECMS · Grades 5–6',57,12,37.1,7]
 ]){
   const label=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(text),depthTest:true}));
   label.name=text;label.scale.set(width,1,1);label.position.set(x,y,z);scene.add(label);schoolWayfinding.push(label);
 }
+const areaLabelSprites=[];
+function rebuildAreaLabelSprites(){
+  for(const sprite of areaLabelSprites){scene.remove(sprite);sprite.material.map.dispose();sprite.material.dispose();}
+  areaLabelSprites.length=0;
+  for(const v of areaLabels){
+    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(v.text,'#b9edff'),depthTest:true}));
+    sprite.name=v.text;sprite.scale.set(3,.75,1);sprite.position.set(v.x,v.y,v.z);sprite.visible=false;
+    scene.add(sprite);areaLabelSprites.push(sprite);
+  }
+}
+function updateAreaLabelVisibility(){
+  for(const sprite of areaLabelSprites)sprite.visible=sprite.position.distanceToSquared(player.pos)<=18*18;
+}
+function refreshAreaLabelChoices(selected='new'){
+  const choice=document.getElementById('areaLabelChoice');choice.textContent='';
+  for(const [value,text] of [['new','New sign at this spot'],...areaLabels.map((v,i)=>[String(i),v.text])]){
+    const option=document.createElement('option');option.value=value;option.textContent=text;choice.appendChild(option);
+  }
+  choice.value=selected;document.getElementById('removeAreaLabel').disabled=selected==='new';
+}
+function saveAreaLabel(text,index='new'){
+  const clean=String(text).trim();
+  if(!clean||clean.length>32||/[\u0000-\u001f\u007f]/.test(clean))return 'Use a short name from 1 to 32 letters, numbers or symbols.';
+  const i=index==='new'?-1:Number(index);
+  if(i!==-1&&(!Number.isInteger(i)||!areaLabels[i]))return 'Choose a sign from the list.';
+  if(i===-1&&areaLabels.length>=MAX_AREA_LABELS)return 'Your world has 40 signs. Edit or remove one first.';
+  if(i===-1){
+    const v={text:clean,x:player.pos.x,y:player.pos.y+.4,z:player.pos.z};
+    try{readAreaLabels([v]);}catch{return 'Move inside the world before placing a sign.';}
+    areaLabels.push(v);
+  }else areaLabels[i].text=clean;
+  rebuildAreaLabelSprites();refreshAreaLabelChoices(String(i===-1?areaLabels.length-1:i));
+  return persistSave()?'Sign saved. Press Play and step back to see it.':'Sign is in this world, but browser storage is full. Download World now to keep it.';
+}
+function removeAreaLabel(index){
+  const i=Number(index);
+  if(index==='new'||!Number.isInteger(i)||!areaLabels[i])return 'Choose the sign you want to remove.';
+  areaLabels.splice(i,1);rebuildAreaLabelSprites();refreshAreaLabelChoices();document.getElementById('areaLabelText').value='';
+  return persistSave()?'Sign removed.':'Sign removed here. Download World to keep this change.';
+}
+document.getElementById('areaLabelChoice').addEventListener('change',()=>{
+  const value=document.getElementById('areaLabelChoice').value;
+  document.getElementById('areaLabelText').value=value==='new'?'':areaLabels[Number(value)]?.text||'';
+  document.getElementById('removeAreaLabel').disabled=value==='new';
+});
+document.getElementById('areaLabelForm').addEventListener('submit',event=>{
+  event.preventDefault();document.getElementById('areaLabelStatus').textContent=saveAreaLabel(document.getElementById('areaLabelText').value,document.getElementById('areaLabelChoice').value);
+});
+document.getElementById('removeAreaLabel').addEventListener('click',()=>{
+  document.getElementById('areaLabelStatus').textContent=removeAreaLabel(document.getElementById('areaLabelChoice').value);
+});
+rebuildAreaLabelSprites();refreshAreaLabelChoices();
 const schoolLogoTexture=new THREE.TextureLoader().load('./assets/sv-school-logo.png');
 schoolLogoTexture.colorSpace=THREE.SRGBColorSpace;
 // Official transparent monogram, flush with the white entry facade at z=23.
@@ -1563,7 +1637,6 @@ for(const x of [70,74]){for(const dx of [-.4,.4])campusBox(.035,2.1,.035,0xc5cbd
 // Outdoor teaching board beside the open stump classroom.
 campusBox(4,2,.16,0x243d39,78,7.5,-16.8);
 for(const x of [75.9,80.1])campusBox(.2,3,.2,0x806745,x,6.5,-16.8);
-const outdoorLabel=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('OUTDOOR'),depthTest:true}));outdoorLabel.scale.set(4,1,1);outdoorLabel.position.set(78,9.3,-15.7);campusDetails.add(outdoorLabel);
 // Officer Shields' blue front desk and stool, just inside the glass entrance.
 // These are decorative boxes, not voxels, so the lobby stays fully walkable.
 campusBox(4.6,1.05,.75,0x1f5f9b,50.4,5.52,21.6);
@@ -1647,7 +1720,7 @@ eddiePart(.74,.65,.75,eddieBlue,0,1,1.08);eddiePart(.58,.32,.5,eddieLight,0,.82,
 const eyeWhite=new THREE.MeshLambertMaterial({color:0xffffff});
 for(const x of [-.39,.39]){eddiePart(.1,.32,.32,eyeWhite,x,1.12,1.28);eddiePart(.12,.19,.19,eddieDark,x*1.02,1.1,1.33);}
 eddiePart(1.1,.1,.95,hatMat,0,1.39,1.03);eddiePart(.67,.32,.56,hatMat,0,1.59,1.03);eddiePart(.7,.1,.59,eddieDark,0,1.46,1.03);
-const eddieTag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('Eddie'),depthTest:true}));eddieTag.scale.set(2,.5,1);eddieTag.position.set(0,2.2,0);eddie.add(eddieTag);
+const eddieTag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag('Eddie'),depthTest:true}));eddieTag.scale.set(2,.5,1);eddieTag.position.set(0,2.2,0);eddieTag.visible=false;eddie.add(eddieTag);
 scene.add(eddie);
 // Eddie keeps two perches: the lawn rock by day and the white roof after sunset.
 // Both ends, the cruise height and the easing are constants, so the whole flight
@@ -2250,7 +2323,7 @@ function makeRetriever(actor,collarColor,coatColor,faceColor,scale=1){
   part(.49,.44,.26,light,0,.51,.46);part(.56,.18,.68,light,0,.34,-.16);
   for(let i=0;i<3;i++){const feather=part(.35-i*.05,.18,.35,light,0,.76-i*.1,-.91-i*.15);feather.rotation.x=-.25;actor.tail.add(feather);feather.position.set(0,-.09-i*.06,-.12-i*.13);}
   part(.6,.12,.18,new THREE.MeshLambertMaterial({color:collarColor}),0,.76,.42);
-  const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(actor.name),depthTest:true}));tag.scale.set(1.8,.45,1);tag.position.y=1.8;actor.group.add(tag);actor.group.scale.setScalar(scale);scene.add(actor.group);actor.speed=2.5;
+  const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(actor.name),depthTest:true}));tag.scale.set(1.8,.45,1);tag.position.y=1.8;tag.visible=false;actor.group.add(tag);actor.group.scale.setScalar(scale);scene.add(actor.group);actor.speed=2.5;
 }
 const sirD=new CampusActor('Sir D',46,5,26,'sir');
 const macek=new CampusActor('Mr. Macek',47,5,29,'macek',worldBounds);
@@ -2777,10 +2850,11 @@ function releaseInput(){
 function noteTouch(){lastTouchAt=performance.now();}
 addEventListener('touchstart',noteTouch,{passive:true});
 addEventListener('pointerdown',e=>{if(e.pointerType&&e.pointerType!=='mouse')noteTouch();},{passive:true});
-addEventListener('keydown', e => { if(started){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
+function isFormInput(event){return ['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target?.tagName);}
+addEventListener('keydown', e => { if(started&&!isFormInput(e)){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
 addEventListener('keyup',   e => { keys[e.code] = false; });
 addEventListener('blur', pauseGame);
-addEventListener('orientationchange', ()=>setControlsLayout('auto'));
+addEventListener('orientationchange', ()=>setControlsLayout(controlsLayout));
 
 let selected = 0; // BLOCK_KEYS index
 // restore saved player position / facing / selected block from a previous session
@@ -2812,6 +2886,7 @@ function recoverSchoolSavePosition(pos,flying=false){
   if(best){pos.copy(best);return true;}return false;
 }
 addEventListener('keydown', e => {
+  if(!started||isFormInput(e))return;
   const m = e.code.match(/^Digit([1-9])$/);
   if (m) selected = Math.min(BLOCK_KEYS.length-1, parseInt(m[1],10)-1);
   if(e.code==='Digit0')selected=9;
@@ -2820,7 +2895,7 @@ addEventListener('keydown', e => {
   refreshHotbar();
 });
 addEventListener('wheel', e => {
-  if (!started) return;
+  if (!started||isFormInput(e)) return;
   selected = (selected + (e.deltaY > 0 ? 1 : -1) + BLOCK_KEYS.length) % BLOCK_KEYS.length;
   refreshHotbar();
 }, { passive: true });
@@ -2836,7 +2911,7 @@ function pauseGame(){
   refreshMenuStatus();
 }
 function isMouseGesture(event){
-  if(!event||touchLayoutOn()||!started)return false;
+  if(!event||touchLayoutOn()||environmentWantsTouch()||!started)return false;
   if(event.pointerType&&event.pointerType!=='mouse')return false;
   if(event.sourceCapabilities?.firesTouchEvents)return false;
   if(performance.now()-lastTouchAt<700)return false;
@@ -2850,7 +2925,7 @@ function requestDesktopLock(event){
   let pending;
   try{pending=renderer.domElement.requestPointerLock?.();}catch{return;}
   const finish=()=>{
-    if(epoch!==inputEpoch||!started||touchLayoutOn()||document.hidden){
+    if(epoch!==inputEpoch||!started||touchLayoutOn()||environmentWantsTouch()||document.hidden){
       try{document.exitPointerLock?.();}catch{}
     }
   };
@@ -2908,12 +2983,12 @@ addEventListener('keydown', e => {
 
 // V swaps between Mr. Macek's own eyes and a view from just behind him.
 addEventListener('keydown', e => {
-  if (e.code === 'KeyV' && started) { setView(view==='third'?'first':'third'); persistSave(); }
+  if (e.code === 'KeyV' && started && !isFormInput(e)) { setView(view==='third'?'first':'third'); persistSave(); }
 });
 
 // F toggles creative flight (press SPACE to rise, SHIFT to descend while flying)
 addEventListener('keydown', e => {
-  if (e.code === 'KeyF' && started && gameMode==='creative') {
+  if (e.code === 'KeyF' && started && gameMode==='creative' && !isFormInput(e)) {
     player.flying = !player.flying;
     player.vel.set(0, 0, 0);
     if (typeof flashFly === 'function') flashFly(player.flying);
@@ -2931,7 +3006,7 @@ addEventListener('mouseup',   () => { lookActive = false; });
 addEventListener('mouseleave',() => { lookActive = false; });
 document.addEventListener('pointerlockchange', () => {
   if(document.pointerLockElement===renderer.domElement){
-    if(!started||touchLayoutOn()||document.hidden)releaseInput();
+    if(!started||touchLayoutOn()||environmentWantsTouch()||document.hidden)releaseInput();
     return;
   }
   lookActive=false;
@@ -3181,6 +3256,13 @@ const _tmpSky = new THREE.Color();
 // reuses these instead of handing four new objects per frame to the collector.
 const _euler = new THREE.Euler(0,0,0,'YXZ');
 const _forward = new THREE.Vector3(), _right = new THREE.Vector3(), _accel = new THREE.Vector3();
+// A continuous Water column above Glowstone is a lift. Use existing block IDs
+// so old saves and downloaded worlds remain compatible. Bounded to world height.
+function waterLiftAt(x,y,z){
+  if(getBlock(x,y,z)!=='water')return false;
+  while(y>-8&&getBlock(x,y,z)==='water')y--;
+  return getBlock(x,y,z)==='glow';
+}
 let last = performance.now();
 function tick(now) {
   const frameInterval=now-last;
@@ -3220,7 +3302,7 @@ function tick(now) {
   updateParticles(dt);
   updateCoordHUD();
   if(started){ npcs.forEach(n=>n.update(dt,player.pos));animals.forEach(a=>a.update(dt));updateEddie(dt);updateCampus(dt); }
-  updateBubble();
+  updateBubble();updateAreaLabelVisibility();
 
   // movement vector (yaw only)
   const forward = _forward.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
@@ -3233,6 +3315,7 @@ function tick(now) {
   if (keys['KeyA']) accel.sub(right);
   if (accel.lengthSq() > 0) accel.normalize();
   const swimming=getBlock(Math.floor(player.pos.x),Math.floor(player.pos.y-1),Math.floor(player.pos.z))==='water';
+  const waterLift=waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z));
   const speed = swimming ? 3 : (keys['ShiftLeft'] || keys['ShiftRight']) ? 8 : 5;
 
   player.vel.x = accel.x * speed;
@@ -3243,6 +3326,8 @@ function tick(now) {
     player.vel.y = 0;
     if (keys['Space']) player.vel.y = speed;
     if (keys['ShiftLeft'] || keys['ShiftRight']) player.vel.y = -speed;
+  } else if(waterLift) {
+    player.vel.y=(keys['ShiftLeft']||keys['ShiftRight'])?-3:4;
   } else if(swimming) {
     player.vel.y = keys['Space'] ? 3.5 : -1.5;
   } else {
@@ -3261,7 +3346,7 @@ function tick(now) {
     if(gameMode==='survival'){
       if(player.onGround && fallSpeed < -12) health-=Math.floor((-fallSpeed-12)/2);
       const underwater=getBlock(Math.floor(player.pos.x),Math.floor(player.pos.y),Math.floor(player.pos.z))==='water';
-      breath=underwater?Math.max(0,breath-dt):10;
+      breath=underwater&&!waterLift?Math.max(0,breath-dt):10;
       if(breath===0)health-=dt*2;
       if(!underwater&&player.onGround)health=Math.min(20,health+dt*.15);
     }
@@ -3402,11 +3487,12 @@ graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detai
 setGraphics(graphics);
 controlsSelect=document.createElement('select');
 controlsSelect.id='controlsToggle';controlsSelect.setAttribute('aria-label','Controls layout');
-controlsSelect.title='Controls follow this device. A phone or tablet never captures the mouse.';
-const controlsOption=document.createElement('option');controlsOption.value='auto';controlsOption.textContent='Auto · match this device';controlsSelect.appendChild(controlsOption);
-controlsSelect.disabled=true;
+controlsSelect.title='Choose Auto, Touch, or Keyboard and mouse. Auto follows this device.';
+for(const [value,text] of [['auto','Auto · match this device'],['touch','Touch · show screen buttons'],['desktop','Keyboard and mouse']]){
+  const option=document.createElement('option');option.value=value;option.textContent=text;controlsSelect.appendChild(option);
+}
 controlsSelect.style.cssText=backLink.style.cssText+'min-height:44px;border-radius:0;background:#171615;color:#f8f6f2;';
-controlsSelect.addEventListener('change',()=>setControlsLayout('auto',true));
+controlsSelect.addEventListener('change',()=>setControlsLayout(controlsSelect.value,true));
 // Tablet-friendly twin of the V key, so play-as-Mr. Macek is reachable without a keyboard.
 viewBtn=document.createElement('button');
 viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
@@ -3611,7 +3697,7 @@ const btnDown    = document.getElementById('btnDown');
   btnJump.addEventListener('touchend', jumpUp);
   btnJump.addEventListener('touchcancel', jumpUp);
   btnJump.addEventListener('pointercancel', jumpUp);
-  btnDown.addEventListener('touchstart',e=>{if(started&&player.flying)keys['ShiftLeft']=true;e.preventDefault();},{passive:false});
+  btnDown.addEventListener('touchstart',e=>{if(started&&(player.flying||waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z))))keys['ShiftLeft']=true;e.preventDefault();},{passive:false});
   for(const name of ['touchend','touchcancel','pointercancel'])btnDown.addEventListener(name,()=>{keys['ShiftLeft']=false;});
 
   // fly: toggle, same as pressing F
@@ -3627,9 +3713,9 @@ const btnDown    = document.getElementById('btnDown');
   addEventListener('touchcancel', releaseTouch);
   addEventListener('pointercancel', releaseTouch);
 }
-setControlsLayout('auto',migratedControls);
+setControlsLayout(controlsLayout);
 for(const query of ['(pointer: coarse)','(hover: none)']){
-  try{window.matchMedia?.(query)?.addEventListener?.('change',()=>setControlsLayout('auto'));}catch{}
+  try{window.matchMedia?.(query)?.addEventListener?.('change',()=>setControlsLayout(controlsLayout));}catch{}
 }
 
 addEventListener('beforeunload', persistSave);

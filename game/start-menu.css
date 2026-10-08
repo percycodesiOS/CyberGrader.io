@@ -40,6 +40,10 @@ html body #start {
 }
 
 html body #start * { box-sizing: border-box; }
+html body #start .area-label-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+html body #start .area-label-form label { display: flex; flex-direction: column; gap: 6px; flex: 1 1 220px; }
+html body #start .area-label-form input { width: 100%; min-height: 44px; padding: 10px; font: inherit; border: 2px solid #888; border-radius: 4px; background: #fff; color: #171615; }
+html body #start .area-label-form select { width: 100%; }
 
 html body #start.hidden {
   opacity: 0;
