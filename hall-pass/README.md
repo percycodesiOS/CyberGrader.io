@@ -1,6 +1,6 @@
 # CIRC Check-In
 
-A supervised digital visit list for Kenny’s school computer. Keep using the existing address:
+A supervised digital visit list for the teacher’s school computer. Keep using the existing address:
 
 **https://percycodesios.github.io/CyberGrader.io/hall-pass/**
 
@@ -13,6 +13,8 @@ A supervised digital visit list for Kenny’s school computer. Keep using the ex
 5. When the visit is finished, select **Finish / return** and scan. The code can then receive another approval.
 
 The list is ordered by expected time. It shows approval, registration and arrival status. Open Staff access to see names; names disappear when staff controls lock. The code can stay at the desk. No handwritten date, signature or carried paper pass is required by the app.
+
+The front screen shows three short steps: teacher approval, registration, and scanning in/out. **Need help scanning? > Reset screen** clears only unfinished input, returns to Register and locks staff controls. It does not change saved visits, names, codes, history or the staff PIN. Reopen **Staff access** with the existing PIN to unlock; a new device/profile instead asks the teacher to create its own private PIN. This is not a forgotten-PIN bypass. Never clear website data to fix a locked screen.
 
 All steps use this **same school computer, browser and browser profile**. There is no sync to another classroom device. Staff can cancel an unused approval. Finish can close a registered visit if arrival was missed. Repeated scans in the same step do not advance to the next step or create duplicate records.
 

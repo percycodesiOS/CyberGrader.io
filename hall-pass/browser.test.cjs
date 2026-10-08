@@ -70,6 +70,22 @@ async function saved(page){return page.evaluate(k=>JSON.parse(localStorage.getIt
   await page.evaluate(()=>{delete document.hidden;});
   await unlock(page);await page.clock.fastForward(100000);await page.locator('[data-mode=arrive]').click();await page.clock.fastForward(96000);assert.equal(await page.locator('#staff-panel').isHidden(),true);
   const restoreCopy=await saved(page);await page.evaluate(k=>localStorage.removeItem(k),key);await page.reload();await page.waitForFunction(()=>document.getElementById('storage-status').textContent.includes('records are missing'));assert.equal(await page.locator('#scan-submit').isDisabled(),true);await unlock(page);await page.locator('#restore-file').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{')});await message(page,'Backup was not restored');assert.equal(await page.locator('#scan-submit').isDisabled(),true);page.once('dialog',dialog=>dialog.accept());await page.locator('#restore-file').setInputFiles({name:'test-backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(restoreCopy))});await message(page,'Private backup restored');assert.deepEqual(await saved(page),restoreCopy);assert.equal(await page.locator('#scan-submit').isDisabled(),false);
+  // Reset screen is safe housekeeping, never a PIN or student-record reset.
+  await unlock(page);await page.locator('[data-mode=return]').click();
+  await page.locator('#student-code').fill('UNSAVED TEST');await page.locator('#approval-pass').fill('99');
+  const beforeScreenReset=await page.evaluate(()=>({records:localStorage.getItem('circ-passdesk-v2'),staff:localStorage.getItem('circ-passdesk-staff-v1')}));
+  await page.locator('.scan-help summary').click();await page.locator('#reset-screen').click();await message(page,'Screen reset');
+  assert.deepEqual(await page.evaluate(()=>({records:localStorage.getItem('circ-passdesk-v2'),staff:localStorage.getItem('circ-passdesk-staff-v1')})),beforeScreenReset);
+  assert.equal(await page.locator('#staff-panel').isHidden(),true);assert.equal(await page.locator('[data-mode=depart]').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('#student-code').inputValue(),'');assert.equal(await page.locator('#approval-pass').inputValue(),'');assert.equal(await page.locator('#scan-number').inputValue(),'');
+  assert.match(await page.locator('body').textContent(),/The teacher opens Staff access/);
+  // A reset cannot claim success while a PIN unlock is still in progress.
+  await page.evaluate(()=>{const original=crypto.subtle.deriveBits.bind(crypto.subtle);crypto.subtle.deriveBits=async function(...args){await new Promise(resolve=>window.finishPinTest=resolve);return original(...args);};});
+  await page.locator('#staff-toggle').click();await page.locator('#pin').fill('728491');await page.locator('#pin-submit').click();
+  await page.waitForFunction(()=>typeof window.finishPinTest==='function');await page.locator('#reset-screen').click();await message(page,'Wait for the current action');
+  assert.equal(await page.locator('#staff-panel').isHidden(),true);await page.evaluate(()=>window.finishPinTest());
+  await page.locator('#staff-panel').waitFor({state:'visible'});await page.locator('#reset-screen').click();await message(page,'Screen reset');
+  assert.equal(await page.locator('#staff-panel').isHidden(),true);assert.deepEqual(await page.evaluate(()=>({records:localStorage.getItem('circ-passdesk-v2'),staff:localStorage.getItem('circ-passdesk-staff-v1')})),beforeScreenReset);
   assert.deepEqual(errors,[]);await context.close();
   // Scanner regression checks use a separate empty profile and fictional names.
   const scanContext=await browser.newContext({viewport:{width:1280,height:900},timezoneId:'America/Los_Angeles'}),scanPage=await scanContext.newPage();

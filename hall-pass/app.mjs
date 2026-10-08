@@ -3,7 +3,7 @@ import {createStore} from './storage.mjs?v=3';
 import {createScanner} from './scanner.mjs?v=3';
 import {code39} from './barcode.mjs?v=3';
 const $=id=>document.getElementById(id),node=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
-let state=createState(),ready=false,busy=false,unlocked=false,staffUnlockedAt=0,action='depart',store,pinRecord=null,pinError=false,staffTimer=null;
+let state=createState(),ready=false,busy=false,pinBusy=false,unlocked=false,staffUnlockedAt=0,action='depart',store,pinRecord=null,pinError=false,staffTimer=null;
 const clock=ms=>ms===null?'—':new Date(ms).toLocaleTimeString([], {timeZone:ZONE,hour:'numeric',minute:'2-digit'});
 const stamp=ms=>new Date(ms).toLocaleString([], {timeZone:ZONE,month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 const feedback=(message,error=false)=>{$('message').textContent=message;$('message').className='feedback scan-feedback'+(error?' error':'');};
@@ -26,7 +26,7 @@ function readPin(){
 $('staff-toggle').addEventListener('click',showAccess);
 $('pin-form').addEventListener('submit',async event=>{
   event.preventDefault();const pin=$('pin').value;if(!/^\d{6,12}$/.test(pin)){feedback('Use a PIN with 6–12 digits.',true);return;}
-  $('pin-submit').disabled=true;
+  $('pin-submit').disabled=true;pinBusy=true;
   try{
     if(pinError)throw Error('Staff setup is unavailable. Saved records were not changed.');
     // Serialize setup across tabs so a second setup cannot replace the first PIN.
@@ -39,7 +39,7 @@ $('pin-form').addEventListener('submit',async event=>{
         localStorage.setItem(STAFF_KEY,JSON.stringify(record));pinRecord=record;}
     });
     unlocked=true;staffUnlockedAt=Date.now();clearTimeout(staffTimer);staffTimer=setTimeout(lockStaff,180000);$('staff-access').hidden=true;$('staff-panel').hidden=false;$('staff-history').hidden=false;$('staff-toggle').textContent='Lock staff controls';$('pin').value='';$('pin-confirm').value='';feedback('Staff controls open for three minutes. Approve the student and expected visit time.');await load();render();$('student-code').focus();
-  }catch(error){feedback(error.message,true);}finally{$('pin-submit').disabled=false;}
+  }catch(error){feedback(error.message,true);}finally{pinBusy=false;$('pin-submit').disabled=false;}
 });
 function render(){
   const now=Date.now();$('today').textContent=new Date(now).toLocaleDateString([], {timeZone:ZONE,weekday:'long',month:'short',day:'numeric'});
@@ -79,6 +79,7 @@ document.addEventListener('focusout',()=>queueMicrotask(scanReadiness));
 async function recordScan(value){if(!String(value).trim())return;$('scan-number').value='';const scanAction=action;try{const card=normalizePass(value);await transact(s=>scanPass(s,card,scanAction));}catch(error){feedback(error.message,true);}finally{if(!document.activeElement?.closest('#staff-panel,#staff-access'))focusScan();}}
 $('scan-form').addEventListener('submit',event=>{event.preventDefault();recordScan($('scan-number').value);});
 function selectAction(next,announce=true){action=next;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===action)));$('scan-submit').textContent={depart:'Record registration',arrive:'Record arrival',return:'Record finish / return'}[action];if(announce)feedback(`${{depart:'Register',arrive:'Arrive',return:'Finish / return'}[action]} selected. Scan the code or type its number.`);focusScan();}
+$('reset-screen').addEventListener('click',()=>{if(busy||pinBusy){feedback('Wait for the current action to finish before resetting the screen.',true);return;}lockStaff();$('approval-pass').value='';$('scan-number').value='';selectAction('depart',false);feedback('Screen reset. Saved visits and the staff PIN are unchanged. Register is selected. Choose Arrive or Finish if needed, then scan.');});
 for(const button of document.querySelectorAll('[data-mode]'))button.addEventListener('click',()=>selectAction(button.dataset.mode));
 $('approval-form').addEventListener('submit',async event=>{
   event.preventDefault();if(!unlocked||Date.now()-staffUnlockedAt>180000){lockStaff();feedback('Unlock staff controls to approve a card.',true);return;}if(!$('approval-confirm').checked){feedback('Confirm teacher permission first.',true);return;}
