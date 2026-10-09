@@ -208,7 +208,8 @@
   </div>
 </div>
 <div id="info">
-  WASD move &nbsp;·&nbsp; DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
+  W Forward · S Back · A Left · D Right (or arrow keys)<br/>
+  DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block<br/>
   Press Esc to release the mouse and open the menu
 </div>
@@ -242,7 +243,7 @@
         <p><strong>Creative:</strong> unlimited blocks, flight, and coordinate travel. <strong>Embrace the Challenge:</strong> collect 10 wood blocks, place 12 blocks, and find CIRC on foot. It is a peaceful world; falls and deep water can hurt.</p>
         <p>Use <strong>Smooth</strong> for lighter graphics. <strong>Detailed</strong> adds shadows. Switch camera views here or with the in-game View button.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
-        <p class="start-tip">Play resumes your current world and position. On a computer, Play requests mouse capture; press Esc or Menu to pause. If the cursor stays free, drag to look. Phones and tablets use touch controls automatically.</p>
+        <p class="start-tip"><strong>Start here:</strong> Keep Creative and press Play. <strong>W Forward · S Back · A Left · D Right</strong>, or use the arrow keys. Move your mouse to look; click and drag if it stays free. Space jumps. Esc or Menu pauses. On a phone or tablet, use the stick and drag to look. You can explore the other choices later.</p>
       </section>
     </div>
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
@@ -259,10 +260,10 @@
     </section></details>
     <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
       <h2 id="saveTitle" class="start-wide">Keep your world</h2>
-      <p class="start-wide"><strong>Save</strong> in the game toolbar saves progress in this browser. Autosave also runs while you play. <strong>Download World</strong> creates a portable JSON backup of your build, position, outfit, settings, world clock, and challenge progress.</p>
-      <p class="start-wide"><strong>Load World</strong> opens a downloaded backup and replaces this browser's current world after you confirm. Worlds do not merge. Download your current world first if you want to keep both, then use Load World on another device to continue there.</p>
-      <p class="start-wide">There is no account or automatic device sync. The school link and primary MYnecraft site share one autosave in the same browser. Clearing browser data can erase it. <strong>Reset World</strong> starts fresh after confirmation, so download a backup first.</p>
-      <button id="downloadWorld" type="button">Download World</button>
+      <p class="start-wide"><strong>Save</strong> keeps your progress in this browser on this device. The game also saves as you play. <strong>Download Save</strong> puts a copy of your world in a file you can keep. It does not remove or change your world. Check your Downloads folder for the file ending in .json.</p>
+      <p class="start-wide"><strong>Load World</strong> opens a MYnecraft save file you choose. It asks before replacing the world saved in this browser. The two worlds do not join together. <strong>Keep both?</strong> Use Download Save first and check that your current world's file downloaded. Then choose Load World. Press Cancel at the warning to keep playing your current world.</p>
+      <p class="start-wide">To play on another device, move your save file there and open it with Load World in MYnecraft. This file <strong>cannot open in Minecraft</strong>; it only works in MYnecraft. There is no account or automatic device sync. The school and primary links share one save in the same browser. Clearing browser data can erase it. Reset World starts fresh after asking, so keep a downloaded copy first.</p>
+      <button id="downloadWorld" type="button">Download Save</button>
       <button id="loadWorld" type="button">Load World</button>
       <input id="worldFile" type="file" accept=".json,application/json" hidden>
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
@@ -281,10 +282,10 @@
       <p>This MYnecraft recipe uses Glowstone. Ordinary water still works for swimming. The lift works in both game modes; in Embrace the Challenge, collect the blocks first.</p>
     </details>
     <details class="start-advanced"><summary>How to play</summary>
-      <p><strong>Keyboard and mouse:</strong> WASD moves. Move the captured mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
+      <p><strong>Keyboard and mouse:</strong> W Forward · S Back · A Left · D Right. The arrow keys also move: ↑ Forward · ↓ Back · ← Left · → Right. Move your mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
       <p><strong>Creative flight and camera:</strong> F toggles flight. While flying, Space rises and Shift descends. V switches between first and third person; the toolbar's View button does the same.</p>
       <p><strong>Phone or tablet:</strong> Choose Touch to show the screen buttons, or Auto to follow your device. Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight. DOWN descends while flying or in a water elevator. Phones and tablets never capture a mouse.</p>
-      <p><strong>Pause and keep playing:</strong> Esc releases the mouse and opens this menu. The Menu button also pauses. Use Play to continue, Save to keep local progress now, and Download World for a backup you can keep or move.</p>
+      <p><strong>Pause and keep playing:</strong> Esc releases the mouse and opens this menu. The Menu button also pauses. Use Play to continue, Save to keep local progress now, and Download Save for a copy you can keep or move.</p>
     </details>
   </div>
 </div>
@@ -1049,7 +1050,7 @@ function persistSave(){
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
     flashSaved();
     return true;
-  } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open and use Menu > Download World to keep your progress.'; return false; }
+  } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open and use Menu > Download Save to keep your progress.'; return false; }
 }
 
 // Portable backups contain game state only. Never evaluate imported file contents.
@@ -1067,7 +1068,7 @@ function readWorldBackup(text){
   const s=data?.state;
   const object=v=>v!==null && typeof v==='object' && !Array.isArray(v);
   const finite=v=>typeof v==='number' && Number.isFinite(v);
-  if(data?.format!=='mynecraft-world'||data.version!==1||!object(s)||!object(s.edits)||!object(s.player)) throw new Error('Choose a backup made with Download World.');
+  if(data?.format!=='mynecraft-world'||data.version!==1||!object(s)||!object(s.edits)||!object(s.player)) throw new Error('Choose a MYnecraft file made with Download Save (previously called Download World).');
   const edits=Object.create(null);
   for(const [id,block] of Object.entries(s.edits)){
     if(!/^-?\d+,-?\d+,-?\d+$/.test(id)||id.split(',').some(n=>Math.abs(Number(n))>10000)||(block!==null&&!BLOCK_KEYS.includes(block))) throw new Error('This backup contains an invalid block. Your world was kept.');
@@ -1095,7 +1096,7 @@ function readWorldBackup(text){
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
-  if(!confirm('Load this world instead of the world on this device? Download your current world first if you want to keep both.')) return false;
+  if(!confirm('Replace this browser\'s saved world with this file? The two worlds will not join together. To keep your current world, press Cancel, then use Download Save and check that the file downloaded. Press OK only when you are ready to replace it.')) return false;
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); }
   catch { throw new Error('This device could not save the loaded world. Your current world was kept.'); }
   resetting=true;clearTimeout(_saveTimer);location.reload();return true;
@@ -1104,7 +1105,7 @@ document.getElementById('downloadWorld').addEventListener('click',()=>{
   const url=URL.createObjectURL(new Blob([worldBackupText()],{type:'application/json'}));
   const link=document.createElement('a');link.href=url;link.download=`MYnecraft EC World ${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-  document.getElementById('backupStatus').textContent='World file prepared. Keep it in Files or Downloads, or save it to your school OneDrive. Check that it finished downloading.';
+  document.getElementById('backupStatus').textContent='Your world file is ready. Check your Downloads folder for the .json file. Keep it somewhere safe, such as your school OneDrive. Your world is still here.';
 });
 const worldFile=document.getElementById('worldFile');
 document.getElementById('loadWorld').addEventListener('click',()=>{worldFile.value='';worldFile.click();});
@@ -1421,13 +1422,13 @@ function saveAreaLabel(text,index='new'){
     areaLabels.push(v);
   }else areaLabels[i].text=clean;
   rebuildAreaLabelSprites();refreshAreaLabelChoices(String(i===-1?areaLabels.length-1:i));
-  return persistSave()?'Sign saved. Press Play and step back to see it.':'Sign is in this world, but browser storage is full. Download World now to keep it.';
+  return persistSave()?'Sign saved. Press Play and step back to see it.':'Sign is in this world, but browser storage is full. Download Save now to keep it.';
 }
 function removeAreaLabel(index){
   const i=Number(index);
   if(index==='new'||!Number.isInteger(i)||!areaLabels[i])return 'Choose the sign you want to remove.';
   areaLabels.splice(i,1);rebuildAreaLabelSprites();refreshAreaLabelChoices();document.getElementById('areaLabelText').value='';
-  return persistSave()?'Sign removed.':'Sign removed here. Download World to keep this change.';
+  return persistSave()?'Sign removed.':'Sign removed here. Download Save to keep this change.';
 }
 document.getElementById('areaLabelChoice').addEventListener('change',()=>{
   const value=document.getElementById('areaLabelChoice').value;
@@ -2851,7 +2852,7 @@ function noteTouch(){lastTouchAt=performance.now();}
 addEventListener('touchstart',noteTouch,{passive:true});
 addEventListener('pointerdown',e=>{if(e.pointerType&&e.pointerType!=='mouse')noteTouch();},{passive:true});
 function isFormInput(event){return ['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target?.tagName);}
-addEventListener('keydown', e => { if(started&&!isFormInput(e)){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();} });
+addEventListener('keydown', e => { if(started&&!isFormInput(e)){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();} });
 addEventListener('keyup',   e => { keys[e.code] = false; });
 addEventListener('blur', pauseGame);
 addEventListener('orientationchange', ()=>setControlsLayout(controlsLayout));
@@ -3309,10 +3310,10 @@ function tick(now) {
   const right   = _right.set(  Math.cos(player.yaw), 0, -Math.sin(player.yaw));
 
   const accel = _accel.set(0,0,0);
-  if (keys['KeyW']) accel.add(forward);
-  if (keys['KeyS']) accel.sub(forward);
-  if (keys['KeyD']) accel.add(right);
-  if (keys['KeyA']) accel.sub(right);
+  if (keys['KeyW'] || keys['ArrowUp']) accel.add(forward);
+  if (keys['KeyS'] || keys['ArrowDown']) accel.sub(forward);
+  if (keys['KeyD'] || keys['ArrowRight']) accel.add(right);
+  if (keys['KeyA'] || keys['ArrowLeft']) accel.sub(right);
   if (accel.lengthSq() > 0) accel.normalize();
   const swimming=getBlock(Math.floor(player.pos.x),Math.floor(player.pos.y-1),Math.floor(player.pos.z))==='water';
   const waterLift=waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z));
@@ -3473,7 +3474,7 @@ resetBtn.style.cssText = `
   border-radius: 6px; padding: 7px 10px; font: inherit; box-shadow: 2px 2px 0 #0006;
 `;
 resetBtn.addEventListener('click', () => {
-  if (!confirm('Reset this browser’s world to the original campus? This clears your build, inventory and challenge progress. Download World first to keep a backup.')) return;
+  if (!confirm('Reset this browser’s world to the original campus? This clears your build, inventory and challenge progress. Download Save first to keep a copy.')) return;
   resetting=true; clearTimeout(_saveTimer);
   try { localStorage.removeItem(SAVE_KEY); } catch(e){resetting=false;document.getElementById('status').textContent='Could not reset storage. Your world was kept.';return;}
   location.reload();
