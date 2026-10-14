@@ -251,6 +251,7 @@
       <button id="overview" type="button">Fly above ECMS · Creative</button>
       <p class="start-wide"><strong>Choose a starting point:</strong> Visit the ECMS entrance moves you to the front approach in either mode. Fly above ECMS starts a flying view in Creative. Neither shortcut changes the world clock or clears your build.</p>
       <p class="start-wide"><strong>Front lawn and entrance:</strong> Find Sleeves in his number 28 jersey, larger than KaY and smaller than the adults. Officer Shields stays by his front desk, and Mr. Eiler walks the entrance area. Eddie perches on the lawn rock during the day.</p>
+      <p class="start-wide"><strong>Playground:</strong> Look for js in a red tee and lime shorts. He walks around the playground and takes turns on the two swings.</p>
       <p class="start-wide"><strong>Find your learning community:</strong> Pass through both glass doorways. The main cafeteria and its high ECTV screen are straight ahead; the elementary cafeteria is to your left. Grade 5 is in the right wing with Grade 6 upstairs. Grades 3–4 are in the left wing with Grades 1–2 upstairs. Kindergarten is at the upper landing of the broad curved walkway. Outside, the flag is in the center of the entrance circle and the parking rows are to the left of the approach.</p>
       <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy follow the campus Mr. Macek. Sir D and Mr. Macek meet near the entrance around sunset.</p>
       <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer parks beyond the far curb near the circle exit at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
@@ -1079,7 +1080,7 @@ function readWorldBackup(text){
   if(!['creative','survival'].includes(s.mode)||!finite(s.health)||s.health<1||s.health>20||!finite(s.dayTime)||!object(s.inventory)) throw new Error('This backup has invalid game settings. Your world was kept.');
   const inventory={};
   for(const k of BLOCK_KEYS){if(!Number.isSafeInteger(s.inventory[k])||s.inventory[k]<0)throw new Error('This backup has an invalid inventory. Your world was kept.');inventory[k]=s.inventory[k];}
-  if(!Array.isArray(s.campus)||s.campus.length>12)throw new Error('This backup has invalid characters. Your world was kept.');
+  if(!Array.isArray(s.campus)||s.campus.length>13)throw new Error('This backup has invalid characters. Your world was kept.');
   const campus=s.campus.map(a=>{
     if(!object(a)||typeof a.name!=='string'||a.name.length>40||!['x','y','z'].every(k=>finite(a[k])&&Math.abs(a[k])<=10000)||!Number.isSafeInteger(a.patrolIndex)||a.patrolIndex<0)throw new Error('This backup has invalid characters. Your world was kept.');
     return {name:canonicalCampusName(a.name),x:a.x,y:a.y,z:a.z,patrolIndex:a.patrolIndex};
@@ -1634,7 +1635,14 @@ for(const z of [21.3,41.7]){
 // Swings and climbing bars add recognizable playground silhouettes.
 for(const x of [67.5,76.5])campusBox(.15,3.4,.15,0x275d9b,x,6.7,33.5);
 campusBox(9.15,.16,.17,0x275d9b,72,8.4,33.5);
-for(const x of [70,74]){for(const dx of [-.4,.4])campusBox(.035,2.1,.035,0xc5cbd0,x+dx,7.25,33.5);campusBox(1,.1,.55,0x23363c,x,6.18,33.5);}
+// Each seat and its chains share a pivot, so a seated rider follows the same arc.
+const playgroundSwings=[70,74].map(x=>{
+  const pivot=new THREE.Group();pivot.position.set(x,8.4,33.5);pivot.name='playground swing';
+  const part=(w,h,d,color,px,py)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));mesh.position.set(px,py,0);pivot.add(mesh);return mesh;};
+  for(const dx of [-.4,.4])part(.035,2.22,.035,0xc5cbd0,dx,-1.11);
+  const seat=part(1,.1,.55,0x23363c,0,-2.22);seat.name='swing seat';
+  campusDetails.add(pivot);return {pivot,seat};
+});
 // Outdoor teaching board beside the open stump classroom.
 campusBox(4,2,.16,0x243d39,78,7.5,-16.8);
 for(const x of [75.9,80.1])campusBox(.2,3,.2,0x806745,x,6.5,-16.8);
@@ -1984,6 +1992,10 @@ function faceForPerson(style){
       ctx.fillStyle='#c9a15c';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,3);ctx.fillRect(14,3,2,3);
       ctx.fillStyle='#e1bf77';ctx.fillRect(2,0,4,2);ctx.fillRect(9,1,5,2);ctx.fillRect(3,3,3,1);
     }
+    else if(style==='js'){
+      ctx.fillStyle='#b48a50';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,3);ctx.fillRect(14,3,2,2);
+      ctx.fillStyle='#d1ae6e';ctx.fillRect(1,1,9,2);ctx.fillRect(2,3,6,2);ctx.fillRect(3,5,3,1);
+    }
     else if(style==='micco'){
       ctx.fillStyle='#79502e';ctx.fillRect(0,0,16,4);ctx.fillRect(0,0,3,16);ctx.fillRect(13,0,3,16);ctx.fillRect(3,3,3,2);
     }
@@ -2110,6 +2122,34 @@ function stylePerson(npc,style){
     const hair=part(.52,.12,.52,0xc9a15c,0,1.81,0);hair.name='blond crop';
     part(.51,.18,.04,0xc9a15c,0,1.70,-.25);
     part(.22,.045,.16,0xe1bf77,-.11,1.89,.07);
+  } else if(style==='js'){
+    // Public nickname and handmade voxel clothing only; no reference photo asset.
+    npc.group.scale.setScalar(.74);
+    npc.group.userData.appearance='light brown blond hair, red tee, tied reddish sweatshirt, lime shorts, black socks, orange lime shoes';
+    const tee=makeFlatTex(207,52,48),bareArm=makeFlatTex(229,185,147);
+    npc.body.material.forEach(m=>m.map=tee);
+    for(const arm of [npc.armL,npc.armR]){
+      arm.children[0].material.forEach(m=>m.map=bareArm);
+      const cap=bodyPart(.27,.25,.27,tee);cap.position.y=-.1;cap.name='red tee sleeve';arm.add(cap);
+    }
+    const shorts=makeTexture(ctx=>{
+      ctx.fillStyle='#e5b993';ctx.fillRect(0,0,16,16);ctx.fillStyle='#b7df3b';ctx.fillRect(0,0,16,8);
+      ctx.fillStyle='#99bc30';ctx.fillRect(0,7,16,1);ctx.fillStyle='#202127';ctx.fillRect(0,11,16,5);
+    });
+    for(const leg of [npc.legL,npc.legR]){
+      const limb=leg.children[0];limb.geometry.dispose();limb.geometry=new THREE.BoxGeometry(.25,.55,.25);
+      limb.geometry.clearGroups();limb.geometry.addGroup(0,36,0);limb.position.y=-.275;limb.material.forEach(m=>m.map=shorts);
+      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.29,.14,.4),new THREE.MeshLambertMaterial({color:0xf27326}));
+      shoe.name='orange lime shoe';shoe.position.set(0,-.48,.06);leg.add(shoe);
+      const toe=new THREE.Mesh(new THREE.BoxGeometry(.295,.09,.16),new THREE.MeshLambertMaterial({color:0xc7e945}));toe.position.set(0,.02,.125);shoe.add(toe);
+    }
+    const sweatshirt=part(.56,.16,.32,0xa63f43,0,.59,0);sweatshirt.name='tied sweatshirt';
+    part(.54,.38,.09,0xa63f43,0,.38,-.18);
+    part(.15,.12,.13,0x963239,0,.57,.21);
+    for(const side of [-1,1]){const sleeve=part(.12,.3,.1,0xb54a4d,side*.1,.39,.2);sleeve.rotation.z=side*.18;}
+    const hair=part(.53,.13,.54,0xb48a50,0,1.81,-.01);hair.name='light brown blond hair';
+    part(.51,.2,.05,0xb48a50,0,1.69,-.25);
+    const fringe=part(.33,.12,.08,0xd1ae6e,-.08,1.73,.25);fringe.name='side fringe';fringe.rotation.z=-.17;
   } else if(style==='schoolOfficer'){
     // Tied-back auburn hair, glasses, black vest, badge and radio.
     // No weapon or holster. The photo itself is not part of the public game.
@@ -2333,6 +2373,50 @@ const kay=new CampusActor('KaY',44,5,26,'sir');
 const sleevesBounds={minX:44,maxX:47.9,minZ:34,maxZ:36.9};
 const sleeves=new CampusActor('Sleeves',44,5,34,'sleeves',sleevesBounds);sleeves.speed=1.25;
 const sleevesPatrol=[[44,5,34],[47,5,34],[47,5,36],[44,5,36]];
+const jsBounds={minX:67,maxX:76.9,minZ:30,maxZ:35.9};
+const js=new CampusActor('js',67,5,30,'js',jsBounds);js.speed=1.3;
+// Inset from the decorative swing posts at x=67.5 and 76.5.
+const jsStops=[[68,5,30],[68,5,35],[75,5,35],[75,5,30],[72,5,30]];
+const jsRoutine={phase:'walk',elapsed:0,swing:0};
+const jsGoal={x:67,y:5,z:30};
+function updateJs(dt){
+  const swing=playgroundSwings[jsRoutine.swing],pivot=swing.pivot;
+  if(jsRoutine.phase==='walk'){
+    js.patrolIndex%=jsStops.length+1;
+    const stop=jsStops[js.patrolIndex];
+    jsGoal.x=stop?stop[0]:pivot.position.x;jsGoal.y=5;jsGoal.z=stop?stop[2]:33;
+    js.go(dt,jsGoal);
+    // Require the actual destination, not a nearby fallback around a built wall.
+    if(Math.hypot(js.pos.x-jsGoal.x-.5,js.pos.z-jsGoal.z-.5)<.15&&Math.abs(js.pos.y-5)<.15){
+      if(stop)js.patrolIndex++;
+      else {jsRoutine.phase='board';jsRoutine.elapsed=0;}
+    }
+    return;
+  }
+  const duration=jsRoutine.phase==='swing'?12:1;
+  jsRoutine.elapsed=Math.min(duration,jsRoutine.elapsed+dt);
+  const progress=jsRoutine.elapsed/duration;
+  const blend=jsRoutine.phase==='board'?smoothStep(progress):jsRoutine.phase==='leave'?1-smoothStep(progress):1;
+  const angle=jsRoutine.phase==='swing'?Math.sin(jsRoutine.elapsed*Math.PI/2)*.46*Math.sin(progress*Math.PI):0;
+  pivot.rotation.x=angle;
+  // Save the ground anchor in js.pos, as with Officer Shields' seated pose.
+  // A reload resumes walking safely rather than spawning in midair.
+  const seatOrigin=-2.22+.05-.55*js.group.scale.y;
+  js.group.position.set(
+    js.pos.x+(pivot.position.x-js.pos.x)*blend,
+    js.pos.y+(pivot.position.y+seatOrigin*Math.cos(angle)-js.pos.y)*blend,
+    js.pos.z+(pivot.position.z+seatOrigin*Math.sin(angle)-js.pos.z)*blend);
+  js.group.rotation.set(angle,0,0);
+  js.legL.rotation.x=js.legR.rotation.x=-Math.PI/2*blend;
+  js.armL.rotation.x=js.armR.rotation.x=-2.95*blend;
+  js.armL.rotation.z=-.22*blend;js.armR.rotation.z=.22*blend;
+  if(progress===1){
+    jsRoutine.elapsed=0;
+    if(jsRoutine.phase==='board')jsRoutine.phase='swing';
+    else if(jsRoutine.phase==='swing')jsRoutine.phase='leave';
+    else {jsRoutine.phase='walk';js.patrolIndex=0;jsRoutine.swing=1-jsRoutine.swing;}
+  }
+}
 const ellie=new CampusActor('Ellie',47,5,31,'macek',worldBounds);makeRetriever(ellie,0x38b8b0,0xd9a252,0xf0d09c,.96);
 const percy=new CampusActor('Percy',45,5,31,'macek',worldBounds);makeRetriever(percy,0x253f52,0xba732f,0xd59951,1.1);
 const micco=new CampusActor('Ms. Micco',26,5,-26,'micco');
@@ -2513,7 +2597,7 @@ function updateSchoolOfficer(dt,time=dayTime){
   schoolOfficerCar.position.set(officerSample.x,officerSample.y,officerSample.z);schoolOfficerCar.rotation.y=officerSample.yaw;
 }
 updateSchoolOfficer(0,LOADED_DAY_TIME);
-const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie,schoolOfficer,sleeves];
+const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie,schoolOfficer,sleeves,js];
 // Cache both outfits once; switching clothes does not allocate textures per frame.
 function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
@@ -2738,6 +2822,7 @@ function updateCampus(dt){
   } else {greetedAtSunset=false;sirD.patrol(dt,sirPatrol);macek.patrol(dt,macekPatrol);}
   kay.go(dt,{x:sirD.pos.x-1.3,y:sirD.pos.y,z:sirD.pos.z+1.3});
   sleeves.patrol(dt,sleevesPatrol);
+  updateJs(dt);
   updateCompanions(dt);
   entranceDoors.forEach(h=>{
     const atDoor=p=>Math.hypot(p.x-46.5,p.z-h.position.z)<5&&p.y<10;
