@@ -188,7 +188,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css">
+<link rel="stylesheet" href="start-menu.css?v=staff-20261016">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -220,24 +220,20 @@
       <a class="start-home" href="../index.html">← Back to MYnecraft</a>
       <h1 class="start-brand">MYNECRAFT</h1>
       <p class="edition">EC EDITION</p>
-      <p>Build your world, explore ECMS, and meet the campus crew as Mr. Macek.</p>
+      <p>Choose your character, build your world, and explore ECMS.</p>
     </header>
     <div class="start-grid">
       <section class="start-character-panel" aria-labelledby="characterTitle">
-        <h2 id="characterTitle">Play as Mr. Macek</h2>
-        <p class="character-note">Florida Gators lanyard. School ID. Choose an outfit for your character and first-person sleeves.</p>
-        <div class="outfit-options" role="group" aria-label="Choose Mr. Macek's outfit">
-          <label class="outfit-option"><img class="outfit-preview" src="./assets/macek-avatar-lanyard.png" width="1086" height="1448" alt="Mr. Macek in a blue polo, patterned arm sleeve and Gators lanyard"><span><input type="radio" name="outfitPreview" id="outfitPolo" value="polo" checked> Blue polo</span><small>One patterned SV sleeve</small></label>
-          <label class="outfit-option"><img class="outfit-preview" src="./assets/macek-avatar-black.png" width="1024" height="1536" alt="Mr. Macek in a black SV shirt, two patterned sleeves and Gators lanyard"><span><input type="radio" name="outfitPreview" id="outfitBlack" value="black"> Black SV shirt</span><small>Two patterned SV sleeves</small></label>
-        </div>
-        <select id="macekOutfit" aria-label="Mr. Macek's outfit" hidden><option value="polo">Blue polo + one sleeve</option><option value="black">Black SV shirt + two sleeves</option></select>
+        <h2 id="characterTitle">Choose your character</h2>
+        <p class="character-note">Six familiar faces. Pick who you play as, then explore in first or third person.</p>
+        <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your playable character"></div>
         <p id="identityStatus" role="status">You play as Mr. Macek.</p>
       </section>
       <section class="start-settings" aria-labelledby="settingsTitle">
         <h2 id="settingsTitle">Choose your adventure</h2>
         <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option></select></label>
         <p id="modeHelp">Changing modes keeps your build and saved challenge progress.</p>
-        <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see Mr. Macek</option></select></label>
+        <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see your character</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
         <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · show screen buttons</option><option value="desktop">Keyboard and mouse</option></select></label>
         <p><strong>Creative:</strong> unlimited blocks, flight, and coordinate travel. <strong>Embrace the Challenge:</strong> collect 10 wood blocks, place 12 blocks, and find CIRC on foot. It is a peaceful world; falls and deep water can hurt.</p>
@@ -254,6 +250,7 @@
       <p class="start-wide"><strong>Playground:</strong> Look for js in a red tee and lime shorts. He walks around the playground and takes turns on the two swings.</p>
       <p class="start-wide"><strong>Find your learning community:</strong> Pass through both glass doorways. The main cafeteria and its high ECTV screen are straight ahead; the elementary cafeteria is to your left. Grade 5 is in the right wing with Grade 6 upstairs. Grades 3–4 are in the left wing with Grades 1–2 upstairs. Kindergarten is at the upper landing of the broad curved walkway. Outside, the flag is in the center of the entrance circle and the parking rows are to the left of the approach.</p>
       <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy follow the campus Mr. Macek. Sir D and Mr. Macek meet near the entrance around sunset.</p>
+      <p class="start-wide"><strong>Meet the staff:</strong> Ms. Eriksen paints upstairs in the left wing. Mr. Wingenbach plays a keyboard upstairs above CIRC. Ms. McMichael greets you in Spanish in the upstairs right wing. Mr. Mullet walks around the outdoor court. The campus Mr. Macek wears his black SV shirt in CIRC.</p>
       <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer parks beyond the far curb near the circle exit at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
       <p class="start-wide"><strong>Evening:</strong> Cookie Man sweeps the halls from 4:00 PM to 10:00 PM. Eddie starts flying to the roof at 6:00 PM and returns to the lawn by 6:00 AM.</p>
       <p class="start-wide"><strong>These are game-clock routines.</strong> A full day takes 20 minutes of active play. Opening this menu pauses the world, including the clock, characters, and buses. Your real school day does not set their schedule.</p>
@@ -904,6 +901,16 @@ if((requestedMode==='creative'||requestedMode==='survival')&&typeof history!=='u
   try{const cleanURL=new URL(location.href);cleanURL.searchParams.delete('mode');history.replaceState(history.state,'',cleanURL.href);}catch{}
 }
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
+const STAFF_CHARACTERS=Object.freeze([
+  {id:'macek',name:'Mr. Macek',role:'CIRC',style:'macekStriped',detail:'Striped polo and Gators lanyard'},
+  {id:'micco',name:'Ms. Micco',role:'CIRC',style:'micco',detail:'The familiar campus character'},
+  {id:'eriksen',name:'Ms. Eriksen',role:'Art',style:'eriksen',detail:'Curly hair and a purple top'},
+  {id:'mullet',name:'Mr. Mullet',role:'PE',style:'mullet',detail:'Navy hoodie and khaki shorts'},
+  {id:'wingenbach',name:'Mr. Wingenbach',role:'Music',style:'wingenbach',detail:'Black quarter-zip and gray pants'},
+  {id:'mcmichael',name:'Ms. McMichael',role:'Spanish',style:'mcmichael',detail:'Glasses, cream sweater and polka dots'}
+]);
+const STAFF_CHARACTER_IDS=STAFF_CHARACTERS.map(c=>c.id);
+let playerCharacter=STAFF_CHARACTER_IDS.includes(saveState.playerCharacter)?saveState.playerCharacter:'macek';
 // The clock the world was saved at. Eddie's perch and the bus loop are both pure
 // functions of it, so they are placed correctly the instant the world loads.
 const LOADED_DAY_TIME = Number.isFinite(saveState.dayTime) ? ((saveState.dayTime % 1) + 1) % 1 : 0.12;
@@ -1042,6 +1049,7 @@ function persistSave(){
     saveState.challenge = {...challenge};
     saveState.dayTime = dayTime;
     saveState.macekOutfit = macekOutfit;
+    saveState.playerCharacter = playerCharacter;
     saveState.view = view;
     saveState.graphics = graphics;
     saveState.controls = controlsLayout;
@@ -1080,12 +1088,14 @@ function readWorldBackup(text){
   if(!['creative','survival'].includes(s.mode)||!finite(s.health)||s.health<1||s.health>20||!finite(s.dayTime)||!object(s.inventory)) throw new Error('This backup has invalid game settings. Your world was kept.');
   const inventory={};
   for(const k of BLOCK_KEYS){if(!Number.isSafeInteger(s.inventory[k])||s.inventory[k]<0)throw new Error('This backup has an invalid inventory. Your world was kept.');inventory[k]=s.inventory[k];}
-  if(!Array.isArray(s.campus)||s.campus.length>13)throw new Error('This backup has invalid characters. Your world was kept.');
+  if(!Array.isArray(s.campus)||s.campus.length>MAX_CAMPUS_ACTORS)throw new Error('This backup has invalid characters. Your world was kept.');
   const campus=s.campus.map(a=>{
     if(!object(a)||typeof a.name!=='string'||a.name.length>40||!['x','y','z'].every(k=>finite(a[k])&&Math.abs(a[k])<=10000)||!Number.isSafeInteger(a.patrolIndex)||a.patrolIndex<0)throw new Error('This backup has invalid characters. Your world was kept.');
     return {name:canonicalCampusName(a.name),x:a.x,y:a.y,z:a.z,patrolIndex:a.patrolIndex};
   });
+  if(new Set(campus.map(a=>a.name)).size!==campus.length)throw new Error('This backup has duplicate characters. Your world was kept.');
   if(s.macekOutfit!==undefined&&!['polo','black'].includes(s.macekOutfit))throw new Error('This backup has an invalid outfit. Your world was kept.');
+  if(s.playerCharacter!==undefined&&!STAFF_CHARACTER_IDS.includes(s.playerCharacter))throw new Error('This backup has an invalid playable character. Your world was kept.');
   // Backups written before the playable Mr. Macek identity simply have no camera
   // choice; they load as first person rather than being rejected.
   if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
@@ -1093,7 +1103,7 @@ function readWorldBackup(text){
   if(s.controls!==undefined&&!['auto','touch','desktop'].includes(s.controls))throw new Error('This backup has an invalid controls setting. Your world was kept.');
   const areaLabels=readAreaLabels(s.areaLabels);
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge)};
+  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',playerCharacter:s.playerCharacter||'macek',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge)};
 }
 function restoreWorldBackup(text){
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
@@ -2033,7 +2043,100 @@ function faceForPerson(style){
     }
   });
 }
+// Staff looks are procedural game art. Source photographs never enter the game.
+// Cache one texture set per look; selecting a character never allocates textures.
+const staffLooks=new Map();
+function staffLook(style){
+  if(staffLooks.has(style))return staffLooks.get(style);
+  const isMacek=style==='macekStriped',isArt=style==='eriksen',isPE=style==='mullet',isMusic=style==='wingenbach';
+  const skin=isMusic?'#d9a27d':isArt?'#e6b894':isMacek?'#eab887':'#edc3a2';
+  const hair=isMusic?'#3e3129':isArt?'#735943':isPE?'#b3a080':isMacek?'#775c40':'#b89b67';
+  const face=outfitTexture(ctx=>{
+    ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);
+    ctx.fillStyle=hair;
+    if(isMacek||isPE){ctx.fillRect(0,0,9,22);ctx.fillRect(55,0,9,22);ctx.fillRect(7,0,50,3);}
+    else {ctx.fillRect(0,0,64,10);ctx.fillRect(0,10,7,isArt?40:15);ctx.fillRect(57,10,7,isArt?40:15);}
+    ctx.fillStyle=isArt?'#bba47d':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
+    ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
+    ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(19,29,7,8);ctx.fillRect(38,29,7,8);
+    ctx.fillStyle='#292d30';ctx.fillRect(22,30,4,6);ctx.fillRect(38,30,4,6);
+    ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
+    if(isMusic){ctx.fillStyle='#41372e';ctx.fillRect(7,43,50,17);ctx.fillRect(4,38,7,13);ctx.fillRect(53,38,7,13);}
+    if(isMacek){ctx.fillStyle='#9c7856';ctx.fillRect(21,47,22,3);ctx.fillRect(25,56,14,5);}
+    ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
+    if(style==='mcmichael'){
+      ctx.strokeStyle='#292b31';ctx.lineWidth=3;ctx.strokeRect(6,26,23,17);ctx.strokeRect(35,26,23,17);ctx.fillStyle='#292b31';ctx.fillRect(29,30,6,3);
+    }
+  });
+  const shirt=outfitTexture(ctx=>{
+    ctx.fillStyle=isMacek?'#202027':isArt?'#16191e':isPE?'#202e49':isMusic?'#202429':'#eee6d6';ctx.fillRect(0,0,64,64);
+    if(isMacek){for(let y=3;y<64;y+=10){ctx.fillStyle='#e9e8e0';ctx.fillRect(0,y,64,2);ctx.fillStyle='#b84348';ctx.fillRect(0,y+3,64,2);ctx.fillStyle='#cbc7bc';ctx.fillRect(0,y+6,64,1);}ctx.fillStyle='#171b23';ctx.fillRect(25,0,14,16);}
+    if(isArt){ctx.fillStyle='#a54cb0';ctx.fillRect(17,0,30,64);ctx.fillStyle='#803f91';ctx.fillRect(17,0,30,3);}
+    if(isPE){ctx.fillStyle='#142039';ctx.fillRect(5,44,54,3);ctx.fillRect(10,46,44,14);ctx.fillStyle='#8b8d94';ctx.fillRect(20,2,2,26);ctx.fillRect(43,2,2,26);}
+    if(isMusic){ctx.fillStyle='#777d83';ctx.fillRect(31,0,2,27);ctx.fillStyle='#d0d0c7';ctx.fillRect(30,23,4,5);}
+    if(style==='mcmichael'){ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=6)ctx.fillRect(x,0,1,64);ctx.fillRect(0,58,64,6);}
+  });
+  const back=isArt?makeFlatTex(22,25,30):isPE?makeFlatTex(32,46,73):isMusic?makeFlatTex(32,36,41):shirt;
+  const sleeve=isMacek?outfitTexture(ctx=>{ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);ctx.fillStyle='#202027';ctx.fillRect(0,0,64,18);for(let y=3;y<18;y+=7){ctx.fillStyle='#f3eddf';ctx.fillRect(0,y,64,2);ctx.fillStyle='#bb4549';ctx.fillRect(0,y+3,64,2);}}):back;
+  const pants=outfitTexture(ctx=>{
+    ctx.fillStyle=isMusic?'#8e9398':isPE?'#c4b28c':style==='mcmichael'?'#30282b':'#20232a';ctx.fillRect(0,0,64,64);
+    if(isPE){ctx.fillStyle='#a89470';ctx.fillRect(3,14,20,22);ctx.fillRect(42,14,18,22);ctx.fillStyle=skin;ctx.fillRect(0,38,64,26);}
+    if(style==='mcmichael'){ctx.fillStyle='#f4f0e7';for(let y=8;y<64;y+=22)for(let x=9;x<64;x+=24){ctx.beginPath();ctx.arc(x+(y%44?0:8),y,5,0,Math.PI*2);ctx.fill();}}
+  });
+  const look={face,shirt,back,sleeve,pants,skin:outfitTexture(ctx=>{ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);}),hair,skinColor:skin};
+  staffLooks.set(style,look);return look;
+}
+function styleStaffPerson(npc,style){
+  const look=staffLook(style),isArt=style==='eriksen',isPE=style==='mullet',isMusic=style==='wingenbach',isMacek=style==='macekStriped';
+  npc.style=style;npc.group.userData.characterStyle=style;npc.group.userData.appearance=STAFF_CHARACTERS.find(c=>c.style===style)?.detail||style;
+  const resize=(mesh,w,h,d,front=false)=>{mesh.geometry.dispose();mesh.geometry=new THREE.BoxGeometry(w,h,d);mesh.geometry.clearGroups();if(front){mesh.geometry.addGroup(0,24,0);mesh.geometry.addGroup(24,6,4);mesh.geometry.addGroup(30,6,0);}else mesh.geometry.addGroup(0,36,0);};
+  const paint=(mesh,texture)=>mesh.material.forEach(m=>{m.map=texture;m.needsUpdate=true;});
+  const part=(parent,name,w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.name=name;m.position.set(x,y,z);parent.add(m);return m;};
+  resize(npc.head,isPE?.55:.52,.55,.48,true);npc.head.position.y=1.65;paint(npc.head,look.skin);npc.head.material[4].map=look.face;
+  const bodyWidth=isMusic?.63:isPE?.62:isArt?.5:.55;
+  resize(npc.body,bodyWidth,.68,.31,true);npc.body.position.y=1.02;paint(npc.body,look.back);npc.body.material[4].map=look.shirt;
+  npc.shoulderCaps=[];npc.poloCollars=[];
+  for(const [side,arm,leg] of [[-1,npc.armL,npc.legL],[1,npc.armR,npc.legR]]){
+    arm.position.set(side*(bodyWidth/2+.12),1.35,0);resize(arm.children[0],.22,.62,.25);arm.children[0].position.y=-.31;paint(arm.children[0],look.sleeve);
+    const hand=bodyPart(.22,.17,.25,look.skin);hand.position.y=-.70;arm.add(hand);arm.userData.hand=hand;
+    leg.position.set(side*.145,.69,0);resize(leg.children[0],.27,.60,.28);leg.children[0].position.y=-.30;paint(leg.children[0],look.pants);
+    part(leg,'shoe',.29,.14,.4,isPE?0x8b8b83:style==='mcmichael'?0xe6e5df:0x24262b,0,-.62,.055);
+    part(leg,'shoe sole',.3,.035,.41,isMusic||isPE||style==='mcmichael'?0xe5e3d9:0x31333a,0,-.68,.055);
+    if(isPE)part(leg,'white sock',.275,.17,.285,0xf0eee8,0,-.48,0);
+    part(npc.group,'ear',.05,.14,.17,look.skinColor,side*.28,1.65,0);
+  }
+  const hair=new THREE.Group();hair.name='hair';npc.group.add(hair);npc.hair=hair;
+  if(isMacek||isPE){
+    part(hair,'short back',.53,.26,.06,look.hair,0,1.79,-.24);
+    for(const side of [-1,1])part(hair,'receding side',.065,.22,.47,look.hair,side*.265,1.81,0);
+    part(hair,'receding crown',.51,.045,.15,look.hair,0,1.94,-.16);
+    if(isPE){part(hair,'thinning light crown',.49,.035,.26,0xb5a68c,0,1.94,-.035);part(hair,'thinning fringe',.25,.035,.07,0xb7a78b,-.10,1.94,.12);}
+  }else if(isArt){
+    part(hair,'curly crown',.59,.15,.53,look.hair,0,1.97,-.015);
+    part(hair,'back curls',.58,.57,.17,look.hair,0,1.68,-.28);
+    for(const side of [-1,1])for(let i=0;i<4;i++)part(hair,'curl',.16,.19,.34,i%2?0xa28b64:0x78634b,side*(.28+(i%2)*.025),1.88-i*.15,.025+(i%2)*.03);
+    part(hair,'side fringe',.22,.17,.10,0x8e7858,-.18,1.88,.25);
+  }else if(style==='mcmichael'){
+    part(hair,'blonde crown',.56,.12,.5,0x9c8058,0,1.96,-.02);
+    part(hair,'long blonde back',.56,.73,.14,0xb99a65,0,1.63,-.27);
+    for(const side of [-1,1]){part(hair,'long blonde side',.14,.72,.32,0xc7aa75,side*.28,1.62,.03);part(hair,'highlight',.045,.63,.035,0xe2c994,side*.27,1.63,.2);}
+    // Frames are also geometry, so the silhouette reads from a three-quarter view.
+    for(const side of [-1,1]){part(npc.group,'glasses top',.19,.025,.035,0x28282e,side*.12,1.72,.26);part(npc.group,'glasses bottom',.19,.025,.035,0x28282e,side*.12,1.58,.26);for(const x of [-.09,.09])part(npc.group,'glasses rim',.025,.14,.035,0x28282e,side*.12+x,1.65,.26);}part(npc.group,'glasses bridge',.06,.025,.035,0x28282e,0,1.69,.26);
+  }else{
+    part(hair,'short dark crown',.55,.13,.5,0x3e3129,0,1.95,-.015);
+    part(hair,'short dark back',.53,.25,.06,0x3e3129,0,1.82,-.24);
+    for(const side of [-1,1])part(hair,'short dark side',.035,.18,.45,0x3e3129,side*.265,1.85,0);
+  }
+  if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
+  if(isMacek){for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;npc.poloCollars.push(collar);}}
+  const strapColor=isMacek?0x242321:0x242a31;
+  for(const side of [-1,1]){const strap=part(npc.group,'lanyard',.025,.55,.025,strapColor,side*.08,1.08,.18);strap.rotation.z=side*-.24;}
+  if(isMacek){for(const side of [-1,1])for(let i=0;i<5;i++)part(npc.group,'Gators orange',.026,.035,.028,0xe57b3f,side*(.12-i*.014),1.28-i*.075,.196);}
+  part(npc.group,'school badge',.17,.21,.035,0xe9e8de,0,.77,.19);part(npc.group,'badge photo',.08,.08,.02,0x3b7092,0,.79,.215);
+  npc.group.userData.role=STAFF_CHARACTERS.find(c=>c.style===style)?.role;
+}
 function stylePerson(npc,style){
+  if(['macekStriped','eriksen','mullet','wingenbach','mcmichael'].includes(style)){styleStaffPerson(npc,style);return;}
   npc.style=style;
   npc.head.material[4].map=faceForPerson(style);
   const shirt=makeTexture(ctx=>{
@@ -2367,7 +2470,7 @@ function makeRetriever(actor,collarColor,coatColor,faceColor,scale=1){
   const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:makeNameTag(actor.name),depthTest:true}));tag.scale.set(1.8,.45,1);tag.position.y=1.8;tag.visible=false;actor.group.add(tag);actor.group.scale.setScalar(scale);scene.add(actor.group);actor.speed=2.5;
 }
 const sirD=new CampusActor('Sir D',46,5,26,'sir');
-const macek=new CampusActor('Mr. Macek',47,5,29,'macek',worldBounds);
+const macek=new CampusActor('Mr. Macek',54,5,-11,'macek',worldBounds);
 const kay=new CampusActor('KaY',44,5,26,'sir');
 // The lawn circuit clears the entrance sensor, Eddie's rock and the parked car.
 const sleevesBounds={minX:44,maxX:47.9,minZ:34,maxZ:36.9};
@@ -2417,8 +2520,30 @@ function updateJs(dt){
     else {jsRoutine.phase='walk';js.patrolIndex=0;jsRoutine.swing=1-jsRoutine.swing;}
   }
 }
-const ellie=new CampusActor('Ellie',47,5,31,'macek',worldBounds);makeRetriever(ellie,0x38b8b0,0xd9a252,0xf0d09c,.96);
-const percy=new CampusActor('Percy',45,5,31,'macek',worldBounds);makeRetriever(percy,0x253f52,0xba732f,0xd59951,1.1);
+function companionFallbackStart(side){
+  // Partial older saves may restore Macek without either dog. Start those dogs
+  // near his restored position, on connected floor, rather than across campus.
+  const start=nearestWalkPoint(macek.pos,worldBounds)||{x:Math.floor(macek.pos.x),y:Math.round(macek.pos.y),z:Math.floor(macek.pos.z)};
+  const candidates=[{...start,steps:0}],seen=new Set([`${start.x},${start.z}`]);
+  const targetX=start.x+side*2;
+  let best=start,bestScore=(start.x-targetX)**2;
+  for(let i=0;i<candidates.length;i++){
+    const point=candidates[i],score=(point.x-targetX)**2+(point.z-start.z)**2;
+    if(score<bestScore){best=point;bestScore=score;}
+    if(point.steps===2)continue;
+    for(const [dx,dz] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const x=point.x+dx,z=point.z+dz,id=`${x},${z}`;
+      if(seen.has(id)||!insideBounds(x,z,worldBounds))continue;
+      seen.add(id);
+      if(walkFeet(x,z,start.y)===start.y)candidates.push({x,y:start.y,z,steps:point.steps+1});
+    }
+  }
+  return best;
+}
+const ellieStart=companionFallbackStart(-1),percyStart=companionFallbackStart(1);
+// The constructor still honors each dog's own explicit saved position first.
+const ellie=new CampusActor('Ellie',ellieStart.x,ellieStart.y,ellieStart.z,'macek',worldBounds);makeRetriever(ellie,0x38b8b0,0xd9a252,0xf0d09c,.96);
+const percy=new CampusActor('Percy',percyStart.x,percyStart.y,percyStart.z,'macek',worldBounds);makeRetriever(percy,0x253f52,0xba732f,0xd59951,1.1);
 const micco=new CampusActor('Ms. Micco',26,5,-26,'micco');
 // Both school greeters stay in this small, walkable entrance area.
 const entranceStaffBounds={minX:48,maxX:54,minZ:16,maxZ:22,filter:schoolFootprint};
@@ -2597,7 +2722,70 @@ function updateSchoolOfficer(dt,time=dayTime){
   schoolOfficerCar.position.set(officerSample.x,officerSample.y,officerSample.z);schoolOfficerCar.rotation.y=officerSample.yaw;
 }
 updateSchoolOfficer(0,LOADED_DAY_TIME);
-const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie,schoolOfficer,sleeves,js];
+// These classroom activities are scene props, never edits to a player's blocks.
+const eriksenBounds={minX:27,maxX:34.9,minZ:-27,maxZ:-19.1,filter:schoolFootprint};
+const wingenbachBounds={minX:52,maxX:60.9,minZ:-15,maxZ:-7.1,filter:schoolFootprint};
+const mcmichaelBounds={minX:52,maxX:60.9,minZ:-28,maxZ:-20.1,filter:schoolFootprint};
+const mulletBounds={minX:81,maxX:91.9,minZ:23,maxZ:38.9,filter:(x,z)=>!schoolFootprint(x,z)};
+const eriksen=new CampusActor('Ms. Eriksen',30,11,-24,'eriksen',eriksenBounds);
+const mullet=new CampusActor('Mr. Mullet',83,5,35,'mullet',mulletBounds);
+const wingenbach=new CampusActor('Mr. Wingenbach',56,11,-12,'wingenbach',wingenbachBounds);
+const mcmichael=new CampusActor('Ms. McMichael',55,11,-24,'mcmichael',mcmichaelBounds);
+const mulletPatrol=[[83,5,35],[89,5,35],[89,5,25],[83,5,25]];
+const mcmichaelPatrol=[[55,11,-24],[58,11,-24],[58,11,-22],[55,11,-22]];
+mullet.speed=1.55;mcmichael.speed=1.05;
+for(const [actor,activity] of [[eriksen,'painting'],[mullet,'outdoor walk'],[wingenbach,'playing keyboard'],[mcmichael,'Spanish greeting']]){
+  actor.invulnerable=true;actor.group.userData.activity=activity;
+}
+function staffProp(parent,name,w,h,d,color,x,y,z){
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));
+  mesh.name=name;mesh.position.set(x,y,z);parent.add(mesh);return mesh;
+}
+// A block landscape on the easel and a brush in the moving hand read as painting.
+eriksen.easel=new THREE.Group();eriksen.easel.name='Art easel';
+for(const side of [-1,1])staffProp(eriksen.easel,'easel leg',.07,1.9,.09,0x8c633f,side*.43,.95,0);
+staffProp(eriksen.easel,'easel back leg',.07,1.7,.09,0x8c633f,0,.85,.34).rotation.x=-.22;
+staffProp(eriksen.easel,'canvas',1.17,.98,.07,0xf4eddb,0,1.48,-.04);
+staffProp(eriksen.easel,'painted sky',1.06,.47,.016,0x81b9d2,0,1.69,-.086);
+staffProp(eriksen.easel,'painted grass',1.06,.36,.016,0x7e995f,0,1.275,-.086);
+staffProp(eriksen.easel,'painted sun',.20,.19,.02,0xecc36a,-.29,1.75,-.10);
+staffProp(eriksen.easel,'painted tree trunk',.075,.33,.02,0x7a553d,.26,1.38,-.11);
+staffProp(eriksen.easel,'painted tree',.30,.30,.025,0x4c7963,.26,1.60,-.13);
+staffProp(eriksen.easel,'easel shelf',1.30,.07,.24,0x8c633f,0,.96,-.04);
+eriksen.easel.position.copy(eriksen.pos);eriksen.easel.position.z+=.95;scene.add(eriksen.easel);
+eriksen.yaw=0;eriksen.group.rotation.y=0;
+eriksen.brush=staffProp(eriksen.armR,'paintbrush',.045,.42,.045,0x986c3c,0,-.88,.01);
+staffProp(eriksen.brush,'paintbrush blue tip',.065,.10,.065,0x76a6d4,0,-.24,0);
+eriksen.palette=staffProp(eriksen.armL,'paint palette',.29,.055,.26,0xd6b786,0,-.73,.09);
+for(const [x,z,color] of [[-.08,.05,0x9f598c],[.08,.05,0x79a7d2],[0,-.07,0xe7bc61]])staffProp(eriksen.palette,'paint',.07,.018,.07,color,x,.038,z);
+// A full keyboard with black and white keys, a stand, and gently moving hands.
+wingenbach.keyboard=new THREE.Group();wingenbach.keyboard.name='Music keyboard';
+staffProp(wingenbach.keyboard,'keyboard body',1.45,.15,.49,0x24292f,0,.93,0);
+for(let i=0;i<14;i++)staffProp(wingenbach.keyboard,'white key',.09,.045,.30,0xedece4,-.65+i*.10,1.025,-.06);
+for(let i=0;i<13;i++)if(![2,6,9].includes(i))staffProp(wingenbach.keyboard,'black key',.045,.055,.17,0x14171c,-.60+i*.10,1.07,.005);
+for(const side of [-1,1]){const stand=staffProp(wingenbach.keyboard,'keyboard stand',.07,.9,.07,0x30383e,side*.25,.47,0);stand.rotation.z=side*.55;staffProp(wingenbach.keyboard,'stand foot',.08,.06,.48,0x30383e,side*.47,.05,0);}
+wingenbach.keyboard.position.copy(wingenbach.pos);wingenbach.keyboard.position.z+=.62;scene.add(wingenbach.keyboard);
+wingenbach.yaw=0;wingenbach.group.rotation.y=0;
+const staffRoutine={elapsed:0,spanishCooldown:0,spanishWasNear:false};
+function updateStaffActivities(dt){
+  staffRoutine.elapsed+=dt;staffRoutine.spanishCooldown=Math.max(0,staffRoutine.spanishCooldown-dt);
+  const beat=staffRoutine.elapsed;
+  eriksen.armR.rotation.x=-1.50+Math.sin(beat*2.1)*.16;eriksen.armR.rotation.z=Math.sin(beat*1.3)*.12;
+  eriksen.armL.rotation.x=-.72;eriksen.head.rotation.y=Math.sin(beat*.6)*.055;
+  wingenbach.armL.rotation.x=-1.05+Math.sin(beat*5.1)*.065;
+  wingenbach.armR.rotation.x=-1.05+Math.sin(beat*4.6+1)*.065;
+  wingenbach.head.rotation.x=Math.sin(beat*1.8)*.045;
+  mullet.patrol(dt,mulletPatrol);mcmichael.patrol(dt,mcmichaelPatrol);
+  const dx=player.pos.x-mcmichael.pos.x,dz=player.pos.z-mcmichael.pos.z;
+  const sameFloor=Math.abs(player.pos.y-mcmichael.pos.y)<2.5,distanceSquared=dx*dx+dz*dz;
+  if(!sameFloor||distanceSquared>49)staffRoutine.spanishWasNear=false;
+  if(sameFloor&&distanceSquared<25&&!staffRoutine.spanishWasNear&&staffRoutine.spanishCooldown===0){
+    showBubble(mcmichael,'¡Hola! ¿Cómo estás?');staffRoutine.spanishWasNear=true;staffRoutine.spanishCooldown=12;
+  }
+}
+// Preserve the historical actor order so older 10/11/13-character saves restore.
+const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie,schoolOfficer,sleeves,js,eriksen,mullet,wingenbach,mcmichael];
+const MAX_CAMPUS_ACTORS=campusActors.length;
 // Cache both outfits once; switching clothes does not allocate textures per frame.
 function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
@@ -2611,32 +2799,23 @@ const patternedSleeve=outfitTexture(ctx=>{
   ctx.font='bold 13px sans-serif';for(let y=4;y<55;y+=16)for(let x=1;x<64;x+=22){ctx.save();ctx.translate(x+(y%32?0:7),y);ctx.rotate(-.2);ctx.fillText('SV',0,10);ctx.restore();}
   ctx.fillStyle='#101319';ctx.fillRect(0,55,64,9);ctx.fillStyle='#8098a8';ctx.fillRect(22,56,17,6);
 });
-// Every Mr. Macek body — the campus NPC, the playable third-person avatar and the
-// first-person sleeves — is registered here, so one outfit choice dresses all of
-// them from the same cached textures. Nothing is allocated when clothes change.
+// The roaming CIRC character keeps his black SV shirt and patterned sleeves.
+// A playable selection never changes this independent campus character.
 const macekBodies=[];
 const registerMacekBody=parts=>{macekBodies.push(parts);return parts;};
 function setMacekOutfit(value){
-  macekOutfit=value==='black'?'black':'polo';
-  const shirt=macekClothes[macekOutfit];
-  // The blue polo wears the patterned SV sleeve on one arm only; the black SV
-  // shirt wears it on both. That difference is the whole point of the two looks.
-  const leftSleeve=macekOutfit==='black'?patternedSleeve:skinTex;
+  macekOutfit=value==='black'?'black':'polo'; // retained only for older saved worlds
   for(const parts of macekBodies){
-    if(parts.body){parts.body.material.forEach(m=>{m.map=shirt;});parts.body.userData.outfit=macekOutfit;}
-    parts.armR.material.forEach(m=>{m.map=patternedSleeve;});
-    parts.armL.material.forEach(m=>{m.map=leftSleeve;});
-    for(const cap of parts.shoulderCaps||[])cap.material.forEach(m=>{m.map=shirt;});
-    for(const collar of parts.poloCollars||[])collar.visible=macekOutfit==='polo';
+    if(parts.body){parts.body.material.forEach(m=>{m.map=macekClothes.black;});parts.body.userData.outfit='black';}
+    for(const arm of [parts.armL,parts.armR])arm.material.forEach(m=>{m.map=patternedSleeve;});
+    for(const cap of parts.shoulderCaps||[])cap.material.forEach(m=>{m.map=macekClothes.black;});
+    for(const collar of parts.poloCollars||[])collar.visible=false;
   }
-  updateIdentityStatus();
 }
 registerMacekBody({body:macek.body,armL:macek.armL.children[0],armR:macek.armR.children[0],shoulderCaps:macek.shoulderCaps,poloCollars:macek.poloCollars});
-// ---------- playable Mr. Macek ----------
-// The avatar and the first-person sleeves are built from the same parts and the
-// same style pass as the NPC, so "play as Mr. Macek" shows the approved character
-// rather than a re-dressed wanderer. No real photograph is used anywhere.
-function buildPlayerAvatar(){
+setMacekOutfit(macekOutfit);
+// ---------- six playable staff characters ----------
+function buildPlayerAvatar(style='macekStriped'){
   const avatar={group:new THREE.Group()};
   avatar.head=bodyPart(.5,.5,.5,skinTex,faceTex);avatar.head.position.y=1.55;
   avatar.body=bodyPart(.5,.75,.25,shirtTex);avatar.body.position.y=.925;
@@ -2649,17 +2828,15 @@ function buildPlayerAvatar(){
     limb.position.y=-.35;pivot.add(limb);pivot.position.set(side*.125,.55,0);avatar[name]=pivot;
   }
   avatar.group.add(avatar.head,avatar.body,avatar.armL,avatar.armR,avatar.legL,avatar.legR);
-  stylePerson(avatar,'macek');
+  stylePerson(avatar,style);
   return avatar;
 }
-const playerAvatar=buildPlayerAvatar();
-playerAvatar.group.visible=false;scene.add(playerAvatar.group);
-registerMacekBody({body:playerAvatar.body,armL:playerAvatar.armL.children[0],armR:playerAvatar.armR.children[0],shoulderCaps:playerAvatar.shoulderCaps,poloCollars:playerAvatar.poloCollars});
-// Sleeves and hands carried on the camera, so the chosen outfit is visible even
-// when the view is first person. They are built once and never re-created.
-const viewModel=new THREE.Group();
-const viewArms={};
-const viewShoulders=[];
+const playerAvatars=Object.fromEntries(STAFF_CHARACTERS.map(c=>{
+  const avatar=buildPlayerAvatar(c.style);avatar.group.name=c.name;avatar.group.userData.characterId=c.id;
+  avatar.group.visible=false;scene.add(avatar.group);return [c.id,avatar];
+}));
+let playerAvatar=playerAvatars[playerCharacter];
+const viewModel=new THREE.Group(),viewArms={},viewShoulders=[];
 for(const [name,side] of [['armL',-1],['armR',1]]){
   const limb=bodyPart(.17,.48,.17,shirtTex);
   limb.position.set(side*.37,-.43,-.72);limb.rotation.set(-.55,0,side*.12);
@@ -2671,45 +2848,82 @@ for(const [name,side] of [['armL',-1],['armR',1]]){
   viewModel.add(limb);viewArms[name]=limb;
 }
 camera.add(viewModel);scene.add(camera);
-registerMacekBody({armL:viewArms.armL,armR:viewArms.armR,shoulderCaps:viewShoulders});
-// Both original-style portraits stay visible while selection dresses the player.
 const identityStatus=document.getElementById('identityStatus');
-const outfitPolo=document.getElementById('outfitPolo'),outfitBlack=document.getElementById('outfitBlack');
-function refreshOutfitPreview(){
-  outfitPolo.checked=macekOutfit==='polo';outfitBlack.checked=macekOutfit==='black';
-  updateIdentityStatus();
+const staffInputs={},staffCanvases={},staffCards={};
+const staffChoices=document.getElementById('staffChoices');
+for(const character of STAFF_CHARACTERS){
+  const label=document.createElement('label');label.className='staff-choice';label.dataset.character=character.id;
+  const canvas=document.createElement('canvas');canvas.className='staff-preview';canvas.width=240;canvas.height=280;
+  canvas.setAttribute('role','img');canvas.setAttribute('aria-label',`${character.name}: ${character.detail}`);staffCanvases[character.id]=canvas;
+  const row=document.createElement('span');row.className='staff-choice-name';
+  const input=document.createElement('input');input.type='radio';input.name='playerCharacter';input.value=character.id;input.id=`character-${character.id}`;input.dataset.character=character.id;
+  input.setAttribute('aria-describedby',`character-description-${character.id}`);
+  const name=document.createElement('strong');name.textContent=character.name;row.append(input,name);
+  const role=document.createElement('span');role.className='staff-role';role.textContent=character.role;
+  const detail=document.createElement('small');detail.id=`character-description-${character.id}`;detail.textContent=character.detail;
+  label.append(canvas,row,role,detail);staffChoices.appendChild(label);staffInputs[character.id]=input;staffCards[character.id]=label;
+  input.addEventListener('change',()=>{if(input.checked){setPlayerCharacter(character.id);persistSave();}});
 }
 let view=saveState.view==='third'?'third':'first';
 let viewBtn=null;
 const viewSelect=document.getElementById('playerView');
 function updateIdentityStatus(){
-  if(!identityStatus)return;
-  const outfit=macekOutfit==='black'
-    ?'black SV shirt with both patterned sleeves'
-    :'blue SV polo with one patterned SV sleeve';
-  const lens=view==='third'?'third person, so you can see him':'first person, so you see his sleeves and hands';
-  identityStatus.textContent=`Mr. Macek · ${outfit}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press V while playing to switch views.`;
+  const character=STAFF_CHARACTERS.find(c=>c.id===playerCharacter);
+  identityStatus.textContent=`${character.name} · ${character.role}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press V while playing to switch views.`;
+  document.getElementById('enter').textContent=`▶ PLAY AS ${character.name.toUpperCase()}`;
+}
+function setPlayerCharacter(id){
+  if(!STAFF_CHARACTER_IDS.includes(id))return false;
+  for(const avatar of Object.values(playerAvatars))avatar.group.visible=false;
+  playerCharacter=id;playerAvatar=playerAvatars[id];
+  const character=STAFF_CHARACTERS.find(c=>c.id===id);
+  for(const [i,armName] of ['armL','armR'].entries()){
+    const source=playerAvatar[armName].children[0],target=viewArms[armName];
+    target.material.forEach((m,n)=>{m.map=source.material[n].map;m.needsUpdate=true;});
+    const skin=character.style==='micco'?skinTex:staffLook(character.style).skin;
+    target.userData.hand.material.forEach(m=>{m.map=skin;m.needsUpdate=true;});
+    viewShoulders[i].material.forEach(m=>{m.map=source.material[0].map;m.needsUpdate=true;});
+    target.userData.characterId=id;
+  }
+  for(const character of STAFF_CHARACTERS){
+    staffInputs[character.id].checked=character.id===id;
+    staffCards[character.id].dataset.selected=String(character.id===id);
+  }
+  playerAvatar.group.visible=view==='third';viewModel.visible=view==='first';
+  updateIdentityStatus();return true;
 }
 function setView(value){
   view=value==='third'?'third':'first';
-  playerAvatar.group.visible=view==='third';
-  viewModel.visible=view==='first';
+  playerAvatar.group.visible=view==='third';viewModel.visible=view==='first';
   if(viewSelect)viewSelect.value=view;
   if(viewBtn){viewBtn.textContent=view==='third'?'View: 3rd':'View: 1st';viewBtn.setAttribute('aria-pressed',String(view==='third'));}
   updateIdentityStatus();
 }
-setMacekOutfit(macekOutfit);setView(view);refreshOutfitPreview();
-const outfitSelect=document.getElementById('macekOutfit');outfitSelect.value=macekOutfit;
-outfitSelect.addEventListener('change',()=>{setMacekOutfit(outfitSelect.value);refreshOutfitPreview();persistSave();});
-for(const [choice,value] of [[outfitPolo,'polo'],[outfitBlack,'black']]){
-  choice.addEventListener('change',()=>{
-    if(!choice.checked)return;
-    outfitSelect.value=value;setMacekOutfit(value);refreshOutfitPreview();persistSave();
-  });
-}
+setPlayerCharacter(playerCharacter);setView(view);
 viewSelect.addEventListener('change',()=>{setView(viewSelect.value);persistSave();});
+// Render the actual playable meshes once into card canvases, with one temporary
+// renderer. No photographs, per-card WebGL contexts, or per-frame preview work.
+function renderStaffPreviews(){
+  let previewRenderer;
+  try{
+    previewRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
+    previewRenderer.setPixelRatio(1);previewRenderer.setSize(240,280,false);
+    const previewScene=new THREE.Scene();
+    previewScene.add(new THREE.HemisphereLight(0xffffff,0x718179,2.6));
+    const light=new THREE.DirectionalLight(0xfff7e7,3.0);light.position.set(-3,5,6);previewScene.add(light);
+    const lens=new THREE.OrthographicCamera(-1.01,1.01,1.18,-1.18,.1,20);lens.position.set(3,1.15,7);lens.lookAt(0,1.05,0);
+    for(const character of STAFF_CHARACTERS){
+      const model=playerAvatars[character.id].group.clone(true);model.visible=true;model.position.set(0,0,0);model.rotation.set(0,0,0);previewScene.add(model);
+      previewRenderer.render(previewScene,lens);
+      staffCanvases[character.id].getContext('2d').drawImage(previewRenderer.domElement,0,0,240,280);
+      previewScene.remove(model);
+    }
+  }catch(error){console.warn('Character previews are unavailable; the character names and selection still work.',error);}
+  finally{if(previewRenderer){previewRenderer.dispose();previewRenderer.forceContextLoss();}}
+}
+requestAnimationFrame(renderStaffPreviews);
 const sirPatrol=[[46,5,18],[50,5,6],[42,11,12],[46,11,16],[46,5,26],[55,5,38]];
-const macekPatrol=[[46,5,18],[47,11,16],[46,5,29],[25,heightAt(25,12)+1,12],[15,heightAt(15,12)+1,12]];
+const macekPatrol=[[54,5,-11],[58,5,-11],[54,5,-5],[49,5,-10],[46,5,18]];
 // Every stop is interior floor inside the building footprint: lobby, main hub,
 // the west hallway and maker room, and the east wing.
 const unicornPatrol=[[46,5,15],[40,5,2],[35,5,-11],[27,5,-24],[38,5,-4],[52,5,-12],[50,5,8]];
@@ -2807,6 +3021,7 @@ function updateCookie(dt){
 function updateCampus(dt){
   updateCookie(dt);
   updateSchoolOfficer(dt);
+  updateStaffActivities(dt);
   micco.patrol(dt,[[26,5,-26],[32,5,-12],[46,5,17],[72,5,-9],[46,5,26]]);
   unicorn.patrol(dt,unicornPatrol);
   eiler.patrol(dt,eilerPatrol);
@@ -3067,7 +3282,7 @@ addEventListener('keydown', e => {
   }
 });
 
-// V swaps between Mr. Macek's own eyes and a view from just behind him.
+// V swaps between the selected character's eyes and a view just behind them.
 addEventListener('keydown', e => {
   if (e.code === 'KeyV' && started && !isFormInput(e)) { setView(view==='third'?'first':'third'); persistSave(); }
 });
@@ -3177,7 +3392,7 @@ const _castDir=new THREE.Vector3(),_castNormal=new THREE.Vector3();
 const _cell=[0,0,0],_o=[0,0,0],_d=[0,0,0],_step=[0,0,0],_delta=[0,0,0],_next=[0,0,0];
 function castVoxel() {
   // Walk the crossed voxels, not every instance in the large world. The ray starts
-  // at Mr. Macek's own eye, not the camera, so third person aims exactly like first.
+  // at the player's own eye, not the camera, so third person aims exactly like first.
   const origin=player.pos,dir=camera.getWorldDirection(_castDir);
   _o[0]=origin.x;_o[1]=origin.y;_o[2]=origin.z;
   _d[0]=dir.x;_d[1]=dir.y;_d[2]=dir.z;
@@ -3295,7 +3510,7 @@ function moveHorizontal(axis,delta){
   else player.pos.copy(blocked);
 }
 
-// ---------- playable Mr. Macek body ----------
+// ---------- selected playable character body ----------
 // Keeps the avatar under the camera and swings its limbs from the player's own
 // speed. Scratch vectors are module scope, so a frame allocates nothing here.
 const THIRD_PERSON_RANGE=4.2;
@@ -3313,7 +3528,7 @@ function updatePlayerAvatar(dt){
   playerAvatar.group.rotation.y=player.yaw+Math.PI;
   viewArms.armL.rotation.x=-.55+swing*.15;viewArms.armR.rotation.x=-.55-swing*.15;
   if(view!=='third')return;
-  // Pull the camera back behind Mr. Macek, stopping short of whatever is behind him
+  // Pull the camera back behind the player, stopping short of whatever is behind them
   // so the view never ends up inside a wall.
   camera.getWorldDirection(_viewDir);
   let back=0;
@@ -3579,7 +3794,7 @@ for(const [value,text] of [['auto','Auto · match this device'],['touch','Touch 
 }
 controlsSelect.style.cssText=backLink.style.cssText+'min-height:44px;border-radius:0;background:#171615;color:#f8f6f2;';
 controlsSelect.addEventListener('change',()=>setControlsLayout(controlsSelect.value,true));
-// Tablet-friendly twin of the V key, so play-as-Mr. Macek is reachable without a keyboard.
+// Tablet-friendly twin of the V key, so either view works without a keyboard.
 viewBtn=document.createElement('button');
 viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
 viewBtn.addEventListener('click',()=>{setView(view==='third'?'first':'third');persistSave();});
