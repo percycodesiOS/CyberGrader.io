@@ -503,6 +503,46 @@ html body #start .staff-choice[data-character="mcmichael"] .staff-preview {
   background: radial-gradient(ellipse at 50% 45%, #776651, #332921 78%);
 }
 html body #start:has(#staffChoices) #identityStatus { margin-bottom: 0; min-height: 36px; }
+/* A visible first-minute guide keeps the essential controls above the options. */
+html body #start .first-minute {
+  padding: 22px;
+  border: 1px solid #587690;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #22394b, #19252f 68%);
+  box-shadow: 0 12px 34px #0004;
+}
+html body #start .first-minute-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+html body #start .guide-eyebrow { color: #9bdfbc; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+html body #start .first-minute h2 { margin: 3px 0 0; font-size: clamp(21px, 3vw, 29px); line-height: 1.15; }
+html body #start .guide-mode { flex: 0 0 auto; padding: 8px 12px; border: 1px solid #77ba98; border-radius: 20px; color: #d0f3dc; font-size: 12px; font-weight: 700; }
+html body #start .play-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+html body #start .play-steps li { display: flex; gap: 10px; min-width: 0; }
+html body #start .step-number { flex: 0 0 27px; width: 27px; height: 27px; display: grid; place-items: center; border-radius: 8px; background: #aedcfa; color: #152c40; font-weight: 900; }
+html body #start .play-steps h3 { margin: 2px 0 7px; font-size: 16px; line-height: 1.25; color: #fff; }
+html body #start .play-steps p { margin: 0 0 5px; color: #d6e1e9; font-size: 13px; line-height: 1.6; }
+html body #start kbd { display: inline-block; padding: 0 5px; border: 1px solid #68869b; border-bottom-width: 2px; border-radius: 4px; background: #102330; color: #eff8ff; font: 700 12px/1.6 system-ui, sans-serif; }
+html body #start .flight-guide { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 18px; padding: 12px 14px; border: 1px solid #657b90; border-radius: 9px; background: #0c1d2a99; }
+html body #start .flight-guide > strong { color: #f8dca2; font-size: 14px; }
+html body #start .flight-guide p { margin: 0; color: #e1eaf1; font-size: 13px; }
+html body #start .flight-guide p > span { padding: 0 5px; color: #96aab9; }
+html body #start .flight-guide small { width: 100%; color: #b5c9d7; font-size: 12px; }
+html body #start .class-reminder { margin: 12px 0 0; color: #bfd1dd; font-size: 12px; }
+html body #start .touch-help { display: none; }
+html body.touch-device #start .touch-help { display: block; }
+html body.touch-device #start .desktop-help { display: none; }
+html body #start .play-options { margin-top: 18px; border-top: 1px solid #58616b; padding-top: 10px; }
+html body #start .play-options > summary { padding: 7px 0; cursor: pointer; font-size: 14px; color: #bde3ff; font-weight: 700; }
+html body #start .play-options[open] > summary { margin-bottom: 10px; }
+html body #start .start-settings { align-self: start; }
+@media (max-width: 900px) {
+  html body #start .play-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  html body #start .first-minute { padding: 16px; }
+  html body #start .first-minute-heading { display: block; }
+  html body #start .guide-mode { display: inline-block; margin-top: 10px; }
+  html body #start .play-steps { grid-template-columns: 1fr; gap: 15px; }
+}
 @media (max-width: 900px) {
   html body #start:has(#staffChoices) .start-grid { grid-template-columns: 1fr; }
   html body #start .staff-preview { height: 155px; }

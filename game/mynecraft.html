@@ -188,7 +188,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=staff-20261016">
+<link rel="stylesheet" href="start-menu.css?v=learn-20261017">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -209,7 +209,7 @@
 </div>
 <div id="info">
   W Forward · S Back · A Left · D Right (or arrow keys)<br/>
-  DRAG to look &nbsp;·&nbsp; SPACE jump &nbsp;·&nbsp; SHIFT sprint &nbsp;·&nbsp; F fly<br/>
+  DRAG to look &nbsp;·&nbsp; SPACE jump/up &nbsp;·&nbsp; V down &nbsp;·&nbsp; SHIFT faster &nbsp;·&nbsp; F fly<br/>
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block<br/>
   Press Esc to release the mouse and open the menu
 </div>
@@ -220,26 +220,39 @@
       <a class="start-home" href="../index.html">← Back to MYnecraft</a>
       <h1 class="start-brand">MYNECRAFT</h1>
       <p class="edition">EC EDITION</p>
-      <p>Choose your character, build your world, and explore ECMS.</p>
+      <p>Your ideas. Your school. Your world.</p>
     </header>
+    <section class="first-minute" aria-labelledby="firstMinuteTitle">
+      <div class="first-minute-heading"><div><span class="guide-eyebrow">START HERE</span><h2 id="firstMinuteTitle">Your first minute in MYnecraft</h2></div><span class="guide-mode">For class: choose Creative</span></div>
+      <ol class="play-steps">
+        <li><span class="step-number">1</span><div><h3>Pick your character</h3><p>Choose a teacher below. Keep <strong>Creative</strong>, then press <strong>PLAY AS…</strong>.</p></div></li>
+        <li><span class="step-number">2</span><div><h3>Move and look</h3><p class="desktop-help"><kbd>W</kbd> forward · <kbd>S</kbd> back<br><kbd>A</kbd> left · <kbd>D</kbd> right. Arrow keys work too. Move your mouse to look; click and drag if it stays free. <kbd>Space</kbd> jumps.</p><p class="touch-help">Use the round stick to move. Drag the screen to look. Tap <strong>JUMP</strong> to jump.</p></div></li>
+        <li><span class="step-number">3</span><div><h3>Place your first block</h3><p>Choose a material in the block bar. Aim the + at a nearby block.</p><p class="desktop-help"><strong>Right click</strong> to add a block. <strong>Left click</strong> to remove one.</p><p class="touch-help">Tap <strong>PLACE</strong> to add a block. Tap <strong>BREAK</strong> to remove one.</p></div></li>
+        <li><span class="step-number">4</span><div><h3>Keep your work</h3><p>Click <strong>Save</strong>. Before leaving: <strong>Menu → Save, download or load a world → Download Save</strong>. Check Downloads for your <strong>.json</strong> file.</p></div></li>
+      </ol>
+      <div class="flight-guide"><strong>Want to fly?</strong><p class="desktop-help"><kbd>F</kbd> flight on/off <span>·</span> <kbd>Space</kbd> up <span>·</span> <kbd>V</kbd> down <span>·</span> hold <kbd>Shift</kbd> to move faster. Let go of up/down to hover.</p><p class="touch-help">Tap <strong>FLY</strong> on/off. Hold <strong>JUMP</strong> to go up or <strong>DOWN</strong> to go down. Let go to hover.</p><small>Creative mode only. <span class="desktop-help">Press <kbd>Esc</kbd> or </span>open <strong>Menu</strong> to pause and see these steps again.</small></div>
+      <p class="class-reminder">Building for class? Follow your teacher’s directions for what to make and where. Each browser has its own world; there is no automatic device sync.</p>
+    </section>
     <div class="start-grid">
       <section class="start-character-panel" aria-labelledby="characterTitle">
-        <h2 id="characterTitle">Choose your character</h2>
-        <p class="character-note">Six familiar faces. Pick who you play as, then explore in first or third person.</p>
+        <h2 id="characterTitle">Specials Teachers</h2>
+        <p class="character-note">Choose your character. Pick who you play as, then explore in first or third person.</p>
         <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your playable character"></div>
         <p id="identityStatus" role="status">You play as Mr. Macek.</p>
       </section>
       <section class="start-settings" aria-labelledby="settingsTitle">
-        <h2 id="settingsTitle">Choose your adventure</h2>
+        <h2 id="settingsTitle">Ready? Let’s build.</h2>
         <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option></select></label>
         <p id="modeHelp">Changing modes keeps your build and saved challenge progress.</p>
+        <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
+        <p class="start-tip"><strong>Creative</strong> gives you unlimited blocks and flight. Your saved build stays here when you press Play.</p>
+        <details class="play-options"><summary>Camera, graphics and controls</summary>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see your character</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
         <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · show screen buttons</option><option value="desktop">Keyboard and mouse</option></select></label>
         <p><strong>Creative:</strong> unlimited blocks, flight, and coordinate travel. <strong>Embrace the Challenge:</strong> collect 10 wood blocks, place 12 blocks, and find CIRC on foot. It is a peaceful world; falls and deep water can hurt.</p>
         <p>Use <strong>Smooth</strong> for lighter graphics. <strong>Detailed</strong> adds shadows. Switch camera views here or with the in-game View button.</p>
-        <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
-        <p class="start-tip"><strong>Start here:</strong> Keep Creative and press Play. <strong>W Forward · S Back · A Left · D Right</strong>, or use the arrow keys. Move your mouse to look; click and drag if it stays free. Space jumps. Esc or Menu pauses. On a phone or tablet, use the stick and drag to look. You can explore the other choices later.</p>
+        </details>
       </section>
     </div>
     <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
@@ -276,12 +289,12 @@
       </form><p id="areaLabelStatus" role="status">Up to 40 signs. They save with your world and downloaded backup.</p>
     </details>
     <details class="start-advanced"><summary>Build a water elevator</summary>
-      <ol><li>Place one Glowstone block on the ground.</li><li>Build a shaft with Glass around it. Leave a doorway at the bottom and an exit at the top.</li><li>Place Water in every space directly above the Glowstone. A gap stops the lift.</li><li>Turn flight off and walk into the water. It lifts you! Walk out at the top. Hold Shift or DOWN to ride down.</li></ol>
+      <ol><li>Place one Glowstone block on the ground.</li><li>Build a shaft with Glass around it. Leave a doorway at the bottom and an exit at the top.</li><li>Place Water in every space directly above the Glowstone. A gap stops the lift.</li><li>Turn flight off and walk into the water. It lifts you! Walk out at the top. Hold V or DOWN to ride down.</li></ol>
       <p>This MYnecraft recipe uses Glowstone. Ordinary water still works for swimming. The lift works in both game modes; in Embrace the Challenge, collect the blocks first.</p>
     </details>
     <details class="start-advanced"><summary>How to play</summary>
       <p><strong>Keyboard and mouse:</strong> W Forward · S Back · A Left · D Right. The arrow keys also move: ↑ Forward · ↓ Back · ← Left · → Right. Move your mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
-      <p><strong>Creative flight and camera:</strong> F toggles flight. While flying, Space rises and Shift descends. V switches between first and third person; the toolbar's View button does the same.</p>
+      <p><strong>Creative flight and camera:</strong> Press F once to turn flight on or off. While flying, Space goes up and V goes down; let go to hover. Hold Shift to move faster on foot or in flight without changing height. C switches between first and third person; the toolbar's View button does the same.</p>
       <p><strong>Phone or tablet:</strong> Choose Touch to show the screen buttons, or Auto to follow your device. Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight. DOWN descends while flying or in a water elevator. Phones and tablets never capture a mouse.</p>
       <p><strong>Pause and keep playing:</strong> Esc releases the mouse and opens this menu. The Menu button also pauses. Use Play to continue, Save to keep local progress now, and Download Save for a copy you can keep or move.</p>
     </details>
@@ -2054,12 +2067,12 @@ function staffLook(style){
   const face=outfitTexture(ctx=>{
     ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);
     ctx.fillStyle=hair;
-    if(isMacek||isPE){ctx.fillRect(0,0,9,22);ctx.fillRect(55,0,9,22);ctx.fillRect(7,0,50,3);}
+    if(isPE){ctx.fillRect(0,0,9,22);ctx.fillRect(55,0,9,22);ctx.fillRect(7,0,50,3);}
     else {ctx.fillRect(0,0,64,10);ctx.fillRect(0,10,7,isArt?40:15);ctx.fillRect(57,10,7,isArt?40:15);}
     ctx.fillStyle=isArt?'#bba47d':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
     ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
-    ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(19,29,7,8);ctx.fillRect(38,29,7,8);
-    ctx.fillStyle='#292d30';ctx.fillRect(22,30,4,6);ctx.fillRect(38,30,4,6);
+    ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
+    ctx.fillStyle='#292d30';ctx.fillRect(17,30,4,6);ctx.fillRect(44,30,4,6);
     ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
     if(isMusic){ctx.fillStyle='#41372e';ctx.fillRect(7,43,50,17);ctx.fillRect(4,38,7,13);ctx.fillRect(53,38,7,13);}
     if(isMacek){ctx.fillStyle='#9c7856';ctx.fillRect(21,47,22,3);ctx.fillRect(25,56,14,5);}
@@ -2077,7 +2090,7 @@ function staffLook(style){
     if(style==='mcmichael'){ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=6)ctx.fillRect(x,0,1,64);ctx.fillRect(0,58,64,6);}
   });
   const back=isArt?makeFlatTex(22,25,30):isPE?makeFlatTex(32,46,73):isMusic?makeFlatTex(32,36,41):shirt;
-  const sleeve=isMacek?outfitTexture(ctx=>{ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);ctx.fillStyle='#202027';ctx.fillRect(0,0,64,18);for(let y=3;y<18;y+=7){ctx.fillStyle='#f3eddf';ctx.fillRect(0,y,64,2);ctx.fillStyle='#bb4549';ctx.fillRect(0,y+3,64,2);}}):back;
+  const sleeve=isMacek?outfitTexture(ctx=>{ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);ctx.fillStyle='#202027';ctx.fillRect(0,0,64,18);for(let y=3;y<18;y+=7){ctx.fillStyle='#f3eddf';ctx.fillRect(0,y,64,2);ctx.fillStyle='#bb4549';ctx.fillRect(0,y+3,64,2);}}):isArt?outfitTexture(ctx=>{ctx.fillStyle='#16191e';ctx.fillRect(0,0,64,44);ctx.fillStyle=skin;ctx.fillRect(0,44,64,20);}):back;
   const pants=outfitTexture(ctx=>{
     ctx.fillStyle=isMusic?'#8e9398':isPE?'#c4b28c':style==='mcmichael'?'#30282b':'#20232a';ctx.fillRect(0,0,64,64);
     if(isPE){ctx.fillStyle='#a89470';ctx.fillRect(3,14,20,22);ctx.fillRect(42,14,18,22);ctx.fillStyle=skin;ctx.fillRect(0,38,64,26);}
@@ -2099,14 +2112,21 @@ function styleStaffPerson(npc,style){
   for(const [side,arm,leg] of [[-1,npc.armL,npc.legL],[1,npc.armR,npc.legR]]){
     arm.position.set(side*(bodyWidth/2+.12),1.35,0);resize(arm.children[0],.22,.62,.25);arm.children[0].position.y=-.31;paint(arm.children[0],look.sleeve);
     const hand=bodyPart(.22,.17,.25,look.skin);hand.position.y=-.70;arm.add(hand);arm.userData.hand=hand;
-    leg.position.set(side*.145,.69,0);resize(leg.children[0],.27,.60,.28);leg.children[0].position.y=-.30;paint(leg.children[0],look.pants);
+    const looseTrousers=style==='mcmichael';
+    leg.position.set(side*(looseTrousers?.17:.145),.69,0);resize(leg.children[0],looseTrousers?.32:.27,.60,.28);leg.children[0].position.y=-.30;paint(leg.children[0],look.pants);
+    if(isMacek&&side===-1){part(arm,'watch strap',.235,.09,.27,0x191c23,0,-.57,0);part(arm,'watch face',.15,.12,.04,0x3c4653,0,-.57,.15);}
     part(leg,'shoe',.29,.14,.4,isPE?0x8b8b83:style==='mcmichael'?0xe6e5df:0x24262b,0,-.62,.055);
     part(leg,'shoe sole',.3,.035,.41,isMusic||isPE||style==='mcmichael'?0xe5e3d9:0x31333a,0,-.68,.055);
     if(isPE)part(leg,'white sock',.275,.17,.285,0xf0eee8,0,-.48,0);
     part(npc.group,'ear',.05,.14,.17,look.skinColor,side*.28,1.65,0);
   }
   const hair=new THREE.Group();hair.name='hair';npc.group.add(hair);npc.hair=hair;
-  if(isMacek||isPE){
+  if(isMacek){
+    part(hair,'full short crown',.56,.11,.52,look.hair,0,1.95,0);
+    part(hair,'straight hairline',.56,.10,.04,look.hair,0,1.89,.255);
+    part(hair,'short back',.55,.27,.06,look.hair,0,1.80,-.25);
+    for(const side of [-1,1])part(hair,'short side',.045,.24,.49,look.hair,side*.27,1.82,0);
+  }else if(isPE){
     part(hair,'short back',.53,.26,.06,look.hair,0,1.79,-.24);
     for(const side of [-1,1])part(hair,'receding side',.065,.22,.47,look.hair,side*.265,1.81,0);
     part(hair,'receding crown',.51,.045,.15,look.hair,0,1.94,-.16);
@@ -2128,6 +2148,7 @@ function styleStaffPerson(npc,style){
     for(const side of [-1,1])part(hair,'short dark side',.035,.18,.45,0x3e3129,side*.265,1.85,0);
   }
   if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
+  if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.055,.17,.27,0x41372e,side*.245,1.47,.095);part(npc.group,'beard chin',.38,.055,.13,0x41372e,0,1.37,.19);}
   if(isMacek){for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;npc.poloCollars.push(collar);}}
   const strapColor=isMacek?0x242321:0x242a31;
   for(const side of [-1,1]){const strap=part(npc.group,'lanyard',.025,.55,.025,strapColor,side*.08,1.08,.18);strap.rotation.z=side*-.24;}
@@ -2829,6 +2850,14 @@ function buildPlayerAvatar(style='macekStriped'){
   }
   avatar.group.add(avatar.head,avatar.body,avatar.armL,avatar.armR,avatar.legL,avatar.legR);
   stylePerson(avatar,style);
+  if(style==='micco'){
+    const accessory=(name,w,h,d,color,x,y,z)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));mesh.name=name;mesh.position.set(x,y,z);avatar.group.add(mesh);return mesh;};
+    for(const side of [-1,1]){const strap=accessory('school lanyard',.025,.48,.025,0x253d59,side*.07,1.05,.15);strap.rotation.z=side*-.25;}
+    accessory('school badge',.18,.22,.035,0xf5f1e7,0,.78,.17);
+    accessory('badge header',.16,.035,.02,0x284f75,0,.85,.193);
+    accessory('badge photo',.065,.075,.02,0x698dad,-.035,.79,.193);
+    for(let i=0;i<2;i++)accessory('badge print',.06,.012,.02,0x53677c,.043,.80-i*.035,.193);
+  }
   return avatar;
 }
 const playerAvatars=Object.fromEntries(STAFF_CHARACTERS.map(c=>{
@@ -2869,7 +2898,7 @@ let viewBtn=null;
 const viewSelect=document.getElementById('playerView');
 function updateIdentityStatus(){
   const character=STAFF_CHARACTERS.find(c=>c.id===playerCharacter);
-  identityStatus.textContent=`${character.name} · ${character.role}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press V while playing to switch views.`;
+  identityStatus.textContent=`${character.name} · ${character.role}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press C while playing to switch views.`;
   document.getElementById('enter').textContent=`▶ PLAY AS ${character.name.toUpperCase()}`;
 }
 function setPlayerCharacter(id){
@@ -3282,14 +3311,14 @@ addEventListener('keydown', e => {
   }
 });
 
-// V swaps between the selected character's eyes and a view just behind them.
+// C swaps between the selected character's eyes and a view just behind them.
 addEventListener('keydown', e => {
-  if (e.code === 'KeyV' && started && !isFormInput(e)) { setView(view==='third'?'first':'third'); persistSave(); }
+  if (e.code === 'KeyC' && !e.repeat && started && !isFormInput(e)) { setView(view==='third'?'first':'third'); persistSave(); }
 });
 
-// F toggles creative flight (press SPACE to rise, SHIFT to descend while flying)
+// Flight height is independent of sprint: SPACE rises, V descends, SHIFT speeds up.
 addEventListener('keydown', e => {
-  if (e.code === 'KeyF' && started && gameMode==='creative' && !isFormInput(e)) {
+  if (e.code === 'KeyF' && !e.repeat && started && gameMode==='creative' && !isFormInput(e)) {
     player.flying = !player.flying;
     player.vel.set(0, 0, 0);
     if (typeof flashFly === 'function') flashFly(player.flying);
@@ -3624,11 +3653,9 @@ function tick(now) {
 
   // gravity + jump (or vertical control while flying)
   if (player.flying) {
-    player.vel.y = 0;
-    if (keys['Space']) player.vel.y = speed;
-    if (keys['ShiftLeft'] || keys['ShiftRight']) player.vel.y = -speed;
+    player.vel.y = ((keys['Space']?1:0)-(keys['KeyV']?1:0))*speed;
   } else if(waterLift) {
-    player.vel.y=(keys['ShiftLeft']||keys['ShiftRight'])?-3:4;
+    player.vel.y=keys['KeyV']?-3:4;
   } else if(swimming) {
     player.vel.y = keys['Space'] ? 3.5 : -1.5;
   } else {
@@ -3794,7 +3821,7 @@ for(const [value,text] of [['auto','Auto · match this device'],['touch','Touch 
 }
 controlsSelect.style.cssText=backLink.style.cssText+'min-height:44px;border-radius:0;background:#171615;color:#f8f6f2;';
 controlsSelect.addEventListener('change',()=>setControlsLayout(controlsSelect.value,true));
-// Tablet-friendly twin of the V key, so either view works without a keyboard.
+// Tablet-friendly twin of the C key, so either view works without a keyboard.
 viewBtn=document.createElement('button');
 viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
 viewBtn.addEventListener('click',()=>{setView(view==='third'?'first':'third');persistSave();});
@@ -3811,6 +3838,7 @@ function flashSaved(){
 
 // ---------- flight-mode toast ----------
 const flyTag = document.createElement('div');
+flyTag.setAttribute('role','status');
 flyTag.style.cssText = `
   position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%);
   background: #102a1c; color: #8fffa8; border: 2px solid #000;
@@ -3819,7 +3847,7 @@ flyTag.style.cssText = `
 `;
 document.body.appendChild(flyTag);
 function flashFly(on){
-  flyTag.textContent = on ? '\u2708 Flight ON   (SPACE up \u00b7 SHIFT down)' : 'Flight OFF';
+  flyTag.textContent = on ? (touchLayoutOn()?'\u2708 Flight ON · JUMP up · DOWN down':'\u2708 Flight ON · SPACE up · V down · SHIFT faster') : 'Flight OFF';
   flyTag.style.color = on ? '#8fffa8' : '#ffd0d0';
   flyTag.style.opacity = '1';
   clearTimeout(flashFly._t);
@@ -3998,8 +4026,8 @@ const btnDown    = document.getElementById('btnDown');
   btnJump.addEventListener('touchend', jumpUp);
   btnJump.addEventListener('touchcancel', jumpUp);
   btnJump.addEventListener('pointercancel', jumpUp);
-  btnDown.addEventListener('touchstart',e=>{if(started&&(player.flying||waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z))))keys['ShiftLeft']=true;e.preventDefault();},{passive:false});
-  for(const name of ['touchend','touchcancel','pointercancel'])btnDown.addEventListener(name,()=>{keys['ShiftLeft']=false;});
+  btnDown.addEventListener('touchstart',e=>{if(started&&(player.flying||waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z))))keys['KeyV']=true;e.preventDefault();},{passive:false});
+  for(const name of ['touchend','touchcancel','pointercancel'])btnDown.addEventListener(name,()=>{keys['KeyV']=false;});
 
   // fly: toggle, same as pressing F
   btnFly.addEventListener('touchstart', e => {
@@ -4010,7 +4038,7 @@ const btnDown    = document.getElementById('btnDown');
     if (typeof flashFly === 'function') flashFly(player.flying);
     e.preventDefault();
   }, { passive: false });
-  releaseTouch=()=>{lookId=null;stickId=null;clearMoveKeys();resetNub();keys['Space']=false;keys['ShiftLeft']=false;};
+  releaseTouch=()=>{lookId=null;stickId=null;clearMoveKeys();resetNub();keys['Space']=false;keys['KeyV']=false;keys['ShiftLeft']=false;};
   addEventListener('touchcancel', releaseTouch);
   addEventListener('pointercancel', releaseTouch);
 }
