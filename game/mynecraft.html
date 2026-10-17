@@ -188,7 +188,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=learn-20261017">
+<link rel="stylesheet" href="start-menu.css?v=inventory-20261017">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -227,7 +227,7 @@
       <ol class="play-steps">
         <li><span class="step-number">1</span><div><h3>Pick your character</h3><p>Choose a teacher below. Keep <strong>Creative</strong>, then press <strong>PLAY AS…</strong>.</p></div></li>
         <li><span class="step-number">2</span><div><h3>Move and look</h3><p class="desktop-help"><kbd>W</kbd> forward · <kbd>S</kbd> back<br><kbd>A</kbd> left · <kbd>D</kbd> right. Arrow keys work too. Move your mouse to look; click and drag if it stays free. <kbd>Space</kbd> jumps.</p><p class="touch-help">Use the round stick to move. Drag the screen to look. Tap <strong>JUMP</strong> to jump.</p></div></li>
-        <li><span class="step-number">3</span><div><h3>Place your first block</h3><p>Choose a material in the block bar. Aim the + at a nearby block.</p><p class="desktop-help"><strong>Right click</strong> to add a block. <strong>Left click</strong> to remove one.</p><p class="touch-help">Tap <strong>PLACE</strong> to add a block. Tap <strong>BREAK</strong> to remove one.</p></div></li>
+        <li><span class="step-number">3</span><div><h3>Place your first block</h3><p>Open <strong>Blocks / Inventory</strong> and choose a material. <span class="desktop-help">The <kbd>I</kbd> key opens it too.</span> Aim the + at a nearby block.</p><p class="desktop-help"><strong>Right click</strong> to add a block. <strong>Left click</strong> to remove one.</p><p class="touch-help">Tap <strong>PLACE</strong> to add a block. Tap <strong>BREAK</strong> to remove one.</p></div></li>
         <li><span class="step-number">4</span><div><h3>Keep your work</h3><p>Click <strong>Save</strong>. Before leaving: <strong>Menu → Save, download or load a world → Download Save</strong>. Check Downloads for your <strong>.json</strong> file.</p></div></li>
       </ol>
       <div class="flight-guide"><strong>Want to fly?</strong><p class="desktop-help"><kbd>F</kbd> flight on/off <span>·</span> <kbd>Space</kbd> up <span>·</span> <kbd>V</kbd> down <span>·</span> hold <kbd>Shift</kbd> to move faster. Let go of up/down to hover.</p><p class="touch-help">Tap <strong>FLY</strong> on/off. Hold <strong>JUMP</strong> to go up or <strong>DOWN</strong> to go down. Let go to hover.</p><small>Creative mode only. <span class="desktop-help">Press <kbd>Esc</kbd> or </span>open <strong>Menu</strong> to pause and see these steps again.</small></div>
@@ -293,6 +293,7 @@
       <p>This MYnecraft recipe uses Glowstone. Ordinary water still works for swimming. The lift works in both game modes; in Embrace the Challenge, collect the blocks first.</p>
     </details>
     <details class="start-advanced"><summary>How to play</summary>
+      <p><strong>Choose your blocks:</strong> Open Blocks / Inventory or press I while playing. Choose a pictured material to keep building. Creative has unlimited blocks; Embrace the Challenge shows what you have collected. Back to game, I, or Esc closes the picker. The block bar still works too.</p>
       <p><strong>Keyboard and mouse:</strong> W Forward · S Back · A Left · D Right. The arrow keys also move: ↑ Forward · ↓ Back · ← Left · → Right. Move your mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
       <p><strong>Creative flight and camera:</strong> Press F once to turn flight on or off. While flying, Space goes up and V goes down; let go to hover. Hold Shift to move faster on foot or in flight without changing height. C switches between first and third person; the toolbar's View button does the same.</p>
       <p><strong>Phone or tablet:</strong> Choose Touch to show the screen buttons, or Auto to follow your device. Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight. DOWN descends while flying or in a water elevator. Phones and tablets never capture a mouse.</p>
@@ -3234,7 +3235,9 @@ addEventListener('wheel', e => {
 // A lock that arrives after pause, blur, or a layout change is released at once.
 const startEl = document.getElementById('start');
 let started = false;
+let inventoryOpen=false;
 function pauseGame(){
+  if(inventoryOpen)closeInventory(false);
   started=false;
   releaseInput();
   startEl.classList.remove('hidden');
@@ -3771,6 +3774,72 @@ addEventListener('keydown', e => {
   if (/^Digit[1-9]$/.test(e.code)) refreshHotbar();
 });
 
+// The picker uses the existing materials, selected index and survival inventory.
+// Opening it pauses the world and releases held inputs; it never creates a save.
+const inventoryOverlay=document.createElement('div');
+inventoryOverlay.id='inventoryOverlay';inventoryOverlay.hidden=true;
+const inventoryDialog=document.createElement('section');
+inventoryDialog.className='inventory-sheet';inventoryDialog.setAttribute('role','dialog');
+inventoryDialog.setAttribute('aria-modal','true');inventoryDialog.setAttribute('aria-labelledby','inventoryTitle');
+inventoryDialog.setAttribute('aria-describedby','inventoryHelp');
+const inventoryTitle=document.createElement('h2');inventoryTitle.id='inventoryTitle';inventoryTitle.textContent='Blocks / Inventory';
+const inventoryHelp=document.createElement('p');inventoryHelp.id='inventoryHelp';
+const inventoryGrid=document.createElement('div');inventoryGrid.className='inventory-grid';
+const inventoryChoices=BLOCK_KEYS.map((k,i)=>{
+  const button=document.createElement('button');button.type='button';button.className='inventory-choice';
+  button.setAttribute('aria-label',`Choose ${BLOCKS[k].name}`);button.dataset.block=k;
+  const thumbnail=blockThumbnail(k);thumbnail.style.cssText='width:56px;height:56px;image-rendering:pixelated;pointer-events:none';
+  const name=document.createElement('strong');name.textContent=BLOCKS[k].name;
+  const count=document.createElement('span');count.className='inventory-count';
+  button.append(thumbnail,name,count);
+  button.addEventListener('click',event=>{
+    if(!inventoryOpen||button.disabled)return;
+    selected=i;refreshHotbar();persistSave();closeInventory(true,event);
+  });
+  inventoryGrid.appendChild(button);return {button,count};
+});
+const inventoryBack=document.createElement('button');inventoryBack.type='button';inventoryBack.className='inventory-back';inventoryBack.textContent='Back to game';
+inventoryBack.addEventListener('click',event=>closeInventory(true,event));
+const inventoryHint=document.createElement('p');inventoryHint.className='inventory-hint';inventoryHint.textContent='Choose one block, then aim the + at a nearby block. Right click or tap PLACE to add it.';
+inventoryDialog.append(inventoryTitle,inventoryHelp,inventoryGrid,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
+function inventoryBackground(disabled){
+  for(const element of [hotbar,ctrlPanel,renderer.domElement,document.getElementById('touchUI')])element.inert=disabled;
+}
+function refreshInventory(){
+  inventoryHelp.textContent=gameMode==='creative'?'Creative: every block is unlimited. Choose one to keep building.':'Embrace the Challenge: choose a block you have collected. Break blocks in the world to collect more.';
+  for(let i=0;i<inventoryChoices.length;i++){
+    const {button,count}=inventoryChoices[i],amount=inventory[BLOCK_KEYS[i]];
+    button.disabled=gameMode==='survival'&&amount===0;
+    button.setAttribute('aria-pressed',String(i===selected));
+    count.textContent=gameMode==='creative'?'Unlimited':amount>0?`${amount} available`:'Collect first';
+  }
+}
+function openInventory(){
+  if(!started||inventoryOpen)return;
+  inventoryOpen=true;started=false;releaseInput();refreshInventory();
+  inventoryOverlay.hidden=false;inventoryBackground(true);
+  (inventoryChoices[selected].button.disabled?inventoryBack:inventoryChoices[selected].button).focus?.();
+}
+function closeInventory(resume=true,event){
+  if(!inventoryOpen)return;
+  inventoryOpen=false;inventoryOverlay.hidden=true;inventoryBackground(false);releaseInput();
+  if(resume){startGame();renderer.domElement.tabIndex=-1;renderer.domElement.focus?.({preventScroll:true});requestDesktopLock(event);}
+}
+addEventListener('keydown',event=>{
+  if(inventoryOpen){
+    if(event.code==='KeyI'||event.code==='Escape'){
+      event.preventDefault();if(!event.repeat)closeInventory();return;
+    }
+    if(event.code==='Tab'){
+      const choices=[...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),inventoryBack];
+      const current=choices.indexOf(document.activeElement),next=(current+(event.shiftKey?-1:1)+choices.length)%choices.length;
+      event.preventDefault();choices[next].focus?.();
+    }
+  }else if(event.code==='KeyI'&&!event.repeat&&started&&!isFormInput(event)){
+    event.preventDefault();openInventory();
+  }
+});
+
 // ---------- top-right controls: back to app, autosave indicator, reset ----------
 const ctrlPanel = document.createElement('div');
 ctrlPanel.id='controls';
@@ -3809,6 +3878,8 @@ resetBtn.addEventListener('click', () => {
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
 menuBtn.addEventListener('click',()=>{pauseGame();persistSave();});
 const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
+const inventoryBtn=document.createElement('button');inventoryBtn.id='inventoryToggle';inventoryBtn.type='button';inventoryBtn.textContent='Blocks / Inventory';inventoryBtn.style.cssText=backLink.style.cssText;
+inventoryBtn.setAttribute('aria-keyshortcuts','I');inventoryBtn.setAttribute('aria-haspopup','dialog');inventoryBtn.addEventListener('click',openInventory);
 graphicsBtn=document.createElement('button');
 graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
 graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detailed':'smooth');persistSave();});
@@ -3826,7 +3897,7 @@ viewBtn=document.createElement('button');
 viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
 viewBtn.addEventListener('click',()=>{setView(view==='third'?'first':'third');persistSave();});
 setView(view);
-ctrlPanel.append(menuBtn, saveBtn, controlsSelect, viewBtn, graphicsBtn, backLink, saveTag, resetBtn);
+ctrlPanel.append(menuBtn, saveBtn, inventoryBtn, controlsSelect, viewBtn, graphicsBtn, backLink, saveTag, resetBtn);
 document.body.appendChild(ctrlPanel);
 
 function flashSaved(){
