@@ -51,6 +51,18 @@
     padding: 8px 12px; font: 700 12px/1.4 ui-monospace, monospace; pointer-events: none;
   }
   body.touch-device #mouseHint { display: none; }
+  #sleepTransition {
+    position: fixed; inset: 0; z-index: 9; display: grid; place-content: center;
+    text-align: center; color: #fff; background: radial-gradient(ellipse at top, #273e70, #091327 75%);
+    font-family: system-ui, sans-serif; padding: 24px;
+  }
+  #sleepTransition[hidden] { display: none; }
+  #sleepTransition strong { font-size: clamp(28px, 5vw, 48px); }
+  #sleepTransition p { color: #c8dcff; font-size: 18px; }
+  #sleepTransition .sleep-moon { font-size: 64px; color: #ffe5a5; }
+  #activityInteract { position: fixed; z-index: 8; left: 50%; bottom: 92px; transform: translateX(-50%); min-height: 44px; padding: 10px 18px; border: 2px solid #132d47; border-radius: 8px; background: #f8d778; color: #142b42; font: 800 14px system-ui, sans-serif; cursor: pointer; }
+  #activityInteract[hidden], #btnInteract[hidden], body.touch-device #activityInteract { display: none; }
+  #btnInteract { min-height: 52px; background: #f8d778; color: #142b42; max-width: 180px; }
   .pixel { image-rendering: pixelated; }
 
   /* ---------- touch controls (hidden by default; enabled via JS on touch devices) ---------- */
@@ -196,6 +208,7 @@
   <div id="touchLook"></div>
   <div id="touchStick"><div id="touchStickNub"></div></div>
   <div id="touchActions">
+    <div class="row"><button class="touchBtn" id="btnInteract" type="button" hidden>INTERACT</button></div>
     <div class="row">
       <button class="touchBtn" id="btnFly" type="button">FLY</button>
       <button class="touchBtn" id="btnDown" type="button">DOWN</button>
@@ -207,13 +220,15 @@
     </div>
   </div>
 </div>
+<button id="activityInteract" type="button" aria-keyshortcuts="E" hidden>Interact</button>
 <div id="info">
   W Forward · S Back · A Left · D Right (or arrow keys)<br/>
   DRAG to look &nbsp;·&nbsp; SPACE jump/up &nbsp;·&nbsp; V down &nbsp;·&nbsp; SHIFT faster &nbsp;·&nbsp; F fly<br/>
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block<br/>
-  Press Esc to release the mouse and open the menu
+  E interact with a car or basketball · Press H to hide or show this help · Esc opens the menu
 </div>
 <div id="mouseHint">Press Esc to release the mouse. Drag to look if the cursor stays free.</div>
+<div id="sleepTransition" role="status" aria-live="polite" hidden><span class="sleep-moon" aria-hidden="true">☾</span><strong>You are now asleep</strong><p>Sunrise is one second away. A new day is coming!</p></div>
 <div id="start">
   <div class="start-shell">
     <header class="start-header">
@@ -228,10 +243,10 @@
         <li><span class="step-number">1</span><div><h3>Pick your character</h3><p>Choose a teacher below. Keep <strong>Creative</strong>, then press <strong>PLAY AS…</strong>.</p></div></li>
         <li><span class="step-number">2</span><div><h3>Move and look</h3><p class="desktop-help"><kbd>W</kbd> forward · <kbd>S</kbd> back<br><kbd>A</kbd> left · <kbd>D</kbd> right. Arrow keys work too. Move your mouse to look; click and drag if it stays free. <kbd>Space</kbd> jumps.</p><p class="touch-help">Use the round stick to move. Drag the screen to look. Tap <strong>JUMP</strong> to jump.</p></div></li>
         <li><span class="step-number">3</span><div><h3>Place your first block</h3><p>Open <strong>Blocks / Inventory</strong> and choose a material. <span class="desktop-help">The <kbd>I</kbd> key opens it too.</span> Aim the + at a nearby block.</p><p class="desktop-help"><strong>Right click</strong> to add a block. <strong>Left click</strong> to remove one.</p><p class="touch-help">Tap <strong>PLACE</strong> to add a block. Tap <strong>BREAK</strong> to remove one.</p></div></li>
-        <li><span class="step-number">4</span><div><h3>Keep your work</h3><p>Click <strong>Save</strong>. Before leaving: <strong>Menu → Save, download or load a world → Download Save</strong>. Check Downloads for your <strong>.json</strong> file.</p></div></li>
+        <li><span class="step-number">4</span><div><h3>Keep your work</h3><p id="keepWorkGuide">Click <strong>Save</strong>. Before leaving: <strong>Menu → Save, download or load a world → Download Save</strong>. Check Downloads for your <strong>.json</strong> file.</p></div></li>
       </ol>
       <div class="flight-guide"><strong>Want to fly?</strong><p class="desktop-help"><kbd>F</kbd> flight on/off <span>·</span> <kbd>Space</kbd> up <span>·</span> <kbd>V</kbd> down <span>·</span> hold <kbd>Shift</kbd> to move faster. Let go of up/down to hover.</p><p class="touch-help">Tap <strong>FLY</strong> on/off. Hold <strong>JUMP</strong> to go up or <strong>DOWN</strong> to go down. Let go to hover.</p><small>Creative mode only. <span class="desktop-help">Press <kbd>Esc</kbd> or </span>open <strong>Menu</strong> to pause and see these steps again.</small></div>
-      <p class="class-reminder">Building for class? Follow your teacher’s directions for what to make and where. Each browser has its own world; there is no automatic device sync.</p>
+      <p class="class-reminder" id="classReminder">Building for class? Follow your teacher’s directions for what to make and where. Each browser has its own world; there is no automatic device sync.</p>
     </section>
     <div class="start-grid">
       <section class="start-character-panel" aria-labelledby="characterTitle">
@@ -242,11 +257,15 @@
       </section>
       <section class="start-settings" aria-labelledby="settingsTitle">
         <h2 id="settingsTitle">Ready? Let’s build.</h2>
-        <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option></select></label>
-        <p id="modeHelp">Changing modes keeps your build and saved challenge progress.</p>
+        <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option><option value="hardcore">Embrace the Challenge: Hardcore</option></select></label>
+        <p id="modeHelp">Creative and regular Challenge share your campus. Hardcore has its own resource world and saved progress. Start either challenge any time.</p>
+        <p><strong>Hardcore unlocks more:</strong> Gather, craft tools, build a house, and earn materials, animals and teacher characters. It is peaceful: no enemies or permanent loss of your world.</p>
         <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
-        <p class="start-tip"><strong>Creative</strong> gives you unlimited blocks and flight. Your saved build stays here when you press Play.</p>
-        <details class="play-options"><summary>Camera, graphics and controls</summary>
+        <p class="start-tip" id="startTip"><strong>Creative</strong> gives you unlimited blocks and flight. Your saved build stays here when you press Play.</p>
+        <details class="play-options"><summary>Time, camera, graphics and controls</summary>
+        <label>Day and night <select id="dayNightMode"><option value="auto-sleep">Auto sleep · skip night</option><option value="always-day">Always day · keep the clock running</option><option value="full-cycle">Full day/night · 20-minute days</option></select></label>
+        <p id="dayNightHelp">At 6:00 PM, sleep for one second, then wake at 6:00 AM. Opening the menu pauses sleep too.</p>
+        <label><input id="movementHelp" type="checkbox" checked> Show movement help · H hides or shows it</label>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see your character</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
         <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · show screen buttons</option><option value="desktop">Keyboard and mouse</option></select></label>
@@ -255,18 +274,19 @@
         </details>
       </section>
     </div>
-    <details class="start-advanced"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
+    <details class="start-advanced" id="schoolExplore"><summary>Explore the school</summary><section class="start-actions" aria-label="Explore the school">
       <button id="visitSchool" type="button">Visit the ECMS entrance</button>
       <button id="overview" type="button">Fly above ECMS · Creative</button>
       <p class="start-wide"><strong>Choose a starting point:</strong> Visit the ECMS entrance moves you to the front approach in either mode. Fly above ECMS starts a flying view in Creative. Neither shortcut changes the world clock or clears your build.</p>
       <p class="start-wide"><strong>Front lawn and entrance:</strong> Find Sleeves in his number 28 jersey, larger than KaY and smaller than the adults. Officer Shields stays by his front desk, and Mr. Eiler walks the entrance area. Eddie perches on the lawn rock during the day.</p>
       <p class="start-wide"><strong>Playground:</strong> Look for js in a red tee and lime shorts. He walks around the playground and takes turns on the two swings.</p>
       <p class="start-wide"><strong>Find your learning community:</strong> Pass through both glass doorways. The main cafeteria and its high ECTV screen are straight ahead; the elementary cafeteria is to your left. Grade 5 is in the right wing with Grade 6 upstairs. Grades 3–4 are in the left wing with Grades 1–2 upstairs. Kindergarten is at the upper landing of the broad curved walkway. Outside, the flag is in the center of the entrance circle and the parking rows are to the left of the approach.</p>
-      <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy follow the campus Mr. Macek. Sir D and Mr. Macek meet near the entrance around sunset.</p>
+      <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy explore side by side and come back to you. They wait on your last walkable floor when you fly. Sir D and Mr. Macek meet near the entrance around sunset.</p>
       <p class="start-wide"><strong>Meet the staff:</strong> Ms. Eriksen paints upstairs in the left wing. Mr. Wingenbach plays a keyboard upstairs above CIRC. Ms. McMichael greets you in Spanish in the upstairs right wing. Mr. Mullet walks around the outdoor court. The campus Mr. Macek wears his black SV shirt in CIRC.</p>
       <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer parks beyond the far curb near the circle exit at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
+      <p class="start-wide"><strong>Cafeteria cleanup:</strong> From 2:00 PM to 3:00 PM each game day, the cafeteria custodian rides a gray floor scrubber around the main cafeteria. Keep the aisles clear so he can clean.</p>
       <p class="start-wide"><strong>Evening:</strong> Cookie Man sweeps the halls from 4:00 PM to 10:00 PM. Eddie starts flying to the roof at 6:00 PM and returns to the lawn by 6:00 AM.</p>
-      <p class="start-wide"><strong>These are game-clock routines.</strong> A full day takes 20 minutes of active play. Opening this menu pauses the world, including the clock, characters, and buses. Your real school day does not set their schedule.</p>
+      <p class="start-wide"><strong>These are game-clock routines.</strong> The clock's full cycle takes 20 minutes of active play. Auto sleep skips from 6:00 PM to 6:00 AM after one second. Choose Full day/night to see evening routines, or Always day to keep daylight while the clock runs. Opening this menu pauses the world, including sleep, the clock, characters, and buses. Your real school day does not set their schedule.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
     </section></details>
     <details class="start-advanced"><summary>Save, download or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
@@ -309,6 +329,11 @@
 { "imports": { "three": "./vendor/three.module.js" } }
 </script>
 
+<script src="hardcore-rules.js"></script>
+<script src="hardcore-world.js"></script>
+<script src="play-activities.js"></script>
+<script src="room-client.js"></script>
+<script src="cafeteria-cleaner.js"></script>
 <script type="module">
 import * as THREE from 'three';
 
@@ -457,16 +482,37 @@ const BLOCKS = {
   orange: { name:'Orange panels', mats:Array(6).fill(0).map(()=>new THREE.MeshLambertMaterial({color:0xd87830})),swatch:'#d87830' },
   blue: { name:'Blue panels', mats:Array(6).fill(0).map(()=>new THREE.MeshLambertMaterial({color:0x087bc4})),swatch:'#087bc4' },
 };
-const BLOCK_KEYS = ['grass','dirt','stone','sand','wood','leaves','planks','brick','snow','glow','glass','water','orange','blue'];
+const LEGACY_BLOCK_KEYS = ['grass','dirt','stone','sand','wood','leaves','planks','brick','snow','glow','glass','water','orange','blue'];
+for(const [id,name,color,texture] of [
+ ['cherrywood','Cherry wood','#b97770',texWood],['sprucewood','Spruce wood','#745136',texWood],['pinewood','Pine wood','#d4b572',texWood],
+ ['cherryplanks','Cherry planks','#dfa5a0',texPlanks],['spruceplanks','Spruce planks','#785d40',texPlanks],['pineplanks','Pine planks','#dec58f',texPlanks],
+ ['cherryleaves','Cherry leaves','#eea7c1',texLeaves],['concrete','Concrete','#a7a9ad',texStone],['whiteconcrete','White concrete','#eeeee8',null],
+ ['redconcrete','Red concrete','#d7524c',null],['yellowconcrete','Yellow concrete','#e7c04d',null],['blueconcrete','Blue concrete','#4f80c5',null],
+ ['copperore','Copper ore','#c77b49',texStone],['ironore','Iron ore','#b8a89a',texStone]]){
+ BLOCKS[id]={name,swatch:color,mats:Array.from({length:6},()=>new THREE.MeshLambertMaterial({color,map:texture||null}))};
+}
+const BLOCK_KEYS = [...LEGACY_BLOCK_KEYS,...Object.keys(BLOCKS).filter(k=>!LEGACY_BLOCK_KEYS.includes(k))];
 
 // ---------- voxel world ----------
 const WORLD = new Map(); // key "x,y,z" -> blockKey
+const WORLD_FLOOR=-40;
+const deepVoids=new Set();
 const key = (x,y,z) => `${x},${y},${z}`;
 function setBlock(x,y,z,k) {
   const id = key(x,y,z);
+  // Include the old floor so a saved hole at -8 exposes the virtual layer below.
+  if(y <= -8){if(k==null)deepVoids.add(id);else deepVoids.delete(id);}
   if (k == null) WORLD.delete(id); else WORLD.set(id, k);
 }
-function getBlock(x,y,z) { return WORLD.get(key(x,y,z)); }
+function getBlock(x,y,z) {
+ const id=key(x,y,z);
+ if(WORLD.has(id))return WORLD.get(id);
+ if(y>=WORLD_FLOOR&&y < -8&&x>=-SIZE&&x<=EAST_EDGE&&Math.abs(z)<=SIZE&&!deepVoids.has(id)){
+   if(y===WORLD_FLOOR)return 'stone';
+   const ore=Math.abs(Math.imul(x,73856093)^Math.imul(y,19349663)^Math.imul(z,83492791));
+   return y < -18&&ore%23===0?'ironore':ore%13===0?'copperore':'stone';
+ }
+}
 function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water'; }
 const inHighway = x => x>=-57 && x<=-43;
 const inLake = (x,z) => (x/10)**2 + (z/8)**2 < 1;
@@ -493,7 +539,7 @@ function heightAt(x, z) {
 const ORIGIN_SIZE = 64, ORIGIN_EAST = 96;
 const SIZE = 96;
 const EAST_EDGE = 128;
-const travelLimits = {minX:-SIZE+1, maxX:EAST_EDGE-1, minZ:-SIZE+1, maxZ:SIZE-1, minY:-6, maxY:60};
+const travelLimits = {minX:-SIZE+1, maxX:EAST_EDGE-1, minZ:-SIZE+1, maxZ:SIZE-1, minY:WORLD_FLOOR+2, maxY:60};
 function inPlay(x,z){return x>-SIZE+2 && x<EAST_EDGE-2 && z>-SIZE+2 && z<SIZE-2;}
 for (let x = -SIZE; x <= EAST_EDGE; x++) {
   for (let z = -SIZE; z <= SIZE; z++) {
@@ -875,7 +921,7 @@ function refreshVoxelFaces(x,y,z){
   const type=getBlock(x,y,z);
   for(let face=0;face<6;face++){
     const id=key(x,y,z)+','+face,[dx,dy,dz]=faceDirections[face];
-    const visible=type&&!(y===-8&&face===3)&&faceVisible(type,getBlock(x+dx,y+dy,z+dz));
+    const visible=type&&!(y===WORLD_FLOOR&&face===3)&&faceVisible(type,getBlock(x+dx,y+dy,z+dz));
     const current=faceSlots.get(id);
     if(current&&(!visible||current.bucketKey!==faceBucketKey(type,face,x,z)))removeVoxelFace(id);
     if(visible&&!faceSlots.has(id))addVoxelFace(x,y,z,face,type);
@@ -888,30 +934,63 @@ function updateBlockMeshes(x,y,z){
 function buildMeshes(){
   for(const k in instMeshes){scene.remove(instMeshes[k]);instMeshes[k].dispose?.();delete instMeshes[k];}
   faceBuckets.clear();faceSlots.clear();
+  const exposedDeepCells=new Set();
+  const exposeDeepNeighbors=(x,y,z)=>{
+    for(const [dx,dy,dz] of faceDirections){
+      const nx=x+dx,ny=y+dy,nz=z+dz,neighbor=key(nx,ny,nz);
+      if(ny>=WORLD_FLOOR&&ny < -8&&!WORLD.has(neighbor))exposedDeepCells.add(neighbor);
+    }
+  };
   for(const [id,type] of WORLD){
     const [x,y,z]=id.split(',').map(Number);
+    if(y<=-8&&(type==='water'||type==='glass'))exposeDeepNeighbors(x,y,z);
     for(let face=0;face<6;face++){
-      if(y===-8&&face===3)continue; // Unreachable underside of bedrock need not reach the GPU.
+      if(y===WORLD_FLOOR&&face===3)continue; // Unreachable underside of bedrock need not reach the GPU.
       const [dx,dy,dz]=faceDirections[face];
       if(!faceVisible(type,getBlock(x+dx,y+dy,z+dz)))continue;
       addVoxelFace(x,y,z,face,type);
     }
   }
+  // Deep rock is virtual until exposed. Restore just the faces surrounding
+  // mined cells, including old-floor holes, rather than meshing 32 solid layers.
+  for(const id of deepVoids){
+    exposeDeepNeighbors(...id.split(',').map(Number));
+  }
+  for(const id of exposedDeepCells)refreshVoxelFaces(...id.split(',').map(Number));
   for(const mesh of Object.values(instMeshes))mesh.instanceMatrix.clearUpdateRanges();
 }
 
 // ---------- persistence (autosave to localStorage) ----------
 const SAVE_KEY = 'mynecraft_save_v1';
 let resetting = false;
-let saveState;
-try { saveState = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { saveState = {}; }
-if (!saveState || typeof saveState !== 'object' || Array.isArray(saveState)) saveState = {};
-saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveState.edits : {};
+let saveEnvelope;
+try { saveEnvelope = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { saveEnvelope = {}; }
+if (!saveEnvelope || typeof saveEnvelope !== 'object' || Array.isArray(saveEnvelope)) saveEnvelope = {};
+function emptyCampusSave(){
+  return {mode:'creative',health:20,dayTime:.12,edits:{},inventory:Object.fromEntries(BLOCK_KEYS.map(k=>[k,0])),campus:[],player:{x:.5,y:7.7,z:12.5,yaw:0,pitch:0,sel:0,flying:false}};
+}
+// Keep a valid campus slot even when the first ever visit starts in Hardcore.
+if(!saveEnvelope.player)saveEnvelope={...emptyCampusSave(),...saveEnvelope};
 const requestedMode=new URLSearchParams(location.search).get('mode');
-let gameMode = requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
+const isGroupRoom=new URLSearchParams(location.search).get('room')==='1';
+const roomSession=isGroupRoom?globalThis.MYNE_ROOM?.readSession():null;
+const isHardcoreWorld=!isGroupRoom&&(requestedMode==='hardcore'||(!['creative','survival'].includes(requestedMode)&&saveEnvelope.activeWorld==='hardcore'));
+let roomConnection=null;
+let saveState=isGroupRoom?emptyCampusSave():isHardcoreWorld?(saveEnvelope.hardcoreWorld||{}):saveEnvelope;
+if(!saveState||typeof saveState!=='object'||Array.isArray(saveState))saveState={};
+saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveState.edits : {};
+let gameMode = isGroupRoom?'creative':isHardcoreWorld?'hardcore':requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
+let hardcore=globalThis.MYNE_HARDCORE?.normalize(saveState.hardcore);
+let activities=null;
+let chosenAnimal=null;
+let fishUnlocked=saveState.fishUnlocked===true;
+if((isHardcoreWorld||isGroupRoom)&&globalThis.MYNE_HARDCORE_WORLD){
+ WORLD.clear();deepVoids.clear();
+ globalThis.MYNE_HARDCORE_WORLD.build(setBlock,{minX:-SIZE,maxX:EAST_EDGE,minZ:-SIZE,maxZ:SIZE});
+}
 // Landing-page selection applies once. A reload or imported backup must use its
 // saved mode instead of being forced back by a stale query string.
-if((requestedMode==='creative'||requestedMode==='survival')&&typeof history!=='undefined'&&location.href){
+if(['creative','survival','hardcore'].includes(requestedMode)&&typeof history!=='undefined'&&location.href){
   try{const cleanURL=new URL(location.href);cleanURL.searchParams.delete('mode');history.replaceState(history.state,'',cleanURL.href);}catch{}
 }
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
@@ -925,9 +1004,30 @@ const STAFF_CHARACTERS=Object.freeze([
 ]);
 const STAFF_CHARACTER_IDS=STAFF_CHARACTERS.map(c=>c.id);
 let playerCharacter=STAFF_CHARACTER_IDS.includes(saveState.playerCharacter)?saveState.playerCharacter:'macek';
+if(gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE?.isCharacterUnlocked(hardcore,playerCharacter))playerCharacter='macek';
 // The clock the world was saved at. Eddie's perch and the bus loop are both pure
 // functions of it, so they are placed correctly the instant the world loads.
 const LOADED_DAY_TIME = Number.isFinite(saveState.dayTime) ? ((saveState.dayTime % 1) + 1) % 1 : 0.12;
+function normalizeDayNightMode(value){return ['auto-sleep','always-day','full-cycle'].includes(value)?value:'auto-sleep';}
+let dayNightMode=normalizeDayNightMode(saveState.dayNightMode);
+let movementHelpVisible=saveState.movementHelpVisible!==false;
+const dayNightSelect=document.getElementById('dayNightMode');
+const dayNightHelp=document.getElementById('dayNightHelp');
+const movementHelpCheckbox=document.getElementById('movementHelp');
+const sleepTransition=document.getElementById('sleepTransition');
+function refreshDayNightHelp(){
+  dayNightSelect.value=dayNightMode;
+  dayNightHelp.textContent=dayNightMode==='auto-sleep'?'At 6:00 PM, sleep for one second, then wake at 6:00 AM. Opening the menu pauses sleep too.':
+    dayNightMode==='always-day'?'The sky stays bright. The clock, buses and school routines still follow their full 20-minute cycle.':'See sunrise, daytime, sunset and night. A full cycle takes 20 minutes of active play.';
+}
+function setMovementHelpVisible(visible){
+  movementHelpVisible=visible!==false;
+  movementHelpCheckbox.checked=movementHelpVisible;
+  for(const id of ['info','mouseHint'])document.getElementById(id).style.display=movementHelpVisible?'':'none';
+}
+refreshDayNightHelp();setMovementHelpVisible(movementHelpVisible);
+movementHelpCheckbox.addEventListener('change',()=>{setMovementHelpVisible(movementHelpCheckbox.checked);persistSave();});
+dayNightSelect.addEventListener('change',()=>{setDayNightMode(dayNightSelect.value);persistSave();});
 let graphics=saveState.graphics==='detailed'?'detailed':'smooth';
 let graphicsBtn=null;
 const graphicsSelect=document.getElementById('graphics');
@@ -1014,9 +1114,13 @@ const challenge=normalizeChallenge(saveState.challenge);
 let challengeLabel='';
 function refreshChallenge(){
   const el=document.getElementById('challengeProgress');
-  el.hidden=gameMode!=='survival';
+  el.hidden=gameMode==='creative';
   document.getElementById('btnFly').style.display=gameMode==='creative'?'flex':'none';
   document.getElementById('btnDown').style.display='flex';
+  if(gameMode==='hardcore'){
+    const next=globalThis.MYNE_HARDCORE.status(hardcore).next;
+    el.textContent=next?`HARDCORE · ${next.title}: ${next.instruction} (${next.progress}/${next.goal})`:'HARDCORE · All goals complete! Keep creating.';return;
+  }
   const finished=challenge.wood===10&&challenge.placed===12&&challenge.circ;
   const label=finished?'Challenge complete! Keep building.':`CHALLENGE · Wood ${challenge.wood}/10 · Place ${challenge.placed}/12 · CIRC ${challenge.circ?'✓':'find it'}`;
   if(label!==challengeLabel){el.textContent=label;challengeLabel=label;}
@@ -1031,7 +1135,7 @@ let breath = 10;
 // re-apply the player's saved block changes on top of the procedural world
 for (const [id, k] of Object.entries(saveState.edits)) {
   if (!/^-?\d+,-?\d+,-?\d+$/.test(id)) continue;
-  if (k === null) WORLD.delete(id); else if (BLOCKS[k]) WORLD.set(id, k);
+  if (k === null || BLOCKS[k]) setBlock(...id.split(',').map(Number),k);
 }
 
 let _saveTimer = null;
@@ -1049,7 +1153,7 @@ function readAreaLabels(value){
   return value.map(v=>{
     if(!v||typeof v.text!=='string'||!v.text.trim()||v.text.length>32||/[\u0000-\u001f\u007f]/.test(v.text)||
       !['x','y','z'].every(k=>typeof v[k]==='number'&&Number.isFinite(v[k]))||
-      v.x < -SIZE||v.x>EAST_EDGE+1||Math.abs(v.z)>SIZE+1||v.y < -7||v.y>62)
+      v.x < -SIZE||v.x>EAST_EDGE+1||Math.abs(v.z)>SIZE+1||v.y < WORLD_FLOOR+1||v.y>62)
       throw new Error('This backup has invalid area signs. Your world was kept.');
     return {text:v.text.trim(),x:v.x,y:v.y,z:v.z};
   });
@@ -1057,11 +1161,17 @@ function readAreaLabels(value){
 let areaLabels=[];
 try{areaLabels=readAreaLabels(saveState.areaLabels);}catch{}
 function persistSave(){
+  if(isGroupRoom)return false;
   if (resetting) return false;
   try {
     saveState.mode = gameMode; saveState.health = health; saveState.inventory = inventory;
     saveState.challenge = {...challenge};
+    if(hardcore)saveState.hardcore=hardcore;
+    saveState.fishUnlocked=fishUnlocked;
+    if(activities)saveState.activities=activities.serialize();
     saveState.dayTime = dayTime;
+    saveState.dayNightMode = dayNightMode;
+    saveState.movementHelpVisible = movementHelpVisible;
     saveState.macekOutfit = macekOutfit;
     saveState.playerCharacter = playerCharacter;
     saveState.view = view;
@@ -1070,7 +1180,9 @@ function persistSave(){
     saveState.areaLabels = areaLabels.map(v=>({...v}));
     saveState.campus = campusActors.map(a=>({name:a.name,x:a.pos.x,y:a.pos.y,z:a.pos.z,patrolIndex:a.patrolIndex||0}));
     saveState.player = { x:player.pos.x, y:player.pos.y, z:player.pos.z, yaw:player.yaw, pitch:player.pitch, sel:selected, flying:player.flying };
-    localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
+    if(isHardcoreWorld)saveEnvelope.hardcoreWorld=saveState;
+    saveEnvelope.activeWorld=isHardcoreWorld?'hardcore':'campus';
+    localStorage.setItem(SAVE_KEY, JSON.stringify(saveEnvelope));
     flashSaved();
     return true;
   } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open and use Menu > Download Save to keep your progress.'; return false; }
@@ -1079,13 +1191,15 @@ function persistSave(){
 // Portable backups contain game state only. Never evaluate imported file contents.
 const MAX_WORLD_FILE_BYTES = 5 * 1024 * 1024;
 function worldBackupText(){
+  if(isGroupRoom)throw new Error('This shared room is saved by its room service. Your personal worlds are separate.');
   persistSave(); // Also refreshes the in-memory snapshot if browser storage is full.
-  return JSON.stringify({format:'mynecraft-world',version:1,state:saveState});
+  return JSON.stringify({format:'mynecraft-world',version:1,state:saveEnvelope});
 }
 function canonicalCampusName(name){
   return name==='MaCEk'||name==='Macek'||name==='Mr. Masek'?'Mr. Macek':name==='Mr Unicorn 🦄'||name==='Mr. Unicorn'?'Mr. B':name==='Cookie Monster'?'Cookie Man':name;
 }
-function readWorldBackup(text){
+function readWorldBackup(text,depth=0){
+  if(depth>1)throw new Error('This backup has invalid nested worlds. Your world was kept.');
   if (text.length > MAX_WORLD_FILE_BYTES) throw new Error('This file is too large. Choose a MYnecraft world backup.');
   let data; try { data=JSON.parse(text); } catch { throw new Error('That file is not a readable world backup.'); }
   const s=data?.state;
@@ -1099,9 +1213,9 @@ function readWorldBackup(text){
   }
   const p=s.player;
   if(!['x','y','z','yaw','pitch'].every(k=>finite(p[k]))||['x','y','z'].some(k=>Math.abs(p[k])>10000)||!Number.isInteger(p.sel)||p.sel<0||p.sel>=BLOCK_KEYS.length||typeof p.flying!=='boolean') throw new Error('This backup has an invalid player position. Your world was kept.');
-  if(!['creative','survival'].includes(s.mode)||!finite(s.health)||s.health<1||s.health>20||!finite(s.dayTime)||!object(s.inventory)) throw new Error('This backup has invalid game settings. Your world was kept.');
+  if(!['creative','survival','hardcore'].includes(s.mode)||!finite(s.health)||s.health<1||s.health>20||!finite(s.dayTime)||!object(s.inventory)) throw new Error('This backup has invalid game settings. Your world was kept.');
   const inventory={};
-  for(const k of BLOCK_KEYS){if(!Number.isSafeInteger(s.inventory[k])||s.inventory[k]<0)throw new Error('This backup has an invalid inventory. Your world was kept.');inventory[k]=s.inventory[k];}
+  for(const k of BLOCK_KEYS){const v=s.inventory[k]===undefined&&!LEGACY_BLOCK_KEYS.includes(k)?0:s.inventory[k];if(!Number.isSafeInteger(v)||v<0)throw new Error('This backup has an invalid inventory. Your world was kept.');inventory[k]=v;}
   if(!Array.isArray(s.campus)||s.campus.length>MAX_CAMPUS_ACTORS)throw new Error('This backup has invalid characters. Your world was kept.');
   const campus=s.campus.map(a=>{
     if(!object(a)||typeof a.name!=='string'||a.name.length>40||!['x','y','z'].every(k=>finite(a[k])&&Math.abs(a[k])<=10000)||!Number.isSafeInteger(a.patrolIndex)||a.patrolIndex<0)throw new Error('This backup has invalid characters. Your world was kept.');
@@ -1117,9 +1231,20 @@ function readWorldBackup(text){
   if(s.controls!==undefined&&!['auto','touch','desktop'].includes(s.controls))throw new Error('This backup has an invalid controls setting. Your world was kept.');
   const areaLabels=readAreaLabels(s.areaLabels);
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
-  return {edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',playerCharacter:s.playerCharacter||'macek',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge)};
+  const result={edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',playerCharacter:s.playerCharacter||'macek',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge),dayNightMode:normalizeDayNightMode(s.dayNightMode),movementHelpVisible:s.movementHelpVisible!==false,fishUnlocked:s.fishUnlocked===true};
+  if(globalThis.MYNE_HARDCORE)result.hardcore=globalThis.MYNE_HARDCORE.normalize(s.hardcore);
+  if(s.activities!==undefined){
+    if(!object(s.activities)||!globalThis.MYNE_ACTIVITIES?.validateSerialized(s.activities))throw new Error('Invalid activities in backup. Your world was kept.');
+    result.activities=s.activities;
+  }
+  if(s.hardcoreWorld!==undefined){
+    result.hardcoreWorld=readWorldBackup(JSON.stringify({format:'mynecraft-world',version:1,state:s.hardcoreWorld}),depth+1);
+  }
+  result.activeWorld=s.activeWorld==='hardcore'?'hardcore':'campus';
+  return result;
 }
 function restoreWorldBackup(text){
+  if(isGroupRoom)throw new Error('Leave the group room before loading a personal world.');
   const state=readWorldBackup(text); // Validate before confirmation or touching storage.
   if(!confirm('Replace this browser\'s saved world with this file? The two worlds will not join together. To keep your current world, press Cancel, then use Download Save and check that the file downloaded. Press OK only when you are ready to replace it.')) return false;
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); }
@@ -1436,6 +1561,7 @@ function refreshAreaLabelChoices(selected='new'){
   choice.value=selected;document.getElementById('removeAreaLabel').disabled=selected==='new';
 }
 function saveAreaLabel(text,index='new'){
+  if(isGroupRoom)return 'Text signs are off in group rooms.';
   const clean=String(text).trim();
   if(!clean||clean.length>32||/[\u0000-\u001f\u007f]/.test(clean))return 'Use a short name from 1 to 32 letters, numbers or symbols.';
   const i=index==='new'?-1:Number(index);
@@ -1700,8 +1826,8 @@ for(const [color,parts] of detailBatches){
 }
 
 function groundSurface(x,z) {
-  for(let y=32;y>=-8;y--) if(isSolid(Math.floor(x),y,Math.floor(z))) return y+1;
-  return -8;
+  for(let y=32;y>=WORLD_FLOOR;y--) if(isSolid(Math.floor(x),y,Math.floor(z))) return y+1;
+  return WORLD_FLOOR;
 }
 class Animal {
   constructor(kind,x,z) {
@@ -2904,6 +3030,7 @@ function updateIdentityStatus(){
 }
 function setPlayerCharacter(id){
   if(!STAFF_CHARACTER_IDS.includes(id))return false;
+  if(gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.isCharacterUnlocked(hardcore,id))return false;
   for(const avatar of Object.values(playerAvatars))avatar.group.visible=false;
   playerCharacter=id;playerAvatar=playerAvatars[id];
   const character=STAFF_CHARACTERS.find(c=>c.id===id);
@@ -2922,6 +3049,15 @@ function setPlayerCharacter(id){
   playerAvatar.group.visible=view==='third';viewModel.visible=view==='first';
   updateIdentityStatus();return true;
 }
+function refreshStaffLocks(){
+  for(const c of STAFF_CHARACTERS){
+    const locked=gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.isCharacterUnlocked(hardcore,c.id);
+    staffInputs[c.id].disabled=locked;
+    staffCards[c.id].style.opacity=locked?'.48':'1';
+    staffCards[c.id].title=locked?'Complete Hardcore goals to unlock '+c.name:c.detail;
+    staffCards[c.id].children[3].textContent=locked?'Locked: complete the next Hardcore goals.':c.detail;
+  }
+}
 function setView(value){
   view=value==='third'?'third':'first';
   playerAvatar.group.visible=view==='third';viewModel.visible=view==='first';
@@ -2929,7 +3065,7 @@ function setView(value){
   if(viewBtn){viewBtn.textContent=view==='third'?'View: 3rd':'View: 1st';viewBtn.setAttribute('aria-pressed',String(view==='third'));}
   updateIdentityStatus();
 }
-setPlayerCharacter(playerCharacter);setView(view);
+setPlayerCharacter(playerCharacter);setView(view);refreshStaffLocks();
 viewSelect.addEventListener('change',()=>{setView(viewSelect.value);persistSave();});
 // Render the actual playable meshes once into card canvases, with one temporary
 // renderer. No photographs, per-card WebGL contexts, or per-frame preview work.
@@ -3001,34 +3137,99 @@ function updateShields(dt,playerPos){
 let greetedAtSunset=false;
 // Follow cells Mr. Macek actually walked. A sideways offset can land below a
 // raised walkway or across a wall and send a dog on a long detour.
-const companionAnchor={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z,yaw:macek.group.rotation.y};
+const companionAnchor={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z,yaw:0};
 const ellieGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
 const percyGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
-const companionTrail=Array.from({length:64},()=>({x:0,y:0,z:0}));
-let companionTrailHead=0,companionTrailCount=0;
-function recordCompanionStep(x,y,z){
-  const last=companionTrail[(companionTrailHead+63)%64];
-  if(companionTrailCount&&last.x===x&&last.y===y&&last.z===z)return;
-  const point=companionTrail[companionTrailHead];point.x=x;point.y=y;point.z=z;
-  companionTrailHead=(companionTrailHead+1)%64;companionTrailCount=Math.min(64,companionTrailCount+1);
-}
-macek.onWalkStep=recordCompanionStep;
-recordCompanionStep(macek.pos.x,macek.pos.y,macek.pos.z);
-function updateCompanions(dt){
-  const yaw=macek.group.rotation.y;
-  const facingX=Math.sin(yaw),facingZ=Math.cos(yaw);
-  const rightX=facingZ,rightZ=-facingX;
-  companionAnchor.x=macek.pos.x;companionAnchor.y=macek.pos.y;companionAnchor.z=macek.pos.z;companionAnchor.yaw=yaw;
-  const last=companionTrail[(companionTrailHead+63)%64];
-  if(Math.hypot(last.x-macek.pos.x,last.y-macek.pos.y,last.z-macek.pos.z)>2){
-    companionTrailHead=0;companionTrailCount=0;recordCompanionStep(macek.pos.x,macek.pos.y,macek.pos.z);
+// A shared outing keeps the dogs together. They return to the player's last
+// walkable floor, never to a flying camera, and never teleport to catch up.
+const companionPair={phase:'return',elapsed:0,outing:0,stop:0,goal:null,home:null,formation:'side-by-side'};
+const companionStops=[[5,0],[5,5],[0,5]];
+function resetCompanionRoute(dog,target){
+  const k=key(Math.floor(target.x),target.y,Math.floor(target.z));
+  if(dog.companionGoal!==k){
+    dog.companionGoal=k;dog.route=[];dog.navigationSearch=null;dog.planTimer=0;
+    dog.failedGoalKey='';dog.planFailures=0;
   }
-  const back=1.7,side=1.15;
-  ellieGoal.x=companionAnchor.x-facingX*back+rightX*side;ellieGoal.y=companionAnchor.y;ellieGoal.z=companionAnchor.z-facingZ*back+rightZ*side;
-  percyGoal.x=companionAnchor.x-facingX*back-rightX*side;percyGoal.y=companionAnchor.y;percyGoal.z=companionAnchor.z-facingZ*back-rightZ*side;
-  if(companionTrailCount>1){const p=companionTrail[(companionTrailHead+64-2)%64];ellieGoal.x=p.x;ellieGoal.y=p.y;ellieGoal.z=p.z;}
-  if(companionTrailCount>2){const p=companionTrail[(companionTrailHead+64-3)%64];percyGoal.x=p.x;percyGoal.y=p.y;percyGoal.z=p.z;}
+}
+function companionGoals(center,yaw){
+  const alongX=Math.abs(Math.sin(yaw))>Math.abs(Math.cos(yaw));
+  const dx=alongX?0:1,dz=alongX?-1:0;
+  const exact=(x,z)=>{const y=walkFeet(Math.floor(x),Math.floor(z),center.y);return y===center.y&&insideBounds(x,z,worldBounds);};
+  let ex=center.x+dx,ez=center.z+dz,px=center.x-dx,pz=center.z-dz;
+  // A one-block stair or doorway needs single file. They form a pair again as
+// soon as both adjacent lanes are walkable; no dog is pushed through a wall.
+  companionPair.formation='side-by-side';
+  if(!exact(ex,ez)||!exact(px,pz)){
+    const fx=alongX?(Math.sin(yaw)>=0?1:-1):0,fz=alongX?0:(Math.cos(yaw)>=0?1:-1);
+    ex=center.x;ez=center.z;px=center.x-fx;pz=center.z-fz;
+    companionPair.formation='single-file';
+  }
+  const e=nearestWalkPoint({x:ex,y:center.y,z:ez},worldBounds);
+  const p=nearestWalkPoint({x:px,y:center.y,z:pz},worldBounds);
+  if(e){ellieGoal.x=e.x+.5;ellieGoal.y=e.y;ellieGoal.z=e.z+.5;}
+  if(p){percyGoal.x=p.x+.5;percyGoal.y=p.y;percyGoal.z=p.z+.5;}
+  return !!e&&!!p;
+}
+function updateCompanions(dt){
+  if(isHardcoreWorld||isGroupRoom||!Number.isFinite(dt)||dt<=0)return;
+  const feet=player.pos.y-player.height;
+  const playerFloor=!player.flying?nearestWalkPoint({x:player.pos.x,y:feet,z:player.pos.z},worldBounds):null;
+  if(playerFloor&&Math.abs(playerFloor.y-feet)<1.2){
+    const moved=Math.hypot(companionAnchor.x-playerFloor.x-.5,companionAnchor.y-playerFloor.y,companionAnchor.z-playerFloor.z-.5);
+    companionAnchor.x=playerFloor.x+.5;companionAnchor.y=playerFloor.y;companionAnchor.z=playerFloor.z+.5;companionAnchor.yaw=player.yaw;
+    if(moved>1.5){companionPair.phase='return';companionPair.elapsed=0;companionPair.goal=null;}
+  }
+  companionPair.elapsed+=dt;
+  const away=Math.max(Math.hypot(ellie.pos.x-companionAnchor.x,ellie.pos.z-companionAnchor.z),Math.hypot(percy.pos.x-companionAnchor.x,percy.pos.z-companionAnchor.z));
+  const reached=(dog,goal)=>Math.hypot(dog.pos.x-goal.x,dog.pos.z-goal.z)<.3&&Math.abs(dog.pos.y-goal.y)<.2;
+  if(companionPair.phase==='roam'&&(companionPair.elapsed>=12||away>11||ellie.planFailures>0||percy.planFailures>0)){
+    companionPair.phase='return';companionPair.elapsed=0;companionPair.goal=null;
+  }
+  if(companionPair.phase==='rest'&&companionPair.elapsed>=6){
+    companionPair.phase='roam';companionPair.elapsed=0;companionPair.stop=0;companionPair.outing++;
+    companionPair.home={x:companionAnchor.x,y:companionAnchor.y,z:companionAnchor.z};companionPair.goal=null;
+  }
+  if(companionPair.phase==='roam'){
+    if(companionPair.goal&&reached(ellie,ellieGoal)&&reached(percy,percyGoal)){
+      companionPair.stop++;companionPair.goal=null;
+      if(companionPair.stop>=companionStops.length){companionPair.phase='return';companionPair.elapsed=0;}
+    }
+    if(companionPair.phase==='roam'&&!companionPair.goal){
+      const offset=companionStops[companionPair.stop],home=companionPair.home;
+      // Alternate the short circuit, rather than leaving the player forever.
+      const sign=companionPair.outing%2?1:-1;
+      const candidate=nearestWalkPoint({x:home.x+offset[0]*sign,y:home.y,z:home.z+offset[1]*sign},worldBounds);
+      if(candidate){companionPair.goal={x:candidate.x+.5,y:candidate.y,z:candidate.z+.5};}
+      else {companionPair.phase='return';companionPair.elapsed=0;}
+    }
+  }
+  let center=companionPair.goal;
+  if(companionPair.phase!=='roam'){
+    const home=nearestWalkPoint({x:companionAnchor.x-Math.sin(companionAnchor.yaw)*2,y:companionAnchor.y,z:companionAnchor.z-Math.cos(companionAnchor.yaw)*2},worldBounds);
+    if(!home)return;
+    center={x:home.x+.5,y:home.y,z:home.z+.5};
+  }
+  const midX=(ellie.pos.x+percy.pos.x)/2,midZ=(ellie.pos.z+percy.pos.z)/2;
+  // Freeze the chosen lateral lanes until a destination changes. Rotating the
+// lanes around an arriving pair otherwise makes them endlessly swap places.
+  const destinationKey=key(center.x,center.y,center.z);
+  if(companionPair.destinationKey!==destinationKey){
+    companionPair.destinationKey=destinationKey;
+    companionPair.yaw=companionPair.phase==='roam'?Math.atan2(center.x-midX,center.z-midZ):companionAnchor.yaw;
+  }
+  if(!companionGoals(center,companionPair.yaw))return;
+  resetCompanionRoute(ellie,ellieGoal);resetCompanionRoute(percy,percyGoal);
+  const eDist=Math.hypot(ellie.pos.x-ellieGoal.x,ellie.pos.y-ellieGoal.y,ellie.pos.z-ellieGoal.z);
+  const pDist=Math.hypot(percy.pos.x-percyGoal.x,percy.pos.y-percyGoal.y,percy.pos.z-percyGoal.z);
+  const gap=ellie.pos.distanceTo(percy.pos),speed=companionPair.phase==='roam'||away>7?4.2:2.6;
+  // Match their progress toward the common stop. The leading dog waits for a
+// separated friend; the trailing dog keeps its real, collision-tested path.
+  ellie.speed=speed*(gap>3.6&&eDist+.8<pDist?0:Math.min(1,eDist/Math.max(.3,pDist)));
+  percy.speed=speed*(gap>3.6&&pDist+.8<eDist?0:Math.min(1,pDist/Math.max(.3,eDist)));
   ellie.go(dt,ellieGoal);percy.go(dt,percyGoal);
+  if(companionPair.phase==='return'&&reached(ellie,ellieGoal)&&reached(percy,percyGoal)){
+    companionPair.phase='rest';companionPair.elapsed=0;
+  }
 }
 function updateCookie(dt){
   const on=cookieOnDuty(dayTime);
@@ -3268,12 +3469,15 @@ function startGame() {
   if (started) return;
   started = true;
   startEl.classList.add('hidden');
+  renderer.domElement.tabIndex=-1;renderer.domElement.focus?.({preventScroll:true});
 }
 document.getElementById('enter').addEventListener('click', event=>{startGame();requestDesktopLock(event);});
 document.getElementById('visitSchool').addEventListener('click',()=>{
+  if(isHardcoreWorld||isGroupRoom)return;
   player.pos.set(46.5,groundSurface(46,31)+player.height+.1,31.5);player.yaw=0;player.pitch=-.06;player.flying=false;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
 });
 document.getElementById('overview').addEventListener('click',()=>{
+  if(isGroupRoom)return;
   if(gameMode!=='creative'){document.getElementById('modeHelp').textContent='Choose Creative above for the flying campus tour.';return;}
   player.pos.set(61,32,43);player.yaw=.4;player.pitch=-.6;player.flying=true;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
 });
@@ -3286,6 +3490,7 @@ for(const [id,min,max] of [['travelX',travelLimits.minX,travelLimits.maxX],['tra
 }
 const travelStatusEl=document.getElementById('travelStatus'); if(travelStatusEl)travelStatusEl.textContent=worldEdgeText();
 function travelTo(x,y,z){
+  if(isGroupRoom)return 'Coordinate travel is off in group rooms.';
   if(gameMode!=='creative')return 'Choose Creative to use coordinate travel.';
   if(![x,y,z].every(Number.isFinite)||x<travelLimits.minX||x>travelLimits.maxX||z<travelLimits.minZ||z>travelLimits.maxZ||y<travelLimits.minY||y>travelLimits.maxY)return 'Use coordinates within the world limits.';
   const target=new THREE.Vector3(x,y,z);
@@ -3298,9 +3503,19 @@ document.getElementById('travelForm').addEventListener('submit',event=>{
 });
 const modeSelect=document.getElementById('mode'); modeSelect.value=gameMode;
 modeSelect.addEventListener('change',()=>{
-  gameMode=modeSelect.value;player.flying=false;player.vel.set(0,0,0);health=20;breath=10;
+  if(isGroupRoom){modeSelect.value='creative';return;}
+  const next=modeSelect.value;
+  if((next==='hardcore')!==isHardcoreWorld){
+    if(!persistSave()){modeSelect.value=gameMode;return;}
+    const destination={...saveEnvelope,activeWorld:next==='hardcore'?'hardcore':'campus'};
+    if(next!=='hardcore')destination.mode=next;
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(destination));resetting=true;clearTimeout(_saveTimer);location.reload();}
+    catch{modeSelect.value=gameMode;document.getElementById('status').textContent='Could not switch worlds. Download Save to keep your progress.';}
+    return;
+  }
+  gameMode=next;player.flying=false;player.vel.set(0,0,0);health=20;breath=10;
   document.getElementById('modeHelp').textContent=gameMode==='survival'?'Break blocks to collect them. No flying; falls and deep water can hurt.':'Unlimited blocks and flight. Your build stays here.';
-  refreshHotbar();refreshChallenge();persistSave();
+  refreshHotbar();refreshChallenge();refreshStaffLocks();persistSave();
 });
 renderer.domElement.addEventListener('click', event => {
   if (!started) startGame();
@@ -3314,6 +3529,13 @@ addEventListener('keydown', e => {
   }
 });
 
+// H toggles the movement guide without hiding the clock, inventory or controls.
+addEventListener('keydown', e => {
+  if(e.code==='KeyH'&&!e.repeat&&started&&!isFormInput(e)){
+    e.preventDefault();setMovementHelpVisible(!movementHelpVisible);persistSave();
+  }
+});
+
 // C swaps between the selected character's eyes and a view just behind them.
 addEventListener('keydown', e => {
   if (e.code === 'KeyC' && !e.repeat && started && !isFormInput(e)) { setView(view==='third'?'first':'third'); persistSave(); }
@@ -3321,7 +3543,7 @@ addEventListener('keydown', e => {
 
 // Flight height is independent of sprint: SPACE rises, V descends, SHIFT speeds up.
 addEventListener('keydown', e => {
-  if (e.code === 'KeyF' && !e.repeat && started && gameMode==='creative' && !isFormInput(e)) {
+  if (e.code === 'KeyF' && !e.repeat && started && gameMode==='creative' && !isFormInput(e) && !isWorldSleeping() && !activities?.isDriving()) {
     player.flying = !player.flying;
     player.vel.set(0, 0, 0);
     if (typeof flashFly === 'function') flashFly(player.flying);
@@ -3446,29 +3668,47 @@ function castVoxel() {
 
 // break / place actions (shared by mouse clicks AND touch buttons)
 function doBreak() {
-  if (!started) return;
+  if (!started||isWorldSleeping()||activities?.isDriving()) return;
   const hit = castVoxel();
   if (!hit) return;
   const brokenKey = getBlock(hit.x, hit.y, hit.z);
-  if(hit.y<=-8){ document.getElementById('status').textContent='The bottom layer keeps our world safe to build on.';return; }
+  if(hit.y<=WORLD_FLOOR){ document.getElementById('status').textContent='The bottom layer keeps our world safe to build on.';return; }
+  if(isGroupRoom){roomConnection?.edit({x:hit.x,y:hit.y,z:hit.z,block:null});return;}
+  if(gameMode==='hardcore'){
+    if(!globalThis.MYNE_HARDCORE.canMine(hardcore,brokenKey)){document.getElementById('status').textContent='Open Inventory: craft the right tool or finish your next goal to mine this block.';return;}
+    const natural=!Object.prototype.hasOwnProperty.call(saveState.edits,key(hit.x,hit.y,hit.z));
+    hardcore=globalThis.MYNE_HARDCORE.recordMine(hardcore,brokenKey,{natural});inventory[brokenKey]++;
+  }
   if(gameMode==='survival'){inventory[brokenKey]++;if(brokenKey==='wood')challenge.wood=Math.min(10,challenge.wood+1);refreshHotbar();refreshChallenge();}
   setBlock(hit.x, hit.y, hit.z, null);
   recordEdit(hit.x, hit.y, hit.z, null);
   spawnParticles(hit.x, hit.y, hit.z, brokenKey);
   sndBreak();
   updateBlockMeshes(hit.x,hit.y,hit.z);
+  if(gameMode==='hardcore'){advanceHardcore();refreshHotbar();}
 }
 function doPlace() {
-  if (!started) return;
+  if (!started||isWorldSleeping()||activities?.isDriving()) return;
   const hit = castVoxel();
   if (!hit) return;
+  if(isGroupRoom){roomConnection?.edit({x:hit.x+hit.normal.x,y:hit.y+hit.normal.y,z:hit.z+hit.normal.z,block:BLOCK_KEYS[selected]});return;}
+  if(chosenAnimal){
+    const water=chosenAnimal==='fish';
+    const x=water?hit.x:hit.x+hit.normal.x,y=water?hit.y:hit.y+hit.normal.y,z=water?hit.z:hit.z+hit.normal.z;
+    if(gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.canPlaceAnimal(hardcore,chosenAnimal,getBlock,x,y,z)){
+      document.getElementById('status').textContent=water?'Unlock fish by building a pond, then aim at water.':'Unlock this animal first, then choose open space on solid ground.';return;
+    }
+    if(activities?.spawnAnimal(chosenAnimal,{x:x+.5,y:water?y+.5:y,z:z+.5}))persistSave();
+    return;
+  }
   const nx = hit.x + hit.normal.x;
   const ny = hit.y + hit.normal.y;
   const nz = hit.z + hit.normal.z;
-  if(nx < -SIZE || nx>EAST_EDGE || Math.abs(nz)>SIZE || ny>60 || ny<=-8) return;
+  if(nx < -SIZE || nx>EAST_EDGE || Math.abs(nz)>SIZE || ny>60 || ny<=WORLD_FLOOR) return;
   if(getBlock(nx,ny,nz)) return;
   const block=BLOCK_KEYS[selected];
-  if(gameMode==='survival' && inventory[block]<=0){document.getElementById('status').textContent='Collect '+BLOCKS[block].name+' by breaking it first.';return;}
+  if(gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.canUseBlock(hardcore,block)){document.getElementById('status').textContent='Finish your next Hardcore goal to unlock this block.';return;}
+  if(gameMode!=='creative' && inventory[block]<=0){document.getElementById('status').textContent='Collect or craft '+BLOCKS[block].name+' first.';return;}
   // don't overlap player
   const px = player.pos.x, py = player.pos.y, pz = player.pos.z;
   const overlap =
@@ -3477,10 +3717,24 @@ function doPlace() {
     ny + 1 > py - player.height && ny < py + 0.2;
   if (overlap) return;
   if(gameMode==='survival'){inventory[block]--;challenge.placed=Math.min(12,challenge.placed+1);refreshHotbar();refreshChallenge();}
+  if(gameMode==='hardcore'){inventory[block]--;hardcore=globalThis.MYNE_HARDCORE.recordPlace(hardcore,block);}
   setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
   recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
   sndPlace();
   updateBlockMeshes(nx,ny,nz);
+  if(gameMode==='hardcore'){advanceHardcore();refreshHotbar();}
+  else if(!fishUnlocked&&globalThis.MYNE_HARDCORE?.inspectHabitat(getBlock,saveState.edits).valid){
+    fishUnlocked=true;document.getElementById('status').textContent='Pond complete! Fish unlocked in Inventory. Place fish in water.';persistSave();
+  }
+}
+function advanceHardcore(){
+  const result=globalThis.MYNE_HARDCORE.advance(hardcore,{getBlock,edits:saveState.edits});hardcore=result.state;
+  if(result.newlyCompleted.length){
+    const names=result.rewards.map(r=>STAFF_CHARACTERS.find(c=>c.id===r.character)?.name).filter(Boolean);
+    document.getElementById('status').textContent='Goal complete! Unlocked '+names.join(', ')+'. Open Inventory for new materials.';
+    refreshStaffLocks();persistSave();
+  }
+  refreshChallenge();
 }
 
 addEventListener('mousedown', e => {
@@ -3584,6 +3838,36 @@ const SKY_NOON = new THREE.Color(0x9fd8ff);
 const SKY_DUSK = new THREE.Color(0xff9e5a);
 const SKY_NIGHT = new THREE.Color(0x0b1430);
 let dayTime = LOADED_DAY_TIME;
+let sleepRemaining=0;
+function isWorldSleeping(){return sleepRemaining>0;}
+function setDayNightMode(value){
+  dayNightMode=normalizeDayNightMode(value);
+  sleepRemaining=0;sleepTransition.hidden=true;
+  refreshDayNightHelp();
+}
+// Sleep consumes active game time only. The menu and inventory pause this just
+// like the existing world clock, without wall-clock timers or background jumps.
+function advanceWorldClock(dt,activeElapsed=dt){
+  if(!started||!Number.isFinite(dt)||dt<=0)return isWorldSleeping();
+  if(isWorldSleeping()){
+    sleepRemaining=Math.max(0,sleepRemaining-(Number.isFinite(activeElapsed)&&activeElapsed>0?activeElapsed:dt));
+    if(sleepRemaining<1e-9){
+      sleepRemaining=0;dayTime=0;sleepTransition.hidden=true;
+      document.getElementById('status').textContent='Good morning! A new day begins.';
+      persistSave();
+    }
+    return isWorldSleeping();
+  }
+  const next=dayTime+dt/1200;
+  if(dayNightMode==='auto-sleep'&&(dayTime>=.5||next>=.5)){
+    dayTime=.5;sleepRemaining=1;sleepTransition.hidden=false;
+    for(const key in keys)keys[key]=false;
+    releaseTouch();player.vel.set(0,0,0);
+    return true;
+  }
+  dayTime=next%1;
+  return false;
+}
 const _tmpSky = new THREE.Color();
 // Frame scratch objects. The loop runs 60x a second on a school tablet, so it
 // reuses these instead of handing four new objects per frame to the collector.
@@ -3593,8 +3877,41 @@ const _forward = new THREE.Vector3(), _right = new THREE.Vector3(), _accel = new
 // so old saves and downloaded worlds remain compatible. Bounded to world height.
 function waterLiftAt(x,y,z){
   if(getBlock(x,y,z)!=='water')return false;
-  while(y>-8&&getBlock(x,y,z)==='water')y--;
+  while(y>WORLD_FLOOR&&getBlock(x,y,z)==='water')y--;
   return getBlock(x,y,z)==='glow';
+}
+// Campus props retain their world coordinates under an identity parent. Hiding
+// this parent also keeps graphics settings from relighting an absent school.
+const campusOnlyVisuals=new THREE.Group();campusOnlyVisuals.name='Campus-only people and props';
+campusOnlyVisuals.add(campusDetails,schoolLogo,eddie,schoolOfficerCar,eriksen.easel,wingenbach.keyboard,
+  ...schoolWayfinding,...schoolLights,...entranceDoors,...buses,
+  ...npcs.map(n=>n.group),...animals.map(a=>a.group),...campusActors.map(a=>a.group));
+campusOnlyVisuals.visible=!isHardcoreWorld&&!isGroupRoom;scene.add(campusOnlyVisuals);
+const cafeteriaCleaner=!isHardcoreWorld&&!isGroupRoom&&globalThis.MYNE_CAFETERIA_CLEANER?
+  globalThis.MYNE_CAFETERIA_CLEANER.create({THREE,scene,getBlock,walkFeet,bounds:officerCafeteriaBounds,tables:cafeteriaTables,
+    initialTime:LOADED_DAY_TIME,isActive:()=>started&&!inventoryOpen&&!isWorldSleeping()}):null;
+const activityButton=document.getElementById('activityInteract'),touchActivityButton=document.getElementById('btnInteract');
+const activityControls={forward:0,turn:0};
+let activityPrompt='';
+function refreshActivityPrompt(){
+  const prompt=started&&!inventoryOpen&&!isWorldSleeping()&&activities?activities.getPrompt():'';
+  activityButton.hidden=!prompt;touchActivityButton.hidden=!prompt;
+  if(prompt!==activityPrompt){activityPrompt=prompt;activityButton.textContent=prompt+' · E';touchActivityButton.textContent=prompt;}
+}
+function interactWithActivity(event){
+  if(event){event.preventDefault();event.stopPropagation?.();}
+  if(!started||inventoryOpen||isWorldSleeping()||!activities)return false;
+  const acted=activities.interact();refreshActivityPrompt();return acted;
+}
+for(const button of [activityButton,touchActivityButton])button.addEventListener('click',interactWithActivity);
+addEventListener('keydown',event=>{if(event.code==='KeyE'&&!event.repeat&&!isFormInput(event))interactWithActivity(event);});
+if(globalThis.MYNE_ACTIVITIES&&!isGroupRoom){
+  activities=globalThis.MYNE_ACTIVITIES.create({THREE,scene,player,getBlock,isSolid,groundSurface,
+    inBounds:(x,z)=>x>=-SIZE&&x<=EAST_EDGE&&z>=-SIZE&&z<=SIZE,
+    isActive:()=>started&&!inventoryOpen&&!isWorldSleeping(),isHardcore:()=>isHardcoreWorld,
+    isUnlocked:kind=>gameMode==='hardcore'?!!hardcore?.unlocks?.animals?.includes(kind):kind!=='fish'||fishUnlocked,
+    reportStatus:text=>{document.getElementById('status').textContent=text;},onChange:()=>persistSave()});
+  activities.restore(saveState.activities);
 }
 let last = performance.now();
 function tick(now) {
@@ -3602,15 +3919,21 @@ function tick(now) {
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;
   // The menu covers the scene. Give the GPU a rest while play is paused.
-  if(!started){frameWindowStart=now;frameCount=0;requestAnimationFrame(tick);return;}
+  if(!started){refreshActivityPrompt();frameWindowStart=now;frameCount=0;requestAnimationFrame(tick);return;}
+  if(isGroupRoom&&!roomConnection?.canPlay()){
+    player.vel.set(0,0,0);renderer.render(scene,camera);requestAnimationFrame(tick);return;
+  }
 
-  // A full cycle lasts 20 minutes; opening the menu pauses play.
+  // Full-cycle timing and school schedules remain unchanged. Auto sleep skips
+  // only the night, and Always day changes the sky rather than school time.
   const playDt = started ? dt : 0;
-  dayTime = (dayTime + playDt / 1200) % 1;
-  const ang = dayTime * Math.PI * 2;
+  // Physics is capped above for safe collision, but a slow device must still
+  // finish its one-second sleep in one active second rather than one second of frames.
+  if(advanceWorldClock(playDt,Math.max(0,frameInterval/1000))){refreshActivityPrompt();requestAnimationFrame(tick);return;}
+  const ang = dayNightMode==='always-day'?Math.PI/2:dayTime * Math.PI * 2;
   // sun arcs overhead; moon opposite
   sun.position.set(Math.cos(ang) * 80, Math.sin(ang) * 90, 30);
-  const daylight = Math.max(0, Math.sin(ang));            // 0 at night, 1 at noon
+  const daylight = Math.max(dayNightMode==='auto-sleep'?.12:0, Math.sin(ang)); // A readable sunrise after sleep; full-cycle night stays unchanged.
   // moon opposite the sun + stars that fade in after dusk
   moon.position.set(Math.cos(ang + Math.PI) * 80, Math.sin(ang + Math.PI) * 90, 30);
   moon.visible = moon.position.y > -8;
@@ -3634,9 +3957,11 @@ function tick(now) {
   updateHighlight();
   updateParticles(dt);
   updateCoordHUD();
-  if(started){ npcs.forEach(n=>n.update(dt,player.pos));animals.forEach(a=>a.update(dt));updateEddie(dt);updateCampus(dt); }
-  updateBubble();updateAreaLabelVisibility();
+  if(started&&!isHardcoreWorld&&!isGroupRoom){ npcs.forEach(n=>n.update(dt,player.pos));animals.forEach(a=>a.update(dt));updateEddie(dt);updateCampus(dt);cafeteriaCleaner?.update(dt,dayTime);updateBubble(); }
+  else if(isHardcoreWorld)bubble.style.opacity='0';
+  updateAreaLabelVisibility();
 
+  if(!activities?.isDriving()){
   // movement vector (yaw only)
   const forward = _forward.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
   const right   = _right.set(  Math.cos(player.yaw), 0, -Math.sin(player.yaw));
@@ -3682,9 +4007,18 @@ function tick(now) {
       if(!underwater&&player.onGround)health=Math.min(20,health+dt*.15);
     }
   } else player.vel.set(0,0,0);
+  }
+  if(activities){
+    activityControls.forward=Number(!!(keys['KeyW']||keys['ArrowUp']))-Number(!!(keys['KeyS']||keys['ArrowDown']));
+    activityControls.turn=Number(!!(keys['KeyD']||keys['ArrowRight']))-Number(!!(keys['KeyA']||keys['ArrowLeft']));
+    activities.update(dt,activityControls);
+    // Driving changes yaw after ordinary mouse-look is calculated above.
+    camera.quaternion.setFromEuler(_euler.set(player.pitch,player.yaw,0,'YXZ'));
+  }
+  refreshActivityPrompt();
 
   // fell off the world? respawn
-  if (player.pos.y < -25 || health<=0) {
+  if (player.pos.y < WORLD_FLOOR-8 || health<=0) {
     player.pos.set(.5, groundSurface(0,12)+2.7, 12.5);
     player.vel.set(0,0,0);
     health=20;breath=10;persistSave();
@@ -3755,7 +4089,7 @@ BLOCK_KEYS.forEach((k, i) => {
   count.style.cssText='position:relative;z-index:1;text-shadow:1px 1px #000,-1px -1px #000;font-size:11px;line-height:1';
   slot.appendChild(count);
   slot.dataset.k = k;
-  slot.addEventListener('click',()=>{selected=i;refreshHotbar();});
+  slot.addEventListener('click',()=>{chosenAnimal=null;selected=i;refreshHotbar();});
   hotbar.appendChild(slot);
 });
 document.body.appendChild(hotbar);
@@ -3764,8 +4098,8 @@ function refreshHotbar() {
     el.style.outline = i === selected ? '3px solid #fff' : 'none';
     el.style.outlineOffset = i === selected ? '2px' : '0';
     el.setAttribute('aria-pressed',String(i===selected));
-    el.children[1].textContent=gameMode==='survival' ? String(inventory[BLOCK_KEYS[i]]) : (i<9?String(i+1):i===9?'0':'');
-    el.style.opacity=gameMode==='survival'&&inventory[BLOCK_KEYS[i]]===0?'.55':'1';
+    el.children[1].textContent=gameMode!=='creative' ? String(inventory[BLOCK_KEYS[i]]) : (i<9?String(i+1):i===9?'0':'');
+    el.style.opacity=gameMode!=='creative'&&inventory[BLOCK_KEYS[i]]===0?'.55':'1';
   });
 }
 refreshHotbar();
@@ -3794,24 +4128,61 @@ const inventoryChoices=BLOCK_KEYS.map((k,i)=>{
   button.append(thumbnail,name,count);
   button.addEventListener('click',event=>{
     if(!inventoryOpen||button.disabled)return;
-    selected=i;refreshHotbar();persistSave();closeInventory(true,event);
+    chosenAnimal=null;selected=i;refreshHotbar();persistSave();closeInventory(true,event);
   });
   inventoryGrid.appendChild(button);return {button,count};
 });
 const inventoryBack=document.createElement('button');inventoryBack.type='button';inventoryBack.className='inventory-back';inventoryBack.textContent='Back to game';
 inventoryBack.addEventListener('click',event=>closeInventory(true,event));
 const inventoryHint=document.createElement('p');inventoryHint.className='inventory-hint';inventoryHint.textContent='Choose one block, then aim the + at a nearby block. Right click or tap PLACE to add it.';
-inventoryDialog.append(inventoryTitle,inventoryHelp,inventoryGrid,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
+const craftingPanel=document.createElement('section');craftingPanel.className='crafting-panel';
+const craftingTitle=document.createElement('h3');craftingTitle.textContent='Craft building tools and blocks';
+const craftingHelp=document.createElement('p');craftingHelp.textContent='Tools stay with you. Once crafted, the right tool is used automatically when you break a block.';
+const craftingGrid=document.createElement('div');craftingGrid.className='crafting-grid';
+const craftingStatus=document.createElement('p');craftingStatus.id='craftingStatus';craftingStatus.setAttribute('aria-live','polite');
+const craftingChoices=Object.entries(globalThis.MYNE_HARDCORE?.RECIPES||{}).map(([id,recipe])=>{
+  const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.recipe=id;
+  button.addEventListener('click',()=>{
+    if(!inventoryOpen||gameMode!=='hardcore')return;
+    const result=globalThis.MYNE_HARDCORE.craft(hardcore,inventory,id);craftingStatus.textContent=result.message;
+    if(result.ok){hardcore=result.state;Object.assign(inventory,result.inventory);advanceHardcore();refreshHotbar();refreshInventory();persistSave();}
+  });
+  craftingGrid.appendChild(button);return {id,recipe,button};
+});
+craftingPanel.append(craftingTitle,craftingHelp,craftingGrid,craftingStatus);
+const animalPanel=document.createElement('section');animalPanel.className='animal-panel';
+const animalTitle=document.createElement('h3');animalTitle.textContent='Animals';
+const animalHelp=document.createElement('p');animalHelp.textContent='Choose an animal, then aim and use PLACE. To unlock fish, build a 2 by 2 pond or tank with a solid bottom and sides. Place all four water blocks. Fish stay in water.';
+const animalGrid=document.createElement('div');animalGrid.className='crafting-grid';
+const animalChoices=['dog','cat','horse','sheep','cow','fish'].map(kind=>{
+  const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.animal=kind;
+  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
+  animalGrid.appendChild(button);return {kind,button};
+});
+animalPanel.append(animalTitle,animalHelp,animalGrid);
+inventoryDialog.append(inventoryTitle,inventoryHelp,craftingPanel,inventoryGrid,animalPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
 function inventoryBackground(disabled){
   for(const element of [hotbar,ctrlPanel,renderer.domElement,document.getElementById('touchUI')])element.inert=disabled;
 }
 function refreshInventory(){
-  inventoryHelp.textContent=gameMode==='creative'?'Creative: every block is unlimited. Choose one to keep building.':'Embrace the Challenge: choose a block you have collected. Break blocks in the world to collect more.';
+  animalPanel.hidden=isGroupRoom;
+  inventoryHelp.textContent=gameMode==='creative'?'Creative: every block is unlimited. Choose one to keep building.':gameMode==='hardcore'?'Hardcore: collect, craft and build. Complete goals to unlock materials, animals and teachers.':'Embrace the Challenge: choose a block you have collected. Break blocks in the world to collect more.';
+  craftingPanel.hidden=gameMode!=='hardcore';
+  for(const {id,recipe,button} of craftingChoices){
+    const locked=recipe.after&&!hardcore?.completed.includes(recipe.after),owned=recipe.tool&&hardcore?.tools[recipe.tool];
+    button.disabled=!!(locked||owned||Object.entries(recipe.costs).some(([k,n])=>inventory[k]<n));
+    button.textContent=(owned?'Made: ':locked?'Locked: ':'Craft: ')+recipe.name+' · '+Object.entries(recipe.costs).map(([k,n])=>n+' '+BLOCKS[k].name).join(' + ');
+  }
+  for(const {kind,button} of animalChoices){
+    const unlocked=gameMode==='hardcore'?hardcore.unlocks.animals.includes(kind):kind!=='fish'||fishUnlocked;
+    button.disabled=!unlocked;button.textContent=kind[0].toUpperCase()+kind.slice(1)+(unlocked?'':' · Locked');
+  }
   for(let i=0;i<inventoryChoices.length;i++){
     const {button,count}=inventoryChoices[i],amount=inventory[BLOCK_KEYS[i]];
-    button.disabled=gameMode==='survival'&&amount===0;
+    const locked=gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.canUseBlock(hardcore,BLOCK_KEYS[i]);
+    button.disabled=locked||(gameMode!=='creative'&&amount===0);
     button.setAttribute('aria-pressed',String(i===selected));
-    count.textContent=gameMode==='creative'?'Unlimited':amount>0?`${amount} available`:'Collect first';
+    count.textContent=locked?'Unlock with goals':gameMode==='creative'?'Unlimited':amount>0?`${amount} available`:'Collect or craft';
   }
 }
 function openInventory(){
@@ -3831,7 +4202,7 @@ addEventListener('keydown',event=>{
       event.preventDefault();if(!event.repeat)closeInventory();return;
     }
     if(event.code==='Tab'){
-      const choices=[...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),inventoryBack];
+      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...animalChoices.filter(c=>!c.button.disabled).map(c=>c.button),inventoryBack];
       const current=choices.indexOf(document.activeElement),next=(current+(event.shiftKey?-1:1)+choices.length)%choices.length;
       event.preventDefault();choices[next].focus?.();
     }
@@ -3870,9 +4241,14 @@ resetBtn.style.cssText = `
   border-radius: 6px; padding: 7px 10px; font: inherit; box-shadow: 2px 2px 0 #0006;
 `;
 resetBtn.addEventListener('click', () => {
-  if (!confirm('Reset this browser’s world to the original campus? This clears your build, inventory and challenge progress. Download Save first to keep a copy.')) return;
+  if(isGroupRoom)return;
+  if (!confirm('Reset this '+(isHardcoreWorld?'Hardcore world':'campus')+'? This clears its build, inventory and progress. Your other world is kept. Download Save first to keep a copy.')) return;
   resetting=true; clearTimeout(_saveTimer);
-  try { localStorage.removeItem(SAVE_KEY); } catch(e){resetting=false;document.getElementById('status').textContent='Could not reset storage. Your world was kept.';return;}
+  try {
+    if(isHardcoreWorld){const next={...saveEnvelope,activeWorld:'hardcore'};delete next.hardcoreWorld;localStorage.setItem(SAVE_KEY,JSON.stringify(next));}
+    else if(saveEnvelope.hardcoreWorld)localStorage.setItem(SAVE_KEY,JSON.stringify({...emptyCampusSave(),hardcoreWorld:saveEnvelope.hardcoreWorld,activeWorld:'campus'}));
+    else localStorage.removeItem(SAVE_KEY);
+  } catch(e){resetting=false;document.getElementById('status').textContent='Could not reset storage. Your world was kept.';return;}
   location.reload();
 });
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
@@ -3943,7 +4319,7 @@ function timeLabel() {
   const h12 = ((h + 11) % 12) + 1;
   const phase = (dayTime < 0.04 || dayTime > 0.54) && (dayTime < 0.96) ?
     (Math.sin(dayTime*Math.PI*2) > 0 ? '' : '') : '';
-  const isDay = Math.sin(dayTime * Math.PI * 2) > 0;
+  const isDay = dayNightMode==='always-day'||(dayTime>=0&&dayTime<.5);
   return `${h12}:${String(m).padStart(2,'0')} ${ampm} ${isDay ? '\u2600\ufe0f' : '\u{1f319}'}`;
 }
 // The start menu shows the same clock the HUD does, plus when the buses are due,
@@ -3956,7 +4332,7 @@ function busStatusLine(){
   return `School buses start their rear-loop trip at ${busClockLabel} game time.`;
 }
 function refreshMenuStatus(){
-  if(worldClockEl)worldClockEl.textContent=`World clock: ${timeLabel()} · ${busStatusLine()}`;
+  if(worldClockEl)worldClockEl.textContent=`World clock: ${timeLabel()} · ${isGroupRoom?'Shared build room':isHardcoreWorld?'Your Hardcore resource world':busStatusLine()}`;
 }
 let nextHudUpdate=0, frameFps=0, frameWindowStart=0, frameCount=0;
 function recordFrame(now,interval){
@@ -3976,10 +4352,10 @@ function updateCoordHUD() {
   coordHUD.innerHTML =
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
-    `<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}` +
-    (gameMode==='survival'?` (${inventory[BLOCK_KEYS[selected]]})<br>Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
-    (dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
-    (cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +
+    (chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
+    (gameMode!=='creative'?` (${inventory[BLOCK_KEYS[selected]]})<br>${gameMode==='hardcore'?'Hardcore · ':''}Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
+    (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
+    (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +
     (frameFps?`<br>${frameFps} FPS`:'');
 }
 
@@ -4103,7 +4479,7 @@ const btnDown    = document.getElementById('btnDown');
   // fly: toggle, same as pressing F
   btnFly.addEventListener('touchstart', e => {
     if (!started) { startGame(); return; }
-    if(gameMode!=='creative'){e.preventDefault();return;}
+    if(gameMode!=='creative'||isWorldSleeping()||activities?.isDriving()){e.preventDefault();return;}
     player.flying = !player.flying;
     player.vel.set(0, 0, 0);
     if (typeof flashFly === 'function') flashFly(player.flying);
@@ -4121,7 +4497,45 @@ for(const query of ['(pointer: coarse)','(hover: none)']){
 addEventListener('beforeunload', persistSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pauseGame(); persistSave(); } });
 refreshMenuStatus();
-document.getElementById('status').textContent='Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
+document.getElementById('schoolExplore').hidden=isHardcoreWorld||isGroupRoom;
+document.getElementById('status').textContent=isHardcoreWorld?'Hardcore: gather logs from the nearby trees. Open Inventory to craft. Village: east. Court: west. Mine: northeast.':'Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
+if(isGroupRoom){
+  const status=document.getElementById('status');status.textContent='Group room: waiting for the teacher to admit you.';
+  for(const control of [saveBtn,resetBtn,modeSelect,document.getElementById('downloadWorld'),document.getElementById('loadWorld'),document.getElementById('areaLabelText'),document.getElementById('removeAreaLabel')])control.disabled=true;
+  saveTag.textContent='Shared room · personal worlds kept';
+  document.getElementById('keepWorkGuide').textContent='Room blocks stay in the running room service. Save and Download Save are for solo worlds and are off here. Restarting the room service clears this prototype world.';
+  document.getElementById('classReminder').textContent='Wait for your teacher to admit you. Follow the group building task. Your teacher can pause you or close the room. There is no chat or text-sign tool.';
+  document.getElementById('startTip').textContent='This group room shares blocks with admitted players. Your personal worlds stay separate.';
+  document.getElementById('modeHelp').textContent='Group build: your teacher admits players and opens or closes building. Chat, text signs, personal imports and animals are off here.';
+  backLink.href='rooms.html';backLink.textContent='Leave room';
+  const peers=new Map(),peerGeometry=new THREE.BoxGeometry(.55,.9,.35),headGeometry=new THREE.BoxGeometry(.4,.4,.4);
+  function showPeers(players){
+    const present=new Set();
+    for(const p of players){
+      if(p.id===roomSession.studentId||p.removed)continue;present.add(p.id);
+      let group=peers.get(p.id);
+      if(!group){
+        group=new THREE.Group();group.name='Builder '+p.number;
+        const material=new THREE.MeshLambertMaterial({color:new THREE.Color().setHSL((p.number*.17)%1,.55,.5)});
+        const body=new THREE.Mesh(peerGeometry,material);body.position.y=.85;group.add(body);
+        const head=new THREE.Mesh(headGeometry,new THREE.MeshLambertMaterial({color:0xdbaf8d}));head.position.y=1.5;group.add(head);
+        scene.add(group);peers.set(p.id,group);
+      }
+      group.position.set(p.x,p.y-player.height,p.z);group.rotation.y=p.yaw+Math.PI;group.visible=!p.locked;
+    }
+    for(const [id,group] of peers)if(!present.has(id)){scene.remove(group);for(const child of group.children)child.material?.dispose();peers.delete(id);}
+  }
+  if(roomSession)roomConnection=globalThis.MYNE_ROOM.create({session:roomSession,isActive:()=>started&&!inventoryOpen&&!isWorldSleeping(),
+    onEdit:edit=>{if(edit.block!==null&&!BLOCKS[edit.block])return;setBlock(edit.x,edit.y,edit.z,edit.block);updateBlockMeshes(edit.x,edit.y,edit.z);},
+    onPlayers:showPeers,onStatus:text=>{status.textContent=text;},
+    onState:state=>{
+      status.textContent=state.status!=='open'?'The teacher has closed this room.':state.self?.locked?'Waiting for the teacher to admit or resume you.':'Group room · Builder '+roomSession.number+' · Build together. No chat or text signs.';
+      if(state.self&&player.pos.distanceTo(new THREE.Vector3(state.self.x,state.self.y,state.self.z))>4){player.pos.set(state.self.x,state.self.y,state.self.z);player.vel.set(0,0,0);}
+    },onClosed:()=>{player.vel.set(0,0,0);}});
+  else status.textContent='No active room session. Choose Leave room, then join with your teacher’s code.';
+  setInterval(()=>{if(started&&roomConnection?.canWrite())roomConnection.move({x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw});},250);
+  addEventListener('beforeunload',()=>roomConnection?.dispose());
+}
 setInterval(()=>{if(started)persistSave();},5000);
 </script>
 </body>

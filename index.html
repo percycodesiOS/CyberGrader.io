@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#272524">
-<meta name="description" content="Build your own world and explore the EC campus. Choose Creative or Embrace the Challenge in MYnecraft: EC Edition.">
+<meta name="description" content="Build and explore in MYnecraft: EC Edition. Choose Creative, Embrace the Challenge, or a separate Hardcore resource world with crafting and unlocks.">
 <title>MYnecraft: EC Edition</title>
 <link rel="icon" type="image/svg+xml" href="game/assets/mynecraft-icon.svg">
 <link rel="preload" href="game/assets/bungee/Bungee-Regular.ttf" as="font" type="font/ttf" crossorigin>
@@ -22,7 +22,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href="#play" aria-label="MYnecraft: EC Edition">MYnecraft<span>EC EDITION</span></a>
-    <nav aria-label="Main navigation"><a href="#play">Play</a><a href="#explore">Explore</a><a href="#how-to-play">How to Play</a></nav>
+    <nav aria-label="Main navigation"><a href="#play">Play</a><a href="#explore">Explore</a><a href="#how-to-play">How to Play</a><a href="game/rooms.html">Teacher rooms</a></nav>
   </div>
 </header>
 <main class="page">
@@ -50,9 +50,15 @@
           <span class="mode-features"><span>Collect &amp; build</span><span>Health &amp; air</span><span>Peaceful world</span></span>
           <span class="mode-choice"><input type="radio" name="mode" value="survival"><span>Gather as you go</span></span>
         </label>
+        <label class="mode-card">
+          <span class="mode-title">Embrace the Challenge: Hardcore</span>
+          <span class="mode-copy">Start in a resource world. Make tools, build a house, and earn new teachers and materials. You can jump straight in.</span>
+          <span class="mode-features"><span>Crafting goals</span><span>Unlock rewards</span><span>Separate world</span></span>
+          <span class="mode-choice"><input type="radio" name="mode" value="hardcore"><span>Build your way up</span></span>
+        </label>
       </fieldset>
       <a class="play-button" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">PLAY</a>
-      <p class="play-note">No account needed. Autosave stays in this browser on this device.</p>
+      <p class="play-note">No account needed. Autosave stays in this browser on this device. Hardcore keeps its own world and progress.</p>
     </div>
   </section>
   <section class="section" id="explore" aria-labelledby="explore-title">
@@ -63,7 +69,7 @@
       <article class="feature"><h3>Meet the crew</h3><img class="crew-avatar" src="game/assets/macek-avatar-lanyard.png" width="1086" height="1448" loading="lazy" alt="Block-style Mr. Macek with SV arm sleeve, Florida Gators lanyard and ID badge"><p>Meet Sleeves in his number 28 jersey on the front lawn. Officer Shields and Mr. Eiler stay near the entrance; Mr. B carries his laptop through the halls. Ms. Micco patrols campus, KaY follows Sir D, and Ellie and Percy follow the campus Mr. Macek. Sir D and Mr. Macek meet near the entrance around sunset.</p></article>
     </div>
     <p class="menu-note"><strong>Explore the school:</strong> Find the flag in the entrance circle, landscaped parking rows, and two glass doorways into the atrium. The main cafeteria has a high ECTV screen; the elementary cafeteria is on the left. Grade 5 is on the right with Grade 6 above; Grades 3–4 are on the left with Grades 1–2 above. Follow the broad curved walkway to Kindergarten. The school is a playable, scaled interpretation of the real campus.</p>
-    <p class="menu-note"><strong>The campus runs on game time:</strong> The School Officer parks beyond the far curb near the circle exit at 8:30 AM, patrols the cafeteria, and starts walking back to his car at 3:00 PM. He is separate from Officer Shields. Three buses start their rear-loop trip at 3:00 PM. Cookie Man sweeps from 4:00 PM to 10:00 PM. Eddie is on the lawn rock by day, starts flying to the roof at 6:00 PM, and returns by 6:00 AM. A full game day takes 20 minutes of active play; the menu pauses it.</p>
+    <p class="menu-note"><strong>The campus runs on game time:</strong> The School Officer parks beyond the far curb near the circle exit at 8:30 AM, patrols the cafeteria, and starts walking back to his car at 3:00 PM. He is separate from Officer Shields. Three buses start their rear-loop trip at 3:00 PM. Cookie Man sweeps from 4:00 PM to 10:00 PM. Eddie is on the lawn rock by day, starts flying to the roof at 6:00 PM, and returns by 6:00 AM. Auto sleep skips night after a one-second rest at 6:00 PM. Choose Full day/night for the original 20-minute cycle, or Always day for a bright sky while the clock runs. The menu pauses time.</p>
   </section>
   <section class="section" id="how-to-play" aria-labelledby="controls-title">
     <h2 class="section-heading" id="controls-title">How to play</h2>
@@ -72,15 +78,17 @@
       <div><h3>iPad &amp; touch</h3><p>Use the joystick to move. Drag the screen to look.<br>Tap the block bar to choose your material.<br>Use the on-screen buttons to jump, place, or break.<br>In Creative, FLY toggles flight, JUMP rises, and DOWN descends.<br>Open Menu whenever you want to pause.<br>Embrace the Challenge is peaceful; falls and deep water can hurt.</p></div>
     </div>
     <p class="menu-note"><strong>Choose your controls:</strong> Auto follows this device. Choose Touch for screen buttons or Keyboard and mouse for computer controls. You can change this in the menu or toolbar.</p>
+    <p class="menu-note"><strong>Less on screen:</strong> Press <kbd>H</kbd> to hide or show the movement help. On touch screens, use the Show movement help setting in the menu.</p>
     <p class="menu-note"><strong>Name your spaces:</strong> Walk to a space, then use Menu &gt; Name your spaces to add, edit, or remove a small area sign. Signs stay where you place them and save with your world.</p>
     <p class="menu-note"><strong>Build a water elevator:</strong> Place Glowstone at the bottom, then Water directly above it with no gaps. Build Glass walls and leave a bottom doorway and top exit. Turn flight off and walk in to rise; hold V or DOWN to descend. Find the full recipe in the game menu.</p>
-    <p class="menu-note"><strong>Find your way:</strong> Open the game menu to visit the ECMS entrance in either mode, change outfits or camera views, or fly above the school and travel to coordinates in Creative. The visit shortcuts keep the current game time. Choose <strong>Smooth</strong> graphics for faster play. You can switch modes without clearing your build.</p>
+    <p class="menu-note"><strong>Find your way:</strong> In the campus world, open the menu to visit the ECMS entrance, change outfits or camera views, or fly above the school and travel to coordinates in Creative. The visit shortcuts keep the current game time. Choose <strong>Smooth</strong> graphics for faster play. Creative and regular Embrace the Challenge share your campus build. Hardcore opens a separate resource world.</p>
   </section>
   <section class="section save-section" aria-labelledby="save-title">
     <h2 id="save-title">Keep your world</h2>
     <p><strong>Save</strong> keeps your progress in this browser on this device. The game also saves as you play. <strong>Download Save</strong> puts a copy of your world in a file you can keep. Your world stays here. Look in Downloads for the file ending in .json.</p>
     <p><strong>Load World</strong> opens a MYnecraft save file you choose. It asks before replacing this browser's current world. The two worlds do not join together. To keep both, use Download Save first and check that the file downloaded. Press Cancel at the warning if you are not ready.</p>
-    <p>You can move that file to another device and open it in MYnecraft. It <strong>cannot open in Minecraft</strong>. There is no account, automatic device sync, or multiplayer world. The school and primary links share one save in the same browser. Clearing browser data can erase it. Reset World starts fresh after asking, so keep a downloaded copy first.</p>
+    <p>You can move that file to another device and open it in MYnecraft. It <strong>cannot open in Minecraft</strong>. Solo worlds do not automatically sync across devices. The school and primary links share one save in the same browser, containing your campus and separate Hardcore world. Clearing browser data can erase both. Keep a downloaded copy before resetting.</p>
+    <p><a href="game/rooms.html"><strong>Teacher rooms</strong></a> require a separately configured room service and teacher admission. They keep group building separate from your solo saves. No chat or text signs are available. The current room service needs teacher supervision; automatic detection of words built from blocks and screenshot alerts are not yet configured.</p>
   </section>
 </main>
 <footer><p>MYnecraft: EC Edition</p><a href="https://moodle.svsd.net/course/view.php?id=13811">Mr. Macek's teacher website</a><a href="https://percycodesios.github.io/CIRC-HQ/">CIRC HQ</a><a href="#play">Back to play</a></footer>
@@ -89,9 +97,10 @@ const playButton=document.getElementById('play-button');
 for(const mode of document.querySelectorAll('input[name="mode"]')){
   mode.addEventListener('change',()=>{
     if(!mode.checked)return;
-    const selection=mode.value==='survival'?'survival':'creative';
+    const selection=['creative','survival','hardcore'].includes(mode.value)?mode.value:'creative';
     playButton.href='game/mynecraft.html?mode='+selection;
-    playButton.setAttribute('aria-label','Play '+(selection==='survival'?'Embrace the Challenge':'Creative')+' mode');
+    const names={creative:'Creative',survival:'Embrace the Challenge',hardcore:'Embrace the Challenge: Hardcore'};
+    playButton.setAttribute('aria-label','Play '+names[selection]+' mode');
   });
 }
 </script>

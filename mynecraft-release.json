@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "054d91bf5c4f5076352ae8003bef98679b46577b",
+  "sourceCommit": "acb1717b0965250b7f5927f30c80109427dfa0cc",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -13,11 +13,17 @@
     "game/assets/macek-avatar-lanyard.png": "31c8a621bee6b8ba764548c4b65b52a36560c224c0c526400e74653102223c1a",
     "game/assets/mynecraft-icon.svg": "44c67c239e151cdfd5430079c7741a7561aa67f04fd72bd7d014f9cbb43defe5",
     "game/assets/sv-school-logo.png": "dc7d2a961c4f4bf80452c7e70ecd1e720c0205b06a7f6c96ac8a4f9e408cc3e2",
-    "game/mynecraft.html": "b00d4eb82c22193c5f52ef1e9f77b9a4602e2513d88c16793723736526c68f9e",
-    "game/start-menu.css": "0a7d7cc175768db6b76669df671c1b66dbc10f020dd0dc9d0e2fd7c3c17a8a9b",
+    "game/cafeteria-cleaner.js": "c734abb2a3783388e3304792b4fbe3690d2b0564780f50d760fdad1e3e47cada",
+    "game/hardcore-rules.js": "2a4863cfec0182728bbe436d4c35c5ab55331b1b5650897b78cb4ab5d61a2c93",
+    "game/hardcore-world.js": "7de846e937add737f5c810a1ae84da4d0b731a13bc60b6497118f2cfac066852",
+    "game/mynecraft.html": "75071ed4cf97214287f11639022ee2ded1446ac655ba483bb8392b7d64919f58",
+    "game/play-activities.js": "aa2aea1405bc7b9a0765b621407135a34dc9f0360c77edac911ca2940783dd54",
+    "game/room-client.js": "d221e39934796921088ceeb744c647f37644a13aa8cfd34a21b78de40482aa45",
+    "game/rooms.html": "fa578703572a23618ba3a3010f36e97242fb05e2bfddc4440f8d8392751b276f",
+    "game/start-menu.css": "375bb74827113d48c7387ca74a3e7b92262bbb60fb745f8c9ad7ef1f807e226a",
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "59ee84d5379354b2feabb13a41b09fa1066e64d0d33a688b831f47e6f6641b38"
+    "index.html": "031ad0c85d2f8180c89c5873b18bb05421c72830f1a9249f89caa113c7e93b05"
   }
 }

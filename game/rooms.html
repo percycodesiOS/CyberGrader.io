@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MYnecraft Class Rooms</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#193047;background:#eef5f7;color-scheme:light}*{box-sizing:border-box}body{margin:0;padding:24px}main{max-width:1000px;margin:auto}header{padding:26px;border-radius:18px;color:white;background:linear-gradient(120deg,#112d45,#246478);margin-bottom:20px}h1{margin:6px 0;font-size:clamp(28px,5vw,44px)}h2{font-size:23px;margin:0 0 15px}h3{margin:0 0 10px}p{line-height:1.55}a{color:#19516c}header a{color:#bce6f0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{background:white;border:2px solid #d2e1e7;border-radius:14px;padding:22px;margin-bottom:20px}label{display:block;font-weight:700;margin-bottom:6px}input{font:inherit;border:2px solid #b4cbd4;border-radius:8px;min-height:46px;padding:10px;width:100%;margin-bottom:12px}button{font:700 15px system-ui;border:0;border-radius:8px;min-height:44px;padding:11px 17px;background:#19586e;color:white;cursor:pointer}button:disabled{opacity:.5;cursor:default}button.secondary{background:#e4eef2;color:#173749}button.danger{background:#8f3542}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #eeae46;outline-offset:3px}.buttons{display:flex;gap:9px;flex-wrap:wrap}.help{font-size:14px;color:#486172}.notice{padding:12px 16px;border-radius:8px;background:#fff1cf;color:#614817}.status{min-height:1.4em;font-weight:600}.status[data-error=true]{color:#963943}.room{border:2px solid #d4e3e8;border-radius:12px;padding:18px;margin-top:15px}.room-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.code{font:800 24px ui-monospace,monospace;letter-spacing:3px;color:#164e64}.badge{font-weight:800;font-size:12px;padding:5px 10px;background:#e6ecf0;border-radius:20px}.badge.open{background:#d4f1e5;color:#1c6049}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;margin-top:15px}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid #e2ebef;vertical-align:top}td .buttons button{padding:7px 10px;font-size:13px;min-height:36px}details{margin-top:15px}summary{cursor:pointer;font-weight:700}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:340px;overflow:auto;background:#f2f6f8;padding:12px;border-radius:8px}.hidden,[hidden]{display:none!important}@media(max-width:700px){body{padding:12px}.grid{grid-template-columns:1fr}.card{padding:17px}.room-heading{align-items:flex-start;flex-direction:column}}
+    .review-choice{display:flex;align-items:flex-start;gap:8px;margin:14px 0;font-size:14px;line-height:1.5}.review-choice input{width:20px;min-height:20px;height:20px;flex:0 0 20px;margin:0}
+  </style>
+</head>
+<body data-myneroom-launcher>
+<main>
+  <header><a href="../index.html">← MYnecraft home</a><h1>Build together.</h1><p>Your teacher opens a class room. Enter its code, then join your group.</p></header>
+  <section class="card" aria-labelledby="connectionTitle">
+    <h2 id="connectionTitle">Class room connection</h2>
+    <label for="roomService">Room service address</label><input id="roomService" type="url" autocomplete="url" spellcheck="false" placeholder="https://your-school-room-service.example">
+    <p class="help">Use the HTTPS address your teacher provides. This page needs a running room service; the address for the solo game alone does not provide multiplayer.</p>
+  </section>
+  <div class="grid">
+    <section class="card" aria-labelledby="studentTitle"><h2 id="studentTitle">Students</h2>
+      <form id="studentJoin"><label for="roomCode">Class room code</label><input id="roomCode" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16" required placeholder="Enter your code"><button id="joinButton" type="submit">Join room</button></form>
+      <p class="help">You receive a player number, then wait for your teacher to admit you. No name, email or chat is needed. Your teacher can pause or close the room.</p>
+      <p id="studentStatus" class="status" role="status" aria-live="polite"></p>
+    </section>
+    <section class="card" aria-labelledby="teacherTitle"><h2 id="teacherTitle">Teachers</h2>
+      <form id="teacherLogin"><label for="teacherPassword">Teacher password</label><input id="teacherPassword" type="password" autocomplete="current-password" required><button id="loginButton" type="submit">Open teacher controls</button></form>
+      <p class="help">Use the password configured for your room service. It is not your school or Google password. Teacher access is kept only in this open page.</p>
+      <p id="teacherStatus" class="status" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+  <section id="teacherDashboard" class="card" hidden aria-labelledby="dashboardTitle">
+    <div class="room-heading"><h2 id="dashboardTitle">Your class rooms</h2><div class="buttons"><button id="createRoom" type="button">Create a closed room</button><button id="refreshRooms" class="secondary" type="button">Refresh</button><button id="teacherLogout" class="secondary" type="button">Sign out</button></div></div>
+    <p class="help">Create a room, open it, and share its code. New players wait until you choose Admit / resume. Close pauses all student building and joining. Reopen lets the same group continue. Student controls are enforced by the room service.</p>
+    <p class="help">Rooms and review evidence currently stay in the running room service's memory. Restarting the service clears them. This is not long-term project storage.</p>
+    <div id="roomsList"></div>
+    <p class="notice">There is no chat. Teachers should still supervise builds. These controls do not automatically detect every word or image made from blocks. The activity log below contains service records; it is not a screenshot or an email alert.</p>
+  </section>
+</main>
+<script src="room-client.js"></script>
+</body></html>
