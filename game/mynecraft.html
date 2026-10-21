@@ -491,7 +491,39 @@ for(const [id,name,color,texture] of [
  ['copperore','Copper ore','#c77b49',texStone],['ironore','Iron ore','#b8a89a',texStone]]){
  BLOCKS[id]={name,swatch:color,mats:Array.from({length:6},()=>new THREE.MeshLambertMaterial({color,map:texture||null}))};
 }
+// Append materials so the selected-block index in older saves stays unchanged.
+const FLOWERS = {poppy:['Red poppy','#ee5549'],daisy:['White daisy','#fff4d0'],sunflower:['Sunflower','#f4c542'],lavender:['Lavender','#ad82dc']};
+const EXTRA_COLORS = {greenconcrete:['Green concrete','#58a86a'],purpleconcrete:['Purple concrete','#9571bd'],pinkconcrete:['Pink concrete','#e998bc'],blackconcrete:['Black concrete','#343b45']};
+for(const [id,[name,color]] of Object.entries(FLOWERS)){
+  const texture=makeTexture(ctx=>{
+    ctx.clearRect(0,0,16,16);ctx.fillStyle='#397d3c';ctx.fillRect(7,6,2,10);
+    ctx.fillRect(4,10,4,2);ctx.fillRect(9,12,3,2);ctx.fillStyle=color;
+    if(id==='lavender'){ctx.fillRect(6,1,4,8);ctx.fillRect(5,3,6,2);}
+    else{ctx.fillRect(5,1,6,8);ctx.fillRect(3,3,10,4);ctx.fillStyle=id==='sunflower'?'#74522c':'#f4ca48';ctx.fillRect(6,3,4,4);}
+  });
+  const mat=mkMat(texture,{alphaTest:.5,side:THREE.DoubleSide});
+  BLOCKS[id]={name,swatch:color,mats:Array(6).fill(mat),plant:true};
+}
+for(const [id,[name,color]] of Object.entries(EXTRA_COLORS))BLOCKS[id]={name,swatch:color,mats:Array(6).fill(new THREE.MeshLambertMaterial({color}))};
+const INVENTORY_ADDITIONS=[...Object.keys(FLOWERS),...Object.keys(EXTRA_COLORS)];
 const BLOCK_KEYS = [...LEGACY_BLOCK_KEYS,...Object.keys(BLOCKS).filter(k=>!LEGACY_BLOCK_KEYS.includes(k))];
+const GARDEN_KITS={oak:'Oak tree',cherry:'Cherry tree',pine:'Pine tree',hedge:'Leafy hedge',flowerbed:'Flower bed'};
+function gardenPlan(kind,x,y,z){
+  if(!Object.prototype.hasOwnProperty.call(GARDEN_KITS,kind))return [];
+  const cells=new Map(),put=(dx,dy,dz,block)=>cells.set(`${x+dx},${y+dy},${z+dz}`,{x:x+dx,y:y+dy,z:z+dz,block});
+  if(kind==='flowerbed')for(let dx=-2;dx<=2;dx++)put(dx,0,0,Object.keys(FLOWERS)[(dx+2)%4]);
+  else if(kind==='hedge')for(let dx=-2;dx<=2;dx++)for(let dy=0;dy<2;dy++)put(dx,dy,0,'leaves');
+  else{
+    const wood=kind==='cherry'?'cherrywood':kind==='pine'?'pinewood':'wood',leaves=kind==='cherry'?'cherryleaves':'leaves';
+    const height=kind==='pine'?6:4;
+    for(let dy=2;dy<=height;dy++){
+      const radius=kind==='pine'?(dy===height?0:dy<4?2:1):(dy===height?1:2);
+      for(let dx=-radius;dx<=radius;dx++)for(let dz=-radius;dz<=radius;dz++)if(Math.abs(dx)+Math.abs(dz)<=radius+1)put(dx,dy,dz,leaves);
+    }
+    for(let dy=0;dy<height;dy++)put(0,dy,0,wood);
+  }
+  return [...cells.values()];
+}
 
 // ---------- voxel world ----------
 const WORLD = new Map(); // key "x,y,z" -> blockKey
@@ -513,7 +545,7 @@ function getBlock(x,y,z) {
    return y < -18&&ore%23===0?'ironore':ore%13===0?'copperore':'stone';
  }
 }
-function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water'; }
+function isSolid(x,y,z) { const b = getBlock(x,y,z); return !!b && b !== 'water' && !BLOCKS[b]?.plant; }
 const inHighway = x => x>=-57 && x<=-43;
 const inLake = (x,z) => (x/10)**2 + (z/8)**2 < 1;
 const inSchool = (x,z) => x >= 17 && x <= 96 && z >= -35 && z <= 55;
@@ -861,8 +893,9 @@ const faceDirections = [
   [0,0,1,0,0],[0,0,-1,0,Math.PI]
 ];
 function faceVisible(type,neighbor){
-  return !neighbor || (neighbor!==type && (neighbor==='water'||neighbor==='glass'));
+  return !neighbor || BLOCKS[neighbor]?.plant || (neighbor!==type && (neighbor==='water'||neighbor==='glass'));
 }
+function drawVoxelFace(type,face,neighbor){return BLOCKS[type]?.plant?(face===0||face===4):faceVisible(type,neighbor);}
 function isExposed(x,y,z){
   const type=getBlock(x,y,z);
   return faceDirections.some(([dx,dy,dz])=>faceVisible(type,getBlock(x+dx,y+dy,z+dz)));
@@ -907,7 +940,9 @@ function addVoxelFace(x,y,z,face,type){
   }
   if(slot===instMeshes[bucketKey].instanceMatrix.count)growFaceBucket(bucketKey,slot*2);
   const mesh=instMeshes[bucketKey],[dx,dy,dz,rx,ry]=faceDirections[face];
-  faceDummy.position.set(x+.5+dx*.5,y+.5+dy*.5,z+.5+dz*.5);faceDummy.rotation.set(rx,ry,0);faceDummy.updateMatrix();
+  if(BLOCKS[type].plant){faceDummy.position.set(x+.5,y+.5,z+.5);faceDummy.rotation.set(0,face===0?Math.PI/4:-Math.PI/4,0);}
+  else{faceDummy.position.set(x+.5+dx*.5,y+.5+dy*.5,z+.5+dz*.5);faceDummy.rotation.set(rx,ry,0);}
+  faceDummy.updateMatrix();
   mesh.setMatrixAt(slot,faceDummy.matrix);bucket.ids.push(id);faceSlots.set(id,{bucketKey,slot});mesh.count=bucket.ids.length;
   mesh.instanceMatrix.addUpdateRange(slot*16,16);mesh.instanceMatrix.needsUpdate=true;
 }
@@ -921,7 +956,7 @@ function refreshVoxelFaces(x,y,z){
   const type=getBlock(x,y,z);
   for(let face=0;face<6;face++){
     const id=key(x,y,z)+','+face,[dx,dy,dz]=faceDirections[face];
-    const visible=type&&!(y===WORLD_FLOOR&&face===3)&&faceVisible(type,getBlock(x+dx,y+dy,z+dz));
+    const visible=type&&!(y===WORLD_FLOOR&&face===3)&&drawVoxelFace(type,face,getBlock(x+dx,y+dy,z+dz));
     const current=faceSlots.get(id);
     if(current&&(!visible||current.bucketKey!==faceBucketKey(type,face,x,z)))removeVoxelFace(id);
     if(visible&&!faceSlots.has(id))addVoxelFace(x,y,z,face,type);
@@ -947,7 +982,7 @@ function buildMeshes(){
     for(let face=0;face<6;face++){
       if(y===WORLD_FLOOR&&face===3)continue; // Unreachable underside of bedrock need not reach the GPU.
       const [dx,dy,dz]=faceDirections[face];
-      if(!faceVisible(type,getBlock(x+dx,y+dy,z+dz)))continue;
+      if(!drawVoxelFace(type,face,getBlock(x+dx,y+dy,z+dz)))continue;
       addVoxelFace(x,y,z,face,type);
     }
   }
@@ -982,7 +1017,7 @@ saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveS
 let gameMode = isGroupRoom?'creative':isHardcoreWorld?'hardcore':requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
 let hardcore=globalThis.MYNE_HARDCORE?.normalize(saveState.hardcore);
 let activities=null;
-let chosenAnimal=null;
+let chosenAnimal=null,chosenGarden=null;
 let fishUnlocked=saveState.fishUnlocked===true;
 if((isHardcoreWorld||isGroupRoom)&&globalThis.MYNE_HARDCORE_WORLD){
  WORLD.clear();deepVoids.clear();
@@ -3420,6 +3455,7 @@ function recoverSchoolSavePosition(pos,flying=false){
 addEventListener('keydown', e => {
   if(!started||isFormInput(e))return;
   const m = e.code.match(/^Digit([1-9])$/);
+  if(m||['Digit0','BracketRight','BracketLeft'].includes(e.code)){chosenAnimal=null;chosenGarden=null;}
   if (m) selected = Math.min(BLOCK_KEYS.length-1, parseInt(m[1],10)-1);
   if(e.code==='Digit0')selected=9;
   if(e.code==='BracketRight')selected=(selected+1)%BLOCK_KEYS.length;
@@ -3428,6 +3464,7 @@ addEventListener('keydown', e => {
 });
 addEventListener('wheel', e => {
   if (!started||isFormInput(e)) return;
+  chosenAnimal=null;chosenGarden=null;
   selected = (selected + (e.deltaY > 0 ? 1 : -1) + BLOCK_KEYS.length) % BLOCK_KEYS.length;
   refreshHotbar();
 }, { passive: true });
@@ -3513,7 +3550,7 @@ modeSelect.addEventListener('change',()=>{
     catch{modeSelect.value=gameMode;document.getElementById('status').textContent='Could not switch worlds. Download Save to keep your progress.';}
     return;
   }
-  gameMode=next;player.flying=false;player.vel.set(0,0,0);health=20;breath=10;
+  gameMode=next;chosenGarden=null;player.flying=false;player.vel.set(0,0,0);health=20;breath=10;
   document.getElementById('modeHelp').textContent=gameMode==='survival'?'Break blocks to collect them. No flying; falls and deep water can hurt.':'Unlimited blocks and flight. Your build stays here.';
   refreshHotbar();refreshChallenge();refreshStaffLocks();persistSave();
 });
@@ -3691,7 +3728,19 @@ function doPlace() {
   if (!started||isWorldSleeping()||activities?.isDriving()) return;
   const hit = castVoxel();
   if (!hit) return;
-  if(isGroupRoom){roomConnection?.edit({x:hit.x+hit.normal.x,y:hit.y+hit.normal.y,z:hit.z+hit.normal.z,block:BLOCK_KEYS[selected]});return;}
+  if(isGroupRoom){if(!INVENTORY_ADDITIONS.includes(BLOCK_KEYS[selected]))roomConnection?.edit({x:hit.x+hit.normal.x,y:hit.y+hit.normal.y,z:hit.z+hit.normal.z,block:BLOCK_KEYS[selected]});return;}
+  if(chosenGarden){
+    if(gameMode!=='creative')return;
+    if(hit.normal.y!==1||!isSolid(hit.x,hit.y,hit.z)){document.getElementById('status').textContent='Aim at the top of solid ground to plant.';return;}
+    const cells=gardenPlan(chosenGarden,hit.x,hit.y+1,hit.z),px=player.pos.x,py=player.pos.y,pz=player.pos.z;
+    const blocked=cells.some(c=>!inPlay(c.x,c.z)||c.y>60||c.y<=WORLD_FLOOR||getBlock(c.x,c.y,c.z)||
+      (c.x+1>px-player.radius&&c.x<px+player.radius&&c.z+1>pz-player.radius&&c.z<pz+player.radius&&c.y+1>py-player.height&&c.y<py+.2)||
+      (c.y===hit.y+1&&!isSolid(c.x,c.y-1,c.z)));
+    if(blocked||!cells.length){document.getElementById('status').textContent='Choose clear, level ground with room for the whole '+GARDEN_KITS[chosenGarden].toLowerCase()+'. Existing builds stay safe.';return;}
+    for(const c of cells){setBlock(c.x,c.y,c.z,c.block);recordEdit(c.x,c.y,c.z,c.block);}
+    for(const c of cells)updateBlockMeshes(c.x,c.y,c.z);
+    sndPlace();document.getElementById('status').textContent='Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
+  }
   if(chosenAnimal){
     const water=chosenAnimal==='fish';
     const x=water?hit.x:hit.x+hit.normal.x,y=water?hit.y:hit.y+hit.normal.y,z=water?hit.z:hit.z+hit.normal.z;
@@ -4053,6 +4102,7 @@ function blockThumbnail(k){
   c.setAttribute('aria-hidden','true');
   c.style.cssText='position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none';
   const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;
+  if(BLOCKS[k].plant){ctx.drawImage(BLOCKS[k].mats[0].map.image,4,2,32,36);return c;}
   const face=(matrix,material,shade)=>{
     ctx.save();ctx.setTransform(...matrix);
     if(material.map?.image)ctx.drawImage(material.map.image,0,0,16,16);
@@ -4089,12 +4139,14 @@ BLOCK_KEYS.forEach((k, i) => {
   count.style.cssText='position:relative;z-index:1;text-shadow:1px 1px #000,-1px -1px #000;font-size:11px;line-height:1';
   slot.appendChild(count);
   slot.dataset.k = k;
-  slot.addEventListener('click',()=>{chosenAnimal=null;selected=i;refreshHotbar();});
+  slot.addEventListener('click',()=>{chosenAnimal=null;chosenGarden=null;selected=i;refreshHotbar();});
   hotbar.appendChild(slot);
 });
 document.body.appendChild(hotbar);
 function refreshHotbar() {
   [...hotbar.children].forEach((el, i) => {
+    el.hidden=isGroupRoom&&INVENTORY_ADDITIONS.includes(BLOCK_KEYS[i]);
+    el.style.display=el.hidden?'none':'flex';
     el.style.outline = i === selected ? '3px solid #fff' : 'none';
     el.style.outlineOffset = i === selected ? '2px' : '0';
     el.setAttribute('aria-pressed',String(i===selected));
@@ -4128,7 +4180,7 @@ const inventoryChoices=BLOCK_KEYS.map((k,i)=>{
   button.append(thumbnail,name,count);
   button.addEventListener('click',event=>{
     if(!inventoryOpen||button.disabled)return;
-    chosenAnimal=null;selected=i;refreshHotbar();persistSave();closeInventory(true,event);
+    chosenAnimal=null;chosenGarden=null;selected=i;refreshHotbar();persistSave();closeInventory(true,event);
   });
   inventoryGrid.appendChild(button);return {button,count};
 });
@@ -4156,16 +4208,27 @@ const animalHelp=document.createElement('p');animalHelp.textContent='Choose an a
 const animalGrid=document.createElement('div');animalGrid.className='crafting-grid';
 const animalChoices=['dog','cat','horse','sheep','cow','fish'].map(kind=>{
   const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.animal=kind;
-  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
+  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;chosenGarden=null;closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
   animalGrid.appendChild(button);return {kind,button};
 });
 animalPanel.append(animalTitle,animalHelp,animalGrid);
-inventoryDialog.append(inventoryTitle,inventoryHelp,craftingPanel,inventoryGrid,animalPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
+const gardenPanel=document.createElement('section');gardenPanel.className='animal-panel';
+const gardenTitle=document.createElement('h3');gardenTitle.textContent='Trees & garden kits';
+const gardenHelp=document.createElement('p');gardenHelp.textContent='Creative: plant a whole tree, hedge or flower bed with one PLACE on clear, level ground. Existing builds are never replaced.';
+const gardenGrid=document.createElement('div');gardenGrid.className='crafting-grid';
+const gardenChoices=Object.entries(GARDEN_KITS).map(([kind,name])=>{
+  const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.garden=kind;button.textContent=name;
+  button.addEventListener('click',event=>{if(!inventoryOpen||gameMode!=='creative'||isGroupRoom)return;chosenGarden=kind;chosenAnimal=null;closeInventory(true,event);document.getElementById('status').textContent='Selected '+name+'. Aim at clear ground and use PLACE.';});
+  gardenGrid.appendChild(button);return button;
+});
+gardenPanel.append(gardenTitle,gardenHelp,gardenGrid);
+inventoryDialog.append(inventoryTitle,inventoryHelp,craftingPanel,gardenPanel,inventoryGrid,animalPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
 function inventoryBackground(disabled){
   for(const element of [hotbar,ctrlPanel,renderer.domElement,document.getElementById('touchUI')])element.inert=disabled;
 }
 function refreshInventory(){
   animalPanel.hidden=isGroupRoom;
+  gardenPanel.hidden=isGroupRoom||gameMode!=='creative';
   inventoryHelp.textContent=gameMode==='creative'?'Creative: every block is unlimited. Choose one to keep building.':gameMode==='hardcore'?'Hardcore: collect, craft and build. Complete goals to unlock materials, animals and teachers.':'Embrace the Challenge: choose a block you have collected. Break blocks in the world to collect more.';
   craftingPanel.hidden=gameMode!=='hardcore';
   for(const {id,recipe,button} of craftingChoices){
@@ -4180,7 +4243,9 @@ function refreshInventory(){
   for(let i=0;i<inventoryChoices.length;i++){
     const {button,count}=inventoryChoices[i],amount=inventory[BLOCK_KEYS[i]];
     const locked=gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.canUseBlock(hardcore,BLOCK_KEYS[i]);
-    button.disabled=locked||(gameMode!=='creative'&&amount===0);
+    button.hidden=isGroupRoom&&INVENTORY_ADDITIONS.includes(BLOCK_KEYS[i]);
+    button.style.display=button.hidden?'none':'';
+    button.disabled=button.hidden||locked||(gameMode!=='creative'&&amount===0);
     button.setAttribute('aria-pressed',String(i===selected));
     count.textContent=locked?'Unlock with goals':gameMode==='creative'?'Unlimited':amount>0?`${amount} available`:'Collect or craft';
   }
@@ -4202,7 +4267,7 @@ addEventListener('keydown',event=>{
       event.preventDefault();if(!event.repeat)closeInventory();return;
     }
     if(event.code==='Tab'){
-      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...animalChoices.filter(c=>!c.button.disabled).map(c=>c.button),inventoryBack];
+      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!gardenPanel.hidden?gardenChoices:[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),inventoryBack];
       const current=choices.indexOf(document.activeElement),next=(current+(event.shiftKey?-1:1)+choices.length)%choices.length;
       event.preventDefault();choices[next].focus?.();
     }
@@ -4352,7 +4417,7 @@ function updateCoordHUD() {
   coordHUD.innerHTML =
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
-    (chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
+    (chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
     (gameMode!=='creative'?` (${inventory[BLOCK_KEYS[selected]]})<br>${gameMode==='hardcore'?'Hardcore · ':''}Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
     (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
     (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +

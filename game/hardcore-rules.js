@@ -3,12 +3,14 @@
   'use strict';
   const VERSION = 1, LIMIT = 1000000, SCAN_LIMIT = 20000;
   const WOODS = ['wood', 'cherrywood', 'sprucewood', 'pinewood'];
-  const CONCRETES = ['concrete', 'whiteconcrete', 'redconcrete', 'yellowconcrete', 'blueconcrete'];
+  const FLOWERS = ['poppy', 'daisy', 'sunflower', 'lavender'];
+  const CONCRETES = ['concrete', 'whiteconcrete', 'redconcrete', 'yellowconcrete', 'blueconcrete', 'greenconcrete', 'purpleconcrete', 'pinkconcrete', 'blackconcrete'];
   const BLOCKS = ['grass', 'dirt', 'stone', 'sand', 'wood', 'leaves', 'planks', 'brick', 'snow', 'glow', 'glass', 'water', 'orange', 'blue', 'cherrywood', 'sprucewood', 'pinewood', 'concrete', 'copperore', 'ironore', 'cherryplanks', 'spruceplanks', 'pineplanks', 'cherryleaves', 'whiteconcrete', 'redconcrete', 'yellowconcrete', 'blueconcrete'];
+  BLOCKS.push(...FLOWERS,...CONCRETES.filter(id=>!BLOCKS.includes(id)));
   const INITIAL_BLOCKS = ['grass', 'dirt', 'stone', 'sand', 'wood', 'leaves', 'planks', 'water'];
   const CHARACTERS = ['macek', 'micco', 'eriksen', 'mullet', 'wingenbach', 'mcmichael'];
   const QUESTS = [
-    { id: 'wood', title: 'Make a building tool', instruction: 'Collect 10 logs from trees. Craft a building axe.', character: 'micco', blocks: ['cherrywood', 'cherryplanks', 'cherryleaves'], animals: [], goal: 10 },
+    { id: 'wood', title: 'Make a building tool', instruction: 'Collect 10 logs from trees. Craft a building axe.', character: 'micco', blocks: ['cherrywood', 'cherryplanks', 'cherryleaves', ...FLOWERS], animals: [], goal: 10 },
     { id: 'stone', title: 'Start a stone collection', instruction: 'Craft a building pick. Mine 8 stone blocks.', character: 'eriksen', blocks: ['sprucewood', 'spruceplanks', 'copperore', 'ironore'], animals: [], goal: 8 },
     { id: 'house', title: 'Build your first house', instruction: 'Build a 5 by 5 floor, walls 3 blocks high, and a full roof. Leave one door gap 1 block wide and 2 blocks high.', character: 'mullet', blocks: ['pinewood', 'pineplanks', ...CONCRETES, 'glass', 'brick', 'orange', 'blue'], animals: ['cat'], goal: 1 },
     { id: 'workshop', title: 'Build your workshop collection', instruction: 'Mine 6 copper ore and 4 iron ore. Craft 4 concrete blocks in any color.', character: 'wingenbach', blocks: ['glow', 'snow'], animals: ['horse', 'sheep', 'cow'], goal: 14 },
@@ -28,6 +30,8 @@
     blueconcrete: { name: '4 blue concrete', costs: { stone: 2, sand: 2 }, output: { blueconcrete: 4 }, after: 'house' },
     glass: { name: '2 glass', costs: { sand: 2 }, output: { glass: 2 }, after: 'house' }
   };
+  for(const id of FLOWERS)RECIPES[id]={name:'4 '+({poppy:'red poppies',daisy:'white daisies',sunflower:'sunflowers',lavender:'lavender'}[id]),costs:{leaves:1,dirt:1},output:{[id]:4},after:'wood'};
+  for(const id of CONCRETES.filter(id=>!RECIPES[id]))RECIPES[id]={name:'4 '+id.replace('concrete',' concrete'),costs:{stone:2,sand:2},output:{[id]:4},after:'house'};
   const plain = value => value !== null && typeof value === 'object' && !Array.isArray(value);
   const count = value => Number.isSafeInteger(value) && value > 0 ? Math.min(LIMIT, value) : 0;
   const counts = value => Object.fromEntries(BLOCKS.map(key => [key, count(plain(value) ? value[key] : 0)]));
@@ -88,7 +92,7 @@
     return state;
   }
   const key = (x, y, z) => x + ',' + y + ',' + z;
-  const material = block => BLOCKS.includes(block) && !['water', 'leaves', 'cherryleaves', 'snow'].includes(block);
+  const material = block => BLOCKS.includes(block) && !['water', 'leaves', 'cherryleaves', 'snow', ...FLOWERS].includes(block);
   const isMap = edits => Object.prototype.toString.call(edits) === '[object Map]';
   const getEdit = (edits, id) => isMap(edits) ? edits.get(id) : plain(edits) && Object.prototype.hasOwnProperty.call(edits, id) ? edits[id] : undefined;
   const ownBlock = (getBlock, edits, x, y, z) => material(getBlock(x, y, z)) && getEdit(edits, key(x, y, z)) === getBlock(x, y, z);
