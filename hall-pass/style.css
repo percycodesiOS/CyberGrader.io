@@ -18,3 +18,10 @@
   @page{size:letter;margin:.5in}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Large targets and short instructions for a supervised student scan station. */
+.scan-modes button{min-height:96px}.scan-modes strong{font-size:1.2rem}.scan-modes span{font-size:.9rem;line-height:1.4}
+.scan-entry input{font-size:1.25rem}.feedback{font-size:1.15rem;border:2px solid transparent}.feedback.error{border-color:#a12828}
+.correction{min-height:48px;margin:10px 6px 0 0}.history-row{align-items:flex-start}.history-row>div{min-width:0}.history-panel summary{padding:12px 0}
+@media(max-width:850px){.shell{padding:18px 16px}.quick-start{display:none}.scan-card{margin-top:8px}.header-right button{min-height:48px;font-size:.9rem}.intro{font-size:1rem}.section-heading p{font-size:1rem}}
+@media(max-width:580px){.shell{padding:14px 12px}.masthead{margin-bottom:10px}.header-right{max-width:130px}.scan-card{padding:16px}.scan-modes{grid-template-columns:1fr;gap:8px}.scan-modes button{min-height:64px;flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:12px}.scan-modes strong{font-size:1.1rem;flex:none}.scan-modes span{font-size:.85rem;text-align:right;max-width:54%}.scan-entry{margin-top:16px}.scan-entry input{font-size:1.1rem}.feedback{font-size:1.08rem}.hint{font-size:.85rem}.staff-tools>*{width:100%;justify-content:center}.history-row{font-size:.9rem}.correction{width:100%}}

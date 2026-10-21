@@ -33,22 +33,25 @@ export function validateState(raw) {
   if(!keys(raw,['version','revision','trips'])||raw.version!==2||!Number.isSafeInteger(raw.revision)||raw.revision<0||!Array.isArray(raw.trips)||raw.trips.length>500)fail('Saved CIRC Check-In data is not valid. Keep a backup before resetting it.');
   const ids=new Set(),activePasses=new Set();
   const trips=raw.trips.map(t=>{
-    if((!keys(t,fields)&&!keys(t,[...fields,'expectedAt']))||typeof t.id!=='string'||!/^trip-[0-9]+-[0-9]+$/.test(t.id)||ids.has(t.id))fail('Invalid or duplicate saved trip.');
+    if(!t||typeof t!=='object'||Array.isArray(t))fail('Invalid saved trip.');
+    const allowed=[...fields,...('expectedAt' in t?['expectedAt']:[]),...('removedAt' in t?['removedAt']:[])];
+    if(!keys(t,allowed)||typeof t.id!=='string'||!/^trip-[0-9]+-[0-9]+$/.test(t.id)||ids.has(t.id))fail('Invalid or duplicate saved trip.');
     ids.add(t.id);
     if(normalizePass(t.pass)!==t.pass||!cleanText(t.student)||!DESTINATIONS.includes(t.destination))fail('Invalid saved card, student code or destination.');
     time(t.approvedAt);time(t.expiresAt);
     if(t.expiresAt<=t.approvedAt||t.expiresAt>nextMidnight(t.approvedAt))fail('Approval must expire within its New York school date.');
     if('expectedAt' in t&&(dayKey(time(t.expectedAt))!==dayKey(t.approvedAt)||t.expectedAt>=t.expiresAt))fail('Expected visit must be on the approval date, before its expiry.');
     for(const name of ['departedAt','arrivedAt','returnedAt','cancelledAt'])if(t[name]!==null)time(t[name]);
+    if('removedAt' in t&&t.removedAt!==null&&time(t.removedAt)<Math.max(t.approvedAt,t.departedAt??0,t.arrivedAt??0,t.returnedAt??0,t.cancelledAt??0))fail('Invalid removal time.');
     if(t.departedAt!==null&&(t.departedAt<t.approvedAt||t.departedAt>=t.expiresAt))fail('Invalid departure time.');
     if(t.arrivedAt!==null&&(t.departedAt===null||t.arrivedAt<t.departedAt))fail('Arrival needs an earlier departure.');
     if(t.returnedAt!==null&&(t.departedAt===null||t.returnedAt<(t.arrivedAt??t.departedAt)))fail('Return needs an earlier departure or arrival.');
     if(t.cancelledAt!==null&&(t.departedAt!==null||t.cancelledAt<t.approvedAt))fail('Only unused approvals may be cancelled.');
-    if(t.departedAt!==null&&t.returnedAt===null){if(activePasses.has(t.pass))fail('A card has more than one open trip.');activePasses.add(t.pass);}
+    if(t.departedAt!==null&&t.returnedAt===null&&!t.removedAt){if(activePasses.has(t.pass))fail('A card has more than one open trip.');activePasses.add(t.pass);}
     return {...t};
   });
   // No overlapping assignments for the same card or student, including malformed saved data.
-  const ends=t=>t.cancelledAt??t.returnedAt??(t.departedAt===null?t.expiresAt:Infinity);
+  const ends=t=>Math.min(t.removedAt??Infinity,t.cancelledAt??t.returnedAt??(t.departedAt===null?t.expiresAt:Infinity));
   for(let i=0;i<trips.length;i++)for(let j=0;j<i;j++){
     const a=trips[i],b=trips[j];
     if((a.pass===b.pass||a.student.toLocaleLowerCase()===b.student.toLocaleLowerCase())&&a.approvedAt<ends(b)&&b.approvedAt<ends(a))fail('Overlapping card or student assignments in saved records.');
@@ -62,12 +65,13 @@ export function parseState(text) {
 }
 export const isExpired=(trip,now=Date.now())=>now>=trip.expiresAt||dayKey(now)!==dayKey(trip.approvedAt);
 export function status(trip,now=Date.now()) {
+  if(trip.removedAt)return 'Removed by teacher';
   if(trip.cancelledAt!==null)return 'Cancelled';
   if(trip.returnedAt!==null)return 'Finished / returned';
   if(trip.departedAt!==null)return `${trip.arrivedAt!==null?'Arrived':'Registered'}${isExpired(trip,now)?' · overdue':''}`;
   return isExpired(trip,now)?'Expired':'Approved';
 }
-export const isOpen=(trip,now)=>trip.cancelledAt===null&&trip.returnedAt===null&&(trip.departedAt!==null||!isExpired(trip,now));
+export const isOpen=(trip,now)=>!trip.removedAt&&trip.cancelledAt===null&&trip.returnedAt===null&&(trip.departedAt!==null||!isExpired(trip,now));
 export function currentTrip(state,pass,now=Date.now()) {
   const normalized=normalizePass(pass);
   return [...state.trips].reverse().find(t=>t.pass===normalized&&isOpen(t,now))??null;
@@ -107,6 +111,7 @@ export function scanPass(state,pass,action,now=Date.now()) {
   const current=validateState(state);time(now);const card=normalizePass(pass);
   if(!['depart','arrive','return'].includes(action))fail('Choose Register, Arrive or Finish first.');
   const trip=[...current.trips].reverse().find(t=>t.pass===card);
+  if(trip?.removedAt)fail(`${card} was removed by the teacher. Ask for a new approval.`);
   if(!trip||trip.cancelledAt!==null)fail(`${card} has no staff approval. Ask the teacher.`);
   const field={depart:'departedAt',arrive:'arrivedAt',return:'returnedAt'}[action];
   if(trip.returnedAt!==null&&action!=='return')fail('This trip is closed. Ask staff for a new approval.');
@@ -127,4 +132,20 @@ export function cancelApproval(state,id,staffApproved,now=Date.now()) {
   if(trip.cancelledAt!==null)return current;
   if(now<trip.approvedAt)fail('Check the device clock.');
   return commit(current,current.trips.map(t=>t.id===id?{...t,cancelledAt:now}:t),now);
+}
+export function removeTrip(state,id,staffApproved,now=Date.now()) {
+  const current=validateState(state);time(now);
+  if(staffApproved!==true)fail('Staff access required.');
+  const trip=current.trips.find(t=>t.id===id);if(!trip)fail('That visit was not found.');
+  if(trip.removedAt)return current;
+  return commit(current,current.trips.map(t=>t.id===id?{...t,removedAt:now}:t),now);
+}
+export function restoreTrip(state,id,staffApproved,now=Date.now()) {
+  const current=validateState(state);time(now);
+  if(staffApproved!==true)fail('Staff access required.');
+  const trip=current.trips.find(t=>t.id===id);if(!trip)fail('That visit was not found.');
+  if(!trip.removedAt)return current;
+  const restored={...trip};delete restored.removedAt;
+  try{return commit(current,current.trips.map(t=>t.id===id?restored:t),now);}
+  catch{fail('This code or student has another visit. Close or remove the conflicting entry before restoring.');}
 }

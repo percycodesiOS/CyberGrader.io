@@ -1,5 +1,5 @@
-import {STORAGE_KEY,STAFF_KEY,createState,parseState,normalizePass,approvePass,scanPass,cancelApproval,status,isOpen,dayKey,ZONE} from './model.mjs?v=3';
-import {createStore} from './storage.mjs?v=3';
+import {STORAGE_KEY,STAFF_KEY,createState,parseState,normalizePass,approvePass,scanPass,cancelApproval,removeTrip,restoreTrip,status,isOpen,dayKey,ZONE} from './model.mjs?v=4';
+import {createStore} from './storage.mjs?v=4';
 import {createScanner} from './scanner.mjs?v=3';
 import {code39} from './barcode.mjs?v=3';
 const $=id=>document.getElementById(id),node=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
@@ -7,7 +7,21 @@ let state=createState(),ready=false,busy=false,pinBusy=false,unlocked=false,staf
 const clock=ms=>ms===null?'—':new Date(ms).toLocaleTimeString([], {timeZone:ZONE,hour:'numeric',minute:'2-digit'});
 const stamp=ms=>new Date(ms).toLocaleString([], {timeZone:ZONE,month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 const feedback=(message,error=false)=>{$('message').textContent=message;$('message').className='feedback scan-feedback'+(error?' error':'');};
-function controls(){ $('scan-submit').disabled=!ready||busy;$('approve-button').disabled=!ready||busy||!unlocked;document.querySelectorAll('[data-cancel]').forEach(b=>b.disabled=busy||!ready||!unlocked); }
+function controls(){ $('scan-submit').disabled=!ready||busy;$('approve-button').disabled=!ready||busy||!unlocked;document.querySelectorAll('[data-cancel],[data-correct]').forEach(b=>b.disabled=busy||!ready||!unlocked); }
+function correctionButton(trip){
+  const removed=!!trip.removedAt,button=node('button','secondary correction',removed?'Restore entry':'Remove entry');
+  button.type='button';button.dataset.correct=trip.id;
+  button.addEventListener('click',async()=>{
+    if(!unlocked||Date.now()-staffUnlockedAt>180000){lockStaff();feedback('Open Staff access to correct an entry.',true);return;}
+    const prompt=removed?`Restore ${trip.student} (${trip.pass})? Its original times will be kept.`:`Remove ${trip.student} (${trip.pass}) from the visit list? Check where the student is first. The record stays in Recent visits and can be restored.`;
+    if(!confirm(prompt))return;
+    await transact(s=>{
+      if(!unlocked||Date.now()-staffUnlockedAt>180000)throw Error('Staff controls locked. Unlock again to correct this entry.');
+      return (removed?restoreTrip:removeTrip)(s,trip.id,true);
+    },removed?'Entry restored with its original times.':'Entry removed. Find it in Recent visits to restore it.');
+  });
+  return button;
+}
 function lockStaff(){clearTimeout(staffTimer);staffTimer=null;unlocked=false;$('staff-panel').hidden=true;$('staff-history').hidden=true;$('staff-access').hidden=true;$('staff-toggle').textContent='Staff access';$('pin').value='';$('pin-confirm').value='';$('student-code').value='';$('expected-time').value='';$('approval-confirm').checked=false;render();}
 function showAccess(){
   if(unlocked){lockStaff();feedback('Staff controls locked. Approved cards can still be scanned.');return;}
@@ -51,11 +65,12 @@ function render(){
     const card=node('article','trip'),top=node('div','trip-top');top.append(node('strong','pass-id',trip.pass),node('span','out-badge'+(status(trip,now).includes('overdue')?' overdue':''),status(trip,now)));card.append(top,node('div','trip-student',unlocked?trip.student:trip.destination),node('div','expected-time',trip.expectedAt?`Expected ${clock(trip.expectedAt)}`:'Expected time not set'),node('div','trip-meta',`${unlocked?trip.destination+' · ':''}approval ends ${clock(trip.expiresAt)}`));
     if(trip.departedAt!==null)card.append(node('div','trip-meta',`Registered ${clock(trip.departedAt)} · arrived ${clock(trip.arrivedAt)}`));
     if(unlocked&&trip.departedAt===null){const cancel=node('button','secondary','Cancel approval');cancel.type='button';cancel.dataset.cancel=trip.id;cancel.addEventListener('click',()=>transact(s=>cancelApproval(s,trip.id,unlocked),'Unused approval cancelled.'));card.append(cancel);}
+    if(unlocked)card.append(correctionButton(trip));
     $('active-list').append(card);
   }
   $('history-count').textContent=String(state.trips.length);$('history-list').replaceChildren();
   if(unlocked)for(const trip of [...state.trips].reverse()){
-    const row=node('div','history-row'),a=node('div'),b=node('div');a.append(node('strong','',trip.pass),node('span','',`${trip.student} → ${trip.destination}`),node('div','',`${status(trip,now)} · approved ${stamp(trip.approvedAt)}`));b.append(node('div','',`Expected ${trip.expectedAt?clock(trip.expectedAt):'not set'} · Registered ${clock(trip.departedAt)} · Arrived ${clock(trip.arrivedAt)} · Finished ${clock(trip.returnedAt)}`));row.append(a,b);$('history-list').append(row);
+    const row=node('div','history-row'),a=node('div'),b=node('div');a.append(node('strong','',trip.pass),node('span','',`${trip.student} → ${trip.destination}`),node('div','',`${status(trip,now)} · approved ${stamp(trip.approvedAt)}`));b.append(node('div','',`Expected ${trip.expectedAt?clock(trip.expectedAt):'not set'} · Registered ${clock(trip.departedAt)} · Arrived ${clock(trip.arrivedAt)} · Finished ${clock(trip.returnedAt)}`),correctionButton(trip));row.append(a,b);$('history-list').append(row);
   }
   controls();
 }

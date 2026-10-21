@@ -1,12 +1,38 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {STORAGE_KEY,LEGACY_KEY,createState,normalizePass,dayKey,nextMidnight,validateState,parseState,approvePass,scanPass,cancelApproval,status,isOpen} from './model.mjs';
+import {STORAGE_KEY,LEGACY_KEY,createState,normalizePass,dayKey,nextMidnight,validateState,parseState,approvePass,scanPass,cancelApproval,removeTrip,restoreTrip,status,isOpen} from './model.mjs';
 import {createStore} from './storage.mjs';
 import {createScanner} from './scanner.mjs';
 import {code39} from './barcode.mjs';
 const NOW=Date.parse('2026-10-05T12:00:00Z');
 const request=(overrides={})=>({pass:1,student:'TEST-A',destination:'CIRC',minutes:60,staffApproved:true,...overrides});
 const approved=(overrides={})=>approvePass(createState(),request(overrides),NOW);
+
+test('teacher can remove and restore a mistaken entry with names and scan times intact',()=>{
+  const out=scanPass(approved(),1,'depart',NOW+1).state,id=out.trips[0].id;
+  assert.throws(()=>removeTrip(out,id,false,NOW+2),/Staff/);
+  const removed=removeTrip(out,id,true,NOW+2);
+  assert.equal(isOpen(removed.trips[0],NOW+2),false);
+  assert.equal(status(removed.trips[0]),'Removed by teacher');
+  assert.equal(removed.trips[0].departedAt,NOW+1);
+  assert.throws(()=>scanPass(removed,1,'arrive',NOW+3),/removed/);
+  assert.throws(()=>restoreTrip(removed,id,false,NOW+3),/Staff/);
+  const restored=restoreTrip(parseState(JSON.stringify(removed)),id,true,NOW+3);
+  assert.deepEqual(restored.trips,out.trips);
+  assert.equal(isOpen(restored.trips[0],NOW+3),true);
+});
+test('restoring cannot create conflicting assignments and failed writes preserve removal state',async()=>{
+  const out=scanPass(approved(),1,'depart',NOW+1).state,id=out.trips[0].id;
+  const removed=removeTrip(out,id,true,NOW+2);
+  const replacement=approvePass(removed,request({student:'TEST-B'}),NOW+3);
+  assert.throws(()=>restoreTrip(replacement,id,true,NOW+4),/another visit/);
+  assert.equal(replacement.trips[0].removedAt,NOW+2);
+  assert.throws(()=>removeTrip(out,id,true,NOW-1),/removal time/);
+  const h=harness();h.data.set(STORAGE_KEY,JSON.stringify(out));
+  h.storage.setItem=()=>{throw Error('QuotaExceededError');};
+  await assert.rejects(h.store.change(s=>removeTrip(s,id,true,NOW+2)),/Quota/);
+  assert.deepEqual(await h.store.load(),out);
+});
 test('all 100 cards normalize; malformed and out of range codes reject',()=>{
   for(let i=1;i<=100;i++)assert.equal(normalizePass(i),`CIRC-${String(i).padStart(3,'0')}`);
   for(const bad of [0,101,-1,1.5,'1e2','CIRC-000','CIRC-001x','ECTV-001','',null])assert.throws(()=>normalizePass(bad));

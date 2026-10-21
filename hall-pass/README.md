@@ -20,6 +20,16 @@ All steps use this **same school computer, browser and browser profile**. There 
 
 ## Handheld scanner
 
+## October 21 usability update
+
+The same handheld input and saved visits are retained. Student scan choices now read **Register**, **I'm here**, and **I'm done**, with larger targets and a stacked phone layout. The underlying registration, arrival and return sequence is unchanged. Mobile layout does not add cross-device sync.
+
+Unlocked staff can choose **Remove entry** on a visit or in Recent visits. A confirmation names the entry. Removal frees the code but retains the original name and timestamps in history; **Restore entry** restores that record if it does not conflict with another assignment. Removed records share the existing latest-200 closed-record retention limit. Export a private backup for longer retention. Corrections are unavailable when staff access is locked.
+
+Older backups remain readable. Refresh other open copies after this update because older code does not understand the optional removal timestamp. School scanner and physical iPad verification remain separate from software and responsive-layout checks.
+
+### Connecting the handheld scanner
+
 Click **Ready to scan** before scanning. A USB/Bluetooth keyboard-wedge scanner should send **Enter or Tab** after the code. The visible scan box accepts the code at any typing speed; if there is no suffix, click **Record**. A fast barcode burst also works with focus on a button or the page. Staff editing fields do not record visits. Scanning the approval-code field selects a code only; it never approves the visit.
 
 Accepted inputs resolve to the same saved code, for example:
