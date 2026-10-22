@@ -3,6 +3,7 @@
 (function (root) {
   'use strict';
   const LIMIT = 48;
+  const FISH_GROWTH_SECONDS = 120;
   const CAMPUS = { x: 86, y: 5, z: 31.5, ends: [22, 41] };
   const finite = n => typeof n === 'number' && Number.isFinite(n);
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -12,7 +13,7 @@
   const point = value => record(value) && finite(value.x) && Math.abs(value.x) <= 512 && finite(value.y) && value.y >= -64 && value.y <= 80 && finite(value.z) && Math.abs(value.z) <= 512;
   // Validate before the host replaces a world. No coercion and no partial import.
   function validateSerialized(data) {
-    return record(data) && data.version === 1 && record(data.score) && worlds.every(world => Number.isInteger(data.score[world]) && data.score[world] >= 0 && data.score[world] <= 999999) && record(data.cars) && Object.keys(data.cars).every(world => worlds.includes(world) && point(data.cars[world]) && finite(data.cars[world].yaw) && Math.abs(data.cars[world].yaw) <= 1000000) && Array.isArray(data.animals) && data.animals.length <= LIMIT && data.animals.every(p => point(p) && kinds.includes(p.kind) && worlds.includes(p.world));
+    return record(data) && data.version === 1 && record(data.score) && worlds.every(world => Number.isInteger(data.score[world]) && data.score[world] >= 0 && data.score[world] <= 999999) && (data.catches === undefined || (record(data.catches) && worlds.every(world => Number.isInteger(data.catches[world]) && data.catches[world] >= 0 && data.catches[world] <= 999999))) && record(data.cars) && Object.keys(data.cars).every(world => worlds.includes(world) && point(data.cars[world]) && finite(data.cars[world].yaw) && Math.abs(data.cars[world].yaw) <= 1000000) && Array.isArray(data.animals) && data.animals.length <= LIMIT && data.animals.every(p => point(p) && kinds.includes(p.kind) && worlds.includes(p.world) && (p.age === undefined || (p.kind === 'fish' && finite(p.age) && p.age >= 0 && p.age <= FISH_GROWTH_SECONDS)));
   }
   function create(api) {
     const { THREE, scene, player, getBlock, isSolid, groundSurface } = api;
@@ -53,7 +54,22 @@
     const ball = { pos: new THREE.Vector3(), velocity: new THREE.Vector3(), held: false, flight: false, scored: false };
     const car = { pos: new THREE.Vector3(), yaw: 0, speed: 0, driving: false };
     const entities = [];
-    let currentWorld = null, court = CAMPUS, score = { campus: 0, hardcore: 0 }, carPositions = {}, defaultsSpawned = new Set();
+    const confetti = new THREE.Group(); confetti.name = 'Basket confetti'; group.add(confetti);
+    const confettiPieces = Array.from({ length: 36 }, (_, i) => {
+      const mesh = box(confetti, .13, .035, .09, [0xf5c843, 0x4bb8ef, 0xeb637c, 0x62cc8a][i % 4], 0, 0, 0);
+      return { mesh, velocity: new THREE.Vector3() };
+    });
+    confetti.visible = false;
+    const rod = new THREE.Group(); rod.name = 'Fishing rod'; group.add(rod); rod.visible = false;
+    box(rod, .06, .06, 1.7, 0x9b6c3e, .3, 0, -.75);
+    box(rod, .1, .14, .18, 0x354d59, .3, -.03, -.15);
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf8f3df });
+    const lineGeometry = new THREE.BufferGeometry(); lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(6), 3));
+    const fishingLine = new THREE.Line(lineGeometry, lineMaterial); fishingLine.visible = false; group.add(fishingLine);
+    const bobber = new THREE.Mesh(new THREE.SphereGeometry(.09, 6, 4), material(0xf4ce4a)); bobber.visible = false; group.add(bobber);
+    const fishingTip = new THREE.Vector3();
+    let currentWorld = null, court = CAMPUS, score = { campus: 0, hardcore: 0 }, catches = { campus: 0, hardcore: 0 }, carPositions = {}, defaultsSpawned = new Set();
+    let confettiLife = 0, rodSelected = false, cast = null;
 
     function landFits(x, y, z, radius = .35, height = 1.6) {
       if (!inBounds(x - radius, z - radius) || !inBounds(x + radius, z + radius)) return false;
@@ -88,7 +104,8 @@
       return { mesh, legs };
     }
     function addAnimal(kind, pos, world, placed) {
-      const visuals = animalMesh(kind), entity = { kind, world, placed, pos: new THREE.Vector3(pos.x, pos.y, pos.z), home: new THREE.Vector3(pos.x, pos.y, pos.z), heading: Math.random() * Math.PI * 2, timer: 0, phase: 0, ...visuals };
+      const visuals = animalMesh(kind), entity = { kind, world, placed, age: kind === 'fish' ? pos.age || 0 : 0, pos: new THREE.Vector3(pos.x, pos.y, pos.z), home: new THREE.Vector3(pos.x, pos.y, pos.z), heading: Math.random() * Math.PI * 2, timer: 0, phase: 0, ...visuals };
+      if (kind === 'fish') entity.mesh.scale.setScalar(.55 + .45 * entity.age / FISH_GROWTH_SECONDS);
       entity.mesh.name = 'Activity animal: ' + kind; entity.mesh.position.copy(entity.pos); entity.mesh.visible = world === currentWorld && (kind !== 'fish' || fishFits(pos.x, pos.y, pos.z)); group.add(entity.mesh); entities.push(entity); return entity;
     }
     function spawnAnimal(kind, pos) {
@@ -105,6 +122,7 @@
       const next = worldKey(); if (next === currentWorld) return;
       if (currentWorld) carPositions[currentWorld] = { x: car.pos.x, y: car.pos.y, z: car.pos.z, yaw: car.yaw };
       currentWorld = next; car.driving = false; car.speed = 0;
+      unequipRod(); confettiLife = 0; confetti.visible = false;
       const villageY = groundSurface(-29, 30);
       court = next === 'campus' ? CAMPUS : { x: -29, y: villageY, z: 30, ends: [20.5, 39.5] };
       villageCourt.position.set(-29, villageY, 30); villageCourt.visible = next === 'hardcore';
@@ -151,6 +169,7 @@
       if (!active()) return false; setWorld();
       if (car.driving) return exitCar();
       if (ball.held) return shoot();
+      if (rodSelected) return castRod();
       if (distance(player.pos, car.pos) < 3 && Math.abs(player.pos.y - car.pos.y) < 4) { car.driving = true; car.speed = 0; player.flying = false; player.vel.set(0, 0, 0); player.yaw = car.yaw; report('Drive slowly with forward/back and left/right. Use Interact again to park and get out.'); return true; }
       if (distance(player.pos, ball.pos) < 2.5 && Math.abs(player.pos.y - ball.pos.y) < 3 && !ball.flight) { ball.held = true; report('You have the ball! Face either hoop and use Interact to shoot.'); return true; }
       return false;
@@ -158,9 +177,67 @@
     function getPrompt() {
       if (car.driving) return 'Park / get out';
       if (ball.held) return 'Shoot basketball';
+      if (rodSelected) return cast ? 'Fishing…' : 'Cast fishing rod';
       if (distance(player.pos, car.pos) < 3 && Math.abs(player.pos.y - car.pos.y) < 4) return 'Drive car';
       if (!ball.flight && distance(player.pos, ball.pos) < 2.5 && Math.abs(player.pos.y - ball.pos.y) < 3) return 'Pick up basketball';
       return '';
+    }
+    function equipRod() {
+      if (!active() || car.driving || ball.held) return false;
+      if (api.isUnlocked && !api.isUnlocked('fish')) { report('Build a pond to unlock fish and the fishing rod.'); return false; }
+      rodSelected = true; report('Fishing rod ready! Face a grown fish in your pond, then use Interact.'); return true;
+    }
+    function unequipRod() { rodSelected = false; cast = null; rod.visible = fishingLine.visible = bobber.visible = false; }
+    function clearLineTo(entity) {
+      const steps = Math.max(1, Math.ceil(player.pos.distanceTo(entity.pos) * 4));
+      for (let i = 1; i < steps; i++) {
+        const t = i / steps, x = player.pos.x + (entity.pos.x - player.pos.x) * t, y = player.pos.y + (entity.pos.y - player.pos.y) * t, z = player.pos.z + (entity.pos.z - player.pos.z) * t;
+        if (isSolid(Math.floor(x), Math.floor(y), Math.floor(z))) return false;
+      }
+      return true;
+    }
+    function castRod() {
+      if (cast) { report('Keep the line in the pond…'); return true; }
+      const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+      const nearby = entities.filter(e => e.world === currentWorld && e.kind === 'fish' && fishFits(e.pos.x, e.pos.y, e.pos.z) && distance(player.pos, e.pos) <= 5.5 && Math.abs(player.pos.y - e.pos.y) <= 4 && clearLineTo(e) && ((e.pos.x - player.pos.x) * fx + (e.pos.z - player.pos.z) * fz) / Math.max(.01, distance(player.pos, e.pos)) > .65).sort((a, b) => distance(player.pos, a.pos) - distance(player.pos, b.pos));
+      const target = nearby.find(e => e.age >= FISH_GROWTH_SECONDS);
+      if (!target) { report(nearby.length ? 'Your fish are still growing. Give them two minutes of active play in water.' : 'Face a nearby fish in your pond, with a clear view of the water.'); return true; }
+      cast = { target, elapsed: 0 }; report('Line in! Keep close to your pond for a bite.'); return true;
+    }
+    function updateFishing(dt) {
+      rod.visible = rodSelected;
+      if (!rodSelected) return;
+      rod.position.set(player.pos.x, player.pos.y - .6, player.pos.z); rod.rotation.y = player.yaw;
+      if (cast && (!fishFits(cast.target.pos.x, cast.target.pos.y, cast.target.pos.z) || distance(player.pos, cast.target.pos) > 6 || !clearLineTo(cast.target))) { cast = null; report('Line retrieved. Stay near the water and keep a clear view.'); }
+      if (cast) {
+        cast.elapsed += dt;
+        if (cast.elapsed >= 2) {
+          const fish = cast.target; group.remove(fish.mesh); entities.splice(entities.indexOf(fish), 1); catches[currentWorld] = Math.min(999999, catches[currentWorld] + 1); cast = null;
+          report('Caught a grown fish! Total caught in this world: ' + catches[currentWorld] + '. Add more fish from Inventory.'); changed();
+        }
+      }
+      fishingLine.visible = bobber.visible = !!cast;
+      if (cast) {
+        rod.updateWorldMatrix(true, false);
+        const tip = rod.localToWorld(fishingTip.set(.3, 0, -1.6)), p = cast.target.pos, coords = lineGeometry.attributes.position.array;
+        coords[0] = tip.x; coords[1] = tip.y; coords[2] = tip.z; coords[3] = p.x; coords[4] = Math.floor(p.y) + 1.04; coords[5] = p.z;
+        lineGeometry.attributes.position.needsUpdate = true; lineGeometry.computeBoundingSphere();
+        bobber.position.set(p.x, Math.floor(p.y) + 1.04, p.z);
+      }
+    }
+    function celebrateBasket(x, y, z) {
+      confetti.position.set(x, y, z); confetti.visible = true; confettiLife = 2.4;
+      for (let i = 0; i < confettiPieces.length; i++) {
+        const p = confettiPieces[i], angle = i * Math.PI * 2 / confettiPieces.length;
+        p.mesh.position.set(0, 0, 0); p.mesh.rotation.set(0, angle, 0); p.velocity.set(Math.sin(angle) * (1.1 + i % 3 * .3), 2 + i % 5 * .35, Math.cos(angle) * (1.1 + i % 3 * .3));
+        if (api.reducedMotion?.()) p.mesh.position.set(Math.sin(angle) * .7, .3 + (i % 4) * .15, Math.cos(angle) * .7);
+      }
+    }
+    function updateConfetti(dt) {
+      if (confettiLife <= 0) return;
+      confettiLife -= dt; confetti.visible = confettiLife > 0;
+      if (api.reducedMotion?.()) return;
+      for (const p of confettiPieces) { p.velocity.y -= dt * 2.8; p.mesh.position.addScaledVector(p.velocity, dt); p.mesh.rotation.x += dt * 2; p.mesh.rotation.z += dt * 3; }
     }
     function updateCar(dt, controls) {
       if (!car.driving) return;
@@ -185,7 +262,7 @@
         const rimY = court.y + 3.15;
         if (!ball.scored && oldY > rimY && ball.pos.y <= rimY && ball.velocity.y < 0) {
           const t = (oldY - rimY) / (oldY - ball.pos.y), x = oldX + (ball.pos.x - oldX) * t, z = oldZ + (ball.pos.z - oldZ) * t;
-          if (court.ends.some(end => Math.hypot(x - court.x, z - end) < .43)) { ball.scored = true; score[currentWorld]++; report('Basket! Your score: ' + score[currentWorld] + '.'); if (api.onScore) api.onScore(score[currentWorld]); changed(); }
+          if (court.ends.some(end => Math.hypot(x - court.x, z - end) < .43)) { ball.scored = true; score[currentWorld] = Math.min(999999, score[currentWorld] + 1); celebrateBasket(x, rimY, z); report('Basket! Your score: ' + score[currentWorld] + '.'); if (api.onScore) api.onScore(score[currentWorld]); changed(); }
         }
         if (!inBounds(ball.pos.x, ball.pos.z) || distance(ball.pos, { x: court.x, z: court.z }) > 32 || ball.pos.y < -30) { resetBall(); return; }
         const floor = groundSurface(ball.pos.x, ball.pos.z) + .29;
@@ -201,6 +278,10 @@
         // Removing a tank's water hides its fish until that water is restored.
         entity.mesh.visible = !fish || fishFits(entity.pos.x, entity.pos.y, entity.pos.z);
         if (!entity.mesh.visible) continue;
+        if (fish && entity.age < FISH_GROWTH_SECONDS) {
+          const oldAge = entity.age; entity.age = Math.min(FISH_GROWTH_SECONDS, entity.age + dt); entity.mesh.scale.setScalar(.55 + .45 * entity.age / FISH_GROWTH_SECONDS);
+          if (Math.floor(oldAge / 10) !== Math.floor(entity.age / 10)) changed();
+        }
         entity.timer -= dt; entity.phase += dt * 5;
         if (entity.timer <= 0) { entity.heading = Math.random() * Math.PI * 2; entity.timer = 1 + Math.random() * 4; }
         const speed = fish ? .5 : entity.kind === 'horse' ? .8 : .5, x = entity.pos.x + Math.sin(entity.heading) * dt * speed, z = entity.pos.z + Math.cos(entity.heading) * dt * speed;
@@ -211,10 +292,10 @@
         entity.mesh.position.copy(entity.pos); entity.mesh.rotation.y = entity.heading;
       }
     }
-    function update(dt, controls = {}) { setWorld(); if (!active() || !finite(dt) || dt <= 0) return; dt = Math.min(dt, .05); updateCar(dt, controls); updateBall(dt); updateAnimals(dt); }
+    function update(dt, controls = {}) { setWorld(); if (!active() || !finite(dt) || dt <= 0) return; dt = Math.min(dt, .05); updateCar(dt, controls); updateConfetti(dt); updateBall(dt); updateAnimals(dt); updateFishing(dt); }
     function serialize() {
       carPositions[currentWorld] = { x: car.pos.x, y: car.pos.y, z: car.pos.z, yaw: car.yaw };
-      return { version: 1, score: { ...score }, cars: JSON.parse(JSON.stringify(carPositions)), animals: entities.filter(e => e.placed).map(e => ({ kind: e.kind, world: e.world, x: e.pos.x, y: e.pos.y, z: e.pos.z })) };
+      return { version: 1, score: { ...score }, catches: { ...catches }, cars: JSON.parse(JSON.stringify(carPositions)), animals: entities.filter(e => e.placed).map(e => ({ kind: e.kind, world: e.world, x: e.pos.x, y: e.pos.y, z: e.pos.z, ...(e.kind === 'fish' ? { age: e.age } : {}) })) };
     }
     function restore(data) {
       // Missing optional activities data is a valid legacy save, and must clear
@@ -223,17 +304,17 @@
       if (!validateSerialized(data)) return false;
       for (let i = entities.length - 1; i >= 0; i--) if (entities[i].placed) { group.remove(entities[i].mesh); entities.splice(i, 1); }
       carPositions = {};
-      for (const world of worlds) { score[world] = data.score[world]; const p = data.cars[world]; if (p && inBounds(p.x, p.z)) carPositions[world] = { x: p.x, y: p.y, z: p.z, yaw: p.yaw }; }
+      for (const world of worlds) { score[world] = data.score[world]; catches[world] = data.catches?.[world] || 0; const p = data.cars[world]; if (p && inBounds(p.x, p.z)) carPositions[world] = { x: p.x, y: p.y, z: p.z, yaw: p.yaw }; }
       for (const p of data.animals) if (inBounds(p.x, p.z)) addAnimal(p.kind, p, p.world, true);
       const saved = carPositions[currentWorld], initial = currentWorld === 'campus' ? { x: 30, z: 60, yaw: 0 } : { x: 5, z: 24, yaw: 0 };
       const position = saved && landFits(saved.x, groundSurface(saved.x, saved.z), saved.z, 1.35, 1.7) ? saved : initial;
       car.pos.set(position.x, groundSurface(position.x, position.z), position.z); car.yaw = position.yaw; carGroup.position.copy(car.pos); carGroup.rotation.y = car.yaw;
       car.driving = false; car.speed = 0;
-      resetBall(); return true;
+      unequipRod(); confettiLife = 0; confetti.visible = false; resetBall(); return true;
     }
-    function dispose() { scene.remove(group); const geometries = new Set(); group.traverse(node => { if (node.geometry) geometries.add(node.geometry); }); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); }
+    function dispose() { scene.remove(group); const geometries = new Set(); group.traverse(node => { if (node.geometry) geometries.add(node.geometry); }); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); lineMaterial.dispose(); }
     setWorld();
-    return { update, interact, getPrompt, isDriving: () => car.driving, spawnAnimal, serialize, restore, setWorld, dispose };
+    return { update, interact, getPrompt, isDriving: () => car.driving, equipRod, unequipRod, isFishing: () => rodSelected, spawnAnimal, serialize, restore, setWorld, dispose };
   }
   root.MYNE_ACTIVITIES = Object.freeze({ create, validateSerialized });
 })(globalThis);

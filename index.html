@@ -9,63 +9,159 @@
 <link rel="icon" type="image/svg+xml" href="game/assets/mynecraft-icon.svg">
 <link rel="preload" href="game/assets/bungee/Bungee-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <style>
+
 @font-face{font-family:Bungee;src:url('game/assets/bungee/Bungee-Regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 :root{color-scheme:dark;--background:#171615;--surface:#272524;--raised:#34312f;--line:#4a4643;--text:#f8f6f2;--muted:#c4c0bc;--blue:#71b7e4;--blue-hover:#9ed1f1}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:var(--background);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}a{color:inherit}button,input{font:inherit}a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid white;outline-offset:5px}.skip-link{position:absolute;left:20px;top:-80px;z-index:5;background:var(--blue);color:#101e28;padding:12px 18px}.skip-link:focus{top:14px}.site-header{background:var(--surface);border-bottom:3px solid #0b0a0a}.header-inner,.page,footer{width:min(1240px,calc(100% - 64px));margin-inline:auto}.header-inner{min-height:92px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{text-decoration:none;font-family:Bungee,Impact,sans-serif;font-size:27px;line-height:1.1;white-space:nowrap}.brand span{display:block;color:var(--blue);font:700 10px/1.5 system-ui,sans-serif;letter-spacing:.2em;margin-top:5px}nav{display:flex;gap:34px}nav a{font-size:13px;font-weight:750;text-decoration:none;text-transform:uppercase;padding:14px 0;border-bottom:2px solid transparent}nav a:hover{color:var(--blue);border-bottom-color:var(--blue)}.product{display:grid;grid-template-columns:minmax(0,56fr) minmax(0,40fr);gap:32px;align-items:center;padding:42px 0 54px}.cover-card{margin:0;padding:16px 16px 23px;background:var(--surface);border:3px solid var(--line);border-left-color:#070707;border-bottom-color:#070707;box-shadow:2px 2px 0 #070707}.cover-card img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#202d35}.cover-card figcaption{padding:20px 4px 0}h1,h2,h3,.mode-title{font-family:Bungee,Impact,sans-serif;font-weight:400;line-height:1.2}h1{font-size:clamp(28px,3.4vw,43px);margin:0 0 12px;letter-spacing:-.035em}h1 span{display:block;color:var(--blue);font-size:.48em;letter-spacing:.035em;margin-top:9px}.cover-description{font-size:15px;color:var(--muted);max-width:47ch;margin:0}.device-note{font-size:12px;font-weight:650;color:var(--text);margin:17px 0 0}.mode-picker{min-width:0}.mode-picker fieldset{border:0;padding:0;margin:0}.mode-picker legend{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-bottom:13px}.mode-card{display:block;position:relative;background:var(--surface);border:3px solid var(--line);border-bottom-color:#0a0909;cursor:pointer;padding:21px 20px 17px;margin-bottom:15px;transition:border-color .15s,background .15s}.mode-card:has(input:checked){border-color:var(--blue);background:var(--raised)}.mode-card:hover{background:#393633}.mode-card:has(input:focus-visible){outline:3px solid #fff;outline-offset:4px}.mode-title{display:block;font-size:25px;margin:0 0 11px}.mode-copy{display:block;color:var(--muted);font-size:14px;line-height:1.65}.mode-features{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 16px}.mode-features span{font-size:11px;font-weight:650;background:#1d1b1a;padding:3px 7px}.mode-choice{display:flex;align-items:center;gap:10px;padding-top:13px;border-top:2px solid #141313;font-size:13px;font-weight:700}.mode-choice input{accent-color:var(--blue);width:21px;height:21px;margin:0;flex-shrink:0}.play-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;margin-top:20px;padding:15px;background:var(--blue);color:#102431;border:2px solid #a7d4f0;border-bottom:5px solid #376884;text-decoration:none;font-family:Bungee,Impact,sans-serif;font-size:20px;line-height:1.2;transition:background .15s,transform .15s}.play-button:hover{background:var(--blue-hover)}.play-button:active{transform:translateY(2px)}.play-note{text-align:center;color:var(--muted);font-size:12px;margin:12px 0 0}.section{padding:34px 0 40px;border-top:1px solid var(--line)}.section-heading{font-size:24px;margin:0 0 24px}.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}.feature{border-top:3px solid var(--blue);padding-top:18px}.feature h3{font-size:17px;margin:0 0 12px}.crew-avatar{display:block;width:150px;max-width:45%;height:auto;float:right;margin:0 0 10px 12px}.feature p{color:var(--muted);font-size:14px;margin:0;line-height:1.8}.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}.controls-grid h3{font-family:inherit;font-size:16px;font-weight:750;margin:0 0 12px}.controls-grid p{margin:0;color:var(--muted);font-size:14px;line-height:1.9}kbd{display:inline-block;min-width:23px;text-align:center;font:700 12px ui-monospace,monospace;background:var(--raised);border:1px solid #625c57;border-bottom-width:3px;padding:2px 5px;margin-bottom:4px}.menu-note{margin:25px 0 0;padding:17px 20px;background:var(--surface);border-left:3px solid var(--blue);font-size:13px;color:var(--muted);line-height:1.85}.save-section{display:grid;grid-template-columns:1fr 2fr;gap:32px}.save-section h2{font-size:21px;margin:0}.save-section p{font-size:14px;color:var(--muted);margin:0;line-height:1.85}footer{display:flex;justify-content:space-between;gap:24px;border-top:1px solid var(--line);padding:24px 0 30px;font-size:12px;color:#aaa49f}footer p{margin:0}footer a{text-underline-offset:4px}
 @media(max-width:1050px){.header-inner,.page,footer{width:calc(100% - 48px)}.product{gap:25px}.mode-card{padding:18px 16px 15px}.mode-title{font-size:22px}.mode-copy{font-size:13px}.mode-features{gap:5px}.cover-card{padding:12px 12px 21px}.features{gap:22px}}
 @media(max-width:720px){.header-inner,.page,footer{width:calc(100% - 36px)}.header-inner{min-height:108px;align-items:flex-start;justify-content:center;flex-direction:column;gap:10px;padding:17px 0 10px}.brand{font-size:24px}.brand span{font-size:9px;margin-top:3px}nav{gap:27px;width:100%}nav a{font-size:11px;padding:6px 0}.product{grid-template-columns:1fr;gap:30px;padding:24px 0 35px}.cover-card{padding:10px 10px 19px}.cover-card figcaption{padding-top:17px}h1{font-size:34px}.cover-description{font-size:14px}.cover-card img{aspect-ratio:16/9}.mode-card{padding:20px 18px 17px}.mode-title{font-size:24px}.mode-copy{font-size:14px}.mode-picker legend{margin-bottom:12px}.play-button{min-height:59px}.section{padding:28px 0 32px}.section-heading{font-size:22px}.features,.controls-grid,.save-section{grid-template-columns:1fr;gap:26px}.feature{padding-top:14px}.feature h3{font-size:18px}.save-section{gap:15px}footer{flex-direction:column;gap:10px;padding-top:22px}.menu-note{padding:15px 17px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+
+body{margin:0;background:#0B1A2E}
+a{color:#FFD27A}a:hover{color:#FFE3A6}
+.mc{--navy:#0B1A2E;--navy2:#132A47;--forest:#1F5A3E;--forest2:#2E7A54;--sun:#F2B544;--sun2:#FFD27A;--ink:#F4F1E8;--muted:#B8C2D2;--line:rgba(244,241,232,.14);
+  color:var(--ink);background:var(--navy);font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+.mc *{box-sizing:border-box}
+.mc :focus-visible{outline:3px solid var(--sun2);outline-offset:4px;border-radius:6px}
+.mc .wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+.mc .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;isolation:isolate}
+.mc .hero-bg{position:absolute;inset:0;z-index:-2;overflow:hidden}
+.mc .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:62% 45%;display:block;transform:scale(1.04);animation:mc-drift 28s ease-in-out infinite alternate}
+.mc .hero-shade{position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(180deg,rgba(11,26,46,.55) 0%,rgba(11,26,46,.15) 35%,rgba(11,26,46,.55) 70%,#0B1A2E 100%),
+  linear-gradient(90deg,rgba(11,26,46,.78) 0%,rgba(11,26,46,.35) 55%,rgba(11,26,46,0) 100%)}
+.mc .hero-sun{position:absolute;left:-10%;top:-20%;width:60vw;max-width:820px;aspect-ratio:1;border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,210,122,.45) 0%,rgba(242,181,68,.18) 35%,rgba(242,181,68,0) 70%);animation:mc-glow 9s ease-in-out infinite alternate}
+.mc .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0}
+.mc .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.04em;font-size:15px;text-transform:uppercase}
+.mc .brand svg{width:30px;height:30px}
+.mc .top-tag{font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.mc .hero-body{flex:1;display:flex;align-items:flex-end;padding:clamp(48px,10vh,120px) 0 clamp(40px,7vh,88px)}
+.mc .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(28px,5vw,72px);align-items:end;width:100%}
+.mc .kicker{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sun2);margin:0 0 18px}
+.mc .kicker i{display:block;width:34px;height:3px;background:var(--sun);border-radius:2px}
+.mc h1{margin:0;font-size:clamp(44px,7.2vw,104px);line-height:.95;font-weight:900;letter-spacing:-.02em;text-transform:uppercase;text-shadow:0 6px 30px rgba(0,0,0,.45)}
+.mc h1 span{display:block;color:var(--sun2);font-size:.42em;letter-spacing:.06em;margin-top:10px;font-weight:800}
+.mc .lede{margin:22px 0 0;max-width:560px;font-size:clamp(17px,1.5vw,21px);line-height:1.5;color:#E6E1D6;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.mc .panel{background:rgba(11,26,46,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;padding:clamp(20px,2.4vw,30px);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.mc .panel h2{margin:0 0 4px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--sun2);font-weight:800}
+.mc .panel p.sub{margin:0 0 16px;color:var(--muted);font-size:14px}
+.mc .modes{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;border:0}
+.mc .mode{position:relative;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(19,42,71,.55);cursor:pointer;transition:border-color .15s,background .15s;min-height:64px}
+.mc .mode:hover{border-color:rgba(255,210,122,.5)}
+.mc .mode input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.mc .mode .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center}
+.mc .mode .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--sun);transform:scale(0);transition:transform .15s}
+.mc .mode input:checked ~ .dot{border-color:var(--sun)}
+.mc .mode input:checked ~ .dot::after{transform:scale(1)}
+.mc .mode:has(input:checked){border-color:var(--sun);background:rgba(242,181,68,.12)}
+.mc .mode:has(input:focus-visible){outline:3px solid var(--sun2);outline-offset:3px}
+.mc .mode b{display:block;font-size:17px;font-weight:800}
+.mc .mode small{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+.mc .mode .tag{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.mc .mode .tag.hard{color:#FFB3A6;border-color:rgba(255,179,166,.4)}
+.mc .mode .tag.calm{color:#9FE0BB;border-color:rgba(159,224,187,.4)}
+.mc .play{margin-top:18px;width:100%;min-height:68px;display:inline-flex;align-items:center;justify-content:center;gap:14px;border:0;border-radius:14px;cursor:pointer;
+  background:linear-gradient(180deg,#FFD27A,#F2B544);color:#1A1405;font-size:26px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+  box-shadow:0 10px 0 #9A6A12,0 22px 40px rgba(242,181,68,.35);transition:transform .12s,box-shadow .12s;font-family:inherit}
+.mc .play svg{width:28px;height:28px}
+.mc .play:hover{transform:translateY(-2px);box-shadow:0 12px 0 #9A6A12,0 26px 46px rgba(242,181,68,.45)}
+.mc .play:active{transform:translateY(6px);box-shadow:0 4px 0 #9A6A12,0 12px 24px rgba(242,181,68,.3)}
+.mc .save{display:flex;gap:10px;align-items:flex-start;margin:14px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.mc .save svg{flex:none;width:18px;height:18px;margin-top:1px}
+.mc .feats{background:linear-gradient(180deg,#0B1A2E 0%,#0E2238 100%);padding:clamp(48px,7vw,96px) 0;border-top:1px solid var(--line)}
+.mc .feats-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:36px}
+.mc .feats h2{margin:0;font-size:clamp(28px,3.4vw,44px);font-weight:900;letter-spacing:-.01em;text-transform:uppercase}
+.mc .feats h2 em{font-style:normal;color:var(--sun2)}
+.mc .feats-head p{margin:0;color:var(--muted);max-width:420px;font-size:16px;line-height:1.5}
+.mc .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.mc .feat{padding:24px;border-radius:14px;background:rgba(31,90,62,.22);border:1px solid rgba(46,122,84,.35);min-height:220px;display:flex;flex-direction:column;gap:14px}
+.mc .feat .ico{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:var(--forest);border:1px solid var(--forest2)}
+.mc .feat .ico svg{width:28px;height:28px}
+.mc .feat h3{margin:0;font-size:19px;font-weight:800}
+.mc .feat p{margin:0;color:var(--muted);line-height:1.5;font-size:15px}
+.mc .foot{padding:28px 0 40px;border-top:1px solid var(--line);background:#0E2238}
+.mc .foot .row{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.mc .foot a{font-weight:700;text-decoration:none}
+@keyframes mc-drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.1) translate(-1.5%,-1%)}}
+@keyframes mc-glow{from{opacity:.75}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.mc .hero-bg img,.mc .hero-sun{animation:none}.mc .play,.mc .mode{transition:none}.mc .play:hover{transform:none}}
+@media (max-width:1024px){.mc .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){.mc .hero-grid{grid-template-columns:minmax(0,1fr)}.mc .hero{min-height:auto}.mc .hero-body{align-items:flex-start;padding-top:40px}.mc .hero-shade{background:linear-gradient(180deg,rgba(11,26,46,.6) 0%,rgba(11,26,46,.5) 40%,#0B1A2E 85%)}.mc .hero-bg img{object-position:58% 40%}}
+@media (max-width:480px){.mc .grid4{grid-template-columns:minmax(0,1fr)}.mc .top-tag{display:none}.mc .mode{grid-template-columns:22px minmax(0,1fr)}.mc .mode .tag{grid-column:2;justify-self:start}.mc .play{font-size:22px}.mc h1{font-size:46px}}
+
+
+.mc .play{text-decoration:none}.mc .hero h1,.mc .panel h2{font-family:"Segoe UI",system-ui,sans-serif}.mc .hero nav a{font-size:12px}.mc .top>nav{gap:20px}.mc .hero .mode{grid-template-columns:22px minmax(0,1fr) auto}.mc .hero .mode input{left:16px;top:20px}.mc .skip-link{z-index:20}.mc .site-footer{width:100%}@media(max-width:600px){.mc .top{flex-wrap:wrap}.mc .top>nav{gap:15px;flex-wrap:wrap}.mc .hero .mode{grid-template-columns:22px minmax(0,1fr)}}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#play">Skip to game</a>
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="#play" aria-label="MYnecraft: EC Edition">MYnecraft<span>EC EDITION</span></a>
-    <nav aria-label="Main navigation"><a href="#play">Play</a><a href="#explore">Explore</a><a href="#how-to-play">How to Play</a><a href="game/rooms.html">Teacher rooms</a></nav>
-  </div>
-</header>
-<main class="page">
-  <section class="product" id="play" aria-labelledby="game-title">
-    <figure class="cover-card">
-      <img src="game/assets/ec-world-cover.png" width="1672" height="941" fetchpriority="high" alt="Block-built EC campus with a glass entrance, a landscaped drive, and two golden retrievers">
-      <figcaption>
-        <h1 id="game-title">MYnecraft<span>EC Edition</span></h1>
-        <p class="cover-description">Start with a block. Build something new. Explore a world with a familiar school at its heart.</p>
-        <p class="device-note">Play in your browser · Keyboard, mouse, or touch</p>
-      </figcaption>
-    </figure>
-    <div class="mode-picker">
-      <fieldset>
-        <legend>Choose your mode</legend>
-        <label class="mode-card">
-          <span class="mode-title">Creative</span>
-          <span class="mode-copy">Make room for your biggest ideas. Build freely and fly above your world.</span>
-          <span class="mode-features"><span>Unlimited blocks</span><span>Flying</span><span>Coordinate travel</span></span>
-          <span class="mode-choice"><input type="radio" name="mode" value="creative" checked><span>Build without limits</span></span>
-        </label>
-        <label class="mode-card">
-          <span class="mode-title">Embrace the Challenge</span>
-          <span class="mode-copy">Gather 10 wood blocks, place 12 blocks, and find CIRC. Explore on foot and make every block count.</span>
-          <span class="mode-features"><span>Collect &amp; build</span><span>Health &amp; air</span><span>Peaceful world</span></span>
-          <span class="mode-choice"><input type="radio" name="mode" value="survival"><span>Gather as you go</span></span>
-        </label>
-        <label class="mode-card">
-          <span class="mode-title">Embrace the Challenge: Hardcore</span>
-          <span class="mode-copy">Start in a resource world. Make tools, build a house, and earn new teachers and materials. You can jump straight in.</span>
-          <span class="mode-features"><span>Crafting goals</span><span>Unlock rewards</span><span>Separate world</span></span>
-          <span class="mode-choice"><input type="radio" name="mode" value="hardcore"><span>Build your way up</span></span>
-        </label>
-      </fieldset>
-      <a class="play-button" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">PLAY</a>
-      <p class="play-note">No account needed. Autosave stays in this browser on this device. Hardcore keeps its own world and progress.</p>
+<div class="mc">
+<a class="skip-link" href="#play-button">Skip to game</a>
+  <header class="hero" id="play">
+    <div class="hero-bg" aria-hidden="true"><img src="game/assets/ec-world-cover.png" alt=""></div>
+    <div class="hero-sun" aria-hidden="true"></div>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="wrap">
+      <nav class="top" aria-label="Site">
+        <div class="brand">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="12" height="12" fill="#2E7A54"/><rect x="18" y="2" width="12" height="12" fill="#F2B544"/><rect x="2" y="18" width="12" height="12" fill="#F2B544"/><rect x="18" y="18" width="12" height="12" fill="#2E7A54"/></svg>
+          <span>MYnecraft</span>
+        </div>
+        <nav aria-label="Main navigation"><a href="#play">Play</a><a href="#explore">Explore</a><a href="#how-to-play">How to Play</a><a href="game/rooms.html">Teacher rooms</a></nav>
+      </nav>
     </div>
-  </section>
+    <div class="hero-body">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div>
+            <p class="kicker"><i aria-hidden="true"></i>A peaceful block world, built for grades 5 and 6</p>
+            <h1>MYnecraft<span>EC Edition</span></h1>
+            <p class="lede">Your school campus, rebuilt block by block. Raise something new, sink a basket on the court, cast a line at the pond, then wander past the tree line to see what's out there.</p>
+          </div>
+          <div class="panel">
+            <h2>Choose how you play</h2>
+            <p class="sub">Pick a mode, then hit Play.</p>
+            <fieldset class="modes">
+              <legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Game mode</legend>
+              <label class="mode">
+                <input type="radio" name="mode" value="creative" checked>
+                <span class="dot" aria-hidden="true"></span>
+                <span><b>Creative</b><small>Unlimited blocks, no pressure. Build whatever you can imagine.</small></span>
+                <span class="tag calm">Relaxed</span>
+              </label>
+              <label class="mode">
+                <input type="radio" name="mode" value="survival">
+                <span class="dot" aria-hidden="true"></span>
+                <span><b>Embrace the Challenge</b><small>Collect 10 wood, place 12 blocks, and find CIRC in the campus world.</small></span>
+                <span class="tag">Challenge</span>
+              </label>
+              <label class="mode">
+                <input type="radio" name="mode" value="hardcore">
+                <span class="dot" aria-hidden="true"></span>
+                <span><b>Embrace the Challenge: Hardcore</b><small>A separate peaceful resource world. Craft tools, build, and unlock rewards.</small></span>
+                <span class="tag hard">Hardcore</span>
+              </label>
+            </fieldset>
+            <a class="play" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+              Play
+            </a>
+            <p class="save">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#B8C2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a8 4 0 0 1 16 0v12a8 4 0 0 1-16 0z"/><path d="M4 6a8 4 0 0 0 16 0M4 12a8 4 0 0 0 16 0"/></svg>
+              <span>Autosave stays in this browser on this device. Download Save to keep a backup or move your world. Hardcore keeps a separate world.</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+<main class="page">
   <section class="section" id="explore" aria-labelledby="explore-title">
     <h2 class="section-heading" id="explore-title">A world to explore</h2>
     <div class="features">
-      <article class="feature"><h3>Make it yours</h3><p>Build beside the lake or head beyond the campus to find your next project. Choose your blocks, start small, and see where your ideas take you.</p></article>
-      <article class="feature"><h3>Visit EC</h3><p>Walk through the glass entrance and find BELIEVE. Follow the drop-off circle to the playground, basketball court, and outdoor classroom.</p></article>
+      <article class="feature"><h3>Make it yours</h3><p>Build beside the lake or head beyond the campus to find your next project. Choose your blocks, start small, and see where your ideas take you. Creative Inventory also has trees, flowers, and a complete fishing pond kit.</p></article>
+      <article class="feature"><h3>Visit EC</h3><p>Walk through the glass entrance and find BELIEVE. Follow the drop-off circle to the playground, basketball court, and outdoor classroom. Every basket sends confetti above the hoop.</p></article>
       <article class="feature"><h3>Meet the crew</h3><img class="crew-avatar" src="game/assets/macek-avatar-lanyard.png" width="1086" height="1448" loading="lazy" alt="Block-style Mr. Macek with SV arm sleeve, Florida Gators lanyard and ID badge"><p>Meet Sleeves in his number 28 jersey on the front lawn. Officer Shields and Mr. Eiler stay near the entrance; Mr. B carries his laptop through the halls. Ms. Micco patrols campus, KaY follows Sir D, and Ellie and Percy run together and return to your character. Sir D and Mr. Macek meet near the entrance around sunset.</p></article>
     </div>
     <p class="menu-note"><strong>Explore the school:</strong> Find the flag in the entrance circle, landscaped parking rows, and two glass doorways into the atrium. The main cafeteria has a high ECTV screen; the elementary cafeteria is on the left. Grade 5 is on the right with Grade 6 above; Grades 3–4 are on the left with Grades 1–2 above. Follow the broad curved walkway to Kindergarten. The school is a playable, scaled interpretation of the real campus.</p>
@@ -78,6 +174,7 @@
       <div><h3>iPad &amp; touch</h3><p>Use the joystick to move. Drag the screen to look.<br>Tap the block bar to choose your material.<br>Use the on-screen buttons to jump, place, or break.<br>In Creative, FLY toggles flight, JUMP rises, and DOWN descends.<br>Open Menu whenever you want to pause.<br>Embrace the Challenge is peaceful; falls and deep water can hurt.</p></div>
     </div>
     <p class="menu-note"><strong>Choose your controls:</strong> Auto follows this device. Choose Touch for screen buttons or Keyboard and mouse for computer controls. You can change this in the menu or toolbar.</p>
+    <p class="menu-note"><strong>Your own fishing pond:</strong> In Creative, open Inventory and choose Fishing pond under Trees &amp; garden kits. Aim at clear, flat ground and PLACE. Or build a 2 by 2 tank with a solid bottom, sides, and four water blocks. Add Fish from Inventory. They grow in water over two minutes of active play. Choose Fishing rod, face a grown fish, then press <kbd>E</kbd> or tap Interact. Keep close to the pond until you catch it. Fish growth and your catch total save with each world.</p>
     <p class="menu-note"><strong>Less on screen:</strong> Press <kbd>H</kbd> to hide or show the movement help. On touch screens, use the Show movement help setting in the menu.</p>
     <p class="menu-note"><strong>Name your spaces:</strong> Walk to a space, then use Menu &gt; Name your spaces to add, edit, or remove a small area sign. Signs stay where you place them and save with your world.</p>
     <p class="menu-note"><strong>Build a water elevator:</strong> Place Glowstone at the bottom, then Water directly above it with no gaps. Build Glass walls and leave a bottom doorway and top exit. Turn flight off and walk in to rise; hold V or DOWN to descend. Find the full recipe in the game menu.</p>
@@ -90,8 +187,10 @@
     <p>You can move that file to another device and open it in MYnecraft. It <strong>cannot open in Minecraft</strong>. Solo worlds do not automatically sync across devices. The school and primary links share one save in the same browser, containing your campus and separate Hardcore world. Clearing browser data can erase both. Keep a downloaded copy before resetting.</p>
     <p><a href="game/rooms.html"><strong>Teacher rooms</strong></a> require a separately configured room service and teacher admission. They keep group building separate from your solo saves. No chat or text signs are available. The current room service needs teacher supervision; automatic detection of words built from blocks and screenshot alerts are not yet configured.</p>
   </section>
+
 </main>
 <footer><p>MYnecraft: EC Edition</p><a href="https://moodle.svsd.net/course/view.php?id=13811">Mr. Macek's teacher website</a><a href="https://percycodesios.github.io/CIRC-HQ/">CIRC HQ</a><a href="#play">Back to play</a></footer>
+</div>
 <script>
 const playButton=document.getElementById('play-button');
 for(const mode of document.querySelectorAll('input[name="mode"]')){

@@ -225,7 +225,7 @@
   W Forward · S Back · A Left · D Right (or arrow keys)<br/>
   DRAG to look &nbsp;·&nbsp; SPACE jump/up &nbsp;·&nbsp; V down &nbsp;·&nbsp; SHIFT faster &nbsp;·&nbsp; F fly<br/>
   LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block<br/>
-  E interact with a car or basketball · Press H to hide or show this help · Esc opens the menu
+  E interact, shoot, or fish · Press H to hide or show this help · Esc opens the menu
 </div>
 <div id="mouseHint">Press Esc to release the mouse. Drag to look if the cursor stays free.</div>
 <div id="sleepTransition" role="status" aria-live="polite" hidden><span class="sleep-moon" aria-hidden="true">☾</span><strong>You are now asleep</strong><p>Sunrise is one second away. A new day is coming!</p></div>
@@ -507,11 +507,12 @@ for(const [id,[name,color]] of Object.entries(FLOWERS)){
 for(const [id,[name,color]] of Object.entries(EXTRA_COLORS))BLOCKS[id]={name,swatch:color,mats:Array(6).fill(new THREE.MeshLambertMaterial({color}))};
 const INVENTORY_ADDITIONS=[...Object.keys(FLOWERS),...Object.keys(EXTRA_COLORS)];
 const BLOCK_KEYS = [...LEGACY_BLOCK_KEYS,...Object.keys(BLOCKS).filter(k=>!LEGACY_BLOCK_KEYS.includes(k))];
-const GARDEN_KITS={oak:'Oak tree',cherry:'Cherry tree',pine:'Pine tree',hedge:'Leafy hedge',flowerbed:'Flower bed'};
+const GARDEN_KITS={oak:'Oak tree',cherry:'Cherry tree',pine:'Pine tree',hedge:'Leafy hedge',flowerbed:'Flower bed',pond:'Fishing pond'};
 function gardenPlan(kind,x,y,z){
   if(!Object.prototype.hasOwnProperty.call(GARDEN_KITS,kind))return [];
   const cells=new Map(),put=(dx,dy,dz,block)=>cells.set(`${x+dx},${y+dy},${z+dz}`,{x:x+dx,y:y+dy,z:z+dz,block});
-  if(kind==='flowerbed')for(let dx=-2;dx<=2;dx++)put(dx,0,0,Object.keys(FLOWERS)[(dx+2)%4]);
+  if(kind==='pond')for(let dx=-1;dx<=2;dx++)for(let dz=-1;dz<=2;dz++){put(dx,0,dz,'stone');put(dx,1,dz,dx===-1||dx===2||dz===-1||dz===2?'stone':'water');}
+  else if(kind==='flowerbed')for(let dx=-2;dx<=2;dx++)put(dx,0,0,Object.keys(FLOWERS)[(dx+2)%4]);
   else if(kind==='hedge')for(let dx=-2;dx<=2;dx++)for(let dy=0;dy<2;dy++)put(dx,dy,0,'leaves');
   else{
     const wood=kind==='cherry'?'cherrywood':kind==='pine'?'pinewood':'wood',leaves=kind==='cherry'?'cherryleaves':'leaves';
@@ -3455,7 +3456,7 @@ function recoverSchoolSavePosition(pos,flying=false){
 addEventListener('keydown', e => {
   if(!started||isFormInput(e))return;
   const m = e.code.match(/^Digit([1-9])$/);
-  if(m||['Digit0','BracketRight','BracketLeft'].includes(e.code)){chosenAnimal=null;chosenGarden=null;}
+  if(m||['Digit0','BracketRight','BracketLeft'].includes(e.code)){chosenAnimal=null;chosenGarden=null;activities?.unequipRod();}
   if (m) selected = Math.min(BLOCK_KEYS.length-1, parseInt(m[1],10)-1);
   if(e.code==='Digit0')selected=9;
   if(e.code==='BracketRight')selected=(selected+1)%BLOCK_KEYS.length;
@@ -3464,7 +3465,7 @@ addEventListener('keydown', e => {
 });
 addEventListener('wheel', e => {
   if (!started||isFormInput(e)) return;
-  chosenAnimal=null;chosenGarden=null;
+  chosenAnimal=null;chosenGarden=null;activities?.unequipRod();
   selected = (selected + (e.deltaY > 0 ? 1 : -1) + BLOCK_KEYS.length) % BLOCK_KEYS.length;
   refreshHotbar();
 }, { passive: true });
@@ -3726,6 +3727,7 @@ function doBreak() {
 }
 function doPlace() {
   if (!started||isWorldSleeping()||activities?.isDriving()) return;
+  if(activities?.isFishing()){interactWithActivity();return;}
   const hit = castVoxel();
   if (!hit) return;
   if(isGroupRoom){if(!INVENTORY_ADDITIONS.includes(BLOCK_KEYS[selected]))roomConnection?.edit({x:hit.x+hit.normal.x,y:hit.y+hit.normal.y,z:hit.z+hit.normal.z,block:BLOCK_KEYS[selected]});return;}
@@ -3739,7 +3741,8 @@ function doPlace() {
     if(blocked||!cells.length){document.getElementById('status').textContent='Choose clear, level ground with room for the whole '+GARDEN_KITS[chosenGarden].toLowerCase()+'. Existing builds stay safe.';return;}
     for(const c of cells){setBlock(c.x,c.y,c.z,c.block);recordEdit(c.x,c.y,c.z,c.block);}
     for(const c of cells)updateBlockMeshes(c.x,c.y,c.z);
-    sndPlace();document.getElementById('status').textContent='Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
+    if(chosenGarden==='pond'&&globalThis.MYNE_HARDCORE?.inspectHabitat(getBlock,saveState.edits).valid){fishUnlocked=true;persistSave();}
+    sndPlace();document.getElementById('status').textContent=chosenGarden==='pond'?'Pond built! Choose Fish in Inventory. They grow in water; use a fishing rod when they are grown.':'Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
   }
   if(chosenAnimal){
     const water=chosenAnimal==='fish';
@@ -3959,6 +3962,7 @@ if(globalThis.MYNE_ACTIVITIES&&!isGroupRoom){
     inBounds:(x,z)=>x>=-SIZE&&x<=EAST_EDGE&&z>=-SIZE&&z<=SIZE,
     isActive:()=>started&&!inventoryOpen&&!isWorldSleeping(),isHardcore:()=>isHardcoreWorld,
     isUnlocked:kind=>gameMode==='hardcore'?!!hardcore?.unlocks?.animals?.includes(kind):kind!=='fish'||fishUnlocked,
+    reducedMotion:()=>globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches===true,
     reportStatus:text=>{document.getElementById('status').textContent=text;},onChange:()=>persistSave()});
   activities.restore(saveState.activities);
 }
@@ -4139,7 +4143,7 @@ BLOCK_KEYS.forEach((k, i) => {
   count.style.cssText='position:relative;z-index:1;text-shadow:1px 1px #000,-1px -1px #000;font-size:11px;line-height:1';
   slot.appendChild(count);
   slot.dataset.k = k;
-  slot.addEventListener('click',()=>{chosenAnimal=null;chosenGarden=null;selected=i;refreshHotbar();});
+  slot.addEventListener('click',()=>{chosenAnimal=null;chosenGarden=null;activities?.unequipRod();selected=i;refreshHotbar();});
   hotbar.appendChild(slot);
 });
 document.body.appendChild(hotbar);
@@ -4180,7 +4184,7 @@ const inventoryChoices=BLOCK_KEYS.map((k,i)=>{
   button.append(thumbnail,name,count);
   button.addEventListener('click',event=>{
     if(!inventoryOpen||button.disabled)return;
-    chosenAnimal=null;chosenGarden=null;selected=i;refreshHotbar();persistSave();closeInventory(true,event);
+    chosenAnimal=null;chosenGarden=null;activities?.unequipRod();selected=i;refreshHotbar();persistSave();closeInventory(true,event);
   });
   inventoryGrid.appendChild(button);return {button,count};
 });
@@ -4204,21 +4208,24 @@ const craftingChoices=Object.entries(globalThis.MYNE_HARDCORE?.RECIPES||{}).map(
 craftingPanel.append(craftingTitle,craftingHelp,craftingGrid,craftingStatus);
 const animalPanel=document.createElement('section');animalPanel.className='animal-panel';
 const animalTitle=document.createElement('h3');animalTitle.textContent='Animals';
-const animalHelp=document.createElement('p');animalHelp.textContent='Choose an animal, then aim and use PLACE. To unlock fish, build a 2 by 2 pond or tank with a solid bottom and sides. Place all four water blocks. Fish stay in water.';
+const animalHelp=document.createElement('p');animalHelp.textContent='Build a 2 by 2 pond or tank with a solid bottom and sides, or use the Creative Fishing pond kit. Place Fish in water. They grow for two minutes of active play. Choose Fishing rod, face a grown fish, and use E or Interact to catch it.';
 const animalGrid=document.createElement('div');animalGrid.className='crafting-grid';
 const animalChoices=['dog','cat','horse','sheep','cow','fish'].map(kind=>{
   const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.animal=kind;
-  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;chosenGarden=null;closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
+  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;chosenGarden=null;activities?.unequipRod();closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
   animalGrid.appendChild(button);return {kind,button};
 });
+const fishingRodChoice=document.createElement('button');fishingRodChoice.type='button';fishingRodChoice.className='craft-choice';fishingRodChoice.dataset.tool='fishing-rod';
+fishingRodChoice.addEventListener('click',event=>{if(!inventoryOpen||fishingRodChoice.disabled)return;chosenAnimal=null;chosenGarden=null;activities?.unequipRod();closeInventory(true,event);activities?.equipRod();});
+animalGrid.appendChild(fishingRodChoice);
 animalPanel.append(animalTitle,animalHelp,animalGrid);
 const gardenPanel=document.createElement('section');gardenPanel.className='animal-panel';
 const gardenTitle=document.createElement('h3');gardenTitle.textContent='Trees & garden kits';
-const gardenHelp=document.createElement('p');gardenHelp.textContent='Creative: plant a whole tree, hedge or flower bed with one PLACE on clear, level ground. Existing builds are never replaced.';
+const gardenHelp=document.createElement('p');gardenHelp.textContent='Creative: place a whole tree, hedge, flower bed or fishing pond with one PLACE on clear, level ground. Existing builds are never replaced.';
 const gardenGrid=document.createElement('div');gardenGrid.className='crafting-grid';
 const gardenChoices=Object.entries(GARDEN_KITS).map(([kind,name])=>{
   const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.garden=kind;button.textContent=name;
-  button.addEventListener('click',event=>{if(!inventoryOpen||gameMode!=='creative'||isGroupRoom)return;chosenGarden=kind;chosenAnimal=null;closeInventory(true,event);document.getElementById('status').textContent='Selected '+name+'. Aim at clear ground and use PLACE.';});
+  button.addEventListener('click',event=>{if(!inventoryOpen||gameMode!=='creative'||isGroupRoom)return;chosenGarden=kind;chosenAnimal=null;activities?.unequipRod();closeInventory(true,event);document.getElementById('status').textContent='Selected '+name+'. Aim at clear ground and use PLACE.';});
   gardenGrid.appendChild(button);return button;
 });
 gardenPanel.append(gardenTitle,gardenHelp,gardenGrid);
@@ -4240,6 +4247,8 @@ function refreshInventory(){
     const unlocked=gameMode==='hardcore'?hardcore.unlocks.animals.includes(kind):kind!=='fish'||fishUnlocked;
     button.disabled=!unlocked;button.textContent=kind[0].toUpperCase()+kind.slice(1)+(unlocked?'':' · Locked');
   }
+  const rodUnlocked=!!activities&&(gameMode==='hardcore'?hardcore.unlocks.animals.includes('fish'):fishUnlocked);
+  fishingRodChoice.disabled=!rodUnlocked;fishingRodChoice.textContent='Fishing rod'+(rodUnlocked?'':' · Build a pond first');
   for(let i=0;i<inventoryChoices.length;i++){
     const {button,count}=inventoryChoices[i],amount=inventory[BLOCK_KEYS[i]];
     const locked=gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.canUseBlock(hardcore,BLOCK_KEYS[i]);
@@ -4267,7 +4276,7 @@ addEventListener('keydown',event=>{
       event.preventDefault();if(!event.repeat)closeInventory();return;
     }
     if(event.code==='Tab'){
-      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!gardenPanel.hidden?gardenChoices:[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),inventoryBack];
+      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!gardenPanel.hidden?gardenChoices:[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!animalPanel.hidden&&!fishingRodChoice.disabled?[fishingRodChoice]:[]),inventoryBack];
       const current=choices.indexOf(document.activeElement),next=(current+(event.shiftKey?-1:1)+choices.length)%choices.length;
       event.preventDefault();choices[next].focus?.();
     }
@@ -4417,7 +4426,7 @@ function updateCoordHUD() {
   coordHUD.innerHTML =
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
-    (chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
+    (activities?.isFishing()?'Tool: Fishing rod':chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
     (gameMode!=='creative'?` (${inventory[BLOCK_KEYS[selected]]})<br>${gameMode==='hardcore'?'Hardcore · ':''}Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
     (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
     (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +

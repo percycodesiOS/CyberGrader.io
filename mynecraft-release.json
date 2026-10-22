@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "02e6bb33ef1f3e842f5a665259628f55a024e4b1",
+  "sourceCommit": "6da0a2dade78c01e21f26522ad883583d1d6e934",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -16,14 +16,14 @@
     "game/cafeteria-cleaner.js": "c734abb2a3783388e3304792b4fbe3690d2b0564780f50d760fdad1e3e47cada",
     "game/hardcore-rules.js": "04d4e773c1c767e03dc56797f9d648b1ccf4c3b4f17d085dcf179e61c300d5a0",
     "game/hardcore-world.js": "7de846e937add737f5c810a1ae84da4d0b731a13bc60b6497118f2cfac066852",
-    "game/mynecraft.html": "116427fbfc939e3e1a03b803d8cf6a78016dedbc97834fa6b806c5f0116a9a79",
-    "game/play-activities.js": "aa2aea1405bc7b9a0765b621407135a34dc9f0360c77edac911ca2940783dd54",
+    "game/mynecraft.html": "6654b9fa89799cd76b6945aaf628c5bff9f0153c95a6f639d1a0cdb3a2e1102a",
+    "game/play-activities.js": "3824fec6d313dea0fd8d2792d73e1beb935d3b2fe5eedf7aacdd1f4e33d81cd7",
     "game/room-client.js": "d221e39934796921088ceeb744c647f37644a13aa8cfd34a21b78de40482aa45",
     "game/rooms.html": "fa578703572a23618ba3a3010f36e97242fb05e2bfddc4440f8d8392751b276f",
     "game/start-menu.css": "375bb74827113d48c7387ca74a3e7b92262bbb60fb745f8c9ad7ef1f807e226a",
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "5fe65f50d9cbf4b6555efdcfbab545a54fbef95d0280c32eb82f8ce250f403a4"
+    "index.html": "e648eb8758bc4a5ceb9f92919851de03577ec94f8ba9f4737c574ac608ac7f95"
   }
 }
