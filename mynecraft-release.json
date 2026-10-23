@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "6da0a2dade78c01e21f26522ad883583d1d6e934",
+  "sourceCommit": "d0c038a2a0ce0572a5917e3747a395b92e06421e",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -16,14 +16,15 @@
     "game/cafeteria-cleaner.js": "c734abb2a3783388e3304792b4fbe3690d2b0564780f50d760fdad1e3e47cada",
     "game/hardcore-rules.js": "04d4e773c1c767e03dc56797f9d648b1ccf4c3b4f17d085dcf179e61c300d5a0",
     "game/hardcore-world.js": "7de846e937add737f5c810a1ae84da4d0b731a13bc60b6497118f2cfac066852",
-    "game/mynecraft.html": "6654b9fa89799cd76b6945aaf628c5bff9f0153c95a6f639d1a0cdb3a2e1102a",
-    "game/play-activities.js": "3824fec6d313dea0fd8d2792d73e1beb935d3b2fe5eedf7aacdd1f4e33d81cd7",
+    "game/library-books.js": "1f29874af09d96c72f613352a9bfe007006550b4f77f0cc692989ddc3c794b0b",
+    "game/mynecraft.html": "9abb4fc694fb7529707196ac026239ab121be4cb52c2b19d611493d023cc6a96",
+    "game/play-activities.js": "50170804917215f36b5f75ed0f75f275ba9f68541a0c5a3272e5073cb0d21a21",
     "game/room-client.js": "d221e39934796921088ceeb744c647f37644a13aa8cfd34a21b78de40482aa45",
     "game/rooms.html": "fa578703572a23618ba3a3010f36e97242fb05e2bfddc4440f8d8392751b276f",
-    "game/start-menu.css": "375bb74827113d48c7387ca74a3e7b92262bbb60fb745f8c9ad7ef1f807e226a",
+    "game/start-menu.css": "84be8849cd2f815e786ce6d8745fbcb3592504d11462d2447d5929fb051d73d5",
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "e648eb8758bc4a5ceb9f92919851de03577ec94f8ba9f4737c574ac608ac7f95"
+    "index.html": "20c26625d715d18f8a25043230bc44b4e31d2c0147b84a9663218beb29ba7fa2"
   }
 }

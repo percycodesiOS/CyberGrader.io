@@ -117,6 +117,17 @@
     text-align: center;
   }
   .touchBtn:active { background: #fff; color: #1c2a44; }
+  /* Hide buttons: a small toggle above the stick keeps the whole view clear. */
+  #btnHideControls {
+    position: absolute; left: max(16px, env(safe-area-inset-left));
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 146px);
+    min-width: 0; min-height: 44px; padding: 0 12px; font-size: 12px; letter-spacing: 0;
+  }
+  body.touch-buttons-hidden #btnHideControls { bottom: max(16px, env(safe-area-inset-bottom)); background: #f8d778; color: #142b42; }
+  body.touch-buttons-hidden #touchStick, body.touch-buttons-hidden #touchActions,
+  body.touch-buttons-hidden #hotbar, body.touch-buttons-hidden #coordinates,
+  body.touch-buttons-hidden #status, body.touch-buttons-hidden #challengeProgress { display: none !important; }
+  @media (max-height: 520px) { body.touch-device:not(.touch-buttons-hidden) #btnHideControls { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 116px); } }
   #btnPlace { background: #102a1c; color: #8fffa8; }
   #btnPlace:active { background: #8fffa8; color: #102a1c; }
   #btnBreak { background: #2a1118; color: #ff9ec2; }
@@ -200,12 +211,13 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=inventory-20261017">
+<link rel="stylesheet" href="start-menu.css?v=kids-20261022">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
 <div id="touchUI">
   <div id="touchLook"></div>
+  <button class="touchBtn" id="btnHideControls" type="button" aria-pressed="false">🙈 Hide buttons</button>
   <div id="touchStick"><div id="touchStickNub"></div></div>
   <div id="touchActions">
     <div class="row"><button class="touchBtn" id="btnInteract" type="button" hidden>INTERACT</button></div>
@@ -231,16 +243,39 @@
 <div id="sleepTransition" role="status" aria-live="polite" hidden><span class="sleep-moon" aria-hidden="true">☾</span><strong>You are now asleep</strong><p>Sunrise is one second away. A new day is coming!</p></div>
 <div id="start">
   <div class="start-shell">
-    <header class="start-header">
+    <header class="start-header start-hero">
       <a class="start-home" href="../index.html">← Back to MYnecraft</a>
-      <h1 class="start-brand">MYNECRAFT</h1>
-      <p class="edition">EC EDITION</p>
-      <p>Your ideas. Your school. Your world.</p>
+      <div class="hero-row">
+        <div class="hero-brand">
+          <h1 class="start-brand">MYNECRAFT</h1>
+          <p class="edition">EC EDITION</p>
+          <p>Your ideas. Your school. Your world.</p>
+        </div>
+        <div class="hero-play">
+          <label class="hero-mode">Game mode <select id="mode"><option value="creative">Creative · build anything</option><option value="survival">Embrace the Challenge</option><option value="hardcore">Embrace the Challenge: Hardcore</option></select></label>
+          <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
+          <p class="start-tip" id="startTip"><strong>Creative</strong> gives you unlimited blocks and flight. Your saved build stays here when you press Play.</p>
+          <p id="modeHelp">Creative and regular Challenge share your campus. Hardcore has its own resource world and saved progress. Start either challenge any time.</p>
+        </div>
+      </div>
     </header>
+    <!-- One tap takes a student straight to each thing the class asked for. -->
+    <section class="try-panel" id="tryPanel" aria-labelledby="tryTitle">
+      <h2 id="tryTitle">Things to try</h2>
+      <div class="try-grid">
+        <button type="button" class="try-choice" data-try="car"><span aria-hidden="true">🚗</span><strong>Drive the car</strong><small>Start right beside it</small></button>
+        <button type="button" class="try-choice" data-try="hoops"><span aria-hidden="true">🏀</span><strong>Shoot hoops</strong><small>Start on the court</small></button>
+        <button type="button" class="try-choice" data-try="tea"><span aria-hidden="true">☕</span><strong>Tea on the roof</strong><small>A cozy cup with a view</small></button>
+        <button type="button" class="try-choice" data-try="story"><span aria-hidden="true">📖</span><strong>Story time</strong><small>Hear a book read aloud</small></button>
+        <button type="button" class="try-choice" data-try="library"><span aria-hidden="true">📚</span><strong>Build a library</strong><small>Place one with a tap</small></button>
+        <button type="button" class="try-choice" data-try="dogs"><span aria-hidden="true">🐕</span><strong>Walk with the dogs</strong><small>Percy and Ellie follow you</small></button>
+      </div>
+      <p id="tryStatus" role="status"></p>
+    </section>
     <section class="first-minute" aria-labelledby="firstMinuteTitle">
       <div class="first-minute-heading"><div><span class="guide-eyebrow">START HERE</span><h2 id="firstMinuteTitle">Your first minute in MYnecraft</h2></div><span class="guide-mode">For class: choose Creative</span></div>
       <ol class="play-steps">
-        <li><span class="step-number">1</span><div><h3>Pick your character</h3><p>Choose a teacher below. Keep <strong>Creative</strong>, then press <strong>PLAY AS…</strong>.</p></div></li>
+        <li><span class="step-number">1</span><div><h3>Press Play</h3><p>Keep <strong>Creative</strong> and press <strong>PLAY</strong> at the top. Want a different character? Pick a teacher below first.</p></div></li>
         <li><span class="step-number">2</span><div><h3>Move and look</h3><p class="desktop-help"><kbd>W</kbd> forward · <kbd>S</kbd> back<br><kbd>A</kbd> left · <kbd>D</kbd> right. Arrow keys work too. Move your mouse to look; click and drag if it stays free. <kbd>Space</kbd> jumps.</p><p class="touch-help">Use the round stick to move. Drag the screen to look. Tap <strong>JUMP</strong> to jump.</p></div></li>
         <li><span class="step-number">3</span><div><h3>Place your first block</h3><p>Open <strong>Blocks / Inventory</strong> and choose a material. <span class="desktop-help">The <kbd>I</kbd> key opens it too.</span> Aim the + at a nearby block.</p><p class="desktop-help"><strong>Right click</strong> to add a block. <strong>Left click</strong> to remove one.</p><p class="touch-help">Tap <strong>PLACE</strong> to add a block. Tap <strong>BREAK</strong> to remove one.</p></div></li>
         <li><span class="step-number">4</span><div><h3>Keep your work</h3><p id="keepWorkGuide">Click <strong>Save</strong>. Before leaving: <strong>Menu → Save, download or load a world → Download Save</strong>. Check Downloads for your <strong>.json</strong> file.</p></div></li>
@@ -256,15 +291,12 @@
         <p id="identityStatus" role="status">You play as Mr. Macek.</p>
       </section>
       <section class="start-settings" aria-labelledby="settingsTitle">
-        <h2 id="settingsTitle">Ready? Let’s build.</h2>
-        <label>Game mode <select id="mode"><option value="creative">Creative</option><option value="survival">Embrace the Challenge</option><option value="hardcore">Embrace the Challenge: Hardcore</option></select></label>
-        <p id="modeHelp">Creative and regular Challenge share your campus. Hardcore has its own resource world and saved progress. Start either challenge any time.</p>
+        <h2 id="settingsTitle">Settings</h2>
         <p><strong>Hardcore unlocks more:</strong> Gather, craft tools, build a house, and earn materials, animals and teacher characters. It is peaceful: no enemies or permanent loss of your world.</p>
-        <button class="btn" id="enter" type="button">▶ PLAY AS MR. MACEK</button>
-        <p class="start-tip" id="startTip"><strong>Creative</strong> gives you unlimited blocks and flight. Your saved build stays here when you press Play.</p>
         <details class="play-options"><summary>Time, camera, graphics and controls</summary>
         <label>Day and night <select id="dayNightMode"><option value="auto-sleep">Auto sleep · skip night</option><option value="always-day">Always day · keep the clock running</option><option value="full-cycle">Full day/night · 20-minute days</option></select></label>
         <p id="dayNightHelp">At 6:00 PM, sleep for one second, then wake at 6:00 AM. Opening the menu pauses sleep too.</p>
+        <label>Percy and Ellie <select id="companionMode"><option value="play">Play on their own · they stay near home</option><option value="follow">Follow me everywhere</option><option value="stay">Stay where they are</option></select></label>
         <label><input id="movementHelp" type="checkbox" checked> Show movement help · H hides or shows it</label>
         <label>Camera <select id="playerView"><option value="first">First person · see your sleeves</option><option value="third">Third person · see your character</option></select></label>
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
@@ -281,7 +313,7 @@
       <p class="start-wide"><strong>Front lawn and entrance:</strong> Find Sleeves in his number 28 jersey, larger than KaY and smaller than the adults. Officer Shields stays by his front desk, and Mr. Eiler walks the entrance area. Eddie perches on the lawn rock during the day.</p>
       <p class="start-wide"><strong>Playground:</strong> Look for js in a red tee and lime shorts. He walks around the playground and takes turns on the two swings.</p>
       <p class="start-wide"><strong>Find your learning community:</strong> Pass through both glass doorways. The main cafeteria and its high ECTV screen are straight ahead; the elementary cafeteria is to your left. Grade 5 is in the right wing with Grade 6 upstairs. Grades 3–4 are in the left wing with Grades 1–2 upstairs. Kindergarten is at the upper landing of the broad curved walkway. Outside, the flag is in the center of the entrance circle and the parking rows are to the left of the approach.</p>
-      <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D, while Ellie and Percy explore side by side and come back to you. They wait on your last walkable floor when you fly. Sir D and Mr. Macek meet near the entrance around sunset.</p>
+      <p class="start-wide"><strong>Around campus:</strong> Mr. B carries his laptop through the halls. Ms. Micco patrols the campus. KaY follows Sir D. Ellie and Percy play side by side near home. Walk up to them and use Interact to ask them to follow you, or choose Follow me in the menu; they wait on your last walkable floor when you fly. Sir D and Mr. Macek meet near the entrance around sunset.</p>
       <p class="start-wide"><strong>Meet the staff:</strong> Ms. Eriksen paints upstairs in the left wing. Mr. Wingenbach plays a keyboard upstairs above CIRC. Ms. McMichael greets you in Spanish in the upstairs right wing. Mr. Mullet walks around the outdoor court. The campus Mr. Macek wears his black SV shirt in CIRC.</p>
       <p class="start-wide"><strong>Morning and afternoon:</strong> The separate School Officer parks beyond the far curb near the circle exit at 8:30 AM, walks inside to patrol the cafeteria, and starts walking back to his car at 3:00 PM. Three school buses begin their trip to the rear loop at 3:00 PM, arriving one after another before leaving again.</p>
       <p class="start-wide"><strong>Cafeteria cleanup:</strong> From 2:00 PM to 3:00 PM each game day, the cafeteria custodian rides a gray floor scrubber around the main cafeteria. Keep the aisles clear so he can clean.</p>
@@ -332,6 +364,7 @@
 <script src="hardcore-rules.js"></script>
 <script src="hardcore-world.js"></script>
 <script src="play-activities.js"></script>
+<script src="library-books.js"></script>
 <script src="room-client.js"></script>
 <script src="cafeteria-cleaner.js"></script>
 <script type="module">
@@ -505,12 +538,43 @@ for(const [id,[name,color]] of Object.entries(FLOWERS)){
   BLOCKS[id]={name,swatch:color,mats:Array(6).fill(mat),plant:true};
 }
 for(const [id,[name,color]] of Object.entries(EXTRA_COLORS))BLOCKS[id]={name,swatch:color,mats:Array(6).fill(new THREE.MeshLambertMaterial({color}))};
-const INVENTORY_ADDITIONS=[...Object.keys(FLOWERS),...Object.keys(EXTRA_COLORS)];
+// Bookshelves make a real library: face one and use Interact to read a story.
+// Appended last, so every older save's selected-block index stays the same.
+const texBookshelf=makeTexture(ctx=>{
+  ctx.fillStyle='#6b4a2b';ctx.fillRect(0,0,16,16);
+  const spines=['#c0504d','#4f81bd','#9bbb59','#f2c14e','#8064a2','#e47c3c','#3fa7a0'];
+  for(const top of [2,9])for(let x=1,i=top;x<15;i++){
+    const w=1+(i%3===0?1:0),h=5-(i%4===1?1:0);
+    ctx.fillStyle=spines[i%spines.length];ctx.fillRect(x,top+(5-h),w,h);
+    ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(x,top+(5-h)+1,w,1);x+=w+(i%5===0?1:0);
+  }
+  ctx.fillStyle='#4a321c';ctx.fillRect(0,7,16,2);ctx.fillRect(0,14,16,2);
+});
+BLOCKS.bookshelf={name:'Bookshelf',swatch:'#8b5a2b',mats:[mkMat(texBookshelf),mkMat(texBookshelf),mkMat(texPlanks),mkMat(texPlanks),mkMat(texBookshelf),mkMat(texBookshelf)]};
+const INVENTORY_ADDITIONS=[...Object.keys(FLOWERS),...Object.keys(EXTRA_COLORS),'bookshelf'];
 const BLOCK_KEYS = [...LEGACY_BLOCK_KEYS,...Object.keys(BLOCKS).filter(k=>!LEGACY_BLOCK_KEYS.includes(k))];
-const GARDEN_KITS={oak:'Oak tree',cherry:'Cherry tree',pine:'Pine tree',hedge:'Leafy hedge',flowerbed:'Flower bed',pond:'Fishing pond'};
-function gardenPlan(kind,x,y,z){
+const GARDEN_KITS={oak:'Oak tree',cherry:'Cherry tree',pine:'Pine tree',hedge:'Leafy hedge',flowerbed:'Flower bed',pond:'Fishing pond',library:'Little library'};
+// facing: the direction from the player to the aimed block, so a library's door faces the player.
+function gardenPlan(kind,x,y,z,facing={x:0,z:-1}){
   if(!Object.prototype.hasOwnProperty.call(GARDEN_KITS,kind))return [];
   const cells=new Map(),put=(dx,dy,dz,block)=>cells.set(`${x+dx},${y+dy},${z+dz}`,{x:x+dx,y:y+dy,z:z+dz,block});
+  if(kind==='library'){
+    // A 5 by 5 reading room: bookshelf walls, a door toward the player, glass
+    // windows on the sides, a planks floor and roof with a glowing ceiling light.
+    const fx=Math.abs(facing.x)>=Math.abs(facing.z)?Math.sign(facing.x)||1:0,fz=fx?0:Math.sign(facing.z)||-1;
+    const cx=fx*2,cz=fz*2; // The room starts at the aimed block and extends away from the player.
+    for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){
+      const dx=cx+a,dz=cz+b,edge=Math.abs(a)===2||Math.abs(b)===2;
+      put(dx,0,dz,'planks');put(dx,4,dz,a===0&&b===0?'glow':'planks');
+      if(!edge)continue;
+      const door=(fx?a===-2*fx&&b===0:b===-2*fz&&a===0),side=fx?Math.abs(b)===2&&a===0:Math.abs(a)===2&&b===0;
+      for(let dy=1;dy<=3;dy++){
+        if(door&&dy<=2)continue;
+        put(dx,dy,dz,side&&dy===2?'glass':'bookshelf');
+      }
+    }
+    return [...cells.values()];
+  }
   if(kind==='pond')for(let dx=-1;dx<=2;dx++)for(let dz=-1;dz<=2;dz++){put(dx,0,dz,'stone');put(dx,1,dz,dx===-1||dx===2||dz===-1||dz===2?'stone':'water');}
   else if(kind==='flowerbed')for(let dx=-2;dx<=2;dx++)put(dx,0,0,Object.keys(FLOWERS)[(dx+2)%4]);
   else if(kind==='hedge')for(let dx=-2;dx<=2;dx++)for(let dy=0;dy<2;dy++)put(dx,dy,0,'leaves');
@@ -1000,8 +1064,19 @@ function buildMeshes(){
 const SAVE_KEY = 'mynecraft_save_v1';
 let resetting = false;
 let saveEnvelope;
-try { saveEnvelope = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { saveEnvelope = {}; }
-if (!saveEnvelope || typeof saveEnvelope !== 'object' || Array.isArray(saveEnvelope)) saveEnvelope = {};
+// A save that cannot be read is copied aside before anything can autosave over
+// it, so a teacher can still recover the student's world from that copy.
+const DAMAGED_SAVE_KEY = 'mynecraft_save_v1_damaged_copy';
+let damagedSaveKept = false;
+function keepDamagedSave(raw){
+  if(typeof raw!=='string'||!raw)return;
+  try{if(localStorage.getItem(DAMAGED_SAVE_KEY)!==raw)localStorage.setItem(DAMAGED_SAVE_KEY,raw);damagedSaveKept=true;}catch{}
+}
+{
+  let raw=null; try { raw = localStorage.getItem(SAVE_KEY); } catch {}
+  try { saveEnvelope = JSON.parse(raw) || {}; } catch { saveEnvelope = {}; keepDamagedSave(raw); }
+  if (!saveEnvelope || typeof saveEnvelope !== 'object' || Array.isArray(saveEnvelope)) { keepDamagedSave(raw); saveEnvelope = {}; }
+}
 function emptyCampusSave(){
   return {mode:'creative',health:20,dayTime:.12,edits:{},inventory:Object.fromEntries(BLOCK_KEYS.map(k=>[k,0])),campus:[],player:{x:.5,y:7.7,z:12.5,yaw:0,pitch:0,sel:0,flying:false}};
 }
@@ -1047,6 +1122,9 @@ const LOADED_DAY_TIME = Number.isFinite(saveState.dayTime) ? ((saveState.dayTime
 function normalizeDayNightMode(value){return ['auto-sleep','always-day','full-cycle'].includes(value)?value:'auto-sleep';}
 let dayNightMode=normalizeDayNightMode(saveState.dayNightMode);
 let movementHelpVisible=saveState.movementHelpVisible!==false;
+// Percy and Ellie: play near home (default), follow the player, or stay put.
+const COMPANION_MODES=['play','follow','stay'];
+let companionMode=COMPANION_MODES.includes(saveState.companionMode)?saveState.companionMode:'play';
 const dayNightSelect=document.getElementById('dayNightMode');
 const dayNightHelp=document.getElementById('dayNightHelp');
 const movementHelpCheckbox=document.getElementById('movementHelp');
@@ -1208,6 +1286,7 @@ function persistSave(){
     saveState.dayTime = dayTime;
     saveState.dayNightMode = dayNightMode;
     saveState.movementHelpVisible = movementHelpVisible;
+    saveState.companionMode = companionMode;
     saveState.macekOutfit = macekOutfit;
     saveState.playerCharacter = playerCharacter;
     saveState.view = view;
@@ -1265,9 +1344,12 @@ function readWorldBackup(text,depth=0){
   if(s.view!==undefined&&!['first','third'].includes(s.view))throw new Error('This backup has an invalid camera setting. Your world was kept.');
   if(s.graphics!==undefined&&!['smooth','detailed'].includes(s.graphics))throw new Error('This backup has an invalid graphics setting. Your world was kept.');
   if(s.controls!==undefined&&!['auto','touch','desktop'].includes(s.controls))throw new Error('This backup has an invalid controls setting. Your world was kept.');
+  // Older backups have no dog setting; they open with the new "play nearby" default.
+  if(s.companionMode!==undefined&&!COMPANION_MODES.includes(s.companionMode))throw new Error('This backup has an invalid Percy and Ellie setting. Your world was kept.');
   const areaLabels=readAreaLabels(s.areaLabels);
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
   const result={edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',playerCharacter:s.playerCharacter||'macek',view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge),dayNightMode:normalizeDayNightMode(s.dayNightMode),movementHelpVisible:s.movementHelpVisible!==false,fishUnlocked:s.fishUnlocked===true};
+  if(s.companionMode!==undefined)result.companionMode=s.companionMode;
   if(globalThis.MYNE_HARDCORE)result.hardcore=globalThis.MYNE_HARDCORE.normalize(s.hardcore);
   if(s.activities!==undefined){
     if(!object(s.activities)||!globalThis.MYNE_ACTIVITIES?.validateSerialized(s.activities))throw new Error('Invalid activities in backup. Your world was kept.');
@@ -3180,6 +3262,27 @@ const percyGoal={x:macek.pos.x,y:macek.pos.y,z:macek.pos.z};
 // walkable floor, never to a flying camera, and never teleport to catch up.
 const companionPair={phase:'return',elapsed:0,outing:0,stop:0,goal:null,home:null,formation:'side-by-side'};
 const companionStops=[[5,0],[5,5],[0,5]];
+// Kids asked for dogs that do not shadow them all the time. "Play" keeps the
+// pair near their own home; "follow" is the original behavior; "stay" holds them.
+const companionHome={x:(ellieStart.x+percyStart.x)/2+.5,y:ellieStart.y,z:(ellieStart.z+percyStart.z)/2+.5};
+const companionSelect=document.getElementById('companionMode');
+function setCompanionMode(mode,announce){
+  companionMode=COMPANION_MODES.includes(mode)?mode:'play';
+  const here=companionMode==='stay'?{x:(ellie.pos.x+percy.pos.x)/2,y:ellie.pos.y,z:(ellie.pos.z+percy.pos.z)/2}:companionMode==='play'?companionHome:null;
+  if(here){companionAnchor.x=here.x;companionAnchor.y=here.y;companionAnchor.z=here.z;}
+  companionPair.phase='return';companionPair.elapsed=0;companionPair.goal=null;
+  if(companionSelect)companionSelect.value=companionMode;
+  if(announce){
+    showBubble(percy,companionMode==='follow'?'Woof! Right behind you!':companionMode==='stay'?'Woof! We will wait here.':'Woof! Off to play!');
+    document.getElementById('status').textContent=companionMode==='follow'?'Percy and Ellie will follow you.':companionMode==='stay'?'Percy and Ellie will stay here.':'Percy and Ellie went to play near their home.';
+  }
+}
+companionSelect?.addEventListener('change',()=>{setCompanionMode(companionSelect.value,false);persistSave();});
+function dogsNearby(){
+  return !isHardcoreWorld&&!isGroupRoom&&[ellie,percy].some(d=>d.group.visible!==false&&Math.hypot(d.pos.x-player.pos.x,d.pos.z-player.pos.z)<2.6&&Math.abs(d.pos.y-(player.pos.y-player.height))<2);
+}
+function toggleDogsFollow(){setCompanionMode(companionMode==='follow'?'play':'follow',true);persistSave();return true;}
+setCompanionMode(companionMode,false);
 function resetCompanionRoute(dog,target){
   const k=key(Math.floor(target.x),target.y,Math.floor(target.z));
   if(dog.companionGoal!==k){
@@ -3209,7 +3312,7 @@ function companionGoals(center,yaw){
 function updateCompanions(dt){
   if(isHardcoreWorld||isGroupRoom||!Number.isFinite(dt)||dt<=0)return;
   const feet=player.pos.y-player.height;
-  const playerFloor=!player.flying?nearestWalkPoint({x:player.pos.x,y:feet,z:player.pos.z},worldBounds):null;
+  const playerFloor=companionMode==='follow'&&!player.flying?nearestWalkPoint({x:player.pos.x,y:feet,z:player.pos.z},worldBounds):null;
   if(playerFloor&&Math.abs(playerFloor.y-feet)<1.2){
     const moved=Math.hypot(companionAnchor.x-playerFloor.x-.5,companionAnchor.y-playerFloor.y,companionAnchor.z-playerFloor.z-.5);
     companionAnchor.x=playerFloor.x+.5;companionAnchor.y=playerFloor.y;companionAnchor.z=playerFloor.z+.5;companionAnchor.yaw=player.yaw;
@@ -3221,7 +3324,7 @@ function updateCompanions(dt){
   if(companionPair.phase==='roam'&&(companionPair.elapsed>=12||away>11||ellie.planFailures>0||percy.planFailures>0)){
     companionPair.phase='return';companionPair.elapsed=0;companionPair.goal=null;
   }
-  if(companionPair.phase==='rest'&&companionPair.elapsed>=6){
+  if(companionPair.phase==='rest'&&companionPair.elapsed>=6&&companionMode!=='stay'){
     companionPair.phase='roam';companionPair.elapsed=0;companionPair.stop=0;companionPair.outing++;
     companionPair.home={x:companionAnchor.x,y:companionAnchor.y,z:companionAnchor.z};companionPair.goal=null;
   }
@@ -3456,7 +3559,7 @@ function recoverSchoolSavePosition(pos,flying=false){
 addEventListener('keydown', e => {
   if(!started||isFormInput(e))return;
   const m = e.code.match(/^Digit([1-9])$/);
-  if(m||['Digit0','BracketRight','BracketLeft'].includes(e.code)){chosenAnimal=null;chosenGarden=null;activities?.unequipRod();}
+  if(m||['Digit0','BracketRight','BracketLeft'].includes(e.code)){chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();}
   if (m) selected = Math.min(BLOCK_KEYS.length-1, parseInt(m[1],10)-1);
   if(e.code==='Digit0')selected=9;
   if(e.code==='BracketRight')selected=(selected+1)%BLOCK_KEYS.length;
@@ -3465,7 +3568,7 @@ addEventListener('keydown', e => {
 });
 addEventListener('wheel', e => {
   if (!started||isFormInput(e)) return;
-  chosenAnimal=null;chosenGarden=null;activities?.unequipRod();
+  chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();
   selected = (selected + (e.deltaY > 0 ? 1 : -1) + BLOCK_KEYS.length) % BLOCK_KEYS.length;
   refreshHotbar();
 }, { passive: true });
@@ -3707,6 +3810,8 @@ function castVoxel() {
 // break / place actions (shared by mouse clicks AND touch buttons)
 function doBreak() {
   if (!started||isWorldSleeping()||activities?.isDriving()) return;
+  // BREAK aimed at a placed animal sends it home instead of breaking the block behind it.
+  if(activities?.putAwayAimed(player.pos,camera.getWorldDirection(_castDir))){persistSave();return;}
   const hit = castVoxel();
   if (!hit) return;
   const brokenKey = getBlock(hit.x, hit.y, hit.z);
@@ -3734,7 +3839,7 @@ function doPlace() {
   if(chosenGarden){
     if(gameMode!=='creative')return;
     if(hit.normal.y!==1||!isSolid(hit.x,hit.y,hit.z)){document.getElementById('status').textContent='Aim at the top of solid ground to plant.';return;}
-    const cells=gardenPlan(chosenGarden,hit.x,hit.y+1,hit.z),px=player.pos.x,py=player.pos.y,pz=player.pos.z;
+    const cells=gardenPlan(chosenGarden,hit.x,hit.y+1,hit.z,{x:hit.x+.5-player.pos.x,z:hit.z+.5-player.pos.z}),px=player.pos.x,py=player.pos.y,pz=player.pos.z;
     const blocked=cells.some(c=>!inPlay(c.x,c.z)||c.y>60||c.y<=WORLD_FLOOR||getBlock(c.x,c.y,c.z)||
       (c.x+1>px-player.radius&&c.x<px+player.radius&&c.z+1>pz-player.radius&&c.z<pz+player.radius&&c.y+1>py-player.height&&c.y<py+.2)||
       (c.y===hit.y+1&&!isSolid(c.x,c.y-1,c.z)));
@@ -3742,7 +3847,7 @@ function doPlace() {
     for(const c of cells){setBlock(c.x,c.y,c.z,c.block);recordEdit(c.x,c.y,c.z,c.block);}
     for(const c of cells)updateBlockMeshes(c.x,c.y,c.z);
     if(chosenGarden==='pond'&&globalThis.MYNE_HARDCORE?.inspectHabitat(getBlock,saveState.edits).valid){fishUnlocked=true;persistSave();}
-    sndPlace();document.getElementById('status').textContent=chosenGarden==='pond'?'Pond built! Choose Fish in Inventory. They grow in water; use a fishing rod when they are grown.':'Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
+    sndPlace();document.getElementById('status').textContent=chosenGarden==='pond'?'Pond built! Choose Fish in Inventory. They grow in water; use a fishing rod when they are grown.':chosenGarden==='library'?'Library built! Walk inside, face a bookshelf and use Interact to read a story.':'Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
   }
   if(chosenAnimal){
     const water=chosenAnimal==='fish';
@@ -3945,16 +4050,36 @@ const cafeteriaCleaner=!isHardcoreWorld&&!isGroupRoom&&globalThis.MYNE_CAFETERIA
 const activityButton=document.getElementById('activityInteract'),touchActivityButton=document.getElementById('btnInteract');
 const activityControls={forward:0,turn:0};
 let activityPrompt='';
+// Bookshelves and Percy/Ellie use the same Interact button as the car and ball.
+function aimedBookshelf(){
+  const hit=aimHit;
+  return !!library&&!!hit&&getBlock(hit.x,hit.y,hit.z)==='bookshelf'&&Math.hypot(hit.x+.5-player.pos.x,hit.y+.5-player.pos.y,hit.z+.5-player.pos.z)<4.5;
+}
+function hostPrompt(){
+  if(aimedBookshelf())return 'Read a book';
+  if(dogsNearby())return companionMode==='follow'?'Dogs: go play':'Dogs: follow me';
+  return '';
+}
+function hostInteract(){
+  if(aimedBookshelf()){library.open();return true;}
+  if(dogsNearby())return toggleDogsFollow();
+  return false;
+}
 function refreshActivityPrompt(){
-  const prompt=started&&!inventoryOpen&&!isWorldSleeping()&&activities?activities.getPrompt():'';
+  const prompt=started&&!inventoryOpen&&!isWorldSleeping()&&activities?(activities.getPrompt()||hostPrompt()):'';
   activityButton.hidden=!prompt;touchActivityButton.hidden=!prompt;
   if(prompt!==activityPrompt){activityPrompt=prompt;activityButton.textContent=prompt+' · E';touchActivityButton.textContent=prompt;}
 }
 function interactWithActivity(event){
   if(event){event.preventDefault();event.stopPropagation?.();}
   if(!started||inventoryOpen||isWorldSleeping()||!activities)return false;
-  const acted=activities.interact();refreshActivityPrompt();return acted;
+  const acted=activities.interact()||hostInteract();refreshActivityPrompt();return acted;
 }
+// The reading room pauses the world like Inventory does, without opening the menu.
+const library=globalThis.MYNE_LIBRARY&&!isGroupRoom?globalThis.MYNE_LIBRARY.mount(document,window,{
+  onOpen:()=>{started=false;releaseInput();inventoryBackground(true);refreshActivityPrompt();},
+  onClose:()=>{inventoryBackground(false);startGame();}
+}):null;
 for(const button of [activityButton,touchActivityButton])button.addEventListener('click',interactWithActivity);
 addEventListener('keydown',event=>{if(event.code==='KeyE'&&!event.repeat&&!isFormInput(event))interactWithActivity(event);});
 if(globalThis.MYNE_ACTIVITIES&&!isGroupRoom){
@@ -3963,9 +4088,95 @@ if(globalThis.MYNE_ACTIVITIES&&!isGroupRoom){
     isActive:()=>started&&!inventoryOpen&&!isWorldSleeping(),isHardcore:()=>isHardcoreWorld,
     isUnlocked:kind=>gameMode==='hardcore'?!!hardcore?.unlocks?.animals?.includes(kind):kind!=='fish'||fishUnlocked,
     reducedMotion:()=>globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches===true,
+    // A roof: solid underfoot with open space somewhere below it (a room or an
+    // overhang), rather than a hill. Campus roofs also sit above the lawn level.
+    isOnRoof:()=>{const feet=Math.floor(player.pos.y-player.height+.05),x=Math.floor(player.pos.x),z=Math.floor(player.pos.z);
+      if(!isSolid(x,feet-1,z)||(!isHardcoreWorld&&feet<8))return false;
+      for(let y=feet-2;y>=feet-12&&y>WORLD_FLOOR;y--)if(!isSolid(x,y,z))return true;
+      return false;},
     reportStatus:text=>{document.getElementById('status').textContent=text;},onChange:()=>persistSave()});
   activities.restore(saveState.activities);
 }
+// ---------- Things to try: one tap from the menu to each student request ----------
+const tryStatus=document.getElementById('tryStatus');
+// Stand on clear ground near a point, trying a few nearby spots first.
+function standNear(x,z,yaw,offsets=[[0,0],[1.5,0],[-1.5,0],[0,1.5],[0,-1.5],[2.5,2.5],[-2.5,-2.5]]){
+  for(const [dx,dz] of offsets){
+    const px=x+dx,pz=z+dz,pos=new THREE.Vector3(px,groundSurface(px,pz)+player.height+.05,pz);
+    if(canStandAt(pos)){player.pos.copy(pos);player.vel.set(0,0,0);player.flying=false;player.yaw=yaw;player.pitch=-.15;camera.position.copy(pos);return true;}
+  }
+  return false;
+}
+// A flat school roof with room below it and a clear view, found once from the
+// real campus blocks. The player faces the most open side, never a wall.
+let cachedRoof;
+function findRoofSpot(){
+  if(cachedRoof!==undefined)return cachedRoof;
+  cachedRoof=null;
+  const directions=[[1,0,-Math.PI/2],[-1,0,Math.PI/2],[0,1,Math.PI],[0,-1,0]];
+  let bestView=0;
+  for(let x=20;x<=110;x++)for(let z=-60;z<=60;z++){
+    const top=groundSurface(x+.5,z+.5);if(top<10)continue;
+    // A real roof: flat for two blocks all around, with nothing taller nearby.
+    let flat=true;
+    for(let dx=-2;dx<=2&&flat;dx++)for(let dz=-2;dz<=2&&flat;dz++){
+      if(groundSurface(x+dx+.5,z+dz+.5)!==top)flat=false;
+      for(let y=top;y<=top+4&&flat;y++)if(isSolid(x+dx,y,z+dz))flat=false;
+    }
+    if(!flat)continue;
+    let room=false;for(let y=top-3;y>=top-12;y--)if(!isSolid(x,y,z)){room=true;break;}
+    if(!room||!canStandAt(new THREE.Vector3(x+.5,top+player.height+.05,z+.5)))continue;
+    // The view: walk out to the roof edge, then count how far the campus below
+    // stays low. A taller building across a courtyard ends the view.
+    for(const [dx,dz,yaw] of directions){
+      let i=1,edge=0,view=0;
+      for(;i<=40;i++){
+        const g=groundSurface(x+dx*i+.5,z+dz*i+.5);
+        if(g>top+1)break;
+        if(!edge&&g<top-3)edge=i;
+        if(edge&&g<top-3)view++;else if(edge)break;
+      }
+      if(edge&&edge<=8&&view>bestView){bestView=view;cachedRoof={x:x+.5,z:z+.5,yaw};}
+    }
+    if(bestView>=30)return cachedRoof;
+  }
+  return cachedRoof;
+}
+function tryThing(kind){
+  if(isGroupRoom)return;
+  const say=text=>{tryStatus.textContent=text;document.getElementById('status').textContent=text;};
+  if(kind==='story'){if(library){tryStatus.textContent='';library.open();}return;}
+  if(kind==='library'){
+    if(gameMode!=='creative'){tryStatus.textContent='Choose Creative above to place the Little library kit. In the challenges, build with Bookshelf blocks you collect.';return;}
+    chosenAnimal=null;activities?.unequipRod();activities?.unequipTea?.();chosenGarden='library';
+    startGame();say('Little library selected. Aim at flat, open ground and use PLACE (right click). Then walk in and face a bookshelf.');return;
+  }
+  if(kind==='dogs'){
+    if(isHardcoreWorld){tryStatus.textContent='Percy and Ellie live on the campus. Choose Creative or Embrace the Challenge to visit them.';return;}
+    const d=ellie.pos;if(!standNear(d.x+1.6,d.z,Math.PI/2)){tryStatus.textContent='The dogs are somewhere tricky right now. Try again in a moment.';return;}
+    setCompanionMode('follow',true);startGame();persistSave();say('Percy and Ellie will follow you! Walk up to them and press E (or tap the yellow button) to let them play.');return;
+  }
+  if(!activities)return;
+  if(kind==='car'){
+    const c=activities.spot('car');
+    if(!c||!standNear(c.x+Math.cos(c.yaw)*1.9,c.z-Math.sin(c.yaw)*1.9,c.yaw,[[0,0],[0,1],[0,-1],[1,0],[-1,0]])){tryStatus.textContent='The car is blocked in. Try again from the parking lot.';return;}
+    startGame();persistSave();say('Press E (or tap Drive car) to get in. Forward and back to go, left and right to steer.');return;
+  }
+  if(kind==='hoops'){
+    const b=activities.spot('ball');
+    if(!b||!standNear(b.x,b.z+1.2,0,[[0,0],[1,0],[-1,0]])){tryStatus.textContent='The court is busy. Try again in a moment.';return;}
+    startGame();persistSave();say('Press E (or tap Pick up basketball), face a hoop, then press E again to shoot.');return;
+  }
+  if(kind==='tea'){
+    const roof=gameMode==='creative'&&!isHardcoreWorld?findRoofSpot():null;
+    if(roof)standNear(roof.x,roof.z,roof.yaw,[[0,0]]);
+    // Start play first: a paused world refuses to hand over the cup.
+    chosenAnimal=null;chosenGarden=null;startGame();activities.equipTea();persistSave();
+    say(roof?'You are on the school roof with a cup of tea. Press E (or tap Sit and drink tea) to sit down.':'Cup of tea ready! Find a cozy spot up high, then press E (or tap Sit and drink tea).');return;
+  }
+}
+for(const button of document.querySelectorAll?.('[data-try]')||[])button.addEventListener('click',()=>tryThing(button.dataset.try));
+const tryPanel=document.getElementById('tryPanel');if(tryPanel)tryPanel.hidden=isGroupRoom;
 let last = performance.now();
 function tick(now) {
   const frameInterval=now-last;
@@ -4014,7 +4225,8 @@ function tick(now) {
   else if(isHardcoreWorld)bubble.style.opacity='0';
   updateAreaLabelVisibility();
 
-  if(!activities?.isDriving()){
+  // A seated tea break holds the player still; moving stands them up.
+  if(!activities?.isDriving()&&!activities?.isSitting()){
   // movement vector (yaw only)
   const forward = _forward.set(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
   const right   = _right.set(  Math.cos(player.yaw), 0, -Math.sin(player.yaw));
@@ -4143,7 +4355,7 @@ BLOCK_KEYS.forEach((k, i) => {
   count.style.cssText='position:relative;z-index:1;text-shadow:1px 1px #000,-1px -1px #000;font-size:11px;line-height:1';
   slot.appendChild(count);
   slot.dataset.k = k;
-  slot.addEventListener('click',()=>{chosenAnimal=null;chosenGarden=null;activities?.unequipRod();selected=i;refreshHotbar();});
+  slot.addEventListener('click',()=>{chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();selected=i;refreshHotbar();});
   hotbar.appendChild(slot);
 });
 document.body.appendChild(hotbar);
@@ -4184,7 +4396,7 @@ const inventoryChoices=BLOCK_KEYS.map((k,i)=>{
   button.append(thumbnail,name,count);
   button.addEventListener('click',event=>{
     if(!inventoryOpen||button.disabled)return;
-    chosenAnimal=null;chosenGarden=null;activities?.unequipRod();selected=i;refreshHotbar();persistSave();closeInventory(true,event);
+    chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();selected=i;refreshHotbar();persistSave();closeInventory(true,event);
   });
   inventoryGrid.appendChild(button);return {button,count};
 });
@@ -4212,24 +4424,43 @@ const animalHelp=document.createElement('p');animalHelp.textContent='Build a 2 b
 const animalGrid=document.createElement('div');animalGrid.className='crafting-grid';
 const animalChoices=['dog','cat','horse','sheep','cow','fish'].map(kind=>{
   const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.animal=kind;
-  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;chosenGarden=null;activities?.unequipRod();closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
+  button.addEventListener('click',event=>{if(!inventoryOpen||button.disabled)return;chosenAnimal=kind;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();closeInventory(true,event);document.getElementById('status').textContent='Selected '+kind+'. Aim at '+(kind==='fish'?'water':'clear ground')+' and use PLACE.';});
   animalGrid.appendChild(button);return {kind,button};
 });
 const fishingRodChoice=document.createElement('button');fishingRodChoice.type='button';fishingRodChoice.className='craft-choice';fishingRodChoice.dataset.tool='fishing-rod';
-fishingRodChoice.addEventListener('click',event=>{if(!inventoryOpen||fishingRodChoice.disabled)return;chosenAnimal=null;chosenGarden=null;activities?.unequipRod();closeInventory(true,event);activities?.equipRod();});
+fishingRodChoice.addEventListener('click',event=>{if(!inventoryOpen||fishingRodChoice.disabled)return;chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();closeInventory(true,event);activities?.equipRod();});
 animalGrid.appendChild(fishingRodChoice);
-animalPanel.append(animalTitle,animalHelp,animalGrid);
+// Kids who place too many animals need an obvious way to tidy up.
+const putAwayAllChoice=document.createElement('button');putAwayAllChoice.type='button';putAwayAllChoice.className='craft-choice';putAwayAllChoice.dataset.tool='put-away-animals';
+putAwayAllChoice.addEventListener('click',()=>{
+  if(!inventoryOpen||!activities)return;
+  const count=activities.placedCount();
+  if(count&&!confirm(`Send all ${count} of your placed animals home? The animals that live in the world stay.`))return;
+  activities.putAwayAll();persistSave();refreshInventory();
+});
+animalGrid.appendChild(putAwayAllChoice);
+const animalTidyHelp=document.createElement('p');animalTidyHelp.className='inventory-tip';
+animalTidyHelp.textContent='Too many animals? Aim at one and use Interact (E) or BREAK to send it home.';
+animalPanel.append(animalTitle,animalHelp,animalGrid,animalTidyHelp);
+const cozyPanel=document.createElement('section');cozyPanel.className='animal-panel';
+const cozyTitle=document.createElement('h3');cozyTitle.textContent='Cozy time';
+const cozyHelp=document.createElement('p');cozyHelp.textContent='Choose Cup of tea, find a cozy spot like a roof, and use Interact (E) to sit down. Move to stand up. Face a Bookshelf and use Interact to read a story out loud.';
+const cozyGrid=document.createElement('div');cozyGrid.className='crafting-grid';
+const teaChoice=document.createElement('button');teaChoice.type='button';teaChoice.className='craft-choice';teaChoice.dataset.tool='tea';teaChoice.textContent='☕ Cup of tea';
+teaChoice.addEventListener('click',event=>{if(!inventoryOpen||!activities)return;chosenAnimal=null;chosenGarden=null;closeInventory(true,event);activities.equipTea();});
+cozyGrid.appendChild(teaChoice);
+cozyPanel.append(cozyTitle,cozyHelp,cozyGrid);
 const gardenPanel=document.createElement('section');gardenPanel.className='animal-panel';
-const gardenTitle=document.createElement('h3');gardenTitle.textContent='Trees & garden kits';
-const gardenHelp=document.createElement('p');gardenHelp.textContent='Creative: place a whole tree, hedge, flower bed or fishing pond with one PLACE on clear, level ground. Existing builds are never replaced.';
+const gardenTitle=document.createElement('h3');gardenTitle.textContent='Kits: trees, gardens & a library';
+const gardenHelp=document.createElement('p');gardenHelp.textContent='Creative: place a whole tree, hedge, flower bed, fishing pond or little library with one PLACE on clear, level ground. Existing builds are never replaced.';
 const gardenGrid=document.createElement('div');gardenGrid.className='crafting-grid';
 const gardenChoices=Object.entries(GARDEN_KITS).map(([kind,name])=>{
   const button=document.createElement('button');button.type='button';button.className='craft-choice';button.dataset.garden=kind;button.textContent=name;
-  button.addEventListener('click',event=>{if(!inventoryOpen||gameMode!=='creative'||isGroupRoom)return;chosenGarden=kind;chosenAnimal=null;activities?.unequipRod();closeInventory(true,event);document.getElementById('status').textContent='Selected '+name+'. Aim at clear ground and use PLACE.';});
+  button.addEventListener('click',event=>{if(!inventoryOpen||gameMode!=='creative'||isGroupRoom)return;chosenGarden=kind;chosenAnimal=null;activities?.unequipRod();activities?.unequipTea?.();closeInventory(true,event);document.getElementById('status').textContent='Selected '+name+'. Aim at clear ground and use PLACE.';});
   gardenGrid.appendChild(button);return button;
 });
 gardenPanel.append(gardenTitle,gardenHelp,gardenGrid);
-inventoryDialog.append(inventoryTitle,inventoryHelp,craftingPanel,gardenPanel,inventoryGrid,animalPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
+inventoryDialog.append(inventoryTitle,inventoryHelp,craftingPanel,gardenPanel,inventoryGrid,animalPanel,cozyPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
 function inventoryBackground(disabled){
   for(const element of [hotbar,ctrlPanel,renderer.domElement,document.getElementById('touchUI')])element.inert=disabled;
 }
@@ -4249,6 +4480,9 @@ function refreshInventory(){
   }
   const rodUnlocked=!!activities&&(gameMode==='hardcore'?hardcore.unlocks.animals.includes('fish'):fishUnlocked);
   fishingRodChoice.disabled=!rodUnlocked;fishingRodChoice.textContent='Fishing rod'+(rodUnlocked?'':' · Build a pond first');
+  const placedAnimals=activities?activities.placedCount():0;
+  putAwayAllChoice.disabled=!placedAnimals;putAwayAllChoice.textContent=placedAnimals?`Put away all my animals (${placedAnimals})`:'Put away all my animals';
+  cozyPanel.hidden=isGroupRoom||!activities;
   for(let i=0;i<inventoryChoices.length;i++){
     const {button,count}=inventoryChoices[i],amount=inventory[BLOCK_KEYS[i]];
     const locked=gameMode==='hardcore'&&!globalThis.MYNE_HARDCORE.canUseBlock(hardcore,BLOCK_KEYS[i]);
@@ -4276,7 +4510,7 @@ addEventListener('keydown',event=>{
       event.preventDefault();if(!event.repeat)closeInventory();return;
     }
     if(event.code==='Tab'){
-      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!gardenPanel.hidden?gardenChoices:[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!animalPanel.hidden&&!fishingRodChoice.disabled?[fishingRodChoice]:[]),inventoryBack];
+      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!gardenPanel.hidden?gardenChoices:[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!animalPanel.hidden&&!fishingRodChoice.disabled?[fishingRodChoice]:[]),...(!animalPanel.hidden&&!putAwayAllChoice.disabled?[putAwayAllChoice]:[]),...(!cozyPanel.hidden?[teaChoice]:[]),inventoryBack];
       const current=choices.indexOf(document.activeElement),next=(current+(event.shiftKey?-1:1)+choices.length)%choices.length;
       event.preventDefault();choices[next].focus?.();
     }
@@ -4426,7 +4660,7 @@ function updateCoordHUD() {
   coordHUD.innerHTML =
     `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
     `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
-    (activities?.isFishing()?'Tool: Fishing rod':chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
+    (activities?.isFishing()?'Tool: Fishing rod':activities?.hasTea?.()?'Holding: Cup of tea':chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
     (gameMode!=='creative'?` (${inventory[BLOCK_KEYS[selected]]})<br>${gameMode==='hardcore'?'Hardcore · ':''}Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
     (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
     (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +
@@ -4559,17 +4793,67 @@ const btnDown    = document.getElementById('btnDown');
     if (typeof flashFly === 'function') flashFly(player.flying);
     e.preventDefault();
   }, { passive: false });
-  releaseTouch=()=>{lookId=null;stickId=null;clearMoveKeys();resetNub();keys['Space']=false;keys['KeyV']=false;keys['ShiftLeft']=false;};
+  // A laptop in Touch layout has a mouse, not fingers. The same buttons, stick and
+  // look layer answer mouse presses too; real touches keep their touch handlers.
+  const mouseOnly=e=>e.pointerType==='mouse';
+  let mouseStick=false,mouseLook=false,mouseX=0,mouseY=0;
+  for(const [el,fn] of [[btnBreak,doBreak],[btnPlace,doPlace]])el.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;e.preventDefault();if(!started){startGame();return;}fn();});
+  for(const [el,code] of [[btnJump,'Space'],[btnDown,'KeyV']]){
+    el.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;e.preventDefault();if(!started){startGame();return;}if(code==='Space'||player.flying)keys[code]=true;});
+    el.addEventListener('pointerup',e=>{if(mouseOnly(e))keys[code]=false;});el.addEventListener('pointerleave',e=>{if(mouseOnly(e))keys[code]=false;});
+  }
+  btnFly.addEventListener('pointerdown',e=>{
+    if(!mouseOnly(e))return;e.preventDefault();if(!started){startGame();return;}
+    if(gameMode!=='creative'||isWorldSleeping()||activities?.isDriving())return;
+    player.flying=!player.flying;player.vel.set(0,0,0);flashFly(player.flying);
+  });
+  stick.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;e.preventDefault();if(!started)startGame();const r=stick.getBoundingClientRect();stickCx=r.left+r.width/2;stickCy=r.top+r.height/2;mouseStick=true;setStick(e.clientX-stickCx,e.clientY-stickCy);});
+  lookLayer.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;if(!started)startGame();mouseLook=true;mouseX=e.clientX;mouseY=e.clientY;});
+  addEventListener('pointermove',e=>{
+    if(!mouseOnly(e))return;
+    if(mouseStick)setStick(e.clientX-stickCx,e.clientY-stickCy);
+    if(mouseLook&&started){player.yaw-=(e.clientX-mouseX)*LOOK_SENS;player.pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,player.pitch-(e.clientY-mouseY)*LOOK_SENS));mouseX=e.clientX;mouseY=e.clientY;}
+  });
+  addEventListener('pointerup',e=>{if(!mouseOnly(e))return;if(mouseStick){mouseStick=false;clearMoveKeys();resetNub();}mouseLook=false;});
+  releaseTouch=()=>{lookId=null;stickId=null;mouseStick=false;mouseLook=false;clearMoveKeys();resetNub();keys['Space']=false;keys['KeyV']=false;keys['ShiftLeft']=false;};
   addEventListener('touchcancel', releaseTouch);
   addEventListener('pointercancel', releaseTouch);
 }
+// Hide the screen buttons to see the whole build; the toggle itself stays.
+// Keys, mouse-look and drag-to-look keep working while the buttons are hidden.
+const hideControlsBtn=document.getElementById('btnHideControls');
+let touchButtonsHidden=false;
+function setTouchButtonsHidden(hidden){
+  touchButtonsHidden=!!hidden;
+  if(touchButtonsHidden)document.body.classList.add('touch-buttons-hidden');else document.body.classList.remove('touch-buttons-hidden');
+  hideControlsBtn.textContent=touchButtonsHidden?'👁 Show buttons':'🙈 Hide buttons';
+  hideControlsBtn.setAttribute('aria-pressed',String(touchButtonsHidden));
+  if(touchButtonsHidden)releaseTouch();
+}
+hideControlsBtn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setTouchButtonsHidden(!touchButtonsHidden);});
+setTouchButtonsHidden(false);
 setControlsLayout(controlsLayout);
 for(const query of ['(pointer: coarse)','(hover: none)']){
   try{window.matchMedia?.(query)?.addEventListener?.('change',()=>setControlsLayout(controlsLayout));}catch{}
 }
 
 addEventListener('beforeunload', persistSave);
+// iPads and phones often skip beforeunload; pagehide is their last reliable moment.
+addEventListener('pagehide', persistSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pauseGame(); persistSave(); } });
+// A steady autosave during play, so a dead battery loses at most half a minute.
+setInterval(()=>{if(started&&!resetting&&!isGroupRoom)persistSave();},30000);
+if(damagedSaveKept){
+  document.getElementById('backupStatus').textContent='Your last save could not be opened, so a safe copy was kept. Use Download damaged save below and show it to your teacher.';
+  const damagedBtn=document.createElement('button');damagedBtn.type='button';damagedBtn.textContent='Download damaged save';
+  damagedBtn.addEventListener('click',()=>{
+    let raw='';try{raw=localStorage.getItem(DAMAGED_SAVE_KEY)||'';}catch{}
+    const url=URL.createObjectURL(new Blob([raw],{type:'text/plain'}));const link=document.createElement('a');link.href=url;link.download='MYnecraft damaged save.txt';
+    document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  });
+  const loadBtn=document.getElementById('loadWorld');
+  if(typeof loadBtn.after==='function')loadBtn.after(damagedBtn);else loadBtn.parentNode?.appendChild?.(damagedBtn);
+}
 refreshMenuStatus();
 document.getElementById('schoolExplore').hidden=isHardcoreWorld||isGroupRoom;
 document.getElementById('status').textContent=isHardcoreWorld?'Hardcore: gather logs from the nearby trees. Open Inventory to craft. Village: east. Court: west. Mine: northeast.':'Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
