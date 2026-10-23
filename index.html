@@ -27,8 +27,15 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 /* ---------- Title screen ---------- */
 .title-screen{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 .title-bg{position:absolute;inset:0;z-index:-2;overflow:hidden}
-.title-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block;transform:scale(1.05);animation:drift 30s ease-in-out infinite alternate}
-.title-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.1) 0%,rgba(11,26,46,.5) 55%,rgba(11,26,46,.9) 100%),linear-gradient(180deg,rgba(11,26,46,.3),rgba(11,26,46,.15) 40%,rgba(11,26,46,.85) 100%)}
+/* The scene is sized like the picture (1672x941) to cover the screen; the script
+   below sets its exact box. Without the script it still fills the screen. */
+.scene{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:60% 60%;animation:drift 30s ease-in-out infinite alternate}
+.scene-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 45%}
+.scene.locked .scene-bg{object-fit:fill}
+.figs-layer{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.fig{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);height:calc(var(--h) * 1%);width:auto;transform:translate(-50%,-100%);filter:drop-shadow(0 12px 10px rgba(0,0,0,.45))}
+.fig-wave{transform-origin:50% 100%;animation:wave-hello 2.8s ease-in-out infinite}
+.title-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.05) 0%,rgba(11,26,46,.3) 60%,rgba(11,26,46,.6) 100%),linear-gradient(180deg,rgba(11,26,46,.25),rgba(11,26,46,.05) 40%,rgba(11,26,46,.55) 100%)}
 .top{display:flex;justify-content:flex-end;padding-top:14px;padding-bottom:4px}
 .top a{color:var(--ink);text-decoration:none;font:600 14px var(--kid);letter-spacing:.04em;opacity:.85;padding:6px 12px;border-radius:999px;background:rgba(11,26,46,.55)}
 .top a:hover{opacity:1;color:var(--sun2)}
@@ -77,11 +84,8 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .howto-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #1d7a50}
 .save{margin:14px 0 0;font:500 14px var(--kid);color:var(--muted)}
 
-/* The Specials teachers hang out on the title screen. Decorative pictures only. */
-.crew{position:absolute;bottom:0;z-index:1;display:flex;align-items:flex-end;pointer-events:none}
-.crew img{display:block;height:clamp(150px,27vh,250px);width:auto;margin:0 -2.2%;filter:drop-shadow(0 10px 10px rgba(0,0,0,.55));animation:sway 5s ease-in-out infinite}
-.crew img:nth-child(2){animation-delay:-1.4s}.crew img:nth-child(3){animation-delay:-2.6s}
-.crew-left{left:max(1vw,8px)}.crew-right{right:max(1vw,8px)}
+/* On narrow screens the wide picture is cut off at the sides, so the teachers
+   stand together in a row under the buttons instead. Decorative pictures only. */
 .crew-row{display:none}
 
 /* ---------- Below the title screen ---------- */
@@ -121,12 +125,11 @@ footer .row{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-betw
 footer a{font-weight:700;text-decoration:none}
 
 @keyframes hop{0%,62%,100%{transform:translateY(0) rotate(0)}72%{transform:translateY(-.14em) rotate(-3deg)}82%{transform:translateY(0) rotate(0)}}
-@keyframes drift{from{transform:scale(1.05) translate(0,0)}to{transform:scale(1.11) translate(-1.5%,-1%)}}
+@keyframes drift{from{transform:scale(1)}to{transform:scale(1.035)}}
 @keyframes nudge{0%,80%,100%{transform:translateY(0)}86%{transform:translateY(-5px)}92%{transform:translateY(0)}96%{transform:translateY(-2px)}}
-@keyframes sway{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(.6deg)}}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.title-bg img,.block-letter,.howto-btn,.crew img{animation:none}.play,.mode{transition:none}.play:hover{transform:none}}
-/* Narrower screens: the teachers stand together in one row under the buttons. */
-@media (max-width:1180px){.crew{display:none}.crew-row{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;margin-top:6px;pointer-events:none}.crew-row img{display:block;height:clamp(96px,17vh,150px);width:auto;margin:0 -10px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.5))}}
+@keyframes wave-hello{0%,70%,100%{transform:translate(-50%,-100%) rotate(0)}78%{transform:translate(-50%,-100%) rotate(-2.5deg)}86%{transform:translate(-50%,-100%) rotate(2deg)}93%{transform:translate(-50%,-100%) rotate(-1deg)}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scene,.block-letter,.howto-btn,.fig-wave{animation:none}.play,.mode{transition:none}.play:hover{transform:none}}
+@media (max-width:1000px){.fig{display:none}.crew-row{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;margin-top:4px;pointer-events:none}.crew-row img{display:block;height:clamp(130px,20vh,190px);width:auto;margin:0 -16px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.5))}.crew-row img.big{height:clamp(160px,25vh,230px);z-index:1}}
 /* Short laptop screens (1366x768 and similar): keep the whole title screen above the fold. */
 @media (max-height:860px) and (min-width:700px){
   .top{position:absolute;top:0;right:0;z-index:3}
@@ -145,16 +148,31 @@ footer a{font-weight:700;text-decoration:none}
   .save{margin-top:10px}
 }
 @media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
-@media (max-width:480px){.title-body{gap:12px;padding-top:2px}.mode{padding:8px 10px;gap:10px;grid-template-columns:42px minmax(0,1fr) auto}.mode .icon{width:42px;height:42px;font-size:24px}.mode b{font-size:18px}.play{min-height:74px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}.crew-row img{height:92px;margin:0 -12px}details.more>summary::after{display:none}}
+@media (max-width:480px){.title-body{gap:12px;padding-top:2px}.mode{padding:8px 10px;gap:10px;grid-template-columns:42px minmax(0,1fr) auto}.mode .icon{width:42px;height:42px;font-size:24px}.mode b{font-size:18px}.play{min-height:74px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}.crew-row img{height:118px;margin:0 -22px}.crew-row img.big{height:150px}details.more>summary::after{display:none}}
 </style>
 </head>
 <body>
 <a class="skip-link" href="#play-button">Skip to Play</a>
 <header class="title-screen" id="play">
-  <div class="title-bg" aria-hidden="true"><img src="game/assets/ec-title-bg.jpg" alt=""></div>
+  <!-- The school picture and the teachers share one box, so each teacher stays
+       standing on the same spot of the school grounds at any screen size. -->
+  <div class="title-bg" aria-hidden="true">
+    <div class="scene" id="scene">
+      <img class="scene-bg" src="game/assets/ec-title-bg.jpg" alt="">
+    </div>
+  </div>
   <div class="title-shade" aria-hidden="true"></div>
-  <div class="crew crew-left" aria-hidden="true"><img src="game/assets/staff-lineup/eriksen.png" alt=""><img src="game/assets/staff-lineup/micco.png" alt=""><img src="game/assets/staff-lineup/macek.png" alt=""></div>
-  <div class="crew crew-right" aria-hidden="true"><img src="game/assets/staff-lineup/mullet.png" alt=""><img src="game/assets/staff-lineup/wingenbach.png" alt=""><img src="game/assets/staff-lineup/mcmichael.png" alt=""></div>
+  <!-- The teachers stand above the shading so they stay bright. -->
+  <div class="figs-layer" aria-hidden="true">
+    <div class="scene scene-figs">
+      <img class="fig" src="game/assets/staff-lineup/micco.png" alt="" style="--x:25.5;--y:86;--h:31">
+      <img class="fig" src="game/assets/staff-lineup/eriksen.png" alt="" style="--x:6.5;--y:99.5;--h:42">
+      <img class="fig" src="game/assets/staff-lineup/wingenbach.png" alt="" style="--x:72;--y:95;--h:39">
+      <img class="fig" src="game/assets/staff-lineup/mullet.png" alt="" style="--x:15.5;--y:97;--h:41">
+      <img class="fig" src="game/assets/staff-lineup/mcmichael.png" alt="" style="--x:94.5;--y:97.5;--h:41">
+      <img class="fig fig-wave" src="game/assets/staff-lineup/macek.png" alt="" style="--x:81.5;--y:101;--h:49">
+    </div>
+  </div>
   <nav class="wrap top" aria-label="Site"><a href="game/rooms.html">Teacher rooms</a></nav>
   <main class="wrap title-body">
     <h1 class="block-title" aria-label="MYnecraft"><span aria-hidden="true" class="block-letter grass">M</span><span aria-hidden="true" class="block-letter stone">Y</span><span aria-hidden="true" class="block-letter grass">N</span><span aria-hidden="true" class="block-letter sand">E</span><span aria-hidden="true" class="block-letter grass">C</span><span aria-hidden="true" class="block-letter stone">R</span><span aria-hidden="true" class="block-letter wood">A</span><span aria-hidden="true" class="block-letter grass">F</span><span aria-hidden="true" class="block-letter gold">T</span></h1>
@@ -175,7 +193,7 @@ footer a{font-weight:700;text-decoration:none}
       <a class="howto-btn" id="howto-button" href="#how-to-play"><span class="q" aria-hidden="true">?</span>How to play</a>
       <p class="save">💾 Your world saves by itself in this browser.</p>
     </div>
-    <div class="crew-row" aria-hidden="true"><img src="game/assets/staff-lineup/eriksen.png" alt=""><img src="game/assets/staff-lineup/micco.png" alt=""><img src="game/assets/staff-lineup/macek.png" alt=""><img src="game/assets/staff-lineup/mullet.png" alt=""><img src="game/assets/staff-lineup/wingenbach.png" alt=""><img src="game/assets/staff-lineup/mcmichael.png" alt=""></div>
+    <div class="crew-row" aria-hidden="true"><img src="game/assets/staff-lineup/eriksen.png" alt=""><img src="game/assets/staff-lineup/micco.png" alt=""><img src="game/assets/staff-lineup/mullet.png" alt=""><img class="big" src="game/assets/staff-lineup/macek.png" alt=""><img src="game/assets/staff-lineup/wingenbach.png" alt=""><img src="game/assets/staff-lineup/mcmichael.png" alt=""></div>
   </main>
 </header>
 <section class="section" id="how-to-play" aria-labelledby="quick-title">
@@ -244,6 +262,24 @@ for(const mode of modes){
 }
 // The big How to play button opens the full controls as well as scrolling to the steps.
 document.getElementById('howto-button')?.addEventListener?.('click',()=>{const more=document.getElementById('howDetails');if(more)more.open=true;});
+</script>
+<script>
+// Size the scene box exactly like the picture covering the title screen (1672x941),
+// so every teacher stays standing on the same spot of the school grounds.
+(function(){
+  const screen=document.querySelector('.title-screen'),scenes=document.querySelectorAll('.scene');
+  if(!screen||!scenes.length)return;
+  function fit(){
+    const w=screen.clientWidth,h=screen.clientHeight,s=Math.max(w/1672,h/941),sw=1672*s,sh=941*s;
+    for(const scene of scenes){
+      scene.style.width=sw+'px';scene.style.height=sh+'px';
+      scene.style.left=(w-sw)*0.5+'px';scene.style.top=(h-sh)*0.45+'px';
+      scene.classList.add('locked');
+    }
+  }
+  fit();addEventListener('resize',fit);
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(screen);
+})();
 </script>
 </body>
 </html>
