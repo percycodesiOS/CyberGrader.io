@@ -225,7 +225,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=howto-20261023">
+<link rel="stylesheet" href="start-menu.css?v=quest-20261023">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -293,6 +293,7 @@
     <section class="try-panel" id="tryPanel" aria-labelledby="tryTitle">
       <h2 id="tryTitle">Things to try</h2>
       <div class="try-grid">
+        <button type="button" class="try-choice" data-try="quest"><span aria-hidden="true">🎓</span><strong>Basics quest</strong><small>Learn by doing, step by step</small></button>
         <button type="button" class="try-choice" data-try="car"><span aria-hidden="true">🚗</span><strong>Drive the car</strong><small>Start right beside it</small></button>
         <button type="button" class="try-choice" data-try="hoops"><span aria-hidden="true">🏀</span><strong>Shoot hoops</strong><small>Start on the court</small></button>
         <button type="button" class="try-choice" data-try="tea"><span aria-hidden="true">☕</span><strong>Tea on the roof</strong><small>A cozy cup with a view</small></button>
@@ -399,6 +400,7 @@
 <script src="hardcore-world.js"></script>
 <script src="play-activities.js"></script>
 <script src="library-books.js"></script>
+<script src="tutorial.js"></script>
 <script src="room-client.js"></script>
 <script src="cafeteria-cleaner.js"></script>
 <script type="module">
@@ -1117,6 +1119,8 @@ function emptyCampusSave(){
 // Keep a valid campus slot even when the first ever visit starts in Hardcore.
 if(!saveEnvelope.player)saveEnvelope={...emptyCampusSave(),...saveEnvelope};
 const requestedMode=new URLSearchParams(location.search).get('mode');
+// ?tutorial=1 (from the title screen's Basics quest link) starts the first-time quest once.
+const requestedTutorial=new URLSearchParams(location.search).get('tutorial')==='1';
 const isGroupRoom=new URLSearchParams(location.search).get('room')==='1';
 const roomSession=isGroupRoom?globalThis.MYNE_ROOM?.readSession():null;
 const isHardcoreWorld=!isGroupRoom&&(requestedMode==='hardcore'||(!['creative','survival'].includes(requestedMode)&&saveEnvelope.activeWorld==='hardcore'));
@@ -1127,6 +1131,7 @@ saveState.edits = saveState.edits && typeof saveState.edits === 'object' ? saveS
 let gameMode = isGroupRoom?'creative':isHardcoreWorld?'hardcore':requestedMode==='creative'||requestedMode==='survival' ? requestedMode : saveState.mode==='survival'?'survival':'creative';
 let hardcore=globalThis.MYNE_HARDCORE?.normalize(saveState.hardcore);
 let activities=null;
+let quest=null,questCard=null; // the first-time Basics quest, when running
 let chosenAnimal=null,chosenGarden=null;
 let fishUnlocked=saveState.fishUnlocked===true;
 if((isHardcoreWorld||isGroupRoom)&&globalThis.MYNE_HARDCORE_WORLD){
@@ -1135,8 +1140,8 @@ if((isHardcoreWorld||isGroupRoom)&&globalThis.MYNE_HARDCORE_WORLD){
 }
 // Landing-page selection applies once. A reload or imported backup must use its
 // saved mode instead of being forced back by a stale query string.
-if(['creative','survival','hardcore'].includes(requestedMode)&&typeof history!=='undefined'&&location.href){
-  try{const cleanURL=new URL(location.href);cleanURL.searchParams.delete('mode');history.replaceState(history.state,'',cleanURL.href);}catch{}
+if((['creative','survival','hardcore'].includes(requestedMode)||requestedTutorial)&&typeof history!=='undefined'&&location.href){
+  try{const cleanURL=new URL(location.href);cleanURL.searchParams.delete('mode');cleanURL.searchParams.delete('tutorial');history.replaceState(history.state,'',cleanURL.href);}catch{}
 }
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
 // The neutral Student comes first and is the default: kids are not dropped into
@@ -2287,10 +2292,12 @@ function faceForPerson(style){
       // A clean, straight hairline with tidy sideburns.
       ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);ctx.fillRect(0,8,6,12);ctx.fillRect(58,8,6,12);
       ctx.fillStyle='#9a744c';ctx.fillRect(10,22,18,4);ctx.fillRect(37,22,17,4);
-      ctx.fillStyle='#fff5e7';ctx.fillRect(11,29,17,9);ctx.fillRect(37,29,17,9);
-      ctx.fillStyle='#538bb1';ctx.fillRect(20,29,7,9);ctx.fillRect(38,29,7,9);
-      ctx.fillStyle='#172631';ctx.fillRect(23,31,4,7);ctx.fillRect(38,31,4,7);
-      ctx.fillStyle='#dceef3';ctx.fillRect(20,29,3,3);ctx.fillRect(39,29,3,3);
+      // Both eyes look straight ahead: each iris and pupil is centred in its eye,
+      // and the two eyes mirror each other across the face (they used to point inward).
+      ctx.fillStyle='#fff5e7';ctx.fillRect(11,29,17,9);ctx.fillRect(36,29,17,9);
+      ctx.fillStyle='#538bb1';ctx.fillRect(16,29,7,9);ctx.fillRect(41,29,7,9);
+      ctx.fillStyle='#172631';ctx.fillRect(18,31,3,6);ctx.fillRect(43,31,3,6);
+      ctx.fillStyle='#dceef3';ctx.fillRect(16,29,2,2);ctx.fillRect(41,29,2,2);
       ctx.fillStyle='#cc9068';ctx.fillRect(27,37,10,7);
       ctx.fillStyle='#ab7851';ctx.fillRect(17,48,31,3);ctx.fillRect(20,51,25,3);
       ctx.fillStyle='#fff1db';ctx.fillRect(20,49,25,3);
@@ -2335,8 +2342,9 @@ function faceForPerson(style){
       ctx.fillStyle='#2a2420';ctx.fillRect(0,0,16,4);ctx.fillRect(0,4,2,2);ctx.fillRect(14,4,2,2);
     }
     else {ctx.fillStyle='#b1986c';ctx.fillRect(0,0,16,3);ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
+    // Pupils sit in the middle of each eye, mirrored across the face, so nobody looks cross-eyed.
     ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
-    ctx.fillStyle=style==='macek'?'#5289b1':'#303b44';ctx.fillRect(4,7,2,2);ctx.fillRect(10,7,2,2);
+    ctx.fillStyle=style==='macek'?'#5289b1':'#303b44';ctx.fillRect(4,7,1,2);ctx.fillRect(11,7,1,2);
     ctx.fillStyle=style==='macek'?'#b28b70':'#704431';ctx.fillRect(6,12,4,1);
     if(style==='micco'){ctx.strokeStyle='#44334e';ctx.lineWidth=1;ctx.strokeRect(2.5,6.5,5,4);ctx.strokeRect(8.5,6.5,5,4);ctx.fillRect(7,8,2,1);}
     // Black rectangular frames with a straight bridge, drawn over the eyes.
@@ -2365,12 +2373,24 @@ function staffLook(style){
     // Every look has a straight, even hairline across the forehead.
     ctx.fillRect(0,0,64,10);ctx.fillRect(0,10,7,isArt?40:15);ctx.fillRect(57,10,7,isArt?40:15);
     ctx.fillStyle=isArt?'#bba47d':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
-    ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
-    ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
-    ctx.fillStyle='#292d30';ctx.fillRect(17,30,4,6);ctx.fillRect(44,30,4,6);
+    if(isArt){
+      // Ms. Eriksen: normal-sized eyes (they used to read as "bug eyes"), centred and mirrored.
+      ctx.fillStyle='#fff5e8';ctx.fillRect(13,30,11,6);ctx.fillRect(40,30,11,6);
+      ctx.fillStyle='#453f37';ctx.fillRect(16,30,5,6);ctx.fillRect(43,30,5,6);
+      ctx.fillStyle='#292d30';ctx.fillRect(17,31,3,4);ctx.fillRect(44,31,3,4);
+    }else{
+      ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
+      ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
+      ctx.fillStyle='#292d30';ctx.fillRect(17,30,3,6);ctx.fillRect(44,30,3,6);
+    }
     ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
     if(isMusic){ctx.fillStyle='#41372e';ctx.fillRect(7,43,50,17);ctx.fillRect(4,38,7,13);ctx.fillRect(53,38,7,13);}
-    ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
+    if(isArt){
+      // Her trademark slight smirk: a closed smile that lifts at one corner.
+      ctx.fillStyle='#9c6650';ctx.fillRect(22,50,17,3);ctx.fillRect(38,47,5,3);ctx.fillRect(41,45,3,3);
+    }else{
+      ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
+    }
     if(style==='mcmichael'){
       ctx.strokeStyle='#292b31';ctx.lineWidth=3;ctx.strokeRect(6,26,23,17);ctx.strokeRect(35,26,23,17);ctx.fillStyle='#292b31';ctx.fillRect(29,30,6,3);
     }
@@ -3925,7 +3945,7 @@ function doBreak() {
   setBlock(hit.x, hit.y, hit.z, null);
   recordEdit(hit.x, hit.y, hit.z, null);
   spawnParticles(hit.x, hit.y, hit.z, brokenKey);
-  sndBreak();
+  sndBreak();quest?.signal('broke');
   updateBlockMeshes(hit.x,hit.y,hit.z);
   if(gameMode==='hardcore'){advanceHardcore();refreshHotbar();}
 }
@@ -3976,7 +3996,7 @@ function doPlace() {
   if(gameMode==='hardcore'){inventory[block]--;hardcore=globalThis.MYNE_HARDCORE.recordPlace(hardcore,block);}
   setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
   recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
-  sndPlace();
+  sndPlace();quest?.signal('placed');
   updateBlockMeshes(nx,ny,nz);
   if(gameMode==='hardcore'){advanceHardcore();refreshHotbar();}
   else if(!fishUnlocked&&globalThis.MYNE_HARDCORE?.inspectHabitat(getBlock,saveState.edits).valid){
@@ -4172,7 +4192,7 @@ function refreshActivityPrompt(){
 function interactWithActivity(event){
   if(event){event.preventDefault();event.stopPropagation?.();}
   if(!started||inventoryOpen||isWorldSleeping()||!activities)return false;
-  const acted=activities.interact()||hostInteract();refreshActivityPrompt();return acted;
+  const acted=activities.interact()||hostInteract();if(acted)quest?.signal('interacted');refreshActivityPrompt();return acted;
 }
 // The reading room pauses the world like Inventory does, without opening the menu.
 const library=globalThis.MYNE_LIBRARY&&!isGroupRoom?globalThis.MYNE_LIBRARY.mount(document,window,{
@@ -4244,6 +4264,7 @@ function findRoofSpot(){
 function tryThing(kind){
   if(isGroupRoom)return;
   const say=text=>{tryStatus.textContent=text;document.getElementById('status').textContent=text;};
+  if(kind==='quest'){tryStatus.textContent='';startQuest();return;}
   if(kind==='story'){if(library){tryStatus.textContent='';library.open();}return;}
   if(kind==='library'){
     if(gameMode!=='creative'){tryStatus.textContent='Choose Creative above to place the Little library kit. In the challenges, build with Bookshelf blocks you collect.';return;}
@@ -4282,6 +4303,8 @@ function tick(now) {
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;
   // The menu covers the scene. Give the GPU a rest while play is paused.
+  // The Basics quest card moves to a corner over the menu and Inventory, where the mouse can reach Skip and Exit.
+  if(questCard)questCard.setDocked(!started);
   if(!started){refreshActivityPrompt();frameWindowStart=now;frameCount=0;requestAnimationFrame(tick);return;}
   if(isGroupRoom&&!roomConnection?.canPlay()){
     player.vel.set(0,0,0);renderer.render(scene,camera);requestAnimationFrame(tick);return;
@@ -4379,6 +4402,7 @@ function tick(now) {
     // Driving changes yaw after ordinary mouse-look is calculated above.
     camera.quaternion.setFromEuler(_euler.set(player.pitch,player.yaw,0,'YXZ'));
   }
+  quest?.update({x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch,flying:player.flying});
   refreshActivityPrompt();
 
   // fell off the world? respawn
@@ -4495,7 +4519,7 @@ const inventoryChoices=BLOCK_KEYS.map((k,i)=>{
   button.append(thumbnail,name,count);
   button.addEventListener('click',event=>{
     if(!inventoryOpen||button.disabled)return;
-    chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();selected=i;refreshHotbar();persistSave();closeInventory(true,event);
+    chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();selected=i;refreshHotbar();persistSave();quest?.signal('picked');closeInventory(true,event);
   });
   inventoryGrid.appendChild(button);return {button,count};
 });
@@ -4660,7 +4684,7 @@ resetBtn.addEventListener('click', () => {
 });
 const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
 menuBtn.addEventListener('click',()=>{pauseGame();persistSave();});
-const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',persistSave);
+const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',()=>{persistSave();quest?.signal('saved');});
 const inventoryBtn=document.createElement('button');inventoryBtn.id='inventoryToggle';inventoryBtn.type='button';inventoryBtn.textContent='Blocks / Inventory';inventoryBtn.style.cssText=backLink.style.cssText;
 inventoryBtn.setAttribute('aria-keyshortcuts','I');inventoryBtn.setAttribute('aria-haspopup','dialog');inventoryBtn.addEventListener('click',openInventory);
 graphicsBtn=document.createElement('button');
@@ -4998,6 +5022,21 @@ try{
   const tab=globalThis.sessionStorage;
   if(tab&&tab.getItem('mynecraft_start_now')==='1'){tab.removeItem('mynecraft_start_now');if(!isGroupRoom)startGame();}
 }catch{}
+// The Basics quest: learn each control by doing it. Finishing it is remembered as
+// a separate browser preference; the world save is never read or written for it.
+function startQuest(){
+  if(isGroupRoom||!globalThis.MYNE_TUTORIAL)return false;
+  if(questCard)questCard.card.remove();
+  quest=globalThis.MYNE_TUTORIAL.createQuest({creative:gameMode==='creative'});
+  questCard=globalThis.MYNE_TUTORIAL.mount(document,quest,{
+    isTouch:()=>touchLayoutOn(),
+    onHelper:id=>{if(id==='interact')tryThing('hoops');},
+    onEnd:kind=>{if(kind==='finished'){try{localStorage.setItem(globalThis.MYNE_TUTORIAL.DONE_KEY,'1');}catch{}}},
+    onClose:()=>{questCard?.card.remove();quest=null;questCard=null;}
+  });
+  startGame();return true;
+}
+if(requestedTutorial)startQuest();
 </script>
 </body>
 </html>

@@ -728,3 +728,28 @@ html body #start .quick-step, html body #start .mode-card strong, html body #sta
 html body #start .quick-step { font-size: 15px; font-weight: 500; }
 @keyframes howto-nudge { 0%, 80%, 100% { transform: translateY(0); } 86% { transform: translateY(-4px); } 92% { transform: translateY(0); } 96% { transform: translateY(-2px); } }
 @media (prefers-reduced-motion: reduce) { html body #start .howto-open { animation: none; } }
+/* ---- The Basics quest card: one big, friendly instruction at a time ---- */
+.quest-card { position: fixed; z-index: 25; top: max(62px, calc(env(safe-area-inset-top) + 56px)); left: 50%; transform: translateX(-50%); box-sizing: border-box; width: min(460px, calc(100vw - 24px)); padding: 14px 18px 14px; border: 3px solid #5fe0a4; border-radius: 20px; background: #081624; color: #f4fff8; text-align: center; font-family: Fredoka, system-ui, sans-serif; box-shadow: 0 16px 40px rgba(0, 0, 0, .5); transition: border-color .2s, box-shadow .2s; }
+.quest-card[hidden] { display: none; }
+.quest-card[data-cheer="true"] { border-color: #ffd27a; box-shadow: 0 0 0 6px rgba(255, 210, 122, .25), 0 16px 40px rgba(0, 0, 0, .5); }
+.quest-progress { margin: 0; color: #9fe9c4; font: 600 14px/1.2 Fredoka, system-ui, sans-serif; letter-spacing: .03em; }
+.quest-icon { margin: 4px 0 0; font-size: 40px; line-height: 1.1; }
+.quest-title { margin: 2px 0 0; font: 700 26px/1.15 Fredoka, system-ui, sans-serif; }
+.quest-text { margin: 6px 0 0; font: 500 19px/1.35 Fredoka, system-ui, sans-serif; color: #e8f6ee; }
+.quest-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
+.quest-buttons button { min-height: 44px; padding: 8px 16px; border-radius: 999px; font: 700 16px Fredoka, system-ui, sans-serif; cursor: pointer; }
+.quest-helper { border: 2px solid #c9ffe4; background: linear-gradient(180deg, #5fe0a4, #2fb47a); color: #062b1a; }
+.quest-helper[hidden], .quest-skip[hidden], .quest-exit[hidden] { display: none; }
+.quest-skip { border: 2px solid #7fa6c4; background: #1d3346; color: #e8f2f8; }
+.quest-exit { border: 2px solid #7a4a52; background: #2a1118; color: #ffb7c9; }
+/* Wide screens: the card sits top-right, clear of the status line and the middle of the view. */
+@media (min-width: 900px) { .quest-card { left: auto; right: 16px; transform: none; width: 420px; } }
+/* Over the menu or Inventory the card shrinks into the bottom corner, so the mouse can reach Skip and Exit. */
+.quest-card[data-place="corner"] { top: auto; bottom: max(16px, env(safe-area-inset-bottom)); left: auto; right: 16px; transform: none; width: min(320px, calc(100vw - 32px)); padding: 10px 14px; }
+.quest-card[data-place="corner"] .quest-icon, .quest-card[data-place="corner"] .quest-text { display: none; }
+.quest-card[data-place="corner"] .quest-title { font-size: 20px; }
+.quest-card[data-place="corner"] .quest-buttons { margin-top: 8px; }
+/* Phones held sideways: a slim card in the top corner keeps the middle of the screen clear. */
+@media (max-height: 500px) { .quest-card[data-place="top"] { top: 8px; left: auto; right: 8px; transform: none; width: min(330px, 46vw); padding: 8px 12px; } .quest-card[data-place="top"] .quest-icon { display: none; } .quest-card[data-place="top"] .quest-title { font-size: 19px; } .quest-card[data-place="top"] .quest-text { font-size: 15px; } .quest-buttons { margin-top: 6px; } .quest-buttons button { min-height: 38px; padding: 6px 12px; font-size: 14px; } }
+@media (max-width: 520px) { .quest-card { top: max(56px, calc(env(safe-area-inset-top) + 52px)); padding: 10px 12px; } .quest-icon { font-size: 32px; } .quest-title { font-size: 22px; } .quest-text { font-size: 17px; } }
+@media (prefers-reduced-motion: reduce) { .quest-card { transition: none; } }

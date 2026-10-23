@@ -36,10 +36,12 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .fig{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);height:calc(var(--h) * 1%);width:auto;transform:translate(-50%,-100%);filter:drop-shadow(0 12px 10px rgba(0,0,0,.45))}
 .fig-wave{transform-origin:50% 100%;animation:wave-hello 2.8s ease-in-out infinite}
 .title-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.05) 0%,rgba(11,26,46,.3) 60%,rgba(11,26,46,.6) 100%),linear-gradient(180deg,rgba(11,26,46,.25),rgba(11,26,46,.05) 40%,rgba(11,26,46,.55) 100%)}
-.top{display:flex;justify-content:flex-end;padding-top:14px;padding-bottom:4px}
-.top a{color:var(--ink);text-decoration:none;font:600 14px var(--kid);letter-spacing:.04em;opacity:.85;padding:6px 12px;border-radius:999px;background:rgba(11,26,46,.55)}
-.top a:hover{opacity:1;color:var(--sun2)}
-.title-body{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 0 26px;text-align:center}
+.title-body{position:relative;z-index:2;pointer-events:none;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 0 26px;text-align:center}
+.title-body>*{pointer-events:auto}
+/* The hidden teacher entrance: Mr. Macek is a plain link with no hint for kids. */
+.fig-link,.fig-link img{pointer-events:auto;cursor:default}
+.fig-link:focus-visible{outline:none}
+.fig-link:focus-visible img{outline:3px solid var(--sun2);outline-offset:4px;border-radius:12px}
 .block-title{display:flex;flex-wrap:wrap;justify-content:center;gap:.09em;margin:0;font-size:clamp(34px,8vw,88px);line-height:1;font-weight:400}
 .block-letter{display:inline-grid;place-items:center;width:1.08em;height:1.14em;padding-top:.1em;border-radius:.05em;color:#fff;font-family:Bungee,Impact,sans-serif;-webkit-text-stroke:.045em #15110c;paint-order:stroke fill;text-shadow:0 .07em 0 #0009;box-shadow:inset 0 -.09em 0 #0005,inset .06em .06em 0 #ffffff2e,0 .12em 0 #000a;animation:hop 3.2s ease-in-out infinite}
 .block-letter.grass{background:linear-gradient(#72d047 0 24%,#4c9a2e 24% 32%,transparent 32%),repeating-conic-gradient(#8b5a34 0 25%,#774b2a 0 50%) 0 0/.26em .26em}
@@ -83,6 +85,14 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .howto-btn:hover{color:#062b1a;filter:brightness(1.06)}
 .howto-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #1d7a50}
 .save{margin:14px 0 0;font:500 14px var(--kid);color:var(--muted)}
+/* First time playing? The Basics quest sits beside the buttons on wide screens and under them on phones. */
+.panel{position:relative}
+.quest-link{display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 16px;border:3px solid #8fd3ff;border-radius:18px;background:rgba(14,34,56,.96);color:#fff;text-decoration:none;text-align:left;box-shadow:0 0 0 5px rgba(143,211,255,.14),0 14px 30px rgba(0,0,0,.4)}
+.quest-link .cap{flex:none;font-size:36px;line-height:1}
+.quest-link b{display:block;font:700 21px/1.15 var(--kid);color:#bfe6ff}
+.quest-link .quest-sub{display:block;margin-top:2px;font:500 16px/1.3 var(--kid);color:#eaf4fb}
+.quest-link:hover{color:#fff;border-color:#d4efff;background:rgba(22,50,80,.98)}
+@media (min-width:1100px){.quest-link{position:absolute;top:0;right:calc(100% + 24px);width:230px;margin:0;flex-direction:column;gap:8px;padding:18px 16px;text-align:center}.quest-link .cap{font-size:44px}}
 
 /* On narrow screens the wide picture is cut off at the sides, so the teachers
    stand together in a row under the buttons instead. Decorative pictures only. */
@@ -129,10 +139,9 @@ footer a{font-weight:700;text-decoration:none}
 @keyframes nudge{0%,80%,100%{transform:translateY(0)}86%{transform:translateY(-5px)}92%{transform:translateY(0)}96%{transform:translateY(-2px)}}
 @keyframes wave-hello{0%,70%,100%{transform:translate(-50%,-100%) rotate(0)}78%{transform:translate(-50%,-100%) rotate(-2.5deg)}86%{transform:translate(-50%,-100%) rotate(2deg)}93%{transform:translate(-50%,-100%) rotate(-1deg)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scene,.block-letter,.howto-btn,.fig-wave{animation:none}.play,.mode{transition:none}.play:hover{transform:none}}
-@media (max-width:1000px){.fig{display:none}.crew-row{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;margin-top:4px;pointer-events:none}.crew-row img{display:block;height:clamp(130px,20vh,190px);width:auto;margin:0 -16px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.5))}.crew-row img.big{height:clamp(160px,25vh,230px);z-index:1}}
+@media (max-width:1000px){.fig,.figs-layer .fig-link{display:none}.crew-row{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;margin-top:4px;pointer-events:none}.crew-row img{display:block;height:clamp(130px,20vh,190px);width:auto;margin:0 -16px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.5))}.crew-row img.big{height:clamp(160px,25vh,230px);z-index:1}}
 /* Short laptop screens (1366x768 and similar): keep the whole title screen above the fold. */
 @media (max-height:860px) and (min-width:700px){
-  .top{position:absolute;top:0;right:0;z-index:3}
   .title-body{gap:9px;padding:14px 0 18px}
   .block-title{font-size:clamp(34px,min(8vw,10vh),88px)}
   .edition{font-size:18px}
@@ -162,18 +171,6 @@ footer a{font-weight:700;text-decoration:none}
     </div>
   </div>
   <div class="title-shade" aria-hidden="true"></div>
-  <!-- The teachers stand above the shading so they stay bright. -->
-  <div class="figs-layer" aria-hidden="true">
-    <div class="scene scene-figs">
-      <img class="fig" src="game/assets/staff-lineup/micco.png" alt="" style="--x:25.5;--y:86;--h:31">
-      <img class="fig" src="game/assets/staff-lineup/eriksen.png" alt="" style="--x:6.5;--y:99.5;--h:42">
-      <img class="fig" src="game/assets/staff-lineup/wingenbach.png" alt="" style="--x:72;--y:95;--h:39">
-      <img class="fig" src="game/assets/staff-lineup/mullet.png" alt="" style="--x:15.5;--y:97;--h:41">
-      <img class="fig" src="game/assets/staff-lineup/mcmichael.png" alt="" style="--x:94.5;--y:97.5;--h:41">
-      <img class="fig fig-wave" src="game/assets/staff-lineup/macek.png" alt="" style="--x:81.5;--y:101;--h:49">
-    </div>
-  </div>
-  <nav class="wrap top" aria-label="Site"><a href="game/rooms.html">Teacher rooms</a></nav>
   <main class="wrap title-body">
     <h1 class="block-title" aria-label="MYnecraft"><span aria-hidden="true" class="block-letter grass">M</span><span aria-hidden="true" class="block-letter stone">Y</span><span aria-hidden="true" class="block-letter grass">N</span><span aria-hidden="true" class="block-letter sand">E</span><span aria-hidden="true" class="block-letter grass">C</span><span aria-hidden="true" class="block-letter stone">R</span><span aria-hidden="true" class="block-letter wood">A</span><span aria-hidden="true" class="block-letter grass">F</span><span aria-hidden="true" class="block-letter gold">T</span></h1>
     <p class="edition">EC EDITION</p>
@@ -191,10 +188,22 @@ footer a{font-weight:700;text-decoration:none}
         PLAY
       </a>
       <a class="howto-btn" id="howto-button" href="#how-to-play"><span class="q" aria-hidden="true">?</span>How to play</a>
+      <a class="quest-link" id="quest-link" href="game/mynecraft.html?mode=creative&amp;tutorial=1"><span class="cap" aria-hidden="true">🎓</span><span><b>First time playing?</b><span class="quest-sub">Click here to quiz your way through the basics.</span></span></a>
       <p class="save">💾 Your world saves by itself in this browser.</p>
     </div>
-    <div class="crew-row" aria-hidden="true"><img src="game/assets/staff-lineup/eriksen.png" alt=""><img src="game/assets/staff-lineup/micco.png" alt=""><img src="game/assets/staff-lineup/mullet.png" alt=""><img class="big" src="game/assets/staff-lineup/macek.png" alt=""><img src="game/assets/staff-lineup/wingenbach.png" alt=""><img src="game/assets/staff-lineup/mcmichael.png" alt=""></div>
+    <div class="crew-row"><img src="game/assets/staff-lineup/eriksen.png" alt=""><img src="game/assets/staff-lineup/micco.png" alt=""><img src="game/assets/staff-lineup/mullet.png" alt=""><a class="fig-link" href="game/teacher.html" aria-label="Teacher information"><img class="big" src="game/assets/staff-lineup/macek.png" alt=""></a><img src="game/assets/staff-lineup/wingenbach.png" alt=""><img src="game/assets/staff-lineup/mcmichael.png" alt=""></div>
   </main>
+  <!-- The teachers stand above the shading so they stay bright. -->
+  <div class="figs-layer">
+    <div class="scene scene-figs">
+      <img class="fig" src="game/assets/staff-lineup/micco.png" alt="" style="--x:25.5;--y:86;--h:31">
+      <img class="fig" src="game/assets/staff-lineup/eriksen.png" alt="" style="--x:6.5;--y:99.5;--h:42">
+      <img class="fig" src="game/assets/staff-lineup/wingenbach.png" alt="" style="--x:72;--y:95;--h:39">
+      <img class="fig" src="game/assets/staff-lineup/mullet.png" alt="" style="--x:15.5;--y:97;--h:41">
+      <img class="fig" src="game/assets/staff-lineup/mcmichael.png" alt="" style="--x:94.5;--y:97.5;--h:41">
+      <a class="fig-link" href="game/teacher.html" aria-label="Teacher information"><img class="fig fig-wave" src="game/assets/staff-lineup/macek.png" alt="" style="--x:81.5;--y:101;--h:49"></a>
+    </div>
+  </div>
 </header>
 <section class="section" id="how-to-play" aria-labelledby="quick-title">
   <div class="wrap">
@@ -211,7 +220,6 @@ footer a{font-weight:700;text-decoration:none}
         <div><h3>⌨️ Keyboard &amp; mouse</h3><ul><li><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrow keys to walk</li><li>Move the mouse to look; click and drag if it stays still</li><li>Right click places a block, left click removes one</li><li><kbd>E</kbd> to drive, shoot, sit, read or call the dogs</li><li><kbd>I</kbd> opens Inventory · <kbd>Space</kbd> jumps · <kbd>Shift</kbd> is faster</li><li>Creative: <kbd>F</kbd> to fly, <kbd>Space</kbd> up, <kbd>V</kbd> down</li><li><kbd>C</kbd> changes the camera · <kbd>Esc</kbd> opens the menu</li></ul></div>
         <div><h3>📱 Tablet, phone or touch</h3><ul><li>Move with the round stick; drag the screen to look</li><li>Tap PLACE to add a block and BREAK to remove one</li><li>Tap the yellow button to drive, shoot, sit or read</li><li>Creative: FLY turns flight on; hold JUMP to rise, DOWN to drop</li><li>🙈 Hide buttons clears the screen; tap it again to bring them back</li><li>On a laptop in Touch mode, the buttons work with the mouse too</li></ul></div>
         <div><h3>💾 Keep your world</h3><p>Your build is saved in this browser on this device, every few seconds and when you leave. For a copy you can keep, open <strong>Menu → Save or load a world → Download Save</strong> and keep the .json file somewhere safe, like your school OneDrive. <strong>Load World</strong> opens that file on another device and asks before replacing anything. Clearing browser data erases the saved world, so keep a copy.</p></div>
-        <div><h3>👩‍🏫 For teachers</h3><p>Teacher rooms need a separately set-up room service and teacher admission, and keep group building apart from solo saves. There is no chat or text signs. The room service needs teacher supervision; automatic detection of words built from blocks is not set up yet. <a href="game/rooms.html">Open teacher rooms</a>.</p></div>
       </div>
     </details>
   </div>
@@ -280,6 +288,11 @@ document.getElementById('howto-button')?.addEventListener?.('click',()=>{const m
   fit();addEventListener('resize',fit);
   if(window.ResizeObserver)new ResizeObserver(fit).observe(screen);
 })();
+// Already finished the Basics quest? Offer it as a refresher instead (a browser preference, not the world save).
+try{
+  const quest=document.getElementById('quest-link');
+  if(quest&&localStorage.getItem('mynecraft_tutorial_done')==='1'){quest.querySelector('b').textContent='Want a refresher?';quest.querySelector('.quest-sub').textContent='Click here to run through the basics again.';}
+}catch(e){}
 </script>
 </body>
 </html>
