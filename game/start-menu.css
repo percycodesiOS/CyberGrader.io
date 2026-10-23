@@ -636,3 +636,69 @@ html body #start #tryStatus:empty { display: none; }
 @media (prefers-reduced-motion: reduce) { .library-book:hover { transform: none; } }
 @media (max-width: 700px) { .inventory-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 430px) { .inventory-sheet { padding: 16px; } .inventory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .inventory-choice { min-height: 110px; } }
+
+/* ---- October 2026 splash simplification (Kenny's feedback) ----
+   One obvious PLAY, three big mode buttons, a small "Playing as" line, and
+   every long section folded behind its own button. */
+/* Blocky title: each letter is a little grass, stone, sand, wood or gold block. */
+html body #start .block-title { display: flex; flex-wrap: wrap; gap: .09em; margin: 0; font-size: clamp(30px, 6vw, 60px); line-height: 1; text-shadow: none; letter-spacing: 0; }
+html body #start .block-letter { display: inline-grid; place-items: center; width: 1.08em; height: 1.14em; padding-top: .1em; border-radius: .05em; color: #fff; font-family: Bungee, Impact, sans-serif; -webkit-text-stroke: .045em #15110c; paint-order: stroke fill; text-shadow: 0 .07em 0 #0009; box-shadow: inset 0 -.09em 0 #0005, inset .06em .06em 0 #ffffff2e, 0 .1em 0 #000a; animation: block-hop 3.2s ease-in-out infinite; }
+html body #start .block-letter.grass { background: linear-gradient(#72d047 0 24%, #4c9a2e 24% 32%, transparent 32%), repeating-conic-gradient(#8b5a34 0 25%, #774b2a 0 50%) 0 0 / .26em .26em; }
+html body #start .block-letter.stone { color: #ffd84d; background: repeating-conic-gradient(#9b9b9b 0 25%, #838383 0 50%) 0 0 / .28em .28em; }
+html body #start .block-letter.sand { color: #ff7a5c; background: repeating-conic-gradient(#ead68f 0 25%, #d8c179 0 50%) 0 0 / .24em .24em; }
+html body #start .block-letter.wood { color: #b8f27c; background: repeating-linear-gradient(0deg, #b98a51 0 .22em, #9c7140 .22em .27em); }
+html body #start .block-letter.gold { color: #fff4c2; background: repeating-conic-gradient(#f6c84a 0 25%, #dca524 0 50%) 0 0 / .26em .26em; }
+html body #start .block-letter:nth-child(2) { animation-delay: .12s; } html body #start .block-letter:nth-child(3) { animation-delay: .24s; }
+html body #start .block-letter:nth-child(4) { animation-delay: .36s; } html body #start .block-letter:nth-child(5) { animation-delay: .48s; }
+html body #start .block-letter:nth-child(6) { animation-delay: .6s; } html body #start .block-letter:nth-child(7) { animation-delay: .72s; }
+html body #start .block-letter:nth-child(8) { animation-delay: .84s; } html body #start .block-letter:nth-child(9) { animation-delay: .96s; }
+@keyframes block-hop { 0%, 62%, 100% { transform: translateY(0) rotate(0); } 72% { transform: translateY(-.14em) rotate(-3deg); } 82% { transform: translateY(0) rotate(0); } }
+@media (prefers-reduced-motion: reduce) { html body #start .block-letter { animation: none; } }
+html body #start .hero-brand .edition { margin-top: 12px; }
+html body #start .hero-brand .hero-tagline { margin-top: 6px; color: #e8e4da; font-size: 16px; }
+
+/* Three big, simple mode choices; the select stays as the single source of truth. */
+html body #start .hero-play .hero-mode { display: none; }
+html body #start .hero-step { margin: 0; color: #f8dca2; font: 400 17px/1.2 Bungee, Impact, sans-serif; }
+html body #start .mode-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+html body #start .mode-card { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 98px; padding: 10px 6px; border: 2px solid #4a6a86; border-bottom: 4px solid #2c4258; border-radius: 12px; background: #1d3346; color: #f4f8fc; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; }
+html body #start .mode-card span { font-size: 30px; line-height: 1; }
+html body #start .mode-card strong { font-size: 15px; line-height: 1.15; }
+html body #start .mode-card small { font-size: 12px; color: #b9cfe0; line-height: 1.2; }
+html body #start .mode-card:hover { background: #26445c; }
+html body #start .mode-card[aria-checked="true"] { background: #f8d778; color: #142b42; border-color: #fff1b8; border-bottom-color: #b98a20; }
+html body #start .mode-card[aria-checked="true"] small { color: #4d3b10; }
+html body #start .mode-card:disabled { opacity: .5; cursor: default; }
+html body #start .playing-as { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin: 2px 0 0; color: #dfe9f2; font-size: 15px; font-weight: 700; }
+html body #start .link-button { flex: none; min-height: 36px; padding: 4px 14px; border: 1px solid #7fb6dd; border-radius: 999px; background: #2b4a63; color: #f4f8fc; font: 700 14px system-ui, -apple-system, "Segoe UI", sans-serif; }
+html body #start .hero-play #startTip { text-align: center; color: #b9cfe0; }
+
+/* Character choice: visible, but smaller than Play. */
+html body #start .start-character-panel { padding: 16px 18px; border: 1px solid #4a6a86; border-radius: 16px; background: #14222ecc; box-shadow: none; }
+html body #start .start-character-panel h2 { margin: 0 0 4px; font: 400 18px/1.2 Bungee, Impact, sans-serif; }
+html body #start .start-character-panel .character-note { margin: 0 0 12px; font-size: 14px; }
+html body #start #staffChoices { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+html body #start .staff-preview { height: 100px; }
+html body #start .staff-choice small { display: none; }
+html body #start .staff-choice[data-character="student"] { border-color: #f8d778; }
+
+/* Folded extras: each is one friendly button until opened. */
+html body #start .start-more { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+html body #start .start-more > details { flex: 1 1 210px; margin: 0; padding: 0; border: 1px solid #4a6a86; border-radius: 12px; background: #1b2a36; box-shadow: none; }
+html body #start .start-more > details > summary { display: flex; align-items: center; min-height: 52px; padding: 10px 16px; list-style: none; color: #f4f8fc; font: 700 15px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; }
+html body #start .start-more > details > summary::-webkit-details-marker { display: none; }
+html body #start .start-more > details.how-to-play > summary { border-radius: 11px; background: #f8d778; color: #142b42; }
+html body #start .start-more > details[open] { flex-basis: 100%; padding-bottom: 14px; }
+html body #start .start-more > details[open] > :not(summary) { margin-left: 14px; margin-right: 14px; }
+html body #start .start-more > details[open] > summary { margin-bottom: 10px; }
+html body #start .start-more .first-minute { margin-top: 0; }
+html body #start .start-more .settings-body > p:first-child { margin-top: 0; }
+@media (max-width: 1000px) { html body #start #staffChoices { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 520px) {
+  html body #start #staffChoices { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html body #start .staff-preview { height: 78px; }
+  html body #start .staff-choice span { font-size: 12px; }
+  html body #start .mode-card { min-height: 88px; padding: 8px 4px; }
+  html body #start .mode-card span { font-size: 26px; }
+  html body #start .start-more > details { flex-basis: 100%; }
+}
