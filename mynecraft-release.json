@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "f2d540faaebc8ac85f194f5745d2e69d06d82882",
+  "sourceCommit": "b8d5455bb5c70c12049e9a164d41e88b5ddcf2c3",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -36,6 +36,6 @@
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "0e7a70dad197343d8171a557e42c898566828e26c8d88c7b4fda44096cd89f6d"
+    "index.html": "1cd72519464b33529ef124e2bade574015a2a128b6ba48a416533bfc2e8a52ca"
   }
 }
