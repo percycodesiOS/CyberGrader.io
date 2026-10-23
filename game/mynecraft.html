@@ -1300,8 +1300,10 @@ for (const [id, k] of Object.entries(saveState.edits)) {
 }
 
 let _saveTimer = null;
+let onWorldEdit=null; // set once Percy and Ellie exist
 function recordEdit(x,y,z,k){
   saveState.edits[key(x,y,z)] = k;   // k = block name, or null for a removed block
+  onWorldEdit?.();
   if (_saveTimer) clearTimeout(_saveTimer);
   _saveTimer = setTimeout(persistSave, 350);
 }
@@ -2235,9 +2237,11 @@ function nearestWalkPoint(target,bounds){
   return null;
 }
 const PATH_STEP_NODES=64,PATH_MAX_NODES=14000;
-function createWalkingSearch(position,target,bounds){
+// With `closest`, a goal that cannot be reached (walled off, or too far for one
+// search) still yields a route to the reachable spot nearest to it, instead of none.
+function createWalkingSearch(position,target,bounds,{closest=false}={}){
   const start=nearestWalkPoint(position,bounds),goal=nearestWalkPoint(target,bounds);
-  const search={done:!start||!goal,path:[],expanded:0,step(){}};
+  const search={done:!start||!goal,path:[],partial:false,expanded:0,step(){}};
   if(search.done)return search;
   const id=p=>key(p.x,p.y,p.z),goalId=id(goal),startId=id(start);
   // A* searches toward the destination instead of flooding the entire world.
@@ -2255,16 +2259,19 @@ function createWalkingSearch(position,target,bounds){
     return first;
   };
   push({p:start,g:0,f:heuristic(start)});
+  let bestId=startId,bestH=heuristic(start);
+  const finish=endId=>{
+    let cur=endId;
+    while(cur!==startId){search.path.push(nodes.get(cur));cur=parents.get(cur);}
+    search.path.reverse();search.done=true;
+  };
   search.step=budget=>{
     if(search.done)return;
     for(let i=0;heap.length&&i<budget&&search.expanded<PATH_MAX_NODES;i++){
       search.expanded++;
       const entry=pop(),p=entry.p,pid=id(p);if(entry.g!==costs.get(pid))continue;
-      if(pid===goalId){
-        let cur=pid;
-        while(cur!==startId){search.path.push(nodes.get(cur));cur=parents.get(cur);}
-        search.path.reverse();search.done=true;return;
-      }
+      if(pid===goalId){finish(pid);return;}
+      const h=heuristic(p);if(h<bestH){bestH=h;bestId=pid;}
       for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
         const x=p.x+dx,z=p.z+dz;if(!insideBounds(x,z,bounds))continue;
         const y=walkFeet(x,z,p.y);if(y===null)continue;
@@ -2272,7 +2279,10 @@ function createWalkingSearch(position,target,bounds){
         parents.set(nid,pid);nodes.set(nid,next);costs.set(nid,g);push({p:next,g,f:g+heuristic(next)});
       }
     }
-    if(!heap.length||search.expanded>=PATH_MAX_NODES)search.done=true;
+    if(!heap.length||search.expanded>=PATH_MAX_NODES){
+      if(closest&&bestId!==startId){search.partial=true;finish(bestId);}
+      else search.done=true;
+    }
   };
   return search;
 }
@@ -2771,7 +2781,7 @@ class CampusActor extends NPC {
     if(atGoal){this.route=[];this.navigationSearch=null;}
     const changedFailedGoal=this.failedGoalKey&&goalKey!==this.failedGoalKey;
     if(!atGoal&&!this.navigationSearch&&(this.planTimer<=0||changedFailedGoal)&&(goalKey!==this.goalKey||!this.route.length)){
-      this.route=[];this.navigationSearch=createWalkingSearch(this.pos,goal,this.bounds);this.goalKey=goalKey;this.planTimer=1.5;
+      this.route=[];this.navigationSearch=createWalkingSearch(this.pos,goal,this.bounds,{closest:!!this.closestRoute});this.goalKey=goalKey;this.planTimer=1.5;
     }
     if(this.navigationSearch){
       const search=this.navigationSearch;search.step(PATH_STEP_NODES);
@@ -2905,6 +2915,10 @@ const ellieStart=companionFallbackStart(-1),percyStart=companionFallbackStart(1)
 // The constructor still honors each dog's own explicit saved position first.
 const ellie=new CampusActor('Ellie',ellieStart.x,ellieStart.y,ellieStart.z,'macek',worldBounds);makeRetriever(ellie,0x38b8b0,0xd9a252,0xf0d09c,.96);
 const percy=new CampusActor('Percy',percyStart.x,percyStart.y,percyStart.z,'macek',worldBounds);makeRetriever(percy,0x253f52,0xba732f,0xd59951,1.1);
+// Kids saw the dogs freeze when the way was blocked. They now walk as close as they
+// can, and look for a new way as soon as anyone builds or breaks a block.
+for(const dog of [ellie,percy])dog.closestRoute=true;
+onWorldEdit=()=>{for(const dog of [ellie,percy])if(dog.planFailures){dog.planTimer=0;dog.failedGoalKey='';}};
 const micco=new CampusActor('Ms. Micco',26,5,-26,'micco');
 // Both school greeters stay in this small, walkable entrance area.
 const entranceStaffBounds={minX:48,maxX:54,minZ:16,maxZ:22,filter:schoolFootprint};

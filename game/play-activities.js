@@ -406,6 +406,16 @@
       }
       return null;
     }
+    // Is there a neighbouring block, at about the same level, that this animal fits on?
+    function roomToWalk(entity) {
+      const r0 = entity.kind === 'horse' ? .48 : .25, h = entity.kind === 'horse' ? 2.2 : 1.4, cx = Math.floor(entity.pos.x), cz = Math.floor(entity.pos.z);
+      for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+        if (!dx && !dz) continue;
+        const xx = cx + dx + .5, zz = cz + dz + .5, y = groundSurface(xx, zz);
+        if (finite(y) && Math.abs(y - entity.pos.y) <= .35 && distance({ x: xx, z: zz }, entity.home) < 9 && landFits(xx, y, zz, r0, h)) return true;
+      }
+      return false;
+    }
     function unstick(entity) {
       entity.stuck = 0;
       const spot = openSpotNear(entity.kind, entity.pos.x, entity.pos.z, entity.pos.y);
@@ -434,7 +444,14 @@
         else {
           entity.heading += Math.PI * .7; entity.timer = .5; entity.stuck = (entity.stuck || 0) + dt;
           // Boxed in by new blocks, on a ledge or far from home: hop to the nearest open spot.
-          if (!fish && entity.stuck > STUCK_SECONDS) unstick(entity);
+          if (!fish && entity.stuck > STUCK_SECONDS) { unstick(entity); entity.boxed = 0; }
+        }
+        // Walled into a single block, an animal can still shuffle a little, which keeps
+        // resetting the count above. Once a second, check it has a neighbouring block to go to.
+        if (!fish && (entity.roomCheck = (entity.roomCheck || 0) - dt) <= 0) {
+          entity.roomCheck = 1;
+          entity.boxed = roomToWalk(entity) ? 0 : (entity.boxed || 0) + 1;
+          if (entity.boxed > STUCK_SECONDS) { unstick(entity); entity.boxed = 0; }
         }
         for (let i = 0; i < entity.legs.length; i++) entity.legs[i].rotation.x = allowed ? Math.sin(entity.phase + (i % 2) * Math.PI) * .28 : 0;
         entity.mesh.position.copy(entity.pos); entity.mesh.rotation.y = entity.heading;
