@@ -702,3 +702,13 @@ html body #start .start-more .settings-body > p:first-child { margin-top: 0; }
   html body #start .mode-card span { font-size: 26px; }
   html body #start .start-more > details { flex-basis: 100%; }
 }
+
+/* Four picture steps under the title: move, look, build, save. */
+html body #start .quick-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+html body #start .quick-step { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px; border: 1px solid #4a6a86; border-radius: 14px; background: #14222ecc; text-align: center; color: #dfe9f2; font-size: 13px; line-height: 1.3; }
+html body #start .quick-step .quick-icon { font-size: 30px; line-height: 1; }
+html body #start .quick-step strong { color: #fff; font: 400 16px/1.1 Bungee, Impact, sans-serif; letter-spacing: .03em; }
+html body #start .quick-step kbd { min-width: 22px; }
+html body #start .quick-step .desktop-help, html body #start .quick-step .touch-help { margin: 0; }
+html body.touch-device #start .quick-step .touch-help { display: inline; }
+@media (max-width: 520px) { html body #start .quick-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

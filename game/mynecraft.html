@@ -4,6 +4,20 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>MYnecraft: EC Edition</title>
+<script>
+// Title screen first, like a real game: the plain school link (no ?query or
+// #hash) opens the landing page once per browser tab. The landing marks the tab
+// in sessionStorage, so this can never loop, and any explicit deep link
+// (?mode=hardcore, ?room=1, #…) opens the game exactly as before. Same site only.
+(function(){
+  try{
+    if(location.search||location.hash)return;
+    if(sessionStorage.getItem('mynecraft_title_seen')==='1')return;
+    sessionStorage.setItem('mynecraft_title_seen','1');
+    location.replace('../index.html');
+  }catch(e){}
+})();
+</script>
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #87ceeb; font-family: ui-monospace, monospace; }
   canvas { display: block; touch-action: none; }
@@ -211,7 +225,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=splash-20261023">
+<link rel="stylesheet" href="start-menu.css?v=title-20261023">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -267,6 +281,13 @@
         </div>
       </div>
     </header>
+    <!-- Four picture steps: all a first-time player needs. The rest is under How to play. -->
+    <section class="quick-steps" aria-label="Quick start">
+      <div class="quick-step"><span class="quick-icon" aria-hidden="true">🕹️</span><strong>Move</strong><span class="desktop-help"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></span><span class="touch-help">Use the round stick</span></div>
+      <div class="quick-step"><span class="quick-icon" aria-hidden="true">👀</span><strong>Look</strong><span class="desktop-help">Move the mouse</span><span class="touch-help">Drag the screen</span></div>
+      <div class="quick-step"><span class="quick-icon" aria-hidden="true">🧱</span><strong>Build</strong><span class="desktop-help">Right click adds · left click removes</span><span class="touch-help">Tap PLACE · tap BREAK</span></div>
+      <div class="quick-step"><span class="quick-icon" aria-hidden="true">💾</span><strong>Save</strong><span>It saves by itself</span></div>
+    </section>
     <!-- One tap takes a student straight to each thing the class asked for. -->
     <section class="try-panel" id="tryPanel" aria-labelledby="tryTitle">
       <h2 id="tryTitle">Things to try</h2>
@@ -4905,8 +4926,6 @@ addEventListener('beforeunload', persistSave);
 // iPads and phones often skip beforeunload; pagehide is their last reliable moment.
 addEventListener('pagehide', persistSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pauseGame(); persistSave(); } });
-// A steady autosave during play, so a dead battery loses at most half a minute.
-setInterval(()=>{if(started&&!resetting&&!isGroupRoom)persistSave();},30000);
 if(damagedSaveKept){
   document.getElementById('backupStatus').textContent='Your last save could not be opened, so a safe copy was kept. Use Download damaged save below and show it to your teacher.';
   const damagedBtn=document.createElement('button');damagedBtn.type='button';damagedBtn.textContent='Download damaged save';
@@ -4959,6 +4978,12 @@ if(isGroupRoom){
   addEventListener('beforeunload',()=>roomConnection?.dispose());
 }
 setInterval(()=>{if(started)persistSave();},5000);
+// PLAY on the title screen goes straight into the world, so nobody presses Play
+// twice. This menu then works as the pause menu (Esc or Menu). Saves are untouched.
+try{
+  const tab=globalThis.sessionStorage;
+  if(tab&&tab.getItem('mynecraft_start_now')==='1'){tab.removeItem('mynecraft_start_now');if(!isGroupRoom)startGame();}
+}catch{}
 </script>
 </body>
 </html>

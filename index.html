@@ -16,223 +16,170 @@ html{scroll-behavior:smooth;scroll-padding-top:20px}
 body{margin:0;background:var(--navy);color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:var(--sun2)}a:hover{color:#ffe3a6}
 :focus-visible{outline:3px solid var(--sun2);outline-offset:4px;border-radius:6px}
-.wrap{width:100%;max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,44px)}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
 .skip-link{position:absolute;left:16px;top:-80px;z-index:20;background:var(--sun);color:#1a1405;padding:12px 18px;border-radius:8px;font-weight:800}
 .skip-link:focus{top:12px}
-h1,h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;line-height:1.1}
+h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;line-height:1.1}
 
-/* Hero: the campus cover with a big, obvious Play. */
-.hero{position:relative;isolation:isolate;min-height:min(100vh,920px);display:flex;flex-direction:column}
-.hero-bg{position:absolute;inset:0;z-index:-2;overflow:hidden}
-.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:62% 45%;display:block;transform:scale(1.04);animation:drift 30s ease-in-out infinite alternate}
-.hero-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,26,46,.6) 0%,rgba(11,26,46,.2) 36%,rgba(11,26,46,.6) 72%,var(--navy) 100%),linear-gradient(90deg,rgba(11,26,46,.82) 0%,rgba(11,26,46,.35) 58%,rgba(11,26,46,0) 100%)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;padding-top:20px;padding-bottom:20px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px;font:400 17px Bungee,Impact,sans-serif;letter-spacing:.04em}
-.brand svg{width:30px;height:30px}
-.top nav{display:flex;gap:22px;flex-wrap:wrap}
-.top nav a{color:var(--ink);text-decoration:none;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:8px 0;border-bottom:2px solid transparent}
-.top nav a:hover{border-bottom-color:var(--sun2);color:var(--sun2)}
-.hero-body{flex:1;display:flex;align-items:center;padding:clamp(28px,7vh,90px) 0 clamp(40px,8vh,96px)}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,5vw,64px);align-items:center;width:100%}
-.kicker{display:inline-block;margin:0 0 16px;padding:6px 12px;border-radius:999px;background:rgba(46,122,84,.85);color:#e8fff1;font-size:13px;font-weight:800;letter-spacing:.06em}
-.hero h1{margin:0;font-size:clamp(46px,7.4vw,100px);text-shadow:0 6px 0 #071121,0 18px 40px rgba(0,0,0,.45)}
-.hero h1 span{display:block;margin-top:10px;color:var(--sun2);font-size:.36em;letter-spacing:.12em}
-.lede{margin:20px 0 0;max-width:34ch;font-size:clamp(18px,1.7vw,22px);line-height:1.45;color:#eee9dd;text-shadow:0 2px 14px rgba(0,0,0,.55)}
-.panel{background:rgba(11,26,46,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,2.6vw,30px);box-shadow:0 24px 60px rgba(0,0,0,.45)}
-.panel h2{margin:0 0 4px;font-size:20px;color:var(--sun2)}
-.panel .sub{margin:0 0 14px;color:var(--muted);font-size:15px}
-.modes{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;border:0}
+/* The title screen: campus behind, blocky title, three choices, one big PLAY. */
+.title-screen{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.title-bg{position:absolute;inset:0;z-index:-2;overflow:hidden}
+.title-bg img{width:100%;height:100%;object-fit:cover;object-position:58% 42%;display:block;transform:scale(1.05);animation:drift 30s ease-in-out infinite alternate}
+.title-shade{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 38%,rgba(11,26,46,.15) 0%,rgba(11,26,46,.55) 55%,rgba(11,26,46,.92) 100%),linear-gradient(180deg,rgba(11,26,46,.35),rgba(11,26,46,.2) 40%,var(--navy) 100%)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:16px;padding-bottom:8px}
+.top a{color:var(--ink);text-decoration:none;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.top a:hover{opacity:1;color:var(--sun2)}
+.title-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:18px 0 40px;text-align:center}
+.block-title{display:flex;flex-wrap:wrap;justify-content:center;gap:.09em;margin:0;font-size:clamp(34px,8.4vw,92px);line-height:1;font-weight:400}
+.block-letter{display:inline-grid;place-items:center;width:1.08em;height:1.14em;padding-top:.1em;border-radius:.05em;color:#fff;font-family:Bungee,Impact,sans-serif;-webkit-text-stroke:.045em #15110c;paint-order:stroke fill;text-shadow:0 .07em 0 #0009;box-shadow:inset 0 -.09em 0 #0005,inset .06em .06em 0 #ffffff2e,0 .12em 0 #000a;animation:hop 3.2s ease-in-out infinite}
+.block-letter.grass{background:linear-gradient(#72d047 0 24%,#4c9a2e 24% 32%,transparent 32%),repeating-conic-gradient(#8b5a34 0 25%,#774b2a 0 50%) 0 0/.26em .26em}
+.block-letter.stone{color:#ffd84d;background:repeating-conic-gradient(#9b9b9b 0 25%,#838383 0 50%) 0 0/.28em .28em}
+.block-letter.sand{color:#ff7a5c;background:repeating-conic-gradient(#ead68f 0 25%,#d8c179 0 50%) 0 0/.24em .24em}
+.block-letter.wood{color:#b8f27c;background:repeating-linear-gradient(0deg,#b98a51 0 .22em,#9c7140 .22em .27em)}
+.block-letter.gold{color:#fff4c2;background:repeating-conic-gradient(#f6c84a 0 25%,#dca524 0 50%) 0 0/.26em .26em}
+.block-letter:nth-child(2){animation-delay:.12s}.block-letter:nth-child(3){animation-delay:.24s}.block-letter:nth-child(4){animation-delay:.36s}.block-letter:nth-child(5){animation-delay:.48s}
+.block-letter:nth-child(6){animation-delay:.6s}.block-letter:nth-child(7){animation-delay:.72s}.block-letter:nth-child(8){animation-delay:.84s}.block-letter:nth-child(9){animation-delay:.96s}
+.edition{margin:0;color:var(--sun2);font:400 clamp(16px,2.4vw,24px)/1 Bungee,Impact,sans-serif;letter-spacing:.18em;text-shadow:0 3px 0 #071121}
+.tagline{margin:0;font-size:clamp(17px,1.8vw,21px);color:#f0ebe0;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.panel{width:min(560px,100%);background:rgba(11,26,46,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:clamp(16px,2.6vw,24px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.panel h2{margin:0 0 12px;font-size:18px;color:var(--sun2)}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0;border:0}
 .modes legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.mode{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:center;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:rgba(19,42,71,.6);cursor:pointer;min-height:72px;transition:border-color .15s,background .15s}
-.mode:hover{border-color:rgba(255,210,122,.55)}
+.mode{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:104px;padding:10px 6px;border:2px solid #4a6a86;border-bottom-width:4px;border-radius:14px;background:rgba(29,51,70,.9);cursor:pointer;transition:background .15s,border-color .15s}
+.mode:hover{background:#26445c}
 .mode input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.mode .icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--navy3);font-size:24px}
-.mode b{display:block;font-size:18px;font-weight:800}
-.mode small{display:block;font-size:14px;color:var(--muted);margin-top:2px;line-height:1.35}
-.mode:has(input:checked){border-color:var(--sun);background:rgba(242,181,68,.15)}
-.mode:has(input:checked) .icon{background:var(--sun);}
-.mode:has(input:focus-visible){outline:3px solid var(--sun2);outline-offset:3px}
-.play{margin-top:18px;width:100%;min-height:74px;display:flex;align-items:center;justify-content:center;gap:14px;border-radius:16px;text-decoration:none;background:linear-gradient(180deg,#ffd27a,#f2b544);color:#1a1405;font:400 30px Bungee,Impact,sans-serif;letter-spacing:.08em;box-shadow:0 10px 0 #9a6a12,0 22px 40px rgba(242,181,68,.35);transition:transform .12s,box-shadow .12s}
-.play svg{width:30px;height:30px}
+.mode .icon{font-size:32px;line-height:1}
+.mode b{font-size:16px;line-height:1.15}
+.mode small{font-size:12px;color:#b9cfe0;line-height:1.2}
+.mode:has(input:checked){background:var(--sun2);border-color:#fff1b8;border-bottom-color:#b98a20;color:#142b42}
+.mode:has(input:checked) small{color:#4d3b10}
+.mode:has(input:focus-visible){outline:3px solid #fff;outline-offset:3px}
+.play{margin-top:14px;width:100%;min-height:84px;display:flex;align-items:center;justify-content:center;gap:16px;border-radius:18px;text-decoration:none;background:linear-gradient(180deg,#ffd27a,#f2b544);color:#1a1405;font:400 clamp(30px,5vw,40px) Bungee,Impact,sans-serif;letter-spacing:.1em;box-shadow:0 10px 0 #9a6a12,0 22px 40px rgba(242,181,68,.35);transition:transform .12s,box-shadow .12s}
+.play svg{width:34px;height:34px}
 .play:hover{color:#1a1405;transform:translateY(-2px);box-shadow:0 12px 0 #9a6a12,0 26px 46px rgba(242,181,68,.45)}
 .play:active{transform:translateY(6px);box-shadow:0 4px 0 #9a6a12,0 12px 24px rgba(242,181,68,.3)}
-.save{display:flex;gap:10px;align-items:flex-start;margin:16px 0 0;font-size:14px;line-height:1.45;color:var(--muted)}
-.save span:first-child{font-size:18px;line-height:1.2}
+.save{margin:14px 0 0;font-size:14px;color:var(--muted)}
+.scroll-hint{color:var(--muted);font-size:14px;text-decoration:none}
 
-/* Sections */
-.section{padding:clamp(44px,7vw,84px) 0;border-top:1px solid var(--line)}
-.section-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px;margin-bottom:28px}
-.section-head h2{margin:0;font-size:clamp(28px,3.6vw,42px)}
+/* Below the title screen */
+.section{padding:clamp(40px,6vw,72px) 0;border-top:1px solid var(--line)}
+.section-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px 24px;margin-bottom:24px}
+.section-head h2{margin:0;font-size:clamp(26px,3.4vw,38px)}
 .section-head h2 em{font-style:normal;color:var(--sun2)}
 .section-head p{margin:0;max-width:44ch;color:var(--muted);font-size:17px}
-.things{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
-.thing{display:flex;flex-direction:column;gap:10px;padding:22px 20px;border-radius:18px;background:linear-gradient(180deg,rgba(46,122,84,.28),rgba(19,42,71,.5));border:1px solid rgba(63,155,107,.4);min-height:190px}
-.thing .emoji{font-size:40px;line-height:1}
-.thing h3{margin:0;font-size:19px}
-.thing p{margin:0;color:var(--muted);font-size:15px;line-height:1.5}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 16px;border-radius:20px;background:var(--navy2);border:1px solid var(--line);text-align:center}
+.step .num{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--sun2);color:#1a1405;font:400 18px Bungee,Impact,sans-serif}
+.step .pic{font-size:48px;line-height:1}
+.step h3{margin:0;font-size:20px}
+.step p{margin:0;color:var(--muted);font-size:15px;line-height:1.4}
+kbd{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 7px;margin:2px;border-radius:7px;background:#25476f;border:1px solid #4b6f99;border-bottom-width:3px;color:#fff;font:800 13px system-ui,sans-serif}
+.touch{display:none}
+@media (pointer:coarse) and (hover:none){.touch{display:block}.mouse{display:none}}
+.things{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.thing{display:flex;flex-direction:column;gap:8px;padding:20px 18px;border-radius:18px;background:linear-gradient(180deg,rgba(46,122,84,.28),rgba(19,42,71,.5));border:1px solid rgba(63,155,107,.4)}
+.thing .emoji{font-size:38px;line-height:1}
+.thing h3{margin:0;font-size:18px}
+.thing p{margin:0;color:var(--muted);font-size:15px;line-height:1.45}
 .thing.new{position:relative}
 .thing.new::after{content:"NEW";position:absolute;top:14px;right:14px;padding:3px 8px;border-radius:999px;background:var(--sun);color:#1a1405;font:800 11px/1.4 system-ui,sans-serif;letter-spacing:.08em}
-
-.how{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.how-card{padding:24px;border-radius:18px;background:var(--navy2);border:1px solid var(--line)}
-.how-card h3{margin:0 0 16px;font-size:20px;color:var(--sun2)}
-.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-.steps li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;font-size:16px}
-.keys{display:flex;gap:4px;min-width:96px}
-kbd{display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 7px;border-radius:7px;background:#25476f;border:1px solid #4b6f99;border-bottom-width:3px;color:#fff;font:800 13px system-ui,sans-serif}
-.pill{display:inline-grid;place-items:center;min-height:32px;padding:0 10px;border-radius:8px;background:#1f5a3e;border:1px solid #3f9b6b;color:#e8fff1;font:800 12px system-ui,sans-serif;letter-spacing:.04em}
-.tip{margin:20px 0 0;padding:16px 18px;border-radius:14px;background:rgba(242,181,68,.12);border:1px solid rgba(242,181,68,.4);color:#f6e7c4;font-size:15px}
-
-.safe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.safe div{padding:22px;border-radius:18px;background:var(--navy2);border:1px solid var(--line)}
-.safe .emoji{font-size:30px}
-.safe h3{margin:10px 0 8px;font-size:17px}
-.safe p{margin:0;color:var(--muted);font-size:15px}
-
-.teachers{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;justify-content:space-between;padding:24px 26px;border-radius:18px;background:var(--navy2);border:1px solid var(--line)}
-.teachers p{margin:0;max-width:70ch;color:var(--muted);font-size:15px}
-.teachers a.button{display:inline-flex;align-items:center;min-height:48px;padding:10px 18px;border-radius:12px;background:var(--grass);border:1px solid var(--grass2);color:#fff;text-decoration:none;font-weight:800}
+details.more{border:1px solid var(--line);border-radius:18px;background:var(--navy2)}
+details.more>summary{display:flex;align-items:center;gap:10px;min-height:64px;padding:12px 22px;cursor:pointer;list-style:none;font:400 20px Bungee,Impact,sans-serif}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:"＋";margin-left:auto;color:var(--sun2)}
+details.more[open]>summary::after{content:"－"}
+.more-body{padding:0 22px 22px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.more-body h3{margin:0 0 8px;font-size:16px;color:var(--sun2)}
+.more-body p,.more-body li{color:var(--muted);font-size:15px;line-height:1.6}
+.more-body ul{margin:0;padding-left:20px}
+.more-body .wide{grid-column:1/-1}
 footer{padding:26px 0 40px;border-top:1px solid var(--line);background:#0e2238}
 footer .row{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted)}
 footer a{font-weight:700;text-decoration:none}
 
-@keyframes drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.1) translate(-1.5%,-1%)}}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-bg img{animation:none}.play,.mode{transition:none}.play:hover{transform:none}}
-@media (max-width:1024px){.things{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:860px){.hero-grid{grid-template-columns:minmax(0,1fr)}.hero{min-height:auto}.hero-body{padding-top:16px}.hero-shade{background:linear-gradient(180deg,rgba(11,26,46,.65) 0%,rgba(11,26,46,.55) 40%,var(--navy) 88%)}.how,.safe{grid-template-columns:1fr}}
-@media (max-width:520px){.things{grid-template-columns:minmax(0,1fr)}.thing{min-height:0}.top{padding-top:14px;padding-bottom:6px}.top nav{gap:4px 14px}.top nav a{font-size:11px;padding:4px 0}.kicker{display:none}.hero h1{font-size:44px}.lede{margin-top:12px;font-size:17px}.hero-body{padding-bottom:28px}.mode{min-height:0;padding:11px 12px;gap:12px;grid-template-columns:38px minmax(0,1fr)}.mode .icon{width:38px;height:38px;font-size:20px}.mode b{font-size:16px}.mode small{font-size:13px}.play{font-size:26px;min-height:66px}.steps li{grid-template-columns:minmax(0,1fr);gap:6px}.teachers{padding:20px}}
+@keyframes hop{0%,62%,100%{transform:translateY(0) rotate(0)}72%{transform:translateY(-.14em) rotate(-3deg)}82%{transform:translateY(0) rotate(0)}}
+@keyframes drift{from{transform:scale(1.05) translate(0,0)}to{transform:scale(1.11) translate(-1.5%,-1%)}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.title-bg img,.block-letter{animation:none}.play,.mode{transition:none}.play:hover{transform:none}}
+@media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
+@media (max-width:480px){.title-body{gap:14px;padding-top:6px}.mode{min-height:92px;padding:8px 4px}.mode .icon{font-size:26px}.mode b{font-size:14px}.play{min-height:76px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}}
 </style>
 </head>
 <body>
 <a class="skip-link" href="#play-button">Skip to Play</a>
-<header class="hero" id="play">
-  <div class="hero-bg" aria-hidden="true"><img src="game/assets/ec-world-cover.png" alt=""></div>
-  <div class="hero-shade" aria-hidden="true"></div>
-  <div class="wrap top">
-    <div class="brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="12" height="12" fill="#2E7A54"/><rect x="18" y="2" width="12" height="12" fill="#F2B544"/><rect x="2" y="18" width="12" height="12" fill="#F2B544"/><rect x="18" y="18" width="12" height="12" fill="#2E7A54"/></svg>
-      <span>MYnecraft</span>
+<header class="title-screen" id="play">
+  <div class="title-bg" aria-hidden="true"><img src="game/assets/ec-world-cover.png" alt=""></div>
+  <div class="title-shade" aria-hidden="true"></div>
+  <nav class="wrap top" aria-label="Site"><a href="#how-to-play">How to play</a><a href="game/rooms.html">Teacher rooms</a></nav>
+  <main class="wrap title-body">
+    <h1 class="block-title" aria-label="MYnecraft"><span aria-hidden="true" class="block-letter grass">M</span><span aria-hidden="true" class="block-letter stone">Y</span><span aria-hidden="true" class="block-letter grass">N</span><span aria-hidden="true" class="block-letter sand">E</span><span aria-hidden="true" class="block-letter grass">C</span><span aria-hidden="true" class="block-letter stone">R</span><span aria-hidden="true" class="block-letter wood">A</span><span aria-hidden="true" class="block-letter grass">F</span><span aria-hidden="true" class="block-letter gold">T</span></h1>
+    <p class="edition">EC EDITION</p>
+    <p class="tagline">Your school, built from blocks.</p>
+    <div class="panel">
+      <h2>How do you want to play?</h2>
+      <fieldset class="modes">
+        <legend>Game mode</legend>
+        <label class="mode"><input type="radio" name="mode" value="creative" checked><span class="icon" aria-hidden="true">🎨</span><b>Creative</b><small>Build anything</small></label>
+        <label class="mode"><input type="radio" name="mode" value="survival"><span class="icon" aria-hidden="true">🌳</span><b>Challenge</b><small>Collect &amp; build</small></label>
+        <label class="mode"><input type="radio" name="mode" value="hardcore"><span class="icon" aria-hidden="true">⛏️</span><b>Hardcore</b><small>Craft &amp; unlock</small></label>
+      </fieldset>
+      <a class="play" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        PLAY
+      </a>
+      <p class="save">💾 Your world saves by itself in this browser.</p>
     </div>
-    <nav aria-label="Main navigation"><a href="#things">Things to do</a><a href="#how-to-play">How to play</a><a href="#keep-your-world">Saving</a><a href="game/rooms.html">Teacher rooms</a></nav>
-  </div>
-  <div class="hero-body">
-    <div class="wrap">
-      <div class="hero-grid">
-        <div>
-          <p class="kicker">A peaceful block world for grades 5 and 6</p>
-          <h1>MYnecraft<span>EC Edition</span></h1>
-          <p class="lede">Your school, built from blocks. Build anything, drive the car, shoot hoops, or sit on the roof with a cup of tea.</p>
-        </div>
-        <div class="panel">
-          <h2>How do you want to play?</h2>
-          <p class="sub">Not sure? Pick Creative. You can change later.</p>
-          <fieldset class="modes">
-            <legend>Game mode</legend>
-            <label class="mode">
-              <input type="radio" name="mode" value="creative" checked>
-              <span class="icon" aria-hidden="true">🎨</span>
-              <span><b>Creative</b><small>Every block, as many as you want. Fly, build and explore.</small></span>
-            </label>
-            <label class="mode">
-              <input type="radio" name="mode" value="survival">
-              <span class="icon" aria-hidden="true">🌳</span>
-              <span><b>Embrace the Challenge</b><small>Collect 10 wood, place 12 blocks and find CIRC.</small></span>
-            </label>
-            <label class="mode">
-              <input type="radio" name="mode" value="hardcore">
-              <span class="icon" aria-hidden="true">⛏️</span>
-              <span><b>Embrace the Challenge: Hardcore</b><small>Its own peaceful world. Gather, craft and unlock rewards.</small></span>
-            </label>
-          </fieldset>
-          <a class="play" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
-            Play
-          </a>
-          <p class="save"><span aria-hidden="true">💾</span><span>Your world saves by itself in this browser. Use <strong>Download Save</strong> in the menu to keep a copy.</span></p>
-        </div>
-      </div>
-    </div>
-  </div>
+    <a class="scroll-hint" href="#quick-start">New here? See how to play ↓</a>
+  </main>
 </header>
-<main>
-  <section class="section" id="things" aria-labelledby="things-title">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="things-title">Things to <em>do</em></h2>
-        <p>Open the menu in the game and tap <strong>Things to try</strong> to jump straight to any of these.</p>
+<section class="section" id="quick-start" aria-labelledby="quick-title">
+  <div class="wrap">
+    <div class="section-head"><h2 id="quick-title">Four steps to <em>start</em></h2><p>That's all you need. Press PLAY and try them.</p></div>
+    <ol class="steps">
+      <li class="step"><span class="num">1</span><span class="pic" aria-hidden="true">🕹️</span><h3>Move</h3><p class="mouse"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><br>or the arrow keys</p><p class="touch">Push the round stick at the bottom left</p></li>
+      <li class="step"><span class="num">2</span><span class="pic" aria-hidden="true">👀</span><h3>Look</h3><p class="mouse">Move the mouse.<br>Click and drag if it stays still.</p><p class="touch">Drag anywhere on the screen</p></li>
+      <li class="step"><span class="num">3</span><span class="pic" aria-hidden="true">🧱</span><h3>Build</h3><p class="mouse">Right click adds a block.<br>Left click removes one.</p><p class="touch">Tap PLACE to add.<br>Tap BREAK to remove.</p></li>
+      <li class="step"><span class="num">4</span><span class="pic" aria-hidden="true">💾</span><h3>Save</h3><p>It saves by itself. Use <strong>Download Save</strong> in the menu to keep a copy.</p></li>
+    </ol>
+  </div>
+</section>
+<section class="section" id="things" aria-labelledby="things-title">
+  <div class="wrap">
+    <div class="section-head"><h2 id="things-title">Things to <em>do</em></h2><p>In the game, press <strong>Menu</strong> and pick one from <strong>Things to try</strong>.</p></div>
+    <ul class="things">
+      <li class="thing"><span class="emoji" aria-hidden="true">🧱</span><h3>Build anything</h3><p>Pick a block in Inventory and place it. Trees, gardens and ponds go down in one tap.</p></li>
+      <li class="thing new"><span class="emoji" aria-hidden="true">🚗</span><h3>Drive the car</h3><p>Find the blue car in the parking lot, walk up and press Drive car.</p></li>
+      <li class="thing new"><span class="emoji" aria-hidden="true">🏀</span><h3>Shoot hoops</h3><p>Pick up the ball and shoot. A basket means a big confetti burst!</p></li>
+      <li class="thing new"><span class="emoji" aria-hidden="true">☕</span><h3>Tea on the roof</h3><p>Choose Cup of tea, find a cozy spot up high and sit down.</p></li>
+      <li class="thing new"><span class="emoji" aria-hidden="true">📚</span><h3>Your own library</h3><p>Build with Bookshelf blocks. Face a shelf and a story is read out loud.</p></li>
+      <li class="thing new"><span class="emoji" aria-hidden="true">🐕</span><h3>Percy &amp; Ellie</h3><p>The dogs play near home. Walk up to them to ask them to follow you.</p></li>
+      <li class="thing"><span class="emoji" aria-hidden="true">🎣</span><h3>Go fishing</h3><p>Build a pond, add fish, let them grow, then catch one.</p></li>
+      <li class="thing"><span class="emoji" aria-hidden="true">🏫</span><h3>Explore EC</h3><p>Walk through the glass doors to find BELIEVE and your classroom wing.</p></li>
+    </ul>
+  </div>
+</section>
+<section class="section" id="how-to-play" aria-label="How to play">
+  <div class="wrap">
+    <details class="more">
+      <summary>❓ How to play</summary>
+      <div class="more-body">
+        <div><h3>⌨️ Keyboard &amp; mouse</h3><ul><li><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrow keys to walk</li><li>Move the mouse to look; click and drag if it stays still</li><li>Right click places a block, left click removes one</li><li><kbd>E</kbd> to drive, shoot, sit, read or call the dogs</li><li><kbd>I</kbd> opens Inventory · <kbd>Space</kbd> jumps · <kbd>Shift</kbd> is faster</li><li>Creative: <kbd>F</kbd> to fly, <kbd>Space</kbd> up, <kbd>V</kbd> down</li><li><kbd>C</kbd> changes the camera · <kbd>Esc</kbd> opens the menu</li></ul></div>
+        <div><h3>📱 Tablet, phone or touch</h3><ul><li>Move with the round stick; drag the screen to look</li><li>Tap PLACE to add a block and BREAK to remove one</li><li>Tap the yellow button to drive, shoot, sit or read</li><li>Creative: FLY turns flight on; hold JUMP to rise, DOWN to drop</li><li>🙈 Hide buttons clears the screen; tap it again to bring them back</li><li>On a laptop in Touch mode, the buttons work with the mouse too</li></ul></div>
+        <div><h3>💾 Keep your world</h3><p>Your build is saved in this browser on this device, every few seconds and when you leave. For a copy you can keep, open <strong>Menu → Save or load a world → Download Save</strong> and keep the .json file somewhere safe, like your school OneDrive. <strong>Load World</strong> opens that file on another device and asks before replacing anything. Clearing browser data erases the saved world, so keep a copy.</p></div>
+        <div><h3>👩‍🏫 For teachers</h3><p>Teacher rooms need a separately set-up room service and teacher admission, and keep group building apart from solo saves. There is no chat or text signs. The room service needs teacher supervision; automatic detection of words built from blocks is not set up yet. <a href="game/rooms.html">Open teacher rooms</a>.</p></div>
       </div>
-      <ul class="things">
-        <li class="thing"><span class="emoji" aria-hidden="true">🧱</span><h3>Build anything</h3><p>Choose a block in Inventory, aim the + and place it. Trees, gardens and ponds go down in one tap.</p></li>
-        <li class="thing new"><span class="emoji" aria-hidden="true">🚗</span><h3>Drive the car</h3><p>Find the blue car in the front parking lot. Walk up and press Drive car. It rolls right over curbs.</p></li>
-        <li class="thing new"><span class="emoji" aria-hidden="true">🏀</span><h3>Shoot hoops</h3><p>Pick up the ball on the court and shoot. Closer shots go in more often. A basket means a big confetti burst!</p></li>
-        <li class="thing new"><span class="emoji" aria-hidden="true">☕</span><h3>Tea on the roof</h3><p>Choose Cup of tea, find a cozy spot up high, and sit down to enjoy the view.</p></li>
-        <li class="thing new"><span class="emoji" aria-hidden="true">📚</span><h3>Your own library</h3><p>Build with Bookshelf blocks or place the Little library kit. Face a shelf and a story is read out loud.</p></li>
-        <li class="thing new"><span class="emoji" aria-hidden="true">🐕</span><h3>Percy &amp; Ellie</h3><p>The dogs play on their own near home. Walk up to them to ask them to follow you, or let them play.</p></li>
-        <li class="thing"><span class="emoji" aria-hidden="true">🎣</span><h3>Go fishing</h3><p>Build a pond, add fish, wait for them to grow, then catch one with the fishing rod.</p></li>
-        <li class="thing"><span class="emoji" aria-hidden="true">🏫</span><h3>Explore EC</h3><p>Walk through the glass doors to find BELIEVE, the cafeteria screen, the gym and your classroom wing.</p></li>
-      </ul>
-    </div>
-  </section>
-  <section class="section" id="how-to-play" aria-labelledby="how-title">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="how-title">How to <em>play</em></h2>
-        <p>Four moves are all you need. Everything else is in the menu.</p>
-      </div>
-      <div class="how">
-        <div class="how-card">
-          <h3>⌨️ Keyboard &amp; mouse</h3>
-          <ol class="steps">
-            <li><span class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span>Walk around. Arrow keys work too.</span></li>
-            <li><span class="keys"><span class="pill">MOUSE</span></span><span>Look around. Click and drag if it stays still.</span></li>
-            <li><span class="keys"><span class="pill">CLICK</span></span><span>Right click places a block. Left click removes one.</span></li>
-            <li><span class="keys"><kbd>E</kbd></span><span>Do things: drive, shoot, sit, read, call the dogs.</span></li>
-          </ol>
-          <p class="tip"><kbd>F</kbd> flies in Creative · <kbd>Space</kbd> up · <kbd>V</kbd> down · <kbd>Esc</kbd> opens the menu</p>
-        </div>
-        <div class="how-card">
-          <h3>📱 Tablet, phone or touch</h3>
-          <ol class="steps">
-            <li><span class="keys"><span class="pill">STICK</span></span><span>Move with the round stick at the bottom left.</span></li>
-            <li><span class="keys"><span class="pill">DRAG</span></span><span>Drag anywhere on the screen to look around.</span></li>
-            <li><span class="keys"><span class="pill">PLACE</span></span><span>Tap PLACE to add a block, BREAK to remove it.</span></li>
-            <li><span class="keys"><span class="pill">YELLOW</span></span><span>Tap the yellow button to drive, shoot, sit or read.</span></li>
-          </ol>
-          <p class="tip">Want to see the whole screen? Tap <strong>🙈 Hide buttons</strong>. Tap it again to bring them back. On a laptop in Touch mode, the buttons work with the mouse too.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="section" id="keep-your-world" aria-labelledby="save-title">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="save-title">Keep your <em>world</em></h2>
-        <p>Your build stays on this device, in this browser.</p>
-      </div>
-      <div class="safe">
-        <div><span class="emoji" aria-hidden="true">💾</span><h3>It saves by itself</h3><p>The game saves as you build, every half minute and when you leave. The Save button saves right away.</p></div>
-        <div><span class="emoji" aria-hidden="true">📥</span><h3>Download a copy</h3><p>Menu → Save, download or load a world → <strong>Download Save</strong>. Keep the .json file somewhere safe, like your school OneDrive.</p></div>
-        <div><span class="emoji" aria-hidden="true">🔁</span><h3>Another device?</h3><p>Open your file with <strong>Load World</strong>. It asks before replacing anything. Clearing browser data erases the saved world, so keep a copy.</p></div>
-      </div>
-    </div>
-  </section>
-  <section class="section" aria-labelledby="teacher-title">
-    <div class="wrap">
-      <div class="teachers">
-        <div>
-          <h2 id="teacher-title" style="margin:0 0 8px;font-size:22px">For teachers</h2>
-          <p>Teacher rooms need a separately set-up room service and teacher admission, and keep group building apart from solo saves. There is no chat or text signs. The room service needs teacher supervision; automatic detection of words built from blocks is not set up yet.</p>
-        </div>
-        <a class="button" href="game/rooms.html">Teacher rooms</a>
-      </div>
-    </div>
-  </section>
-</main>
+    </details>
+  </div>
+</section>
 <footer>
-  <div class="wrap row"><span>MYnecraft: EC Edition</span><a href="https://moodle.svsd.net/course/view.php?id=13811">Mr. Macek's teacher website</a><a href="https://percycodesios.github.io/CIRC-HQ/">CIRC HQ</a><a href="#play">Back to Play</a></div>
+  <div class="wrap row"><span>MYnecraft: EC Edition</span><a href="https://moodle.svsd.net/course/view.php?id=13811">Mr. Macek's teacher website</a><a href="https://percycodesios.github.io/CIRC-HQ/">CIRC HQ</a><a href="#play">Back to the title screen</a></div>
 </footer>
 <script>
+// Mark this tab as having seen the title screen, so the plain game link goes
+// straight to the game from now on (no redirect loop). PLAY then starts the
+// world right away. Only sessionStorage is used; the world save is untouched.
+try{sessionStorage.setItem('mynecraft_title_seen','1');}catch(e){}
 const playButton=document.getElementById('play-button');
+playButton.addEventListener?.('click',()=>{try{sessionStorage.setItem('mynecraft_start_now','1');}catch(e){}});
 for(const mode of document.querySelectorAll('input[name="mode"]')){
   mode.addEventListener('change',()=>{
     if(!mode.checked)return;
