@@ -2299,8 +2299,8 @@ function faceForPerson(style){
     return faceForPerson.macek??=outfitTexture(ctx=>{
       // One even skin tone: the old two-tone checker read as blemishes up close.
       ctx.fillStyle='#eab887';ctx.fillRect(0,0,64,64);
-      // A clean, straight hairline with tidy sideburns.
-      ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);ctx.fillRect(0,8,6,12);ctx.fillRect(58,8,6,12);
+      // One clean, straight hairline across the whole face: no side pieces hanging lower.
+      ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);
       ctx.fillStyle='#9a744c';ctx.fillRect(10,22,18,4);ctx.fillRect(37,22,17,4);
       // Both eyes look straight ahead: each iris and pupil is centred in its eye,
       // and the two eyes mirror each other across the face (they used to point inward).
@@ -2317,13 +2317,14 @@ function faceForPerson(style){
     ctx.fillStyle='#e5b993';ctx.fillRect(0,0,16,16);
     ctx.fillStyle='#4a352a';
     if(style==='sir'){ctx.fillRect(0,0,16,3);ctx.fillRect(1,10,14,6);ctx.fillStyle='#b47b60';ctx.fillRect(5,11,6,2);}
+    // Boys' and men's hair ends in one straight line across the forehead (no side pieces lower down).
     else if(style==='sleeves'){
-      ctx.fillStyle='#c9a15c';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,3);ctx.fillRect(14,3,2,3);
-      ctx.fillStyle='#e1bf77';ctx.fillRect(2,0,4,2);ctx.fillRect(9,1,5,2);
+      ctx.fillStyle='#c9a15c';ctx.fillRect(0,0,16,3);
+      ctx.fillStyle='#e1bf77';ctx.fillRect(2,0,4,1);ctx.fillRect(9,0,5,1);
     }
     else if(style==='js'){
-      ctx.fillStyle='#b48a50';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,3);ctx.fillRect(14,3,2,3);
-      ctx.fillStyle='#d1ae6e';ctx.fillRect(1,1,9,2);
+      ctx.fillStyle='#b48a50';ctx.fillRect(0,0,16,3);
+      ctx.fillStyle='#d1ae6e';ctx.fillRect(1,0,9,1);
     }
     else if(style==='micco'){
       ctx.fillStyle='#79502e';ctx.fillRect(0,0,16,4);ctx.fillRect(0,0,3,16);ctx.fillRect(13,0,3,16);ctx.fillRect(3,3,3,2);
@@ -2333,7 +2334,7 @@ function faceForPerson(style){
     }
     // Officer Shields: short light blond crop, sunglasses pushed up onto his head.
     else if(style==='shields'){
-      ctx.fillStyle='#d8c489';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,2);ctx.fillRect(14,3,2,2);
+      ctx.fillStyle='#d8c489';ctx.fillRect(0,0,16,3);
       ctx.fillStyle='#e8d7a6';for(let x=1;x<15;x+=3)ctx.fillRect(x,1,2,1);
     }
     // Mr. Unicorn: bald, so the skin runs to the crown, with a dark full beard.
@@ -2344,14 +2345,13 @@ function faceForPerson(style){
     }
     // The Student: friendly brown hair with a fringe and a big smile.
     else if(style==='student'){
-      ctx.fillStyle='#6b4a2f';ctx.fillRect(0,0,16,4);ctx.fillRect(0,4,2,4);ctx.fillRect(14,4,2,4);
-      ctx.fillStyle='#8a6340';ctx.fillRect(4,1,6,1);
+      ctx.fillStyle='#6b4a2f';ctx.fillRect(0,0,16,4);
     }
     // Cookie Man: short dark hair. The blue cap, not this face, is the character cue.
     else if(style==='cookie'){
-      ctx.fillStyle='#2a2420';ctx.fillRect(0,0,16,4);ctx.fillRect(0,4,2,2);ctx.fillRect(14,4,2,2);
+      ctx.fillStyle='#2a2420';ctx.fillRect(0,0,16,4);
     }
-    else {ctx.fillStyle='#b1986c';ctx.fillRect(0,0,16,3);ctx.fillRect(0,0,3,6);ctx.fillRect(13,0,3,6);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
+    else {ctx.fillStyle='#b1986c';ctx.fillRect(0,0,16,3);ctx.fillStyle='#ba9374';ctx.fillRect(6,14,4,1);}
     // Pupils sit in the middle of each eye, mirrored across the face, so nobody looks cross-eyed.
     ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
     ctx.fillStyle=style==='macek'?'#5289b1':'#303b44';ctx.fillRect(4,7,1,2);ctx.fillRect(11,7,1,2);
@@ -2380,14 +2380,16 @@ function staffLook(style){
   const face=outfitTexture(ctx=>{
     ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);
     ctx.fillStyle=hair;
-    // Every look has a straight, even hairline across the forehead.
-    ctx.fillRect(0,0,64,10);ctx.fillRect(0,10,7,isArt?40:15);ctx.fillRect(57,10,7,isArt?40:15);
+    // Every look has a straight, even hairline across the forehead. Only Ms. Eriksen's
+    // long hair frames her face; the men's hair stops in one level line.
+    ctx.fillRect(0,0,64,10);if(isArt){ctx.fillRect(0,10,7,40);ctx.fillRect(57,10,7,40);}
     ctx.fillStyle=isArt?'#bba47d':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
     if(isArt){
-      // Ms. Eriksen: normal-sized eyes (they used to read as "bug eyes"), centred and mirrored.
-      ctx.fillStyle='#fff5e8';ctx.fillRect(13,30,11,6);ctx.fillRect(40,30,11,6);
-      ctx.fillStyle='#453f37';ctx.fillRect(16,30,5,6);ctx.fillRect(43,30,5,6);
-      ctx.fillStyle='#292d30';ctx.fillRect(17,31,3,4);ctx.fillRect(44,31,3,4);
+      // Ms. Eriksen: relaxed, slightly lowered lids over normal-sized eyes, centred and mirrored.
+      ctx.fillStyle='#c9946f';ctx.fillRect(13,30,11,1);ctx.fillRect(40,30,11,1);
+      ctx.fillStyle='#fff5e8';ctx.fillRect(13,31,11,4);ctx.fillRect(40,31,11,4);
+      ctx.fillStyle='#453f37';ctx.fillRect(16,31,5,4);ctx.fillRect(43,31,5,4);
+      ctx.fillStyle='#292d30';ctx.fillRect(17,32,3,3);ctx.fillRect(44,32,3,3);
     }else{
       ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
       ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
@@ -2395,12 +2397,7 @@ function staffLook(style){
     }
     ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
     if(isMusic){ctx.fillStyle='#41372e';ctx.fillRect(7,43,50,17);ctx.fillRect(4,38,7,13);ctx.fillRect(53,38,7,13);}
-    if(isArt){
-      // Her trademark slight smirk: a closed smile that lifts at one corner.
-      ctx.fillStyle='#9c6650';ctx.fillRect(22,50,17,3);ctx.fillRect(38,47,5,3);ctx.fillRect(41,45,3,3);
-    }else{
-      ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
-    }
+    ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
     if(style==='mcmichael'){
       ctx.strokeStyle='#292b31';ctx.lineWidth=3;ctx.strokeRect(6,26,23,17);ctx.strokeRect(35,26,23,17);ctx.fillStyle='#292b31';ctx.fillRect(29,30,6,3);
     }
@@ -2449,13 +2446,14 @@ function styleStaffPerson(npc,style){
     part(hair,'full short crown',.56,.11,.52,look.hair,0,1.95,0);
     part(hair,'straight hairline',.56,.10,.04,look.hair,0,1.89,.255);
     part(hair,'short back',.55,.27,.06,look.hair,0,1.80,-.25);
-    for(const side of [-1,1])part(hair,'short side',.045,.24,.49,look.hair,side*.27,1.82,0);
+    // Sides end level with the front edge, so the hairline is one straight line all round.
+    for(const side of [-1,1])part(hair,'short side',.045,.10,.49,look.hair,side*.27,1.89,0);
   }else if(isPE){
     // A full short cut with a clean, straight front edge (no receding pieces).
     part(hair,'full short crown',.57,.11,.5,look.hair,0,1.96,0);
-    part(hair,'straight hairline',.57,.09,.04,look.hair,0,1.9,.255);
+    part(hair,'straight hairline',.57,.10,.04,look.hair,0,1.89,.255);
     part(hair,'short back',.56,.27,.06,look.hair,0,1.81,-.25);
-    for(const side of [-1,1])part(hair,'short side',.045,.22,.49,look.hair,side*.28,1.83,0);
+    for(const side of [-1,1])part(hair,'short side',.045,.10,.49,look.hair,side*.28,1.89,0);
   }else if(isArt){
     part(hair,'curly crown',.59,.15,.53,look.hair,0,1.97,-.015);
     part(hair,'back curls',.58,.57,.17,look.hair,0,1.68,-.28);
@@ -2469,9 +2467,9 @@ function styleStaffPerson(npc,style){
     for(const side of [-1,1]){part(npc.group,'glasses top',.19,.025,.035,0x28282e,side*.12,1.72,.26);part(npc.group,'glasses bottom',.19,.025,.035,0x28282e,side*.12,1.58,.26);for(const x of [-.09,.09])part(npc.group,'glasses rim',.025,.14,.035,0x28282e,side*.12+x,1.65,.26);}part(npc.group,'glasses bridge',.06,.025,.035,0x28282e,0,1.69,.26);
   }else{
     part(hair,'short dark crown',.55,.13,.5,0x3e3129,0,1.95,-.015);
-    part(hair,'straight hairline',.55,.08,.04,0x3e3129,0,1.9,.25);
+    part(hair,'straight hairline',.55,.10,.04,0x3e3129,0,1.89,.25);
     part(hair,'short dark back',.53,.25,.06,0x3e3129,0,1.82,-.24);
-    for(const side of [-1,1])part(hair,'short dark side',.035,.18,.45,0x3e3129,side*.265,1.85,0);
+    for(const side of [-1,1])part(hair,'short dark side',.035,.10,.45,0x3e3129,side*.265,1.89,0);
   }
   if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
   if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.055,.17,.27,0x41372e,side*.245,1.47,.095);part(npc.group,'beard chin',.38,.055,.13,0x41372e,0,1.37,.19);}
@@ -2575,9 +2573,9 @@ function stylePerson(npc,style){
       clog.name='tan clog';clog.position.set(0,-.475,.055);leg.add(clog);
       const vents=new THREE.Mesh(new THREE.BoxGeometry(.15,.012,.09),new THREE.MeshLambertMaterial({color:0x6e6758}));vents.position.set(0,.079,.09);clog.add(vents);
     }
-    const hair=part(.52,.12,.52,0xc9a15c,0,1.81,0);hair.name='blond crop';
+    const hair=part(.52,.12,.52,0xc9a15c,0,1.766,0);hair.name='blond crop';
     part(.51,.18,.04,0xc9a15c,0,1.70,-.25);
-    part(.22,.045,.16,0xe1bf77,-.11,1.89,.07);
+    part(.22,.045,.16,0xe1bf77,-.11,1.846,.07);
   } else if(style==='js'){
     // Public nickname and handmade voxel clothing only; no reference photo asset.
     npc.group.scale.setScalar(.74);
@@ -2603,9 +2601,10 @@ function stylePerson(npc,style){
     part(.54,.38,.09,0xa63f43,0,.38,-.18);
     part(.15,.12,.13,0x963239,0,.57,.21);
     for(const side of [-1,1]){const sleeve=part(.12,.3,.1,0xb54a4d,side*.1,.39,.2);sleeve.rotation.z=side*.18;}
-    const hair=part(.53,.13,.54,0xb48a50,0,1.81,-.01);hair.name='light brown blond hair';
+    // The crown's lower edge sits level with the painted fringe, so the line runs straight round the head.
+    const hair=part(.53,.13,.54,0xb48a50,0,1.771,-.01);hair.name='light brown blond hair';
     part(.51,.2,.05,0xb48a50,0,1.69,-.25);
-    const fringe=part(.33,.12,.08,0xd1ae6e,-.08,1.73,.25);fringe.name='side fringe';fringe.rotation.z=-.17;
+    const fringe=part(.53,.04,.05,0xd1ae6e,0,1.726,.255);fringe.name='straight fringe';
   } else if(style==='schoolOfficer'){
     // Tied-back auburn hair, glasses, black vest, badge and radio.
     // No weapon or holster. The photo itself is not part of the public game.
@@ -2706,10 +2705,11 @@ function stylePerson(npc,style){
   } else if(style==='student'){
     // The neutral Student: brown hair, star tee and white sneakers. No staff
     // lanyard or ID badge, so nobody mistakes the default player for a teacher.
-    part(.54,.11,.5,0x6b4a2f,0,1.83,0);
+    // Straight fringe: the hair's lower edge is one level line across the forehead and sides.
+    part(.54,.11,.52,0x6b4a2f,0,1.83,0);
+    part(.53,.125,.04,0x6b4a2f,0,1.7375,.26).name='straight hairline';
     part(.53,.26,.05,0x6b4a2f,0,1.7,-.24);
-    for(const side of [-1,1])part(.04,.18,.46,0x6b4a2f,side*.265,1.74,0);
-    part(.24,.06,.06,0x7a5638,-.08,1.76,.25);
+    for(const side of [-1,1])part(.04,.155,.46,0x6b4a2f,side*.265,1.7525,0);
     for(const leg of [npc.legL,npc.legR]){
       const shoe=new THREE.Mesh(new THREE.BoxGeometry(.27,.13,.36),new THREE.MeshLambertMaterial({color:0xf4f4ef}));shoe.name='sneaker';shoe.position.set(0,-.62,.05);leg.add(shoe);
       const sole=new THREE.Mesh(new THREE.BoxGeometry(.28,.035,.37),new THREE.MeshLambertMaterial({color:0xe4523f}));sole.name='sneaker sole';sole.position.set(0,-.69,.05);leg.add(sole);
@@ -2739,7 +2739,8 @@ function stylePerson(npc,style){
     part(.56,.1,.52,0xa7804e,0,1.93,0);
     part(.56,.07,.04,0xa7804e,0,1.88,.255);
     part(.55,.29,.045,0xa7804e,0,1.77,-.255);
-    for(const side of [-1,1])part(.035,.2,.5,0xa7804e,side*.277,1.84,0);
+    // The sides stop at the same height as the front edge: one straight hairline all round.
+    for(const side of [-1,1])part(.035,.1,.5,0xa7804e,side*.277,1.89,0);
     // Solid black trousers to match the black SV shirt. Drawn like the shirts
     // (sRGB colour), so they render truly black instead of washed-out gray.
     macekBlackPants??=outfitTexture(ctx=>{ctx.fillStyle='#16181d';ctx.fillRect(0,0,64,64);ctx.fillStyle='#1e2127';ctx.fillRect(0,0,64,4);ctx.fillRect(30,4,4,60);});
