@@ -225,7 +225,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=title-20261023">
+<link rel="stylesheet" href="start-menu.css?v=howto-20261023">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -275,6 +275,7 @@
           </div>
           <label class="hero-mode">Game mode <select id="mode"><option value="creative">Creative · build anything</option><option value="survival">Embrace the Challenge</option><option value="hardcore">Embrace the Challenge: Hardcore</option></select></label>
           <button class="btn" id="enter" type="button">▶ PLAY</button>
+          <button type="button" id="howToPlayOpen" class="howto-open"><span class="q" aria-hidden="true">?</span>How to play</button>
           <p class="playing-as"><span id="playingAs">Playing as: a Student</span> <button type="button" id="changeCharacter" class="link-button">Change</button></p>
           <p class="start-tip" id="startTip">Your world saves by itself.</p>
           <p id="modeHelp">Creative and Challenge share your campus. Hardcore has its own world.</p>
@@ -3738,6 +3739,11 @@ for(const card of modeCards)card.addEventListener('click',()=>{
 });
 modeSelect.addEventListener('change',paintModeCards);
 paintModeCards();
+// The big How to play button opens the guide and brings it into view.
+document.getElementById('howToPlayOpen')?.addEventListener?.('click',()=>{
+  const guide=document.getElementById('howToPlay');if(!guide)return;
+  guide.open=true;guide.scrollIntoView?.({behavior:'smooth',block:'start'});
+});
 // "Change" next to Play jumps to the character cards and focuses the current one.
 document.getElementById('changeCharacter')?.addEventListener?.('click',()=>{
   document.getElementById('characterPanel')?.scrollIntoView?.({behavior:'smooth',block:'start'});
