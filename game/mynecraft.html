@@ -2292,6 +2292,16 @@ function walkingPath(position,target,bounds){
   const search=createWalkingSearch(position,target,bounds);
   search.step(PATH_MAX_NODES);return search.path;
 }
+// The teachers' shared face: brows, eyes, nose and smile in the same places as on the
+// staff looks below, so every teacher's face reads the same way.
+function teacherFeatures(ctx,{brow,iris}){
+  ctx.fillStyle=brow;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
+  ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
+  ctx.fillStyle=iris;ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
+  ctx.fillStyle='#292d30';ctx.fillRect(17,30,3,6);ctx.fillRect(44,30,3,6);
+  ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
+  ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
+}
 function faceForPerson(style){
   if(style==='macek'){
     // The same warm, blue-eyed smiling face is shared by the NPC and player.
@@ -2301,16 +2311,19 @@ function faceForPerson(style){
       ctx.fillStyle='#eab887';ctx.fillRect(0,0,64,64);
       // One clean, straight hairline across the whole face: no side pieces hanging lower.
       ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);
-      ctx.fillStyle='#9a744c';ctx.fillRect(10,22,18,4);ctx.fillRect(37,22,17,4);
-      // Both eyes look straight ahead: each iris and pupil is centred in its eye,
-      // and the two eyes mirror each other across the face (they used to point inward).
-      ctx.fillStyle='#fff5e7';ctx.fillRect(11,29,17,9);ctx.fillRect(36,29,17,9);
-      ctx.fillStyle='#538bb1';ctx.fillRect(16,29,7,9);ctx.fillRect(41,29,7,9);
-      ctx.fillStyle='#172631';ctx.fillRect(18,31,3,6);ctx.fillRect(43,31,3,6);
-      ctx.fillStyle='#dceef3';ctx.fillRect(16,29,2,2);ctx.fillRect(41,29,2,2);
-      ctx.fillStyle='#cc9068';ctx.fillRect(27,37,10,7);
-      ctx.fillStyle='#ab7851';ctx.fillRect(17,48,31,3);ctx.fillRect(20,51,25,3);
-      ctx.fillStyle='#fff1db';ctx.fillRect(20,49,25,3);
+      // The same flat face as the other teachers (brows, eyes, nose and smile all in the
+      // same places), with Mr. Macek's own blue eyes. Nothing sticks out of the face.
+      teacherFeatures(ctx,{brow:'#9a744c',iris:'#5181a3'});
+    });
+  }
+  if(style==='micco'){
+    // Ms. Micco gets the same teacher face too, with her long brown hair and her glasses.
+    return outfitTexture(ctx=>{
+      ctx.fillStyle='#e5b993';ctx.fillRect(0,0,64,64);
+      ctx.fillStyle='#79502e';ctx.fillRect(0,0,64,12);ctx.fillRect(0,12,7,40);ctx.fillRect(57,12,7,40);
+      teacherFeatures(ctx,{brow:'#5e3d23',iris:'#4a3b30'});
+      ctx.strokeStyle='#5b3f6e';ctx.lineWidth=3;ctx.strokeRect(8,26,21,15);ctx.strokeRect(35,26,21,15);
+      ctx.fillStyle='#5b3f6e';ctx.fillRect(29,31,6,3);
     });
   }
   return makeTexture(ctx=>{
@@ -2325,9 +2338,6 @@ function faceForPerson(style){
     else if(style==='js'){
       ctx.fillStyle='#b48a50';ctx.fillRect(0,0,16,3);
       ctx.fillStyle='#d1ae6e';ctx.fillRect(1,0,9,1);
-    }
-    else if(style==='micco'){
-      ctx.fillStyle='#79502e';ctx.fillRect(0,0,16,4);ctx.fillRect(0,0,3,16);ctx.fillRect(13,0,3,16);ctx.fillRect(3,3,3,2);
     }
     else if(style==='schoolOfficer'){
       ctx.fillStyle='#815131';ctx.fillRect(0,0,16,3);ctx.fillRect(0,3,2,6);ctx.fillRect(14,3,2,6);
@@ -2356,7 +2366,6 @@ function faceForPerson(style){
     ctx.fillStyle='#fff';ctx.fillRect(3,7,3,2);ctx.fillRect(10,7,3,2);
     ctx.fillStyle=style==='macek'?'#5289b1':'#303b44';ctx.fillRect(4,7,1,2);ctx.fillRect(11,7,1,2);
     ctx.fillStyle=style==='macek'?'#b28b70':'#704431';ctx.fillRect(6,12,4,1);
-    if(style==='micco'){ctx.strokeStyle='#44334e';ctx.lineWidth=1;ctx.strokeRect(2.5,6.5,5,4);ctx.strokeRect(8.5,6.5,5,4);ctx.fillRect(7,8,2,1);}
     // Black rectangular frames with a straight bridge, drawn over the eyes.
     if(style==='unicorn'||style==='eiler'||style==='schoolOfficer'){ctx.fillStyle='#14161a';ctx.fillRect(2,6,5,1);ctx.fillRect(2,10,5,1);ctx.fillRect(2,6,1,5);ctx.fillRect(6,6,1,5);ctx.fillRect(9,6,5,1);ctx.fillRect(9,10,5,1);ctx.fillRect(9,6,1,5);ctx.fillRect(13,6,1,5);ctx.fillRect(7,7,2,1);}
     if(style==='schoolOfficer'){ctx.fillStyle='#8d4f3c';ctx.fillRect(5,12,6,2);ctx.fillStyle='#fff0db';ctx.fillRect(6,12,4,1);}
@@ -2734,7 +2743,6 @@ function stylePerson(npc,style){
       const shoe=new THREE.Mesh(new THREE.BoxGeometry(.3,.14,.4),new THREE.MeshLambertMaterial({color:0x202329}));shoe.position.set(0,-.60,.05);leg.add(shoe);
       part(.055,.15,.2,0xeab887,side*.295,1.61,0);
     }
-    part(.12,.07,.07,0xe0a477,0,1.55,.28); // small block nose
     // Short hair in one color with a straight front edge.
     part(.56,.1,.52,0xa7804e,0,1.93,0);
     part(.56,.07,.04,0xa7804e,0,1.88,.255);

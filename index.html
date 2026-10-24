@@ -32,12 +32,16 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .scene{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:60% 60%;animation:drift 30s ease-in-out infinite alternate}
 .scene-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 45%}
 .scene.locked .scene-bg{object-fit:fill}
-/* The teachers stand in pairs, in front of the school. Every picture is drawn from the
-   game's own models with the same camera (looking slightly down, like the picture), the
-   same warm sunlight and a soft shadow on the ground. Feet sit 93% down each picture
-   (and 40% across, or --ax). They stay under the shading so their light matches. */
-.figs-layer{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.fig{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);height:calc(var(--h) * 1%);width:auto;transform:translate(calc(var(--ax,40) * -1%),-93%);filter:saturate(1.04)}
+/* The teachers are the heroes: two balanced groups of three standing on the front lawn,
+   one each side of the menu, sized from the screen (--p is about one person's height).
+   Every picture is drawn from the game's own models with the same camera (looking
+   slightly down, like the painting), the same warm sunlight and a soft shadow on the
+   ground. Feet sit 93% down each picture and 40% across (or --ax); --fx and --fb place
+   the feet inside the group, in person heights. */
+.figs-layer{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none;--p:min(50vh,27vw)}
+.cast{position:absolute;bottom:0;width:calc(var(--p) * 1.25);height:calc(var(--p) * 1.7)}
+.cast-left{left:0}.cast-right{right:0}
+.fig{position:absolute;left:calc(var(--fx) * var(--p));bottom:calc(var(--fb,0) * var(--p));height:calc(var(--p) * 1.534 * var(--s,1));width:auto;transform:translate(calc(var(--ax,40) * -1%),7%);filter:saturate(1.05)}
 .title-shade{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.04) 0%,rgba(11,26,46,.18) 60%,rgba(11,26,46,.36) 100%),linear-gradient(180deg,rgba(11,26,46,.25),rgba(11,26,46,.04) 40%,rgba(11,26,46,.04) 74%,rgba(11,26,46,.32) 100%)}
 .title-body{position:relative;z-index:2;pointer-events:none;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 0 26px;text-align:center}
 .title-body>*{pointer-events:auto}
@@ -45,19 +49,18 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .fig-link,.fig-link img{pointer-events:auto;cursor:default}
 .fig-link:focus-visible{outline:none}
 .fig-link:focus-visible img{outline:3px solid var(--sun2);outline-offset:4px;border-radius:12px}
-.block-title{display:flex;flex-wrap:wrap;justify-content:center;gap:.09em;margin:0;font-size:clamp(34px,8vw,88px);line-height:1;font-weight:400}
-.block-letter{display:inline-grid;place-items:center;width:1.08em;height:1.14em;padding-top:.1em;border-radius:.05em;color:#fff;font-family:Bungee,Impact,sans-serif;-webkit-text-stroke:.045em #15110c;paint-order:stroke fill;text-shadow:0 .07em 0 #0009;box-shadow:inset 0 -.09em 0 #0005,inset .06em .06em 0 #ffffff2e,0 .12em 0 #000a;animation:hop 3.2s ease-in-out infinite}
-.block-letter.grass{background:linear-gradient(#72d047 0 24%,#4c9a2e 24% 32%,transparent 32%),repeating-conic-gradient(#8b5a34 0 25%,#774b2a 0 50%) 0 0/.26em .26em}
-.block-letter.stone{color:#ffd84d;background:repeating-conic-gradient(#9b9b9b 0 25%,#838383 0 50%) 0 0/.28em .28em}
-.block-letter.sand{color:#ff7a5c;background:repeating-conic-gradient(#ead68f 0 25%,#d8c179 0 50%) 0 0/.24em .24em}
-.block-letter.wood{color:#b8f27c;background:repeating-linear-gradient(0deg,#b98a51 0 .22em,#9c7140 .22em .27em)}
-.block-letter.gold{color:#fff4c2;background:repeating-conic-gradient(#f6c84a 0 25%,#dca524 0 50%) 0 0/.26em .26em}
-.block-letter:nth-child(2){animation-delay:.12s}.block-letter:nth-child(3){animation-delay:.24s}.block-letter:nth-child(4){animation-delay:.36s}.block-letter:nth-child(5){animation-delay:.48s}
-.block-letter:nth-child(6){animation-delay:.6s}.block-letter:nth-child(7){animation-delay:.72s}.block-letter:nth-child(8){animation-delay:.84s}.block-letter:nth-child(9){animation-delay:.96s}
-.edition{margin:0;color:var(--sun2);font:400 clamp(16px,2.4vw,24px)/1 Bungee,Impact,sans-serif;letter-spacing:.18em;text-shadow:0 3px 0 #071121,0 0 18px #000}
-/* The tagline sits on its own dark plate with a bright edge, so it reads over any part of the picture. */
-.tagline{display:inline-block;margin:2px 0 0;padding:.35em 1em;border:2px solid var(--sun2);border-radius:999px;background:rgba(8,18,33,.9);color:#fff;font:600 clamp(18px,2vw,22px)/1.2 var(--kid);letter-spacing:.01em;text-shadow:0 2px 0 #000;box-shadow:0 6px 18px rgba(0,0,0,.45)}
-.panel{width:min(520px,100%);background:rgba(11,26,46,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:clamp(14px,2.4vw,22px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+/* A classic stone-block logo: chunky gray letters with a dark outline, a light bevel on
+   top and solid depth below. The back copy (::before) draws the outline and the depth;
+   the front copy is the stone face. */
+.brand{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px}
+.block-title{margin:0;font:400 clamp(40px,8.2vw,96px)/1 Bungee,Impact,sans-serif;letter-spacing:.03em}
+.block-title .logo{position:relative;display:inline-block;isolation:isolate;padding:0 .06em .16em}
+.block-title .logo::before{content:attr(data-text);position:absolute;inset:0 .06em .16em;z-index:-1;color:#2e2e2e;-webkit-text-stroke:.1em #121212;text-shadow:0 .035em 0 #3b3b3b,0 .07em 0 #333,0 .105em 0 #2b2b2b,0 .14em 0 #222,0 .2em .16em rgba(0,0,0,.55)}
+.block-title .face{display:block;color:transparent;background:repeating-conic-gradient(rgba(0,0,0,.07) 0 25%,rgba(255,255,255,.05) 0 50%) 0 0/.12em .12em,linear-gradient(180deg,#f4f4f4 0%,#dadada 24%,#bcbcbc 50%,#9e9e9e 74%,#858585 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:.03em #1a1a1a}
+.edition{margin:0;color:#f1efe8;font:400 clamp(15px,1.9vw,22px)/1 Bungee,Impact,sans-serif;letter-spacing:.34em;padding-left:.34em;text-shadow:0 2px 0 #151515,0 0 12px rgba(0,0,0,.6)}
+/* Minecraft-style splash text: yellow, tilted, gently pulsing at the logo's lower right. */
+.tagline{position:absolute;left:76%;top:66%;transform-origin:0 50%;margin:0;color:#ffff4f;font:700 clamp(15px,1.7vw,22px)/1.1 var(--kid);white-space:nowrap;text-shadow:2px 2px 0 #3f3f12,0 0 8px rgba(0,0,0,.45);transform:rotate(-14deg);animation:splash 1.1s ease-in-out infinite alternate;pointer-events:none}
+.panel{width:min(480px,100%);background:rgba(11,26,46,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:clamp(14px,2.4vw,22px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
 .panel h2{margin:0 0 10px;font:600 20px var(--kid);color:var(--sun2);letter-spacing:.02em}
 /* Mode choices: big rows with a picture, a name and a check on the chosen one. Nothing
    in a row changes size, so pointing at or choosing a mode never moves the page. */
@@ -92,19 +95,17 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .howto-btn:hover{color:#062b1a;filter:brightness(1.06);transform:translateY(-2px)}
 .howto-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #1d7a50}
 .save{margin:14px 0 0;font:500 14px var(--kid);color:var(--muted)}
-/* First time playing? The Basics quest sits beside the buttons on wide screens and under them on phones. */
-.panel{position:relative}
-.quest-link{display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 16px;border:3px solid #8fd3ff;border-radius:18px;background:rgba(14,34,56,.96);color:#fff;text-decoration:none;text-align:left;box-shadow:0 0 0 5px rgba(143,211,255,.14),0 14px 30px rgba(0,0,0,.4)}
-.quest-link .cap{flex:none;font-size:36px;line-height:1}
-.quest-link b{display:block;font:700 21px/1.15 var(--kid);color:#bfe6ff}
-.quest-link .quest-sub{display:block;margin-top:2px;font:500 16px/1.3 var(--kid);color:#eaf4fb}
-.quest-link:hover{color:#fff;border-color:#d4efff;background:rgba(22,50,80,.98)}
-@media (min-width:1100px){.quest-link{position:absolute;top:0;right:calc(100% + 24px);width:230px;margin:0;flex-direction:column;gap:8px;padding:18px 16px;text-align:center}.quest-link .cap{font-size:44px}}
+/* First time playing? A wide, bright button bar of its own under the menu, with a soft
+   glow (light only, nothing moves) so it is the first thing a new player notices. */
+.quest-link{display:flex;align-items:center;justify-content:center;gap:16px;width:min(480px,100%);min-height:70px;padding:10px 24px;border:3px solid #eafaff;border-radius:999px;background:linear-gradient(180deg,#7fe2ff,#2fa2e8);color:#04223a;text-decoration:none;text-align:left;box-shadow:0 7px 0 #17679f,0 0 0 6px rgba(127,226,255,.28),0 16px 34px rgba(0,0,0,.45);transition:transform .12s;animation:quest-glow 2.2s ease-in-out infinite}
+.quest-link .cap{flex:none;width:44px;height:44px}
+.quest-link b{display:block;font:700 23px/1.1 var(--kid);color:#04223a}
+.quest-link .quest-sub{display:block;margin-top:2px;font:600 16px/1.25 var(--kid);color:#063356}
+.quest-link:hover{color:#04223a;transform:translateY(-2px)}
+.quest-link:active{transform:translateY(4px)}
 
 /* Phones, tablets and squarer screens: the same pairs stand together under the buttons. */
-.crew-row{display:none;position:relative;z-index:1;align-self:stretch;height:clamp(220px,30vh,300px);margin-top:4px;pointer-events:none}
-.crew{position:absolute;left:50%;top:0;width:min(100%,520px);height:100%;transform:translateX(-50%)}
-.crew-row img{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);height:calc(var(--h) * 1%);width:auto;transform:translate(calc(var(--ax,40) * -1%),-93%)}
+.crew-row{display:none;position:relative;z-index:1;align-self:stretch;--p:clamp(110px,30vw,220px);height:calc(var(--p) * 1.25);margin-top:4px;pointer-events:none}
 
 /* ---------- Below the title screen ---------- */
 .section{padding:clamp(40px,6vw,72px) 0;border-top:1px solid var(--line)}
@@ -142,19 +143,24 @@ footer{padding:26px 0 40px;border-top:1px solid var(--line);background:#0e2238}
 footer .row{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center;font:500 15px var(--kid);color:var(--muted)}
 footer a{font-weight:700;text-decoration:none}
 
-@keyframes hop{0%,62%,100%{transform:translateY(0) rotate(0)}72%{transform:translateY(-.14em) rotate(-3deg)}82%{transform:translateY(0) rotate(0)}}
 @keyframes drift{from{transform:scale(1)}to{transform:scale(1.035)}}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scene,.block-letter{animation:none}.play,.mode,.howto-btn{transition:none}.play:hover,.mode:hover,.howto-btn:hover{transform:none}}
-/* Narrow or squarer screens cut the wide picture off at the sides, so the teachers
-   stand together in pairs under the buttons instead. */
+@keyframes splash{from{transform:rotate(-14deg) scale(1)}to{transform:rotate(-14deg) scale(1.08)}}
+@keyframes splash-small{from{transform:rotate(-5deg) scale(1)}to{transform:rotate(-5deg) scale(1.06)}}
+@keyframes quest-glow{0%,100%{box-shadow:0 7px 0 #17679f,0 0 0 6px rgba(127,226,255,.28),0 16px 34px rgba(0,0,0,.45)}50%{box-shadow:0 7px 0 #17679f,0 0 0 12px rgba(127,226,255,.45),0 16px 34px rgba(0,0,0,.45)}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scene,.tagline,.quest-link{animation:none}.play,.mode,.howto-btn,.quest-link{transition:none}.play:hover,.mode:hover,.howto-btn:hover,.quest-link:hover{transform:none}}
+/* Narrow or squarer screens cut the wide picture off at the sides, so the same two
+   groups stand under the buttons instead. */
 @media (max-width:1000px),(max-aspect-ratio:3/2){.figs-layer{display:none}.crew-row{display:block}}
-@media (min-width:700px) and ((max-width:1000px) or (max-aspect-ratio:3/2)){.crew-row{height:clamp(260px,40vh,380px)}}
 /* Short laptop screens (1366x768 and similar): keep the whole title screen above the fold. */
 @media (max-height:860px) and (min-width:700px){
   .title-body{gap:9px;padding:12px 0 16px}
-  .block-title{font-size:clamp(34px,min(8vw,10vh),88px)}
-  .edition{font-size:18px}
-  .tagline{font-size:18px}
+  .block-title{font-size:clamp(38px,min(7vw,10.5vh),88px)}
+  .edition{font-size:17px}
+  .tagline{font-size:17px}
+  .quest-link{min-height:60px;padding:8px 22px}
+  .quest-link b{font-size:21px}
+  .quest-link .quest-sub{font-size:15px}
+  .quest-link .cap{width:38px;height:38px}
   .panel{padding:12px 18px}
   .panel h2{margin-bottom:8px;font-size:18px}
   .modes{gap:6px}
@@ -171,7 +177,7 @@ footer a{font-weight:700;text-decoration:none}
   .save{margin-top:8px}
 }
 @media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
-@media (max-width:480px){.title-body{gap:12px;padding:2px 12px 26px}.block-title{flex-wrap:nowrap;font-size:min(34px,calc((100vw - 28px) / 10.8))}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
+@media (max-width:480px){.title-body{gap:12px;padding:6px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
 </style>
 </head>
 <body>
@@ -186,9 +192,11 @@ footer a{font-weight:700;text-decoration:none}
   </div>
   <div class="title-shade" aria-hidden="true"></div>
   <main class="wrap title-body">
-    <h1 class="block-title" aria-label="MYnecraft"><span aria-hidden="true" class="block-letter grass">M</span><span aria-hidden="true" class="block-letter stone">Y</span><span aria-hidden="true" class="block-letter grass">N</span><span aria-hidden="true" class="block-letter sand">E</span><span aria-hidden="true" class="block-letter grass">C</span><span aria-hidden="true" class="block-letter stone">R</span><span aria-hidden="true" class="block-letter wood">A</span><span aria-hidden="true" class="block-letter grass">F</span><span aria-hidden="true" class="block-letter gold">T</span></h1>
-    <p class="edition">EC EDITION</p>
-    <p class="tagline">Your school, built from blocks.</p>
+    <div class="brand">
+      <h1 class="block-title" aria-label="MYnecraft"><span class="logo" data-text="MYNECRAFT" aria-hidden="true"><span class="face">MYNECRAFT</span></span></h1>
+      <p class="edition">EC EDITION</p>
+      <p class="tagline">Your school, built from blocks.</p>
+    </div>
     <div class="panel">
       <h2>How do you want to play?</h2>
       <fieldset class="modes">
@@ -203,29 +211,35 @@ footer a{font-weight:700;text-decoration:none}
         PLAY
       </a>
       <a class="howto-btn" id="howto-button" href="#how-to-play"><span class="q" aria-hidden="true">?</span>How to play</a>
-      <a class="quest-link" id="quest-link" href="game/mynecraft.html?mode=creative&amp;tutorial=1"><span class="cap" aria-hidden="true">🎓</span><span><b>First time playing?</b><span class="quest-sub">Click here to quiz your way through the basics.</span></span></a>
       <p class="save">💾 Your world saves by itself in this browser.</p>
     </div>
-    <div class="crew-row"><div class="crew">
-      <img src="game/assets/staff-lineup/wingenbach.png" alt="" style="--x:42;--y:89;--h:64">
-      <img src="game/assets/staff-lineup/mcmichael.png" alt="" style="--x:54;--y:89.5;--h:64">
-      <img src="game/assets/staff-lineup/eriksen.png" alt="" style="--x:10;--y:98;--h:72">
-      <img src="game/assets/staff-lineup/mullet.png" alt="" style="--x:22.5;--y:98.5;--h:72">
-      <img src="game/assets/staff-lineup/micco.png" alt="" style="--x:73.5;--y:98;--h:72">
-      <a class="fig-link" href="game/teacher.html" aria-label="Teacher information"><img class="big" src="game/assets/staff-lineup/macek.png" alt="" style="--x:85.5;--y:98.5;--h:72;--ax:34.29"></a>
-    </div></div>
+    <a class="quest-link" id="quest-link" href="game/mynecraft.html?mode=creative&amp;tutorial=1"><svg class="cap" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="#8a5d06" d="M6 0h4v1H6zM5 1h1v2H5zM10 1h1v2h-1zM0 4h5v1H0zM11 4h5v1h-5zM0 5h1v2H0zM15 5h1v2h-1zM1 7h1v2H1zM14 7h1v2h-1zM2 9h1v2H2zM13 9h1v2h-1zM1 11h1v3H1zM14 11h1v3h-1zM2 14h3v1H2zM11 14h3v1h-3zM5 13h2v1H5zM9 13h2v1H9zM7 12h2v1H7z"/><path fill="#ffd23f" d="M6 1h4v3H6zM5 3h6v2H5zM1 5h14v2H1zM2 7h12v2H2zM3 9h10v2H3zM2 11h5v2H2zM9 11h5v2H9zM2 13h3v1H2zM11 13h3v1h-3zM7 11h2v1H7z"/><path fill="#fff1a8" d="M7 1h1v3H7zM2 5h4v1H2z"/></svg><span><b>First time playing?</b><span class="quest-sub">Click here to quiz your way through the basics.</span></span></a>
+    <!-- Phones, tablets and squarer screens: the same two groups stand under the buttons. -->
+    <div class="crew-row">
+      <div class="cast cast-left">
+        <img class="fig" src="game/assets/staff-lineup/micco.png" alt="" style="--fx:.57;--fb:.14;--s:.9">
+        <img class="fig" src="game/assets/staff-lineup/eriksen.png" alt="" style="--fx:.29;--fb:.05">
+        <img class="fig" src="game/assets/staff-lineup/mullet.png" alt="" style="--fx:.86;--fb:.045">
+      </div>
+      <div class="cast cast-right">
+        <img class="fig" src="game/assets/staff-lineup/mcmichael.png" alt="" style="--fx:.57;--fb:.14;--s:.9">
+        <img class="fig" src="game/assets/staff-lineup/wingenbach.png" alt="" style="--fx:.3;--fb:.05">
+        <a class="fig-link" href="game/teacher.html" aria-label="Teacher information"><img class="fig big" src="game/assets/staff-lineup/macek.png" alt="" style="--fx:.84;--fb:.045;--ax:34.29"></a>
+      </div>
+    </div>
   </main>
-  <!-- Three pairs, farthest first so nearer teachers overlap them: Mr. Wingenbach and
-       Ms. McMichael a little way up the walkway, Ms. Eriksen and Mr. Mullet in front on
-       the left, Ms. Micco and a waving Mr. Macek in front on the right. -->
+  <!-- Wide screens: two groups of three on the front lawn, one each side of the menu.
+       In each group the teacher a step behind comes first, so the nearer ones overlap. -->
   <div class="figs-layer">
-    <div class="scene scene-figs">
-      <img class="fig" src="game/assets/staff-lineup/wingenbach.png" alt="" style="--x:24.5;--y:88;--h:33">
-      <img class="fig" src="game/assets/staff-lineup/mcmichael.png" alt="" style="--x:29.3;--y:88.5;--h:33">
-      <img class="fig" src="game/assets/staff-lineup/eriksen.png" alt="" style="--x:10;--y:99;--h:44">
-      <img class="fig" src="game/assets/staff-lineup/mullet.png" alt="" style="--x:18;--y:99.5;--h:44">
-      <img class="fig" src="game/assets/staff-lineup/micco.png" alt="" style="--x:77;--y:98.5;--h:44">
-      <a class="fig-link" href="game/teacher.html" aria-label="Teacher information"><img class="fig fig-wave" src="game/assets/staff-lineup/macek.png" alt="" style="--x:85.5;--y:99;--h:44;--ax:34.29"></a>
+    <div class="cast cast-left">
+      <img class="fig" src="game/assets/staff-lineup/micco.png" alt="" style="--fx:.57;--fb:.14;--s:.9">
+      <img class="fig" src="game/assets/staff-lineup/eriksen.png" alt="" style="--fx:.29;--fb:.05">
+      <img class="fig" src="game/assets/staff-lineup/mullet.png" alt="" style="--fx:.86;--fb:.045">
+    </div>
+    <div class="cast cast-right">
+      <img class="fig" src="game/assets/staff-lineup/mcmichael.png" alt="" style="--fx:.57;--fb:.14;--s:.9">
+      <img class="fig" src="game/assets/staff-lineup/wingenbach.png" alt="" style="--fx:.3;--fb:.05">
+      <a class="fig-link" href="game/teacher.html" aria-label="Teacher information"><img class="fig fig-wave" src="game/assets/staff-lineup/macek.png" alt="" style="--fx:.84;--fb:.045;--ax:34.29"></a>
     </div>
   </div>
 </header>
@@ -305,7 +319,8 @@ document.getElementById('howto-button')?.addEventListener?.('click',()=>{const m
     const w=screen.clientWidth,h=screen.clientHeight,s=Math.max(w/1672,h/941),sw=1672*s,sh=941*s;
     for(const scene of scenes){
       scene.style.width=sw+'px';scene.style.height=sh+'px';
-      scene.style.left=(w-sw)*0.5+'px';scene.style.top=(h-sh)*0.45+'px';
+      // Extra height is cut from the sky, so the lawn the teachers stand on stays in view.
+      scene.style.left=(w-sw)*0.5+'px';scene.style.top=(h-sh)*0.9+'px';
       scene.classList.add('locked');
     }
   }
