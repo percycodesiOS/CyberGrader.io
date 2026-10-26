@@ -95,13 +95,13 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .howto-btn:hover{color:#062b1a;filter:brightness(1.06);transform:translateY(-2px)}
 .howto-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #1d7a50}
 .save{margin:14px 0 0;font:500 14px var(--kid);color:var(--muted)}
-/* First time playing? A wide, bright button bar of its own under the menu, with a soft
-   glow (light only, nothing moves) so it is the first thing a new player notices. */
+/* First time playing? A gentle, visible pulse draws attention without moving the
+   layout. Hover/focus holds it steady; reduced-motion settings disable it. */
 .quest-link{display:flex;align-items:center;justify-content:center;gap:16px;width:min(480px,100%);min-height:70px;padding:10px 24px;border:3px solid #eafaff;border-radius:999px;background:linear-gradient(180deg,#7fe2ff,#2fa2e8);color:#04223a;text-decoration:none;text-align:left;box-shadow:0 7px 0 #17679f,0 0 0 6px rgba(127,226,255,.28),0 16px 34px rgba(0,0,0,.45);transition:transform .12s;animation:quest-glow 2.2s ease-in-out infinite}
 .quest-link .cap{flex:none;width:44px;height:44px}
 .quest-link b{display:block;font:700 23px/1.1 var(--kid);color:#04223a}
 .quest-link .quest-sub{display:block;margin-top:2px;font:600 16px/1.25 var(--kid);color:#063356}
-.quest-link:hover{color:#04223a;transform:translateY(-2px)}
+.quest-link:hover,.quest-link:focus-visible{animation:none;color:#04223a;transform:translateY(-2px)}
 .quest-link:active{transform:translateY(4px)}
 
 /* Phones, tablets and squarer screens: the same pairs stand together under the buttons. */
@@ -146,7 +146,7 @@ footer a{font-weight:700;text-decoration:none}
 @keyframes drift{from{transform:scale(1)}to{transform:scale(1.035)}}
 @keyframes splash{from{transform:rotate(-14deg) scale(1)}to{transform:rotate(-14deg) scale(1.08)}}
 @keyframes splash-small{from{transform:rotate(-5deg) scale(1)}to{transform:rotate(-5deg) scale(1.06)}}
-@keyframes quest-glow{0%,100%{box-shadow:0 7px 0 #17679f,0 0 0 6px rgba(127,226,255,.28),0 16px 34px rgba(0,0,0,.45)}50%{box-shadow:0 7px 0 #17679f,0 0 0 12px rgba(127,226,255,.45),0 16px 34px rgba(0,0,0,.45)}}
+@keyframes quest-glow{0%,100%{transform:scale(1);box-shadow:0 7px 0 #17679f,0 0 0 6px rgba(127,226,255,.28),0 16px 34px rgba(0,0,0,.45)}50%{transform:scale(1.035);box-shadow:0 7px 0 #17679f,0 0 0 12px rgba(127,226,255,.45),0 16px 34px rgba(0,0,0,.45)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.scene,.tagline,.quest-link{animation:none}.play,.mode,.howto-btn,.quest-link{transition:none}.play:hover,.mode:hover,.howto-btn:hover,.quest-link:hover{transform:none}}
 /* Narrow or squarer screens cut the wide picture off at the sides, so the same two
    groups stand under the buttons instead. */
@@ -178,6 +178,12 @@ footer a{font-weight:700;text-decoration:none}
 }
 @media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
 @media (max-width:480px){.title-body{gap:12px;padding:6px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
+/* Keep the tutorial invitation as the only pulsing action. */
+.scene,.tagline { animation:none; }
+.howto-btn { min-height:48px; border:1px solid #7b9bb3; border-radius:12px; background:#1b3349; color:#ecf5fc; font:650 18px/1.2 var(--kid); box-shadow:none; }
+.howto-btn .q { width:26px; height:26px; font-size:18px; color:#163047; background:#d5e8f6; }
+.howto-btn:hover { color:#fff; }
+.howto-btn:active { box-shadow:none; transform:translateY(2px); }
 </style>
 </head>
 <body>

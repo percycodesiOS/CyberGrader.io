@@ -247,22 +247,15 @@
   </div>
 </div>
 <button id="activityInteract" type="button" aria-keyshortcuts="E" hidden>Interact</button>
-<div id="info">
-  W Forward · S Back · A Left · D Right (or arrow keys)<br/>
-  DRAG to look &nbsp;·&nbsp; SPACE jump/up &nbsp;·&nbsp; V down &nbsp;·&nbsp; SHIFT faster &nbsp;·&nbsp; F fly<br/>
-  LEFT CLICK break &nbsp;·&nbsp; RIGHT CLICK place &nbsp;·&nbsp; 1–9 / [ ] / SCROLL pick block<br/>
-  E interact, shoot, or fish · Press H to hide or show this help · Esc opens the menu
-</div>
+<div id="info">WASD move · Drag to look · Space jump · Esc menu · Help for all controls</div>
 <div id="mouseHint">Press Esc to release the mouse. Drag to look if the cursor stays free.</div>
 <div id="sleepTransition" role="status" aria-live="polite" hidden><span class="sleep-moon" aria-hidden="true">☾</span><strong>You are now asleep</strong><p>Sunrise is one second away. A new day is coming!</p></div>
 <div id="start">
   <div class="start-shell">
     <header class="start-header start-hero">
-      <a class="start-home" href="../index.html">← Back to MYnecraft</a>
       <div class="hero-row">
         <div class="hero-brand">
-          <!-- Each letter is its own little block: grass, stone, sand and more. -->
-          <h1 class="start-brand block-title" aria-label="MYnecraft"><span aria-hidden="true" class="block-letter grass">M</span><span aria-hidden="true" class="block-letter stone">Y</span><span aria-hidden="true" class="block-letter grass">N</span><span aria-hidden="true" class="block-letter sand">E</span><span aria-hidden="true" class="block-letter grass">C</span><span aria-hidden="true" class="block-letter stone">R</span><span aria-hidden="true" class="block-letter wood">A</span><span aria-hidden="true" class="block-letter grass">F</span><span aria-hidden="true" class="block-letter gold">T</span></h1>
+          <h1 class="start-brand block-title" aria-label="MYnecraft">MYNECRAFT</h1>
           <p class="edition">EC EDITION</p>
           <p class="hero-tagline">Your ideas. Your school. Your world.</p>
         </div>
@@ -276,8 +269,9 @@
           <label class="hero-mode">Game mode <select id="mode"><option value="creative">Creative · build anything</option><option value="survival">Embrace the Challenge</option><option value="hardcore">Embrace the Challenge: Hardcore</option></select></label>
           <button class="btn" id="enter" type="button">▶ PLAY</button>
           <button type="button" id="howToPlayOpen" class="howto-open"><span class="q" aria-hidden="true">?</span>How to play</button>
-          <p class="playing-as"><span id="playingAs">Playing as: a Student</span> <button type="button" id="changeCharacter" class="link-button">Change</button></p>
+          <p class="playing-as"><span id="playingAs">Playing as: Mr. Macek</span> <button type="button" id="changeCharacter" class="link-button">Choose your teacher</button></p>
           <p class="start-tip" id="startTip">Your world saves by itself.</p>
+          <p id="saveWarning" role="alert" hidden></p>
           <p id="modeHelp">Creative and Challenge share your campus. Hardcore has its own world.</p>
         </div>
       </div>
@@ -290,8 +284,8 @@
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">💾</span><strong>Save</strong><span>It saves by itself</span></div>
     </section>
     <!-- One tap takes a student straight to each thing the class asked for. -->
-    <section class="try-panel" id="tryPanel" aria-labelledby="tryTitle">
-      <h2 id="tryTitle">Things to try</h2>
+    <details class="try-panel menu-fold" id="tryPanel" aria-labelledby="tryTitle">
+      <summary id="tryTitle">Activities <span>Explore, build and play</span></summary>
       <div class="try-grid">
         <button type="button" class="try-choice" data-try="quest"><span aria-hidden="true">🎓</span><strong>Basics quest</strong><small>Learn by doing, step by step</small></button>
         <button type="button" class="try-choice" data-try="car"><span aria-hidden="true">🚗</span><strong>Drive the car</strong><small>Start right beside it</small></button>
@@ -302,13 +296,14 @@
         <button type="button" class="try-choice" data-try="dogs"><span aria-hidden="true">🐕</span><strong>Walk with the dogs</strong><small>Percy and Ellie follow you</small></button>
       </div>
       <p id="tryStatus" role="status"></p>
-    </section>
-    <section class="start-character-panel" id="characterPanel" aria-labelledby="characterTitle">
-      <h2 id="characterTitle">Choose your character</h2>
-      <p class="character-note">Play as a student, or as one of your Specials teachers. You can change any time.</p>
-      <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your playable character"></div>
-      <p id="identityStatus" role="status">You play as a Student.</p>
-    </section>
+    </details>
+    <details class="start-character-panel menu-fold" id="characterPanel" aria-labelledby="characterTitle">
+      <summary>Your teacher <span>Six Specials teachers</span></summary>
+      <h2 id="characterTitle">Choose your Specials teacher</h2>
+      <p class="character-note">Play as one of your Specials teachers. You can change any time.</p>
+      <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your Specials teacher"></div>
+      <p id="identityStatus" role="status">Pick your Specials teacher.</p>
+    </details>
     <!-- Everything below is folded away behind one friendly button each. -->
     <div class="start-more" aria-label="More options">
     <details class="start-advanced how-to-play" id="howToPlay"><summary>❓ How to play</summary>
@@ -324,7 +319,7 @@
       <p class="class-reminder" id="classReminder">Building for class? Follow your teacher’s directions for what to make and where. Each browser has its own world; there is no automatic device sync.</p>
     </section>
     </details>
-    <details class="start-advanced start-settings" aria-labelledby="settingsTitle"><summary id="settingsTitle">⚙️ Settings</summary>
+    <details class="start-advanced start-settings" id="settingsPanel" aria-labelledby="settingsTitle"><summary id="settingsTitle">⚙️ Settings</summary>
       <section class="settings-body">
         <p><strong>Hardcore unlocks more:</strong> Gather, craft tools, build a house, and earn materials, animals and teacher characters. It is peaceful: no enemies or permanent loss of your world.</p>
         <div class="play-options">
@@ -336,7 +331,7 @@
         <label>Graphics <select id="graphics"><option value="smooth">Smooth · recommended</option><option value="detailed">Detailed · adds shadows</option></select></label>
         <label>Controls <select id="controlsLayout" aria-label="Controls layout"><option value="auto">Auto · match this device</option><option value="touch">Touch · show screen buttons</option><option value="desktop">Keyboard and mouse</option></select></label>
         <p><strong>Creative:</strong> unlimited blocks, flight, and coordinate travel. <strong>Embrace the Challenge:</strong> collect 10 wood blocks, place 12 blocks, and find CIRC on foot. It is a peaceful world; falls and deep water can hurt.</p>
-        <p>Use <strong>Smooth</strong> for lighter graphics. <strong>Detailed</strong> adds shadows. Switch camera views here or with the in-game View button.</p>
+        <p>Use <strong>Smooth</strong> for lighter graphics. <strong>Detailed</strong> adds shadows. Switch camera views here or press C while playing.</p>
         </div>
       </section>
     </details>
@@ -355,7 +350,7 @@
       <p class="start-wide"><strong>These are game-clock routines.</strong> The clock's full cycle takes 20 minutes of active play. Auto sleep skips from 6:00 PM to 6:00 AM after one second. Choose Full day/night to see evening routines, or Always day to keep daylight while the clock runs. Opening this menu pauses the world, including sleep, the clock, characters, and buses. Your real school day does not set their schedule.</p>
       <p id="worldClock" class="start-wide" role="status">World clock loading…</p>
     </section></details>
-    <details class="start-advanced"><summary>💾 Save or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
+    <details class="start-advanced" id="savePanel"><summary>💾 Save or load a world</summary><section class="start-save" aria-labelledby="saveTitle">
       <h2 id="saveTitle" class="start-wide">Keep your world</h2>
       <p class="start-wide"><strong>Save</strong> keeps your progress in this browser on this device. The game also saves as you play. <strong>Download Save</strong> puts a copy of your world in a file you can keep. It does not remove or change your world. Check your Downloads folder for the file ending in .json.</p>
       <p class="start-wide"><strong>Load World</strong> opens a MYnecraft save file you choose. It asks before replacing the world saved in this browser. The two worlds do not join together. <strong>Keep both?</strong> Use Download Save first and check that your current world's file downloaded. Then choose Load World. Press Cancel at the warning to keep playing your current world.</p>
@@ -364,8 +359,10 @@
       <button id="loadWorld" type="button">Load World</button>
       <input id="worldFile" type="file" accept=".json,application/json" hidden>
       <p id="backupStatus" role="status">Autosave is local to this browser. Keep a downloaded backup of builds you want to keep.</p>
+      <div id="worldManagement" class="world-management start-wide"></div>
     </section></details>
-    <details class="travel start-advanced"><summary>🧭 Travel to coordinates</summary><p>Creative only. X and Z move across the map; Y is eye height. Go starts flight at those coordinates if the spot is clear. If it is inside a block, try a higher Y. The crosshair aims at blocks, and the in-game XYZ readout shows your position.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
+    <details class="start-advanced" id="moreTools"><summary>More tools &amp; building guides</summary><div class="menu-extra-content">
+    <details class="travel start-advanced"><summary>🧭 Travel to coordinates</summary><p>Creative only. X and Z move across the map; Y is eye height. Go starts flight at those coordinates if the spot is clear. If it is inside a block, try a higher Y. The crosshair aims at blocks. Settings shows your current position.</p><form id="travelForm"><label>X <input id="travelX" type="number" step="any" min="-95" max="127" value="46.5" required></label><label>Y <input id="travelY" type="number" step="any" min="-6" max="60" value="7" required></label><label>Z <input id="travelZ" type="number" step="any" min="-95" max="95" value="31.5" required></label><button type="submit">Go</button></form><p id="travelStatus" role="status">Your world has edges: X −95 to 127, Z −95 to 95.</p></details>
     <details class="start-advanced" id="areaLabelsPanel"><summary>🪧 Name your spaces</summary>
       <p>Walk to a space, open Menu, then add a short area name. Small signs stay at that spot and show only when you are nearby. Name the space, such as Music Studio or Quiet Corner.</p>
       <form id="areaLabelForm" class="area-label-form">
@@ -381,10 +378,11 @@
     <details class="start-advanced"><summary>⌨️ All the controls</summary>
       <p><strong>Choose your blocks:</strong> Open Blocks / Inventory or press I while playing. Choose a pictured material to keep building. Creative has unlimited blocks; Embrace the Challenge shows what you have collected. Back to game, I, or Esc closes the picker. The block bar still works too.</p>
       <p><strong>Keyboard and mouse:</strong> W Forward · S Back · A Left · D Right. The arrow keys also move: ↑ Forward · ↓ Back · ← Left · → Right. Move your mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
-      <p><strong>Creative flight and camera:</strong> Press F once to turn flight on or off. While flying, Space goes up and V goes down; let go to hover. Hold Shift to move faster on foot or in flight without changing height. C switches between first and third person; the toolbar's View button does the same.</p>
+      <p><strong>Creative flight and camera:</strong> Press F once to turn flight on or off. While flying, Space goes up and V goes down; let go to hover. Hold Shift to move faster on foot or in flight without changing height. C switches between first and third person; Menu → Settings has the same choice.</p>
       <p><strong>Phone or tablet:</strong> Choose Touch to show the screen buttons, or Auto to follow your device. Move with the stick and drag the screen to look. Tap the block bar, BREAK, or PLACE. Hold JUMP to swim or fly upward. In Creative, FLY toggles flight. DOWN descends while flying or in a water elevator. Phones and tablets never capture a mouse.</p>
       <p><strong>Pause and keep playing:</strong> Esc releases the mouse and opens this menu. The Menu button also pauses. Use Play to continue, Save to keep local progress now, and Download Save for a copy you can keep or move.</p>
     </details>
+    </div></details>
     </div>
   </div>
 </div>
@@ -1144,10 +1142,9 @@ if((['creative','survival','hardcore'].includes(requestedMode)||requestedTutoria
   try{const cleanURL=new URL(location.href);cleanURL.searchParams.delete('mode');cleanURL.searchParams.delete('tutorial');history.replaceState(history.state,'',cleanURL.href);}catch{}
 }
 let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
-// The neutral Student comes first and is the default: kids are not dropped into
-// playing as a teacher. It is always available, including in Hardcore.
+// Kenny, October 24: players always play as one of the six Specials teachers. Mr. Macek
+// comes first and is the fallback, because Hardcore unlocks him from the start.
 const STAFF_CHARACTERS=Object.freeze([
-  {id:'student',name:'Student',role:'You',style:'student',detail:'Blue star tee and sneakers'},
   {id:'macek',name:'Mr. Macek',role:'CIRC',style:'macekStriped',detail:'Striped polo and Gators lanyard'},
   {id:'micco',name:'Ms. Micco',role:'CIRC',style:'micco',detail:'The familiar campus character'},
   {id:'eriksen',name:'Ms. Eriksen',role:'Art',style:'eriksen',detail:'Curly hair and a purple top'},
@@ -1156,13 +1153,19 @@ const STAFF_CHARACTERS=Object.freeze([
   {id:'mcmichael',name:'Ms. McMichael',role:'Spanish',style:'mcmichael',detail:'Glasses, cream sweater and polka dots'}
 ]);
 const STAFF_CHARACTER_IDS=STAFF_CHARACTERS.map(c=>c.id);
-const DEFAULT_CHARACTER='student';
+// The retired playable Student. Saves and backups that name it still load.
+const LEGACY_CHARACTER_IDS=Object.freeze(['student']);
+const DEFAULT_CHARACTER='macek';
 function characterUnlocked(id){return id===DEFAULT_CHARACTER||gameMode!=='hardcore'||!globalThis.MYNE_HARDCORE||globalThis.MYNE_HARDCORE.isCharacterUnlocked(hardcore,id);}
-// Before the Student existed every world saved Mr. Macek as the default. Only a
-// choice the player actually made (characterChosen) keeps him; others start as Student.
-let characterChosen=saveState.characterChosen===true;
+// Older worlds saved Mr. Macek automatically, and some name the Student. Neither is a
+// teacher the player picked: they play as Mr. Macek and are asked to choose a teacher.
+// Any other saved teacher, or a Mr. Macek the player chose (characterChosen), is kept.
+let characterChosen=saveState.characterChosen===true&&STAFF_CHARACTER_IDS.includes(saveState.playerCharacter);
 let playerCharacter=STAFF_CHARACTER_IDS.includes(saveState.playerCharacter)&&(saveState.playerCharacter!=='macek'||characterChosen)?saveState.playerCharacter:DEFAULT_CHARACTER;
 if(!characterUnlocked(playerCharacter))playerCharacter=DEFAULT_CHARACTER;
+const LEGACY_STUDENT_SAVE=!isGroupRoom&&LEGACY_CHARACTER_IDS.includes(saveState.playerCharacter);
+const LEGACY_STUDENT_TIP='Your world is saved. Now choose your Specials teacher.';
+const teacherChoicePending=()=>!characterChosen&&playerCharacter===DEFAULT_CHARACTER;
 // The clock the world was saved at. Eddie's perch and the bus loop are both pure
 // functions of it, so they are placed correctly the instant the world loads.
 const LOADED_DAY_TIME = Number.isFinite(saveState.dayTime) ? ((saveState.dayTime % 1) + 1) % 1 : 0.12;
@@ -1256,6 +1259,7 @@ function setControlsLayout(value,save){
   const ui=document.getElementById('touchUI');
   if(ui)ui.style.display=on?'block':'none';
   paintControlsChoice();
+  if(quickbarReady)refreshHotbar();
   saveState.controls=controlsLayout;
   if(save)persistSave();
 }
@@ -1277,7 +1281,7 @@ function refreshChallenge(){
   const el=document.getElementById('challengeProgress');
   el.hidden=gameMode==='creative';
   document.getElementById('btnFly').style.display=gameMode==='creative'?'flex':'none';
-  document.getElementById('btnDown').style.display='flex';
+  document.getElementById('btnDown').style.display='none';
   if(gameMode==='hardcore'){
     const next=globalThis.MYNE_HARDCORE.status(hardcore).next;
     el.textContent=next?`HARDCORE · ${next.title}: ${next.instruction} (${next.progress}/${next.goal})`:'HARDCORE · All goals complete! Keep creating.';return;
@@ -1348,9 +1352,15 @@ function persistSave(){
     if(isHardcoreWorld)saveEnvelope.hardcoreWorld=saveState;
     saveEnvelope.activeWorld=isHardcoreWorld?'hardcore':'campus';
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveEnvelope));
+    document.getElementById('saveWarning').hidden=true;
     flashSaved();
     return true;
-  } catch(e){ document.getElementById('status').textContent='Storage is full or unavailable. Keep this tab open and use Menu > Download Save to keep your progress.'; return false; }
+  } catch(e){
+    const message='Storage is full or unavailable. Keep this tab open. Open Save or load a world in Menu and choose Download Save to keep your progress.';
+    document.getElementById('status').textContent=message;
+    const warning=document.getElementById('saveWarning');warning.textContent=message;warning.hidden=false;
+    return false;
+  }
 }
 
 // Portable backups contain game state only. Never evaluate imported file contents.
@@ -1388,7 +1398,7 @@ function readWorldBackup(text,depth=0){
   });
   if(new Set(campus.map(a=>a.name)).size!==campus.length)throw new Error('This backup has duplicate characters. Your world was kept.');
   if(s.macekOutfit!==undefined&&!['polo','black'].includes(s.macekOutfit))throw new Error('This backup has an invalid outfit. Your world was kept.');
-  if(s.playerCharacter!==undefined&&!STAFF_CHARACTER_IDS.includes(s.playerCharacter))throw new Error('This backup has an invalid playable character. Your world was kept.');
+  if(s.playerCharacter!==undefined&&!STAFF_CHARACTER_IDS.includes(s.playerCharacter)&&!LEGACY_CHARACTER_IDS.includes(s.playerCharacter))throw new Error('This backup has an invalid playable character. Your world was kept.');
   if(s.characterChosen!==undefined&&typeof s.characterChosen!=='boolean')throw new Error('This backup has an invalid playable character choice. Your world was kept.');
   // Backups written before the playable Mr. Macek identity simply have no camera
   // choice; they load as first person rather than being rejected.
@@ -1399,7 +1409,7 @@ function readWorldBackup(text,depth=0){
   if(s.companionMode!==undefined&&!COMPANION_MODES.includes(s.companionMode))throw new Error('This backup has an invalid Percy and Ellie setting. Your world was kept.');
   const areaLabels=readAreaLabels(s.areaLabels);
   if(s.challenge!==undefined&&(!object(s.challenge)||!Number.isSafeInteger(s.challenge.wood)||s.challenge.wood<0||s.challenge.wood>10||!Number.isSafeInteger(s.challenge.placed)||s.challenge.placed<0||s.challenge.placed>12||typeof s.challenge.circ!=='boolean'))throw new Error('This backup has invalid challenge progress. Your world was kept.');
-  const result={edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',playerCharacter:s.playerCharacter||DEFAULT_CHARACTER,characterChosen:s.characterChosen===true,view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge),dayNightMode:normalizeDayNightMode(s.dayNightMode),movementHelpVisible:s.movementHelpVisible!==false,fishUnlocked:s.fishUnlocked===true};
+  const result={edits,player:{x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,sel:p.sel,flying:p.flying},mode:s.mode,health:s.health,dayTime:s.dayTime,inventory,campus,macekOutfit:s.macekOutfit||'polo',playerCharacter:s.playerCharacter||DEFAULT_CHARACTER,characterChosen:s.characterChosen===true&&STAFF_CHARACTER_IDS.includes(s.playerCharacter),view:s.view||'first',graphics:s.graphics||'smooth',controls:s.controls||'auto',areaLabels,challenge:normalizeChallenge(s.challenge),dayNightMode:normalizeDayNightMode(s.dayNightMode),movementHelpVisible:s.movementHelpVisible!==false,fishUnlocked:s.fishUnlocked===true};
   if(s.companionMode!==undefined)result.companionMode=s.companionMode;
   if(globalThis.MYNE_HARDCORE)result.hardcore=globalThis.MYNE_HARDCORE.normalize(s.hardcore);
   if(s.activities!==undefined){
@@ -2452,33 +2462,34 @@ function styleStaffPerson(npc,style){
   }
   const hair=new THREE.Group();hair.name='hair';npc.group.add(hair);npc.hair=hair;
   if(isMacek){
-    part(hair,'full short crown',.56,.11,.52,look.hair,0,1.95,0);
-    part(hair,'straight hairline',.56,.10,.04,look.hair,0,1.89,.255);
-    part(hair,'short back',.55,.27,.06,look.hair,0,1.80,-.25);
+    part(hair,'full short crown',.535,.065,.49,look.hair,0,1.94,0);
+    part(hair,'straight hairline',.535,.065,.025,look.hair,0,1.90,.246);
+    part(hair,'short back',.52,.25,.035,look.hair,0,1.807,-.25);
     // Sides end level with the front edge, so the hairline is one straight line all round.
-    for(const side of [-1,1])part(hair,'short side',.045,.10,.49,look.hair,side*.27,1.89,0);
+    for(const side of [-1,1])part(hair,'short side',.025,.065,.46,look.hair,side*.265,1.90,0);
   }else if(isPE){
     // A full short cut with a clean, straight front edge (no receding pieces).
-    part(hair,'full short crown',.57,.11,.5,look.hair,0,1.96,0);
-    part(hair,'straight hairline',.57,.10,.04,look.hair,0,1.89,.255);
-    part(hair,'short back',.56,.27,.06,look.hair,0,1.81,-.25);
-    for(const side of [-1,1])part(hair,'short side',.045,.10,.49,look.hair,side*.28,1.89,0);
+    part(hair,'full short crown',.56,.06,.49,look.hair,0,1.94,0);
+    part(hair,'straight hairline',.56,.06,.025,look.hair,0,1.90,.246);
+    part(hair,'short back',.55,.22,.035,look.hair,0,1.82,-.25);
+    for(const side of [-1,1])part(hair,'short side',.025,.06,.46,look.hair,side*.278,1.90,0);
   }else if(isArt){
-    part(hair,'curly crown',.59,.15,.53,look.hair,0,1.97,-.015);
-    part(hair,'back curls',.58,.57,.17,look.hair,0,1.68,-.28);
-    for(const side of [-1,1])for(let i=0;i<4;i++)part(hair,'curl',.16,.19,.34,i%2?0xa28b64:0x78634b,side*(.28+(i%2)*.025),1.88-i*.15,.025+(i%2)*.03);
-    part(hair,'side fringe',.22,.17,.10,0x8e7858,-.18,1.88,.25);
+    // Small curls frame the head and taper near the shoulders; no oversized halo.
+    part(hair,'curly crown',.55,.085,.50,look.hair,0,1.945,-.01);
+    part(hair,'back curls',.50,.49,.085,look.hair,0,1.70,-.26);
+    for(const side of [-1,1])for(let i=0;i<4;i++)part(hair,'curl',.09,.145,.21,i%2?0x8e7858:0x78634b,side*(i===3?.255:.27+(i%2)*.005),1.87-i*.135,.005+(i%2)*.015);
+    part(hair,'side fringe',.14,.10,.045,0x8e7858,-.19,1.90,.247);
   }else if(style==='mcmichael'){
-    part(hair,'blonde crown',.56,.12,.5,0x9c8058,0,1.96,-.02);
-    part(hair,'long blonde back',.56,.73,.14,0xb99a65,0,1.63,-.27);
-    for(const side of [-1,1]){part(hair,'long blonde side',.14,.72,.32,0xc7aa75,side*.28,1.62,.03);part(hair,'highlight',.045,.63,.035,0xe2c994,side*.27,1.63,.2);}
+    part(hair,'blonde crown',.535,.085,.49,0x9c8058,0,1.94,-.01);
+    part(hair,'long blonde back',.48,.66,.085,0xb99a65,0,1.65,-.26);
+    for(const side of [-1,1]){part(hair,'long blonde side',.07,.64,.19,0xc7aa75,side*.265,1.65,.015);part(hair,'highlight',.025,.57,.02,0xe2c994,side*.267,1.66,.118);}
     // Frames are also geometry, so the silhouette reads from a three-quarter view.
     for(const side of [-1,1]){part(npc.group,'glasses top',.19,.025,.035,0x28282e,side*.12,1.72,.26);part(npc.group,'glasses bottom',.19,.025,.035,0x28282e,side*.12,1.58,.26);for(const x of [-.09,.09])part(npc.group,'glasses rim',.025,.14,.035,0x28282e,side*.12+x,1.65,.26);}part(npc.group,'glasses bridge',.06,.025,.035,0x28282e,0,1.69,.26);
   }else{
-    part(hair,'short dark crown',.55,.13,.5,0x3e3129,0,1.95,-.015);
-    part(hair,'straight hairline',.55,.10,.04,0x3e3129,0,1.89,.25);
-    part(hair,'short dark back',.53,.25,.06,0x3e3129,0,1.82,-.24);
-    for(const side of [-1,1])part(hair,'short dark side',.035,.10,.45,0x3e3129,side*.265,1.89,0);
+    part(hair,'short dark crown',.535,.075,.49,0x3e3129,0,1.94,-.01);
+    part(hair,'straight hairline',.535,.07,.025,0x3e3129,0,1.90,.246);
+    part(hair,'short dark back',.52,.22,.035,0x3e3129,0,1.82,-.245);
+    for(const side of [-1,1])part(hair,'short dark side',.025,.07,.45,0x3e3129,side*.265,1.90,0);
   }
   if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
   if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.055,.17,.27,0x41372e,side*.245,1.47,.095);part(npc.group,'beard chin',.38,.055,.13,0x41372e,0,1.37,.19);}
@@ -2527,6 +2538,13 @@ function stylePerson(npc,style){
     }
   });
   npc.body.material.forEach(m=>m.map=shirt);
+  if(style==='student'){
+    // The star is printed on the front only. Seen from behind, the small star read as a
+    // rude hand gesture, so the back, sides, top and bottom are plain blue tee.
+    const plainTee=makeTexture(ctx=>{ctx.fillStyle='#2f8fd8';ctx.fillRect(0,0,16,16);ctx.fillStyle='#2478bd';ctx.fillRect(0,0,16,1);});
+    npc.body.material.forEach(m=>m.map=plainTee);npc.body.material[4].map=shirt;
+    npc.body.geometry.clearGroups();npc.body.geometry.addGroup(0,24,0);npc.body.geometry.addGroup(24,6,4);npc.body.geometry.addGroup(30,6,0);
+  }
   const sleeve=style==='student'?makeTexture(ctx=>{ctx.fillStyle='#e5b993';ctx.fillRect(0,0,16,16);ctx.fillStyle='#2f8fd8';ctx.fillRect(0,0,16,6);}):style==='sir'?makeFlatTex(24,130,207):style==='schoolOfficer'?makeTexture(ctx=>{ctx.fillStyle='#e5b993';ctx.fillRect(0,0,16,16);ctx.fillStyle='#111419';ctx.fillRect(0,0,16,7);}):style==='shields'?makeFlatTex(27,37,54):style==='eiler'?makeFlatTex(48,50,56):style==='cookie'?makeFlatTex(142,198,234):skinTex;
   for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=style==='unicorn'?shirt:sleeve);
   // Mr. Unicorn wears dark green cargo trousers; everyone else keeps dark trousers.
@@ -2661,8 +2679,8 @@ function stylePerson(npc,style){
     part(.38,.07,.07,0x606f7b,0,1.91,.29);part(.12,.23,.1,0x303940,-.16,1.13,.18);
     part(.08,.1,.04,0x6cb6e2,.16,1.12,.16);
   } else if(style==='micco'){
-    part(.58,.18,.56,0x79502e,0,1.8,-.03);part(.13,.66,.42,0x79502e,-.27,1.42,-.09);part(.13,.66,.42,0x79502e,.27,1.42,-.09);
-    part(.5,.65,.14,0x69452b,0,1.44,-.27);
+    part(.52,.09,.50,0x79502e,0,1.79,-.01);part(.055,.58,.24,0x79502e,-.262,1.46,-.04);part(.055,.58,.24,0x79502e,.262,1.46,-.04);
+    part(.49,.60,.085,0x69452b,0,1.46,-.26);
     for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=shirt);
   } else if(style==='eiler'){
     // Principal Eiler: charcoal suit, white shirt, striped tie and brown shoes.
@@ -2712,8 +2730,8 @@ function stylePerson(npc,style){
     const tray=new THREE.Mesh(new THREE.BoxGeometry(.3,.05,.22),metal);tray.position.set(0,-1.32,.12);dustpan.add(tray);
     npc.armL.add(dustpan);npc.dustpan=dustpan;
   } else if(style==='student'){
-    // The neutral Student: brown hair, star tee and white sneakers. No staff
-    // lanyard or ID badge, so nobody mistakes the default player for a teacher.
+    // The retired Student look (no longer playable, kept so the style still renders):
+    // brown hair, star tee and white sneakers, with no staff lanyard or ID badge.
     // Straight fringe: the hair's lower edge is one level line across the forehead and sides.
     part(.54,.11,.52,0x6b4a2f,0,1.83,0);
     part(.53,.125,.04,0x6b4a2f,0,1.7375,.26).name='straight hairline';
@@ -2744,11 +2762,11 @@ function stylePerson(npc,style){
       part(.055,.15,.2,0xeab887,side*.295,1.61,0);
     }
     // Short hair in one color with a straight front edge.
-    part(.56,.1,.52,0xa7804e,0,1.93,0);
-    part(.56,.07,.04,0xa7804e,0,1.88,.255);
-    part(.55,.29,.045,0xa7804e,0,1.77,-.255);
+    part(.56,.065,.51,0xa7804e,0,1.92,0);
+    part(.56,.06,.025,0xa7804e,0,1.88,.255);
+    part(.55,.26,.03,0xa7804e,0,1.78,-.255);
     // The sides stop at the same height as the front edge: one straight hairline all round.
-    for(const side of [-1,1])part(.035,.1,.5,0xa7804e,side*.277,1.89,0);
+    for(const side of [-1,1])part(.025,.06,.49,0xa7804e,side*.277,1.88,0);
     // Solid black trousers to match the black SV shirt. Drawn like the shirts
     // (sRGB colour), so they render truly black instead of washed-out gray.
     macekBlackPants??=outfitTexture(ctx=>{ctx.fillStyle='#16181d';ctx.fillRect(0,0,64,64);ctx.fillStyle='#1e2127';ctx.fillRect(0,0,64,4);ctx.fillRect(30,4,4,60);});
@@ -3254,18 +3272,24 @@ for(const character of STAFF_CHARACTERS){
   const role=document.createElement('span');role.className='staff-role';role.textContent=character.role;
   const detail=document.createElement('small');detail.id=`character-description-${character.id}`;detail.textContent=character.detail;
   label.append(canvas,row,role,detail);staffChoices.appendChild(label);staffInputs[character.id]=input;staffCards[character.id]=label;
-  input.addEventListener('change',()=>{if(input.checked&&setPlayerCharacter(character.id)){characterChosen=true;persistSave();}});
+  input.addEventListener('change',()=>{if(input.checked&&setPlayerCharacter(character.id)){characterChosen=true;updateIdentityStatus();persistSave();}});
 }
 let view=saveState.view==='third'?'third':'first';
 let viewBtn=null;
 const viewSelect=document.getElementById('playerView');
 function updateIdentityStatus(){
-  const character=STAFF_CHARACTERS.find(c=>c.id===playerCharacter);
-  identityStatus.textContent=`${character.name} · ${character.role}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press C while playing to switch views.`;
+  const character=STAFF_CHARACTERS.find(c=>c.id===playerCharacter),pending=teacherChoicePending();
+  // Until a teacher is picked, the player is Mr. Macek and is asked, never forced, to choose.
+  const ask=pending?`${LEGACY_STUDENT_SAVE?'Your world and builds are saved. ':''}Pick your Specials teacher. Until you do, you play as `:'';
+  identityStatus.textContent=`${ask}${character.name} · ${character.role}. ${view==='third'?'Third-person camera.':'First-person camera.'} Press C while playing to switch views.`;
   // One plain word on the big button; the character is shown, and changeable, beside it.
-  document.getElementById('enter').textContent='▶ PLAY';
+  document.getElementById('enter').textContent=hasPlayed?'▶ RESUME':'▶ PLAY';
   const playingAs=document.getElementById('playingAs');
-  if(playingAs)playingAs.textContent=`Playing as: ${character.id===DEFAULT_CHARACTER?'a Student':character.name}`;
+  if(playingAs)playingAs.textContent=`Playing as: ${character.name}`;
+  const change=document.getElementById('changeCharacter');
+  if(change)change.textContent=pending?'Choose your teacher':'Change';
+  const tip=document.getElementById('startTip');
+  if(tip&&LEGACY_STUDENT_SAVE&&(pending||tip.textContent===LEGACY_STUDENT_TIP))tip.textContent=pending?LEGACY_STUDENT_TIP:'Your world saves by itself.';
 }
 function setPlayerCharacter(id){
   if(!STAFF_CHARACTER_IDS.includes(id))return false;
@@ -3698,12 +3722,16 @@ addEventListener('wheel', e => {
 // A lock that arrives after pause, blur, or a layout change is released at once.
 const startEl = document.getElementById('start');
 let started = false;
+var hasPlayed = false;
 let inventoryOpen=false;
 function pauseGame(){
   if(inventoryOpen)closeInventory(false);
   started=false;
   releaseInput();
   startEl.classList.remove('hidden');
+  document.body.classList.remove('world-playing');
+  if(hasPlayed)document.getElementById('enter').textContent='▶ RESUME';
+  document.getElementById('enter').focus?.({preventScroll:true});
   refreshMenuStatus();
 }
 function isMouseGesture(event){
@@ -3730,6 +3758,8 @@ function requestDesktopLock(event){
 function startGame() {
   if (started) return;
   started = true;
+  hasPlayed = true;
+  document.body.classList.add('world-playing','has-played');
   startEl.classList.add('hidden');
   renderer.domElement.tabIndex=-1;renderer.domElement.focus?.({preventScroll:true});
 }
@@ -3797,7 +3827,8 @@ document.getElementById('howToPlayOpen')?.addEventListener?.('click',()=>{
 });
 // "Change" next to Play jumps to the character cards and focuses the current one.
 document.getElementById('changeCharacter')?.addEventListener?.('click',()=>{
-  document.getElementById('characterPanel')?.scrollIntoView?.({behavior:'smooth',block:'start'});
+  const panel=document.getElementById('characterPanel');if(panel)panel.open=true;
+  panel?.scrollIntoView?.({behavior:'smooth',block:'start'});
   staffInputs[playerCharacter]?.focus?.({preventScroll:true});
 });
 renderer.domElement.addEventListener('click', event => {
@@ -3807,8 +3838,11 @@ renderer.domElement.addEventListener('click', event => {
 
 // ESC re-shows start
 addEventListener('keydown', e => {
-  if (e.code === 'Escape' && started) {
+  if(e.code!=='Escape'||e.repeat)return;
+  if (started) {
     pauseGame();
+  }else if(hasPlayed&&!inventoryOpen&&!['INPUT','SELECT','TEXTAREA'].includes(e.target?.tagName)){
+    e.preventDefault();startGame();
   }
 });
 
@@ -4479,23 +4513,15 @@ function blockThumbnail(k){
 }
 const hotbar = document.createElement('div');
 hotbar.id='hotbar';
-hotbar.setAttribute('aria-label','Choose a block');
+hotbar.setAttribute('aria-label','Quick blocks. Open Blocks for all materials.');
 hotbar.style.cssText = `
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 6px; padding: 6px;
-  background: #383735; border: 3px solid #141414; border-radius: 0;
-  box-shadow: inset 2px 2px #aaa69e, inset -2px -2px #222, 0 4px 0 #0007;
-  pointer-events: auto;
+  display: flex; pointer-events: auto;
 `;
 BLOCK_KEYS.forEach((k, i) => {
   const slot = document.createElement('button');
   slot.type='button';slot.title=BLOCKS[k].name;slot.setAttribute('aria-label',BLOCKS[k].name);
-  slot.style.cssText = `
-    position: relative; flex: 0 0 44px; width: 44px; height: 44px; background: #65635f;
-    border: 3px solid #222; display: flex; align-items: flex-end; justify-content: flex-end;
-    color: #fff; font: 700 11px ui-monospace; padding: 2px;
-    box-shadow: inset 2px 2px #292826, inset -2px -2px #aaa69e;
-  `;
+  slot.className='quick-slot';
   slot.appendChild(blockThumbnail(k));
   const count=document.createElement('span');
   count.style.cssText='position:relative;z-index:1;text-shadow:1px 1px #000,-1px -1px #000;font-size:11px;line-height:1';
@@ -4505,9 +4531,11 @@ BLOCK_KEYS.forEach((k, i) => {
   hotbar.appendChild(slot);
 });
 document.body.appendChild(hotbar);
+var quickbarReady=true;
 function refreshHotbar() {
+  const limit=touchLayoutOn()?6:9,baseCount=selected>=limit?limit-1:limit;
   [...hotbar.children].forEach((el, i) => {
-    el.hidden=isGroupRoom&&INVENTORY_ADDITIONS.includes(BLOCK_KEYS[i]);
+    el.hidden=(isGroupRoom&&INVENTORY_ADDITIONS.includes(BLOCK_KEYS[i]))||(i>=baseCount&&i!==selected);
     el.style.display=el.hidden?'none':'flex';
     el.style.outline = i === selected ? '3px solid #fff' : 'none';
     el.style.outlineOffset = i === selected ? '2px' : '0';
@@ -4665,7 +4693,7 @@ addEventListener('keydown',event=>{
   }
 });
 
-// ---------- top-right controls: back to app, autosave indicator, reset ----------
+// ---------- four primary actions; settings and world management stay in the menu ----------
 const ctrlPanel = document.createElement('div');
 ctrlPanel.id='controls';
 ctrlPanel.style.cssText = `
@@ -4682,7 +4710,7 @@ backLink.style.cssText = `
   border-radius: 6px; padding: 7px 10px; box-shadow: 2px 2px 0 #0006;
 `;
 const saveTag = document.createElement('div');
-saveTag.textContent = 'Autosave on';
+saveTag.id='saveStateIndicator';saveTag.setAttribute('role','status');saveTag.textContent = 'Autosave · this device';
 saveTag.style.cssText = `
   background: #0008; color: #8fffa8; border: 2px solid #000;
   border-radius: 6px; padding: 7px 10px; opacity: .5; transition: opacity .2s;
@@ -4705,36 +4733,26 @@ resetBtn.addEventListener('click', () => {
   } catch(e){resetting=false;document.getElementById('status').textContent='Could not reset storage. Your world was kept.';return;}
   location.reload();
 });
-const menuBtn=document.createElement('button');menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
+const menuBtn=document.createElement('button');menuBtn.id='menuToggle';menuBtn.type='button';menuBtn.textContent='Menu';menuBtn.style.cssText=resetBtn.style.cssText;
 menuBtn.addEventListener('click',()=>{pauseGame();persistSave();});
-const saveBtn=document.createElement('button');saveBtn.textContent='Save';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',()=>{persistSave();quest?.signal('saved');});
-const inventoryBtn=document.createElement('button');inventoryBtn.id='inventoryToggle';inventoryBtn.type='button';inventoryBtn.textContent='Blocks / Inventory';inventoryBtn.style.cssText=backLink.style.cssText;
+const saveBtn=document.createElement('button');saveBtn.id='saveGame';saveBtn.type='button';saveBtn.textContent='Save';saveBtn.title='Save on this device. Menu → Save or load a world has Download Save.';saveBtn.style.cssText=backLink.style.cssText;saveBtn.addEventListener('click',()=>{if(persistSave())quest?.signal('saved');});
+const inventoryBtn=document.createElement('button');inventoryBtn.id='inventoryToggle';inventoryBtn.type='button';inventoryBtn.textContent='Blocks';inventoryBtn.setAttribute('aria-label','Blocks / Inventory');inventoryBtn.style.cssText=backLink.style.cssText;
 inventoryBtn.setAttribute('aria-keyshortcuts','I');inventoryBtn.setAttribute('aria-haspopup','dialog');inventoryBtn.addEventListener('click',openInventory);
-graphicsBtn=document.createElement('button');
-graphicsBtn.id='graphicsToggle';graphicsBtn.type='button';graphicsBtn.style.cssText=resetBtn.style.cssText;
-graphicsBtn.addEventListener('click',()=>{setGraphics(graphics==='smooth'?'detailed':'smooth');persistSave();});
-setGraphics(graphics);
-controlsSelect=document.createElement('select');
-controlsSelect.id='controlsToggle';controlsSelect.setAttribute('aria-label','Controls layout');
-controlsSelect.title='Choose Auto, Touch, or Keyboard and mouse. Auto follows this device.';
-for(const [value,text] of [['auto','Auto · match this device'],['touch','Touch · show screen buttons'],['desktop','Keyboard and mouse']]){
-  const option=document.createElement('option');option.value=value;option.textContent=text;controlsSelect.appendChild(option);
-}
-controlsSelect.style.cssText=backLink.style.cssText+'min-height:44px;border-radius:0;background:#171615;color:#f8f6f2;';
-controlsSelect.addEventListener('change',()=>setControlsLayout(controlsSelect.value,true));
-// Tablet-friendly twin of the C key, so either view works without a keyboard.
-viewBtn=document.createElement('button');
-viewBtn.id='viewToggle';viewBtn.type='button';viewBtn.style.cssText=backLink.style.cssText;
-viewBtn.addEventListener('click',()=>{setView(view==='third'?'first':'third');persistSave();});
-setView(view);
-ctrlPanel.append(menuBtn, saveBtn, inventoryBtn, controlsSelect, viewBtn, graphicsBtn, backLink, saveTag, resetBtn);
+controlsSelect=controlsMenu;
+const helpBtn=document.createElement('button');helpBtn.id='helpToggle';helpBtn.type='button';helpBtn.textContent='Help';
+helpBtn.addEventListener('click',()=>{pauseGame();const guide=document.getElementById('howToPlay');guide.open=true;guide.scrollIntoView?.({block:'start'});guide.querySelector?.('summary')?.focus?.();});
+const clockBadge=document.createElement('div');clockBadge.id='gameClock';clockBadge.setAttribute('aria-label','World time');
+ctrlPanel.append(menuBtn, inventoryBtn, saveBtn, helpBtn, saveTag, clockBadge);
+for(const control of [menuBtn,inventoryBtn,saveBtn,helpBtn,saveTag])control.style.cssText='';
 document.body.appendChild(ctrlPanel);
+document.getElementById('worldManagement').append(backLink,resetBtn);
+document.getElementById('tryPanel').appendChild(document.getElementById('schoolExplore'));
 
 function flashSaved(){
-  saveTag.textContent = 'Saved \u2713';
+  saveTag.textContent = 'Saved on this device \u2713';
   saveTag.style.opacity = '1';
   clearTimeout(flashSaved._t);
-  flashSaved._t = setTimeout(() => { saveTag.style.opacity = '.5'; saveTag.textContent = 'Autosave on'; }, 1100);
+  flashSaved._t = setTimeout(() => { saveTag.style.opacity = '.8'; saveTag.textContent = 'Autosave · this device'; }, 1600);
 }
 
 // ---------- flight-mode toast ----------
@@ -4759,10 +4777,7 @@ function flashFly(on){
 const coordHUD = document.createElement('div');
 coordHUD.id='coordinates';
 coordHUD.style.cssText = `
-  position: fixed; bottom: 12px; left: 12px; z-index: 6;
-  background: #0008; color: #fff; border: 2px solid #000;
-  border-radius: 6px; padding: 7px 11px; pointer-events: none;
-  font: 700 12px ui-monospace, monospace; line-height: 1.5; text-shadow: 0 1px 2px #000c;
+  position: fixed; z-index: 6; pointer-events: none;
 `;
 document.body.appendChild(coordHUD);
 function timeLabel() {
@@ -4786,7 +4801,7 @@ function busStatusLine(){
   return `School buses start their rear-loop trip at ${busClockLabel} game time.`;
 }
 function refreshMenuStatus(){
-  if(worldClockEl)worldClockEl.textContent=`World clock: ${timeLabel()} · ${isGroupRoom?'Shared build room':isHardcoreWorld?'Your Hardcore resource world':busStatusLine()}`;
+  if(worldClockEl)worldClockEl.textContent=`World clock: ${timeLabel()} · Position: ${Math.floor(player.pos.x)}, ${Math.floor(player.pos.y)}, ${Math.floor(player.pos.z)} · ${isGroupRoom?'Shared build room':isHardcoreWorld?'Your Hardcore resource world':busStatusLine()}`;
 }
 let nextHudUpdate=0, frameFps=0, frameWindowStart=0, frameCount=0;
 function recordFrame(now,interval){
@@ -4802,15 +4817,14 @@ function recordFrame(now,interval){
 function updateCoordHUD() {
   const now=performance.now();if(now<nextHudUpdate)return;nextHudUpdate=now+200;
   refreshMenuStatus();
+  clockBadge.textContent=timeLabel();
+  document.getElementById('btnDown').style.display=(player.flying||waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z)))?'flex':'none';
   const bk = BLOCKS[BLOCK_KEYS[selected]];
   coordHUD.innerHTML =
-    `XYZ <b>${Math.floor(player.pos.x)} ${Math.floor(player.pos.y)} ${Math.floor(player.pos.z)}</b><br>` +
-    `${timeLabel()}` + (player.flying ? '  \u2708' : '') + `<br>` +
     (activities?.isFishing()?'Tool: Fishing rod':activities?.hasTea?.()?'Holding: Cup of tea':chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
     (gameMode!=='creative'?` (${inventory[BLOCK_KEYS[selected]]})<br>${gameMode==='hardcore'?'Hardcore · ':''}Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
     (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
-    (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'') +
-    (frameFps?`<br>${frameFps} FPS`:'');
+    (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'');
 }
 
 // ---------- touch controls (iPhone / iPad) ----------
@@ -4945,7 +4959,7 @@ const btnDown    = document.getElementById('btnDown');
   let mouseStick=false,mouseLook=false,mouseX=0,mouseY=0;
   for(const [el,fn] of [[btnBreak,doBreak],[btnPlace,doPlace]])el.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;e.preventDefault();if(!started){startGame();return;}fn();});
   for(const [el,code] of [[btnJump,'Space'],[btnDown,'KeyV']]){
-    el.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;e.preventDefault();if(!started){startGame();return;}if(code==='Space'||player.flying)keys[code]=true;});
+    el.addEventListener('pointerdown',e=>{if(!mouseOnly(e))return;e.preventDefault();if(!started){startGame();return;}if(code==='Space'||player.flying||waterLiftAt(Math.floor(player.pos.x),Math.floor(player.pos.y-player.height+.1),Math.floor(player.pos.z)))keys[code]=true;});
     el.addEventListener('pointerup',e=>{if(mouseOnly(e))keys[code]=false;});el.addEventListener('pointerleave',e=>{if(mouseOnly(e))keys[code]=false;});
   }
   btnFly.addEventListener('pointerdown',e=>{
@@ -5000,7 +5014,7 @@ if(damagedSaveKept){
 }
 refreshMenuStatus();
 document.getElementById('schoolExplore').hidden=isHardcoreWorld||isGroupRoom;
-document.getElementById('status').textContent=isHardcoreWorld?'Hardcore: gather logs from the nearby trees. Open Inventory to craft. Village: east. Court: west. Mine: northeast.':'Ready. Lake at the center · school to the east · buses at the rear loop each afternoon.';
+document.getElementById('status').textContent=isHardcoreWorld?'Gather logs from the nearby trees. Open Blocks to craft.':'';
 if(isGroupRoom){
   const status=document.getElementById('status');status.textContent='Group room: waiting for the teacher to admit you.';
   for(const control of [saveBtn,resetBtn,modeSelect,document.getElementById('downloadWorld'),document.getElementById('loadWorld'),document.getElementById('areaLabelText'),document.getElementById('removeAreaLabel')])control.disabled=true;
