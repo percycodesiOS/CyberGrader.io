@@ -1,12 +1,12 @@
 # CyberGrader.io
 
-> **MYnecraft source moved September 29, 2026:** Develop the game in [percycodesiOS/MYnecraft](https://github.com/percycodesiOS/MYnecraft). This repository continues publishing the [existing landing page](https://percycodesios.github.io/CyberGrader.io/) and [game URL](https://percycodesios.github.io/CyberGrader.io/game/mynecraft.html). Use the source repository's release helper; `mynecraft-release.json` identifies the released source and runtime hashes. The older CyberGrader product documentation follows for reference.
+> **MYnecraft source moved September 29, 2026:** Develop the game in [percycodesiOS/MYnecraft](https://github.com/percycodesiOS/MYnecraft). Its [primary site](https://percycodesios.github.io/MYnecraft/) is the direct MYnecraft bookmark. This repository preserves the school-approved [MYnecraft compatibility title screen](https://percycodesios.github.io/CyberGrader.io/) and [game URL](https://percycodesios.github.io/CyberGrader.io/game/mynecraft.html), alongside the separate [CyberGrader teacher app](https://percycodesios.github.io/CyberGrader.io/app.html). Use the source repository's release helper for the game; `mynecraft-release.json` identifies its released source and runtime hashes. Keep the existing compatibility URLs working. The CyberGrader teacher-app documentation below applies to `app.html`, not to MYnecraft.
 
 A purpose-built workflow tool for cyber teachers — so you stop copy-pasting the same grading feedback and check-in emails 50 times a day.
 
-Two HTML files. Account required. Your setup syncs to every device automatically. Works on desktop, tablet, and phone.
+The CyberGrader teacher app requires an account. Your setup syncs to every device automatically. Works on desktop, tablet, and phone. MYnecraft is separate and does not use the teacher app's account.
 
-**Live at:** https://percycodesios.github.io/CyberGrader.io/
+**CyberGrader teacher app:** https://percycodesios.github.io/CyberGrader.io/app.html
 
 ---
 
@@ -50,11 +50,11 @@ Edit anytime from the user profile or by tapping the date pill.
 
 ---
 
-## Account Required
+## CyberGrader Teacher-App Account
 
 CyberGrader.io is a personal workflow tool — your edits, saved templates, and school year dates belong to *you*, locked to your account. There is no anonymous mode and no shared classroom view.
 
-1. Visit the site → marketing landing page loads
+1. Open the [CyberGrader teacher app](https://percycodesios.github.io/CyberGrader.io/app.html)
 2. Click **Create Free Account** (or **Sign In** if you already have one)
 3. Choose **Google** (one tap with your school account) or email/password
 4. First sign-in triggers the School Year Setup modal
@@ -105,9 +105,9 @@ When the paid plan launches, **early-beta accounts lock in $4.99/month or $39/ye
 
 | File | Purpose |
 |---|---|
-| `index.html` | Marketing landing page — what visitors see first. Links to `app.html` for sign-in. |
-| `app.html` | The actual tool. Auth-gated. Loads Firebase, renders the workflow UI. |
-| `assets/cybergrader-logo.png` | Brand wordmark. Referenced by both `index.html` and `app.html`. |
+| `index.html` | MYnecraft compatibility title screen. Update only through the MYnecraft source repository's release helper. |
+| `app.html` | Separate CyberGrader teacher tool. Auth-gated. Loads Firebase and renders the workflow UI. |
+| `assets/cybergrader-logo.png` | CyberGrader teacher-app brand wordmark. |
 | `assets/percy-logo.png` | Footer mark. |
 | `assets/sv-portal-logo.png` | Gradebook Setup workflow icon. (Filename predates the rename — kept for cache stability.) |
 
@@ -125,7 +125,7 @@ GitHub Pages serves the whole site for free, auto-deploys on every commit. Setup
 6. Wait about a minute
 7. Your site is live at `https://[your-username].github.io/[repo-name]/`
 
-Bookmark it on desktop. Add it to your iPhone home screen so it feels like an app.
+Bookmark the [teacher app's `app.html` URL](https://percycodesios.github.io/CyberGrader.io/app.html) for CyberGrader, or [MYnecraft's primary site](https://percycodesios.github.io/MYnecraft/) for the game.
 
 ---
 
@@ -150,7 +150,9 @@ The `firebaseConfig` block is embedded directly in `app.html`. The API key is sa
 
 ## How to Update the Tool
 
-When you get a new `app.html` (or `index.html`):
+These steps apply only to the CyberGrader teacher app's `app.html`. Update MYnecraft's `index.html` and `game/` only through the [MYnecraft source repository's release procedure](https://github.com/percycodesiOS/MYnecraft#release); do not replace the compatibility title screen with teacher-app code.
+
+When you get a new `app.html`:
 
 1. Go to your GitHub repo
 2. Click the file you're replacing
