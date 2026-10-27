@@ -41,7 +41,7 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .figs-layer{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none;--p:min(50vh,27vw)}
 .cast{position:absolute;bottom:0;width:calc(var(--p) * 1.25);height:calc(var(--p) * 1.7)}
 .cast-left{left:0}.cast-right{right:0}
-.fig{position:absolute;left:calc(var(--fx) * var(--p));bottom:calc(var(--fb,0) * var(--p));height:calc(var(--p) * 1.534 * var(--s,1));width:auto;transform:translate(calc(var(--ax,40) * -1%),7%);filter:saturate(1.05)}
+.fig{position:absolute;left:calc(var(--fx) * var(--p));bottom:calc(var(--fb,0) * var(--p));height:calc(var(--p) * 1.534 * var(--s,1));width:auto;transform:translate(calc(var(--ax,40) * -1%),7%);filter:saturate(1.06) drop-shadow(0 14px 24px rgba(5,12,24,.55))}
 .title-shade{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.04) 0%,rgba(11,26,46,.18) 60%,rgba(11,26,46,.36) 100%),linear-gradient(180deg,rgba(11,26,46,.25),rgba(11,26,46,.04) 40%,rgba(11,26,46,.04) 74%,rgba(11,26,46,.32) 100%)}
 .title-body{position:relative;z-index:2;pointer-events:none;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 0 26px;text-align:center}
 .title-body>*{pointer-events:auto}
@@ -60,8 +60,34 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .edition{margin:0;color:#f1efe8;font:400 clamp(15px,1.9vw,22px)/1 Bungee,Impact,sans-serif;letter-spacing:.34em;padding-left:.34em;text-shadow:0 2px 0 #151515,0 0 12px rgba(0,0,0,.6)}
 /* Minecraft-style splash text: yellow, tilted, gently pulsing at the logo's lower right. */
 .tagline{position:absolute;left:76%;top:66%;transform-origin:0 50%;margin:0;color:#ffff4f;font:700 clamp(15px,1.7vw,22px)/1.1 var(--kid);white-space:nowrap;text-shadow:2px 2px 0 #3f3f12,0 0 8px rgba(0,0,0,.45);transform:rotate(-14deg);animation:splash 1.1s ease-in-out infinite alternate;pointer-events:none}
-.panel{width:min(480px,100%);background:rgba(11,26,46,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:clamp(14px,2.4vw,22px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.panel{width:min(540px,100%);background:linear-gradient(180deg,rgba(14,32,56,.9),rgba(10,23,41,.94));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid rgba(154,216,255,.32);border-radius:24px;padding:clamp(14px,2.2vw,22px);box-shadow:0 26px 64px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.16)}
 .panel h2{margin:0 0 10px;font:600 20px var(--kid);color:var(--sun2);letter-spacing:.02em}
+.title-staff{margin:10px 0 4px;padding:10px 10px 8px;border:1px solid rgba(154,216,255,.24);border-radius:16px;background:rgba(8,20,36,.68)}
+.title-staff legend{padding:0 8px;font:700 14px/1.2 var(--kid);color:var(--sun2);letter-spacing:.02em}
+.ts-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.ts-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 3px 6px;border:2px solid rgba(132,184,224,.32);border-bottom-width:4px;border-radius:12px;background:rgba(21,42,66,.92);cursor:pointer;transition:transform .14s,border-color .14s,background-color .14s;-webkit-tap-highlight-color:transparent}
+.ts-card input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.ts-pic{width:100%;height:56px;border-radius:8px;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(120,198,255,.28),rgba(9,22,38,.9));border:1px solid rgba(173,218,250,.2)}
+.ts-pic img{display:block;width:100%;height:135%;object-fit:cover;object-position:50% 6%;filter:saturate(1.06)}
+.ts-name{display:block;font:700 11.5px/1.1 var(--kid);color:#f4f9ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ts-role{display:inline-block;padding:1px 6px;border-radius:999px;background:rgba(127,226,255,.16);color:#9be4ff;font:700 10px/1.2 var(--kid)}
+.ts-card:has(input:checked){background:linear-gradient(180deg,#ffe49e,#f3b948);border-color:#fff5cc;border-bottom-color:#9e6d12;transform:translateY(-2px)}
+.ts-card:has(input:checked) .ts-pic{background:radial-gradient(circle at 50% 35%,rgba(255,250,224,.85),rgba(32,64,98,.88));border-color:rgba(20,43,66,.3)}
+.ts-card:has(input:checked) .ts-name{color:#142538}
+.ts-card:has(input:checked) .ts-role{background:#142538;color:#ffd875}
+.ts-card:has(input:focus-visible){outline:3px solid #fff;outline-offset:2px}
+@media (hover:hover){.ts-card:hover{transform:translateY(-2px);border-color:#9be4ff}}
+.ts-picked{margin:6px 0 0;font:600 13.5px/1.25 var(--kid);color:#d7ecff}
+.ts-picked strong{color:#ffd875}
+.specials-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.special-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 12px 16px;border-radius:20px;background:linear-gradient(180deg,rgba(25,52,82,.92),rgba(13,29,49,.96));border:2px solid rgba(140,198,242,.28);box-shadow:0 14px 30px rgba(0,0,0,.34);text-align:center;cursor:pointer;transition:transform .15s,border-color .15s}
+@media (hover:hover){.special-card:hover{transform:translateY(-3px);border-color:#ffd27a}}
+.special-card.active{border-color:#ffd27a;box-shadow:0 0 0 3px rgba(255,210,122,.28),0 16px 32px rgba(0,0,0,.42)}
+.special-art{width:100%;height:190px;border-radius:14px;background:radial-gradient(circle at 50% 35%,rgba(127,212,255,.26),rgba(9,21,36,.92));border:1px solid rgba(173,218,250,.22);display:grid;place-items:center;overflow:hidden}
+.special-art img{height:94%;width:auto;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45))}
+.special-role{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,210,122,.18);border:1px solid rgba(255,210,122,.42);color:#ffd97d;font:700 12px/1.1 var(--kid);letter-spacing:.03em;text-transform:uppercase}
+.special-card h3{margin:0;font:700 19px/1.15 var(--kid);color:#fff}
+.special-card p{margin:0;color:var(--muted);font:500 13.5px/1.35 var(--kid)}
 /* Mode choices: big rows with a picture, a name and a check on the chosen one. Nothing
    in a row changes size, so pointing at or choosing a mode never moves the page. */
 .modes{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;border:0;text-align:left}
@@ -113,7 +139,7 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .section-head h2{margin:0;font-size:clamp(26px,3.4vw,38px)}
 .section-head h2 em{font-style:normal;color:var(--sun2)}
 .section-head p{margin:0;max-width:44ch;color:var(--muted);font:500 18px var(--kid)}
-.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
 .step{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 16px;border-radius:20px;background:var(--navy2);border:1px solid var(--line);text-align:center}
 .step .num{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--sun2);color:#1a1405;font:400 18px Bungee,Impact,sans-serif}
 .step .pic{font-size:48px;line-height:1}
@@ -175,15 +201,10 @@ footer a{font-weight:700;text-decoration:none}
   .play svg{width:36px;height:36px}
   .howto-btn{min-height:52px;margin-top:14px;font-size:23px}
   .save{margin-top:8px}
+  .ts-pic{height:44px}
 }
-@media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
-@media (max-width:480px){.title-body{gap:12px;padding:6px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
-/* Keep the tutorial invitation as the only pulsing action. */
-.scene,.tagline { animation:none; }
-.howto-btn { min-height:48px; border:1px solid #7b9bb3; border-radius:12px; background:#1b3349; color:#ecf5fc; font:650 18px/1.2 var(--kid); box-shadow:none; }
-.howto-btn .q { width:26px; height:26px; font-size:18px; color:#163047; background:#d5e8f6; }
-.howto-btn:hover { color:#fff; }
-.howto-btn:active { box-shadow:none; transform:translateY(2px); }
+@media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.specials-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
+@media (max-width:480px){.title-body{gap:12px;padding:6px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.specials-grid,.ts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
 </style>
 </head>
 <body>
@@ -212,6 +233,18 @@ footer a{font-weight:700;text-decoration:none}
         <label class="mode" data-more="Your own world: gather, craft tools, build a house, unlock teachers."><input type="radio" name="mode" value="hardcore"><span class="icon" aria-hidden="true"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#3b2412" d="M1 13h3v3H1zM2 12h3v3H2zM3 11h3v3H3zM4 10h3v3H4zM5 9h3v3H5zM6 8h3v3H6zM7 7h3v3H7zM8 6h3v3H8z"/><path fill="#a8713f" d="M2 13h1v2H2zM3 12h1v2H3zM4 11h1v2H4zM5 10h1v2H5zM6 9h1v2H6zM7 8h1v2H7zM8 7h1v2H8zM9 6h1v2H9z"/><path fill="#1d5f66" d="M4 0h8v1H4zM3 1h1v1H3zM12 1h1v1h-1zM2 2h1v2H2zM13 2h1v2h-1zM1 4h1v4H1zM14 4h1v4h-1zM2 4h3v1H2zM11 4h3v1h-3zM3 5h2v1H3zM11 5h2v1h-2z"/><path fill="#6fd3da" d="M4 1h8v3H4zM3 2h1v2H3zM12 2h1v2h-1zM2 5h1v3H2zM13 5h1v3h-1zM5 4h1v1H5zM10 4h1v1h-1z"/><path fill="#c6f3f5" d="M5 1h4v1H5zM3 2h1v1H3z"/></svg></span><span><b>Hardcore</b><small>Craft &amp; unlock</small></span><span class="go" aria-hidden="true"></span></label>
       </fieldset>
       <p class="mode-help" id="mode-help" aria-live="polite">Every block, as many as you want. Fly around and build anything!</p>
+      <fieldset class="title-staff">
+        <legend>Choose your Specials teacher</legend>
+        <div class="ts-grid">
+          <label class="ts-card" data-label="Mr. Macek · CIRC"><input type="radio" name="teacher" value="macek" checked><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/macek.png" alt=""></span><span class="ts-name">Mr. Macek</span><span class="ts-role">CIRC</span></label>
+          <label class="ts-card" data-label="Ms. Micco · CIRC"><input type="radio" name="teacher" value="micco"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/micco.png" alt=""></span><span class="ts-name">Ms. Micco</span><span class="ts-role">CIRC</span></label>
+          <label class="ts-card" data-label="Ms. Eriksen · Art"><input type="radio" name="teacher" value="eriksen"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/eriksen.png" alt=""></span><span class="ts-name">Ms. Eriksen</span><span class="ts-role">Art</span></label>
+          <label class="ts-card" data-label="Mr. Mullet · PE"><input type="radio" name="teacher" value="mullet"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/mullet.png" alt=""></span><span class="ts-name">Mr. Mullet</span><span class="ts-role">PE</span></label>
+          <label class="ts-card" data-label="Mr. Wingenbach · Music"><input type="radio" name="teacher" value="wingenbach"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/wingenbach.png" alt=""></span><span class="ts-name">Mr. Wingenbach</span><span class="ts-role">Music</span></label>
+          <label class="ts-card" data-label="Sra. McMichael · Spanish"><input type="radio" name="teacher" value="mcmichael"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/mcmichael.png" alt=""></span><span class="ts-name">Sra. McMichael</span><span class="ts-role">Spanish</span></label>
+        </div>
+        <p class="ts-picked" id="staff-picked" aria-live="polite">Playing as <strong>Mr. Macek · CIRC</strong> — you can switch anytime in Menu!</p>
+      </fieldset>
       <a class="play" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
         PLAY
@@ -251,12 +284,13 @@ footer a{font-weight:700;text-decoration:none}
 </header>
 <section class="section" id="how-to-play" aria-labelledby="quick-title">
   <div class="wrap">
-    <div class="section-head"><h2 id="quick-title">How to <em>play</em></h2><p>Four steps are all you need. Press PLAY and try them.</p></div>
+    <div class="section-head"><h2 id="quick-title">How to <em>play</em></h2><p>Five quick picture steps are all you need. Press PLAY and try them.</p></div>
     <ol class="steps">
       <li class="step"><span class="num">1</span><span class="pic" aria-hidden="true">🕹️</span><h3>Move</h3><p class="mouse"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><br>or the arrow keys</p><p class="touch">Push the round stick at the bottom left</p></li>
       <li class="step"><span class="num">2</span><span class="pic" aria-hidden="true">👀</span><h3>Look</h3><p class="mouse">Move the mouse.<br>Click and drag if it stays still.</p><p class="touch">Drag anywhere on the screen</p></li>
-      <li class="step"><span class="num">3</span><span class="pic" aria-hidden="true">🧱</span><h3>Build</h3><p class="mouse">Right click adds a block.<br>Left click removes one.</p><p class="touch">Tap PLACE to add.<br>Tap BREAK to remove.</p></li>
-      <li class="step"><span class="num">4</span><span class="pic" aria-hidden="true">💾</span><h3>Save</h3><p>It saves by itself. Use <strong>Download Save</strong> in the menu to keep a copy.</p></li>
+      <li class="step"><span class="num">3</span><span class="pic" aria-hidden="true">🚀</span><h3>Fly</h3><p class="mouse"><kbd>F</kbd> or <kbd>2× Space</kbd><br><kbd>Space</kbd> ⬆️ · <kbd>V</kbd> ⬇️</p><p class="touch">Tap <strong>🚀 FLY</strong> · hold <strong>⬆️ JUMP</strong> or <strong>⬇️ DOWN</strong></p></li>
+      <li class="step"><span class="num">4</span><span class="pic" aria-hidden="true">🧱</span><h3>Build</h3><p class="mouse">Right click adds a block.<br>Left click removes one.</p><p class="touch">Tap PLACE to add.<br>Tap BREAK to remove.</p></li>
+      <li class="step"><span class="num">5</span><span class="pic" aria-hidden="true">💾</span><h3>Save</h3><p>It saves by itself. Use <strong>Download Save</strong> in the menu to keep a copy.</p></li>
     </ol>
     <details class="more" id="howDetails" style="margin-top:22px">
       <summary><span class="q" aria-hidden="true">?</span>All the controls and tips</summary>
@@ -266,6 +300,19 @@ footer a{font-weight:700;text-decoration:none}
         <div><h3>💾 Keep your world</h3><p>Your build is saved in this browser on this device, every few seconds and when you leave. For a copy you can keep, open <strong>Menu → Save or load a world → Download Save</strong> and keep the .json file somewhere safe, like your school OneDrive. <strong>Load World</strong> opens that file on another device and asks before replacing anything. Clearing browser data erases the saved world, so keep a copy.</p></div>
       </div>
     </details>
+  </div>
+</section>
+<section class="section" id="specials-crew" aria-labelledby="crew-title">
+  <div class="wrap">
+    <div class="section-head"><h2 id="crew-title">Meet the <em>Specials</em> teachers</h2><p>Tap any teacher to play as them, or switch anytime inside the game Menu.</p></div>
+    <ul class="specials-grid">
+      <li class="special-card active" data-teacher="macek"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/macek.png" alt="Mr. Macek"></div><span class="special-role">CIRC</span><h3>Mr. Macek</h3><p>SV shirt, patterned sleeves, watch, bracelets &amp; lanyard.</p></li>
+      <li class="special-card" data-teacher="micco"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/micco.png" alt="Ms. Micco"></div><span class="special-role">CIRC</span><h3>Ms. Micco</h3><p>Gray knit cardigan, navy top, glasses &amp; school lanyard.</p></li>
+      <li class="special-card" data-teacher="eriksen"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/eriksen.png" alt="Ms. Eriksen"></div><span class="special-role">Art</span><h3>Ms. Eriksen</h3><p>Curly dark hair, bright green eyes, black cardigan &amp; purple top.</p></li>
+      <li class="special-card" data-teacher="mullet"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/mullet.png" alt="Mr. Mullet"></div><span class="special-role">PE</span><h3>Mr. Mullet</h3><p>Navy pullover hoodie, khaki shorts, crew socks &amp; sneakers.</p></li>
+      <li class="special-card" data-teacher="wingenbach"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/wingenbach.png" alt="Mr. Wingenbach"></div><span class="special-role">Music</span><h3>Mr. Wingenbach</h3><p>Full beard, black SV quarter-zip, gray trousers &amp; lanyard.</p></li>
+      <li class="special-card" data-teacher="mcmichael"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/mcmichael.png" alt="Sra. McMichael"></div><span class="special-role">Spanish</span><h3>Sra. McMichael</h3><p>Blonde hair, glasses, cream knit sweater &amp; polka-dot pants.</p></li>
+    </ul>
   </div>
 </section>
 <section class="section" id="things" aria-labelledby="things-title">
@@ -355,6 +402,55 @@ try{
     card.addEventListener('pointerleave',event=>{if(event.pointerType==='mouse')say(chosen(),false);});
   }
   say(chosen(),false);
+})();
+// Sync the chosen Specials teacher with the saved world so pressing PLAY spawns you as that teacher.
+(function(){
+  const radios=[...document.querySelectorAll('input[name="teacher"]')];
+  const cards=[...document.querySelectorAll('.special-card[data-teacher]')];
+  const picked=document.getElementById('staff-picked');
+  if(!radios.length)return;
+  const valid=new Set(radios.map(r=>r.value));
+  const saveKey='mynecraft_save_v1';
+  function readSavedTeacher(){
+    try{
+      const raw=localStorage.getItem(saveKey);
+      if(!raw)return null;
+      const data=JSON.parse(raw);
+      return data&&valid.has(data.playerCharacter)?data.playerCharacter:null;
+    }catch(e){return null;}
+  }
+  function writeSavedTeacher(id){
+    if(!valid.has(id))return;
+    try{
+      const raw=localStorage.getItem(saveKey);
+      const data=raw?JSON.parse(raw):{};
+      if(data&&typeof data==='object'){
+        data.playerCharacter=id;
+        data.characterChosen=true;
+        localStorage.setItem(saveKey,JSON.stringify(data));
+      }
+    }catch(e){}
+  }
+  function applyTeacher(id,persist){
+    if(!valid.has(id))id='macek';
+    for(const r of radios)r.checked=(r.value===id);
+    for(const c of cards)c.classList.toggle('active',c.dataset.teacher===id);
+    const activeRadio=radios.find(r=>r.value===id)||radios[0];
+    const label=activeRadio.closest('.ts-card')?.dataset.label||'Mr. Macek · CIRC';
+    if(picked)picked.innerHTML='Playing as <strong>'+label+'</strong> — you can switch anytime in Menu!';
+    if(persist)writeSavedTeacher(id);
+  }
+  const initial=readSavedTeacher();
+  if(initial)applyTeacher(initial,false);
+  for(const r of radios){
+    r.addEventListener('change',()=>{if(r.checked)applyTeacher(r.value,true);});
+  }
+  for(const c of cards){
+    c.addEventListener('click',()=>{
+      applyTeacher(c.dataset.teacher,true);
+      document.getElementById('play-button')?.scrollIntoView?.({behavior:'smooth',block:'center'});
+    });
+  }
 })();
 </script>
 </body>

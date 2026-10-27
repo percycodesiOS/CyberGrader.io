@@ -673,18 +673,23 @@ html body #start .playing-as { display: flex; flex-wrap: wrap; align-items: cent
 html body #start .link-button { flex: none; min-height: 36px; padding: 4px 14px; border: 1px solid #7fb6dd; border-radius: 999px; background: #2b4a63; color: #f4f8fc; font: 700 14px system-ui, -apple-system, "Segoe UI", sans-serif; }
 html body #start .hero-play #startTip { text-align: center; color: #b9cfe0; }
 
-/* Character choice: visible, but smaller than Play. */
-html body #start .start-character-panel { padding: 16px 18px; border: 1px solid #4a6a86; border-radius: 16px; background: #14222ecc; box-shadow: none; }
-html body #start .start-character-panel h2 { margin: 0 0 4px; font: 400 18px/1.2 Bungee, Impact, sans-serif; }
-html body #start .start-character-panel .character-note { margin: 0 0 12px; font-size: 14px; }
-html body #start #staffChoices { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
-html body #start .staff-preview { height: 100px; }
-html body #start .staff-choice small { display: none; }
+/* Character choice: vibrant 6-teacher showcase with full-body previews, role badges, and outfit details. */
+html body #start .start-character-panel { padding: 18px 20px; border: 2px solid #5d8bb0; border-radius: 20px; background: linear-gradient(145deg, rgba(20, 39, 60, .94), rgba(13, 26, 42, .96)); backdrop-filter: blur(10px); box-shadow: 0 18px 42px rgba(0, 0, 0, .48), inset 0 1px 0 rgba(255, 255, 255, .12); }
+html body #start .start-character-panel h2 { margin: 0 0 6px; font: 400 22px/1.2 Bungee, Impact, sans-serif; color: #ffd27a; text-shadow: 0 2px 0 #09131f; }
+html body #start .start-character-panel .character-note { margin: 0 0 14px; font-size: 15px; color: #dceaf7; }
+html body #start #staffChoices { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+html body #start .staff-choice { padding: 10px; border: 2px solid #486884; border-bottom-width: 4px; border-radius: 14px; background: linear-gradient(180deg, #1e3348, #152434); transition: transform .14s, border-color .14s, box-shadow .14s; }
+html body #start .staff-choice:hover { transform: translateY(-2px); border-color: #8fd3ff; background: linear-gradient(180deg, #254059, #192b3e); }
+html body #start .staff-choice:has(input:checked) { border-color: #ffd27a; border-bottom-color: #c58d1e; background: linear-gradient(180deg, #2b4966, #1b3147); box-shadow: 0 0 0 2px rgba(255, 210, 122, .45), 0 10px 24px rgba(0, 0, 0, .45); }
+html body #start .staff-preview { height: 158px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .1); }
+html body #start .staff-role { display: inline-block; align-self: flex-start; padding: 2px 9px; border-radius: 999px; background: rgba(134, 213, 255, .18); border: 1px solid rgba(134, 213, 255, .45); color: #bfe8ff; font: 700 11px/1.3 Fredoka, system-ui, sans-serif; letter-spacing: .03em; }
+html body #start .staff-choice:has(input:checked) .staff-role { background: #ffd27a; border-color: #fff1b8; color: #1a1405; }
+html body #start .staff-choice small { display: block; font-size: 12px; line-height: 1.35; color: #c8daea; }
 
 /* Folded extras: each is one friendly button until opened. */
-html body #start .start-more { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
-html body #start .start-more > details { flex: 1 1 210px; margin: 0; padding: 0; border: 1px solid #4a6a86; border-radius: 12px; background: #1b2a36; box-shadow: none; }
-html body #start .start-more > details > summary { display: flex; align-items: center; min-height: 52px; padding: 10px 16px; list-style: none; color: #f4f8fc; font: 700 15px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; }
+html body #start .start-more { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+html body #start .start-more > details { flex: 1 1 210px; margin: 0; padding: 0; border: 2px solid #4a6a86; border-bottom-width: 4px; border-radius: 14px; background: rgba(23, 42, 61, .92); box-shadow: 0 8px 20px rgba(0, 0, 0, .3); }
+html body #start .start-more > details > summary { display: flex; align-items: center; min-height: 54px; padding: 10px 16px; list-style: none; color: #f4f8fc; font: 700 16px/1.2 Fredoka, system-ui, -apple-system, "Segoe UI", sans-serif; }
 html body #start .start-more > details > summary::-webkit-details-marker { display: none; }
 html body #start .start-more > details.how-to-play > summary { border-radius: 11px; background: #f8d778; color: #142b42; }
 html body #start .start-more > details[open] { flex-basis: 100%; padding-bottom: 14px; }
@@ -692,35 +697,36 @@ html body #start .start-more > details[open] > :not(summary) { margin-left: 14px
 html body #start .start-more > details[open] > summary { margin-bottom: 10px; }
 html body #start .start-more .first-minute { margin-top: 0; }
 html body #start .start-more .settings-body > p:first-child { margin-top: 0; }
-@media (max-width: 1000px) { html body #start #staffChoices { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 1000px) { html body #start #staffChoices { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 520px) {
-  html body #start #staffChoices { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  html body #start .staff-preview { height: 78px; }
-  html body #start .staff-choice span { font-size: 12px; }
+  html body #start #staffChoices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html body #start .staff-preview { height: 124px; }
+  html body #start .staff-choice span { font-size: 13px; }
   html body #start .mode-card { min-height: 88px; padding: 8px 4px; }
   html body #start .mode-card span { font-size: 26px; }
   html body #start .start-more > details { flex-basis: 100%; }
 }
 
-/* Four picture steps under the title: move, look, build, save. */
-html body #start .quick-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-html body #start .quick-step { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px; border: 1px solid #4a6a86; border-radius: 14px; background: #14222ecc; text-align: center; color: #dfe9f2; font-size: 13px; line-height: 1.3; }
-html body #start .quick-step .quick-icon { font-size: 30px; line-height: 1; }
-html body #start .quick-step strong { color: #fff; font: 400 16px/1.1 Bungee, Impact, sans-serif; letter-spacing: .03em; }
-html body #start .quick-step kbd { min-width: 22px; }
+/* Five picture steps under the title: move, look, fly, build, save. */
+html body #start .quick-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+html body #start .quick-step { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border: 2px solid #4e7393; border-bottom-width: 4px; border-radius: 16px; background: linear-gradient(180deg, rgba(24, 45, 66, .92), rgba(15, 29, 44, .95)); text-align: center; color: #e8f2fa; font-size: 14px; line-height: 1.35; box-shadow: 0 8px 20px rgba(0, 0, 0, .28); }
+html body #start .quick-step .quick-icon { font-size: 34px; line-height: 1; }
+html body #start .quick-step strong { color: #ffd27a; font: 400 17px/1.1 Bungee, Impact, sans-serif; letter-spacing: .03em; }
+html body #start .quick-step kbd { min-width: 24px; }
 html body #start .quick-step .desktop-help, html body #start .quick-step .touch-help { margin: 0; }
 html body.touch-device #start .quick-step .touch-help { display: inline; }
+@media (max-width: 820px) { html body #start .quick-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 520px) { html body #start .quick-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* ---- October 23 round 2: playful font, an unmissable How to play, readable tagline ---- */
 @font-face { font-family: Fredoka; src: url("assets/fredoka/Fredoka-latin.woff2") format("woff2"); font-style: normal; font-weight: 300 700; font-display: swap; }
 /* The tagline sits on a dark plate with a gold edge so it reads over the picture. */
-html body #start .hero-brand .hero-tagline { display: inline-block; margin-top: 10px; padding: .3em 1em; border: 2px solid #ffd27a; border-radius: 999px; background: rgba(8, 18, 33, .9); color: #fff; font: 600 18px/1.2 Fredoka, system-ui, sans-serif; text-shadow: 0 2px 0 #000; box-shadow: 0 6px 18px rgba(0, 0, 0, .45); }
+html body #start .hero-brand .hero-tagline { display: inline-block; margin-top: 10px; padding: .35em 1.05em; border: 2px solid #ffd27a; border-radius: 999px; background: rgba(8, 18, 33, .92); color: #fff; font: 600 18px/1.2 Fredoka, system-ui, sans-serif; text-shadow: 0 2px 0 #000; box-shadow: 0 6px 18px rgba(0, 0, 0, .45); }
 /* A big green How to play button right under PLAY. */
-html body #start .howto-open { flex: none; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; border: 3px solid #c9ffe4; border-bottom: 3px solid #c9ffe4; border-radius: 999px; background: linear-gradient(180deg, #5fe0a4, #2fb47a); color: #062b1a; font: 700 22px/1 Fredoka, system-ui, sans-serif; letter-spacing: .02em; box-shadow: 0 6px 0 #1d7a50; animation: howto-nudge 3.6s ease-in-out infinite; }
+html body #start .howto-open { flex: none; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; border: 3px solid #c9ffe4; border-bottom: 3px solid #c9ffe4; border-radius: 999px; background: linear-gradient(180deg, #5fe0a4, #2fb47a); color: #062b1a; font: 700 20px/1 Fredoka, system-ui, sans-serif; letter-spacing: .02em; box-shadow: 0 6px 0 #1d7a50; animation: howto-nudge 3.6s ease-in-out infinite; }
 html body #start .howto-open:hover { background: linear-gradient(180deg, #74eab3, #38c287); }
 html body #start .howto-open:active { transform: translateY(4px); box-shadow: 0 2px 0 #1d7a50; }
-html body #start .howto-open .q { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #062b1a; color: #5fe0a4; font: 700 20px Fredoka, system-ui, sans-serif; }
+html body #start .howto-open .q { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #062b1a; color: #5fe0a4; font: 700 19px Fredoka, system-ui, sans-serif; }
 html body #start .start-more > details.how-to-play { flex-basis: 100%; border: 3px solid #5fe0a4; }
 html body #start .start-more > details.how-to-play > summary { min-height: 60px; background: linear-gradient(180deg, #5fe0a4, #2fb47a); color: #062b1a; font: 700 22px/1.1 Fredoka, system-ui, sans-serif; }
 html body #start .quick-step, html body #start .mode-card strong, html body #start .mode-card small, html body #start .try-choice strong, html body #start .try-choice small, html body #start .playing-as { font-family: Fredoka, system-ui, sans-serif; }
@@ -753,9 +759,9 @@ html body #start .quick-step { font-size: 15px; font-weight: 500; }
 @media (max-width: 520px) { .quest-card { top: max(56px, calc(env(safe-area-inset-top) + 52px)); padding: 10px 12px; } .quest-icon { font-size: 32px; } .quest-title { font-size: 22px; } .quest-text { font-size: 17px; } }
 @media (prefers-reduced-motion: reduce) { .quest-card { transition: none; } }
 
-/* One quiet game interface: four primary actions, a short block tray and a
-   folded pause menu. The world and the player's build stay in view. */
-body { --game-panel:#132334ed; --game-line:#456078; --game-ink:#edf5fb; --game-gold:#ffd076; }
+/* One quiet game interface: primary actions, a crisp block tray and a
+   polished pause menu. The world and the player's build stay in view. */
+body { --game-panel:#112233f0; --game-line:#557a99; --game-ink:#f2f8fd; --game-gold:#ffd27a; }
 body:not(.world-playing) #controls,
 body:not(.world-playing) #hotbar,
 body:not(.world-playing) #coordinates,
@@ -765,78 +771,78 @@ body:not(.world-playing) #status,
 body:not(.world-playing) #challengeProgress { display:none !important; }
 #mouseHint { display:none !important; }
 html body #controls {
-  padding:8px; gap:8px; border:1px solid #65839a70; border-radius:16px;
-  background:var(--game-panel); box-shadow:0 5px 20px #08121d30;
-  overflow:visible; font:600 14px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;
+  padding:8px 10px; gap:8px; border:2px solid #587c9b; border-radius:18px;
+  background:var(--game-panel); backdrop-filter:blur(8px); box-shadow:0 8px 26px #06101b66;
+  overflow:visible; font:600 14px/1.2 Fredoka,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 html body #controls button {
   pointer-events:auto;
-  min-height:46px; padding:10px 16px !important; border:1px solid #607a91;
-  border-radius:10px; background:#233c50; color:var(--game-ink);
-  box-shadow:none; font:700 15px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;
-  letter-spacing:0; cursor:pointer;
+  min-height:46px; padding:10px 16px !important; border:2px solid #6486a3; border-bottom-width:4px;
+  border-radius:12px; background:#213a4f; color:var(--game-ink);
+  box-shadow:none; font:700 15px/1.2 Fredoka,system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.01em; cursor:pointer;
 }
-html body #controls #inventoryToggle { background:var(--game-gold); border-color:#ffe5b3; color:#2b210f; }
-html body #controls #saveGame { background:#1c4b3e; border-color:#74bca0; color:#e0ffef; }
+html body #controls #inventoryToggle { background:linear-gradient(180deg,#ffd27a,#f2b544); border-color:#fff1c4; border-bottom-color:#9a6a12; color:#1a1405; }
+html body #controls #saveGame { background:linear-gradient(180deg,#2d6e57,#1c4b3e); border-color:#88dec0; border-bottom-color:#113328; color:#eafff4; }
 html body #controls button::before { display:inline-block; margin-right:8px; font-size:18px; line-height:1; }
 #menuToggle::before { content:'☰'; } #inventoryToggle::before { content:'▦'; }
 #saveGame::before { content:'↓'; } #helpToggle::before { content:'?'; }
 #flyToggle::before { content:'🚀'; } #questToggle::before { content:'🎓'; }
-html body #controls #flyToggle[aria-pressed="true"] { background:#1d5a42; border-color:#8fffa8; color:#eafff2; box-shadow:0 0 12px #58e69050; }
-html body #controls #questToggle { background:#2a3c5c; border-color:#8ec5ff; color:#eef7ff; }
+html body #controls #flyToggle { background:linear-gradient(180deg,#2b4b6f,#1d3550); border-color:#8ec5ff; border-bottom-color:#122438; color:#eef7ff; }
+html body #controls #flyToggle[aria-pressed="true"] { background:linear-gradient(180deg,#34a874,#1d6b49); border-color:#b8ffd6; border-bottom-color:#0f422b; color:#fff; box-shadow:0 0 16px #58e69070; }
+html body #controls #questToggle { background:linear-gradient(180deg,#35507a,#233857); border-color:#9fd0ff; border-bottom-color:#142338; color:#f2f8ff; }
 .quest-buttons .quest-speak { background:#234463; border:2px solid #8ec5ff; color:#eef7ff; }
 html body #controls button:hover { filter:brightness(1.13); }
 html body #controls button:focus-visible,
 html body #hotbar button:focus-visible { outline:3px solid #fff; outline-offset:3px; }
-html body #controls #saveStateIndicator { display:block; margin-left:8px; border:0; padding:0; background:none; color:#b8d9cc; opacity:.9; font:500 13px/1.3 system-ui,sans-serif; box-shadow:none; }
-html body #controls #gameClock { display:block; margin-left:auto; padding:0 6px; color:#cad9e5; font:600 14px/1.3 system-ui,sans-serif; white-space:nowrap; }
-html body #info { top:84px; left:16px; max-width:calc(100vw - 32px); padding:6px 10px; border-radius:7px; background:#132334ba; color:#e4eef6; font:500 13px/1.4 system-ui,sans-serif; }
-html body #status { top:123px; left:16px; max-width:min(520px,calc(100vw - 32px)); padding:9px 12px; border-radius:9px; background:#132334ed; color:#f4f7fa; font:600 14px/1.4 system-ui,sans-serif; }
+html body #controls #saveStateIndicator { display:block; margin-left:8px; border:0; padding:0; background:none; color:#b8d9cc; opacity:.95; font:600 13px/1.3 Fredoka,system-ui,sans-serif; box-shadow:none; }
+html body #controls #gameClock { display:block; margin-left:auto; padding:4px 10px; border-radius:999px; background:rgba(12,25,40,.75); border:1px solid rgba(142,197,255,.3); color:#ffd27a; font:700 14px/1.3 Fredoka,system-ui,sans-serif; white-space:nowrap; }
+html body #info { top:84px; left:16px; max-width:calc(100vw - 32px); padding:7px 12px; border-radius:10px; border:1px solid rgba(142,197,255,.35); background:#112233dc; color:#eef6fc; font:600 13px/1.4 Fredoka,system-ui,sans-serif; }
+html body #status { top:125px; left:16px; max-width:min(540px,calc(100vw - 32px)); padding:9px 14px; border-radius:11px; border:1px solid #6486a3; background:#112233f0; color:#f4f7fa; font:600 14px/1.4 Fredoka,system-ui,sans-serif; box-shadow:0 8px 20px rgba(0,0,0,.35); }
 #status:empty { display:none !important; }
 #saveWarning:not([hidden]) { padding:10px 12px; border:1px solid #f4b3b0; border-radius:8px; background:#48272f; color:#fff; font:600 14px/1.4 system-ui,sans-serif; }
-html body #challengeProgress { top:184px; left:16px; border-radius:9px; font:600 14px/1.4 system-ui,sans-serif; background:#132334ed; }
+html body #challengeProgress { top:184px; left:16px; border-radius:10px; border:1px solid #ffd27a; font:600 14px/1.4 Fredoka,system-ui,sans-serif; background:#112233f0; }
 html body #hotbar {
-  max-width:calc(100vw - 24px); overflow:visible; padding:8px; gap:6px;
-  border:1px solid #64839b; border-radius:14px; background:#132334ed;
-  box-shadow:0 6px 18px #06111d50; bottom:18px;
+  max-width:calc(100vw - 24px); overflow:visible; padding:8px 10px; gap:7px;
+  border:2px solid #64839b; border-radius:16px; background:#112233f0;
+  box-shadow:0 10px 26px #06111d70; bottom:18px;
 }
-html body #hotbar button { position:relative; flex:0 0 44px; width:44px; height:44px; display:flex; align-items:flex-end; justify-content:flex-end; color:#fff; font:700 11px system-ui,sans-serif; padding:2px; border:1px solid #8ca0af; border-radius:7px; background:#334858; box-shadow:inset 0 1px 0 #ffffff30; }
+html body #hotbar button { position:relative; flex:0 0 46px; width:46px; height:46px; display:flex; align-items:flex-end; justify-content:flex-end; color:#fff; font:700 11px Fredoka,system-ui,sans-serif; padding:2px; border:2px solid #7d96aa; border-radius:9px; background:#2b4052; box-shadow:inset 0 1px 0 #ffffff30; }
 html body #coordinates {
   left:50% !important; bottom:91px !important; right:auto !important; top:auto !important;
-  transform:translateX(-50%) !important; padding:5px 11px; border:0; border-radius:8px;
-  background:#132334e6; color:#f4f7fa; text-align:center; max-width:calc(100vw - 30px);
-  font:600 13px/1.4 system-ui,sans-serif; text-shadow:none;
+  transform:translateX(-50%) !important; padding:5px 12px; border:1px solid rgba(142,197,255,.35); border-radius:999px;
+  background:#112233eb; color:#f4f7fa; text-align:center; max-width:calc(100vw - 30px);
+  font:600 13px/1.4 Fredoka,system-ui,sans-serif; text-shadow:none;
 }
 body.touch-device #touchStick { width:112px; height:112px; background:#13233480; border:2px solid #aec8da90; box-shadow:none; }
 body.touch-device #touchStickNub { width:48px; height:48px; background:#d9e6eeb8; border:1px solid #ffffffa0; box-shadow:none; }
 body.touch-device #touchActions { gap:10px; }
 body.touch-device #touchActions .row { gap:10px; }
-body.touch-device .touchBtn { min-width:56px; min-height:56px; padding:0 12px; border:1px solid #7b95a9; border-radius:13px; box-shadow:0 3px 10px #04121d30; background:#183045e8; color:#eff7ff; font:800 13px system-ui,sans-serif; letter-spacing:.02em; }
+body.touch-device .touchBtn { min-width:56px; min-height:56px; padding:0 12px; border:2px solid #7b95a9; border-bottom-width:4px; border-radius:13px; box-shadow:0 3px 10px #04121d30; background:#183045e8; color:#eff7ff; font:800 13px Fredoka,system-ui,sans-serif; letter-spacing:.02em; }
 body.touch-device #btnPlace { background:#2b8060; border-color:#c4ffdf; color:#fff; min-width:90px; }
 body.touch-device #btnBreak { background:#7e4555; border-color:#ffced8; color:#fff; min-width:90px; }
 body.touch-device #btnJump { background:#edf4f8; color:#172c3d; border-color:#fff; }
 body.touch-device #btnHideControls { min-height:44px; min-width:0; padding:0 10px; bottom:calc(max(16px,env(safe-area-inset-bottom)) + 124px); font-size:11px; }
 body.touch-device #hotbar { bottom:max(174px,calc(env(safe-area-inset-bottom) + 164px)) !important; max-width:calc(100vw - 24px) !important; }
 html body.touch-device #coordinates { left:50% !important; right:auto !important; top:auto !important; transform:translateX(-50%) !important; bottom:max(245px,calc(env(safe-area-inset-bottom) + 235px)) !important; }
-html body #start { background:radial-gradient(ellipse at top,#263f56,#101b29 75%); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
-html body #start:has(#staffChoices) .start-shell { width:min(900px,100%); gap:12px; }
-html body #start .hero-brand .block-title { color:#e3e7e7; letter-spacing:.025em; font-size:clamp(28px,5vw,46px); text-shadow:0 3px 0 #23313c,0 6px 0 #07101b; }
-html body #start .hero-brand .hero-tagline { border:0; background:none; padding:0; color:#b9cddd; box-shadow:none; text-shadow:none; font:500 16px system-ui,sans-serif; }
-html body #start .hero-brand .edition { font:700 12px system-ui,sans-serif; letter-spacing:.23em; color:#8eb3cc; }
-html body #start .howto-open { min-height:44px; border:1px solid #6e8ca3; border-radius:10px; background:#203a50; color:#e6f0f7; box-shadow:none; animation:none; font:700 16px system-ui,sans-serif; }
-html body #start .howto-open .q { width:24px; height:24px; font-size:16px; background:#d3e3ef; color:#19334a; }
-html body #start .howto-open:hover { background:#2e4e68; }
-html body #start .quick-steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px; }
-html body #start .menu-fold { padding:0; border:1px solid #4c6880; border-radius:12px; background:#192d40; }
-html body #start .menu-fold > summary { padding:15px 18px; cursor:pointer; color:#f1f6fa; font:700 17px/1.3 system-ui,sans-serif; }
-html body #start .menu-fold > summary span { margin-left:8px; color:#b5c8d8; font:400 14px system-ui,sans-serif; }
+html body #start { background:linear-gradient(180deg, rgba(11, 26, 46, .52) 0%, rgba(11, 26, 46, .84) 48%, rgba(9, 20, 36, .95) 100%), url("assets/ec-title-bg.jpg") center 30% / cover no-repeat, #0b1a2e; font-family:Fredoka,system-ui,-apple-system,"Segoe UI",sans-serif; }
+html body #start:has(#staffChoices) .start-shell { width:min(1060px,100%); gap:14px; }
+html body #start .hero-brand .block-title { color:#f4f4f4; letter-spacing:.03em; font-size:clamp(34px,6vw,58px); -webkit-text-stroke:2px #141a22; text-shadow:0 3px 0 #3b4450,0 6px 0 #1b222c,0 10px 24px rgba(0,0,0,.65); }
+html body #start .hero-brand .edition { font:400 16px Bungee,Impact,sans-serif; letter-spacing:.28em; color:#ffd27a; text-shadow:0 2px 0 #101824; }
+html body #start .hero-play { border:2px solid #638db0; border-radius:20px; background:linear-gradient(145deg,rgba(22,42,64,.94),rgba(13,26,42,.96)); backdrop-filter:blur(10px); box-shadow:0 20px 48px rgba(0,0,0,.5); }
+html body #start .hero-play #enter { min-height:72px; border:3px solid #fff1c4; border-radius:16px; background:linear-gradient(180deg,#ffd27a,#f2b544); color:#1a1405; font:400 clamp(24px,3.5vw,34px) Bungee,Impact,sans-serif; letter-spacing:.08em; box-shadow:0 7px 0 #9a6a12,0 16px 32px rgba(242,181,68,.35); }
+html body #start .hero-play #enter:hover { background:linear-gradient(180deg,#ffe09e,#f7c156); transform:translateY(-2px); }
+html body #start .hero-play #enter:active { transform:translateY(4px); box-shadow:0 3px 0 #9a6a12; }
+html body #start .menu-fold { padding:0; border:2px solid #4e7393; border-bottom-width:4px; border-radius:16px; background:rgba(20,38,56,.92); backdrop-filter:blur(8px); }
+html body #start .menu-fold > summary { padding:15px 18px; cursor:pointer; color:#f1f6fa; font:700 18px/1.3 Fredoka,system-ui,sans-serif; }
+html body #start .menu-fold > summary span { margin-left:8px; color:#ffd27a; font:600 14px Fredoka,system-ui,sans-serif; }
 html body #start .menu-fold[open] > :not(summary) { margin:12px 16px; }
 html body #start #staffChoices { grid-template-columns:repeat(6,minmax(0,1fr)); }
-html body #start .start-more > details { border-color:#4c6880; background:#192d40; }
+html body #start .start-more > details { border-color:#4e7393; background:rgba(20,38,56,.92); }
 html body #start #savePanel { order:-2; }
 html body #start #settingsPanel { order:-1; }
-html body #start .start-more > details.how-to-play { flex-basis:210px; border:1px solid #4c6880; }
-html body #start .start-more > details.how-to-play > summary { min-height:52px; background:transparent; color:#f4f8fc; font:700 15px system-ui,sans-serif; }
+html body #start .start-more > details.how-to-play { flex-basis:210px; border:2px solid #5fe0a4; }
+html body #start .start-more > details.how-to-play > summary { min-height:54px; background:linear-gradient(180deg,#5fe0a4,#2fb47a); color:#062b1a; font:700 16px Fredoka,system-ui,sans-serif; }
 html body #start .world-management { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid #4c6880; padding-top:18px; margin-top:18px; }
 html body #start .world-management button { border:1px solid #ba778a; background:#3b2631; color:#ffd8e2; box-shadow:none; }
 body.has-played #start .mode-cards,body.has-played #start .hero-step { display:none; }

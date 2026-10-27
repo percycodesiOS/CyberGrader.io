@@ -225,7 +225,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=quest-20261023">
+<link rel="stylesheet" href="start-menu.css?v=teachers-20261027">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -276,6 +276,13 @@
         </div>
       </div>
     </header>
+    <details class="start-character-panel menu-fold" id="characterPanel" open aria-labelledby="characterTitle">
+      <summary>Your teacher <span>Six Specials teachers</span></summary>
+      <h2 id="characterTitle">Choose your Specials teacher</h2>
+      <p class="character-note">Play as one of your Specials teachers. You can change any time, and press <kbd>C</kbd> in-game to see your full character in 3rd-person view!</p>
+      <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your Specials teacher"></div>
+      <p id="identityStatus" role="status">Pick your Specials teacher.</p>
+    </details>
     <!-- Five picture steps: all a first-time player needs, including how to fly. -->
     <section class="quick-steps" aria-label="Quick start">
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">🕹️</span><strong>Move</strong><span class="desktop-help"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></span><span class="touch-help">Use the round stick</span></div>
@@ -297,13 +304,6 @@
         <button type="button" class="try-choice" data-try="dogs"><span aria-hidden="true">🐕</span><strong>Walk with the dogs</strong><small>Percy and Ellie follow you</small></button>
       </div>
       <p id="tryStatus" role="status"></p>
-    </details>
-    <details class="start-character-panel menu-fold" id="characterPanel" aria-labelledby="characterTitle">
-      <summary>Your teacher <span>Six Specials teachers</span></summary>
-      <h2 id="characterTitle">Choose your Specials teacher</h2>
-      <p class="character-note">Play as one of your Specials teachers. You can change any time.</p>
-      <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your Specials teacher"></div>
-      <p id="identityStatus" role="status">Pick your Specials teacher.</p>
     </details>
     <!-- Everything below is folded away behind one friendly button each. -->
     <div class="start-more" aria-label="More options">
@@ -2315,16 +2315,48 @@ function teacherFeatures(ctx,{brow,iris}){
 }
 // Cache both outfits once; switching clothes does not allocate textures per frame.
 function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
+function frontOnlyUV(geo,plainOnly=false){
+  const uv=geo.attributes.uv;
+  for(let i=0;i<uv.count;i++){
+    if(!plainOnly&&i>=16&&i<20)continue;
+    uv.setXY(i,uv.getX(i)*.25,.75+uv.getY(i)*.25);
+  }
+  uv.needsUpdate=true;return geo;
+}
+function clampCapUV(geo){
+  const uv=geo.attributes.uv;
+  for(let i=8;i<12;i++)uv.setY(i,.75+uv.getY(i)*.25);
+  for(let i=12;i<16;i++)uv.setY(i,uv.getY(i)*.25);
+  uv.needsUpdate=true;return geo;
+}
+function drawSVChestLogo(ctx,cx=32,cy=28,scale=1){
+  ctx.save();ctx.translate(cx,cy);ctx.scale(scale,scale);
+  ctx.font='900 26px Impact,"Arial Black",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.lineJoin='round';
+  ctx.strokeStyle='#f0f7fc';ctx.lineWidth=6;ctx.strokeText('SV',0,0);
+  ctx.strokeStyle='#102842';ctx.lineWidth=3.2;ctx.strokeText('SV',0,0);
+  ctx.fillStyle='#58b4e8';ctx.fillText('SV',0,0);
+  ctx.fillStyle='#70b6df';ctx.fillRect(-14,-10,28,2);
+  ctx.restore();
+}
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
   ctx.fillStyle=style==='polo'?'#1685d1':'#171b22';ctx.fillRect(0,0,64,64);
   for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){ctx.fillStyle=style==='polo'?((x+y)%24?'#1688d5':'#127bc6'):((x+y)%24?'#1d2027':'#24272e');ctx.fillRect(x,y,8,8);}
-  if(style==='black'){ctx.fillStyle='#70b6df';ctx.font='bold 18px sans-serif';ctx.fillText('SV',35,25);}
+  if(style==='black'){ctx.fillStyle='#11141a';ctx.fillRect(20,0,24,6);drawSVChestLogo(ctx,32,27,1);}
   if(style==='polo'){ctx.fillStyle='#1260a1';ctx.fillRect(27,0,10,20);ctx.fillStyle='#d5e6ef';ctx.fillRect(31,7,3,3);ctx.fillRect(31,14,3,3);}
 })]));
 const patternedSleeve=outfitTexture(ctx=>{
-  ctx.fillStyle='#20242b';ctx.fillRect(0,0,64,64);ctx.fillStyle='#7bc4e6';
-  ctx.font='bold 13px sans-serif';for(let y=4;y<62;y+=16)for(let x=1;x<64;x+=22){ctx.save();ctx.translate(x+(y%32?0:7),y);ctx.rotate(-.2);ctx.fillText('SV',0,10);ctx.restore();}
-  ctx.fillStyle='#5ba4c9';for(let y=12;y<60;y+=16)for(let x=8;x<60;x+=18)ctx.fillRect(x,y,4,3);
+  ctx.fillStyle='#181c22';ctx.fillRect(0,0,64,64);
+  ctx.fillStyle='#20242b';for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8)if((x+y)%16===0)ctx.fillRect(x,y,8,8);
+  // Cyan and sky-blue pixel blossom / starburst tattoo-sleeve motifs from the reference portrait.
+  for(let row=0;row<5;row++)for(let col=0;col<4;col++){
+    const bx=6+col*15+(row%2)*7,by=5+row*13;
+    ctx.fillStyle='#2c76a3';ctx.fillRect((bx-4)%64,by,9,3);ctx.fillRect(bx-1,by-3,3,9);
+    ctx.fillStyle='#5ba4c9';ctx.fillRect((bx-3)%64,by-2,7,7);
+    ctx.fillStyle='#7bc4e6';ctx.fillRect((bx-2)%64,by-3,5,9);ctx.fillRect((bx-4)%64,by-1,9,5);
+    ctx.fillStyle='#a8ecff';ctx.fillRect(bx-1,by,3,3);
+  }
+  ctx.fillStyle='#111419';ctx.fillRect(0,58,64,6);
 });
 function faceForPerson(style){
   if(style==='macek'){
@@ -2335,22 +2367,24 @@ function faceForPerson(style){
       ctx.fillStyle='#eab887';ctx.fillRect(0,0,64,64);
       // One clean, straight hairline across the whole face: no side pieces hanging lower.
       ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);
-      // Subtle sandy-brown chin goatee/stubble along the jaw.
-      ctx.fillStyle='#b5865e';ctx.fillRect(22,56,20,5);ctx.fillRect(18,53,4,4);ctx.fillRect(42,53,4,4);
-      ctx.fillStyle='#966a47';ctx.fillRect(26,58,12,3);
+      // Sandy-brown mustache and connected chin goatee framing his smile.
+      ctx.fillStyle='#9e714b';ctx.fillRect(17,45,30,4);ctx.fillRect(16,48,4,10);ctx.fillRect(44,48,4,10);
+      ctx.fillStyle='#966a47';ctx.fillRect(18,55,28,8);
+      ctx.fillStyle='#b5865e';ctx.fillRect(21,46,22,2);ctx.fillRect(22,56,20,5);ctx.fillRect(29,54,6,3);
       // The same flat face as the other teachers (brows, eyes, nose and smile all in the
       // same places), with Mr. Macek's own blue eyes. Nothing sticks out of the face.
       teacherFeatures(ctx,{brow:'#9a744c',iris:'#5181a3'});
     });
   }
   if(style==='micco'){
-    // Ms. Micco gets the same teacher face too, with her long brown hair and her glasses.
+    // Ms. Micco gets the same teacher face too, with her layered brown bob hair and glasses.
     return outfitTexture(ctx=>{
       ctx.fillStyle='#e5b993';ctx.fillRect(0,0,64,64);
-      ctx.fillStyle='#79502e';ctx.fillRect(0,0,64,12);ctx.fillRect(0,12,7,40);ctx.fillRect(57,12,7,40);
+      ctx.fillStyle='#6b4429';ctx.fillRect(0,0,64,12);ctx.fillRect(0,12,8,44);ctx.fillRect(56,12,8,44);
+      ctx.fillStyle='#8c5d38';ctx.fillRect(8,0,10,10);ctx.fillRect(28,0,8,9);ctx.fillRect(46,0,10,10);ctx.fillRect(2,14,3,36);ctx.fillRect(59,14,3,36);
       teacherFeatures(ctx,{brow:'#5e3d23',iris:'#4a3b30'});
-      ctx.strokeStyle='#5b3f6e';ctx.lineWidth=3;ctx.strokeRect(8,26,21,15);ctx.strokeRect(35,26,21,15);
-      ctx.fillStyle='#5b3f6e';ctx.fillRect(29,31,6,3);
+      ctx.strokeStyle='#4a3228';ctx.lineWidth=3;ctx.strokeRect(8,26,21,15);ctx.strokeRect(35,26,21,15);
+      ctx.fillStyle='#4a3228';ctx.fillRect(29,31,6,3);
     });
   }
   return makeTexture(ctx=>{
@@ -2412,43 +2446,76 @@ function staffLook(style){
   if(staffLooks.has(style))return staffLooks.get(style);
   const isMacek=style==='macekStriped',isArt=style==='eriksen',isPE=style==='mullet',isMusic=style==='wingenbach';
   const skin=isMusic?'#d9a27d':isArt?'#e6b894':isMacek?'#eab887':'#edc3a2';
-  const hair=isMusic?'#3e3129':isArt?'#735943':isPE?'#b3a080':isMacek?'#775c40':'#b89b67';
+  const hair=isMusic?'#3e3129':isArt?'#4e3524':isPE?'#9b876a':isMacek?'#8a6845':'#dfb968';
   const face=outfitTexture(ctx=>{
     ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);
     ctx.fillStyle=hair;
     // Every look has a straight, even hairline across the forehead. Only Ms. Eriksen's
-    // long hair frames her face; the men's hair stops in one level line.
-    ctx.fillRect(0,0,64,10);if(isArt){ctx.fillRect(0,10,7,40);ctx.fillRect(57,10,7,40);}
-    ctx.fillStyle=isArt?'#bba47d':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
+    // and Sra. McMichael's long hair frames their faces; the men's hair stops in one level line.
+    ctx.fillRect(0,0,64,10);
+    if(isArt){
+      ctx.fillRect(0,10,9,44);ctx.fillRect(55,10,9,44);
+      ctx.fillStyle='#63442f';for(let y=12;y<50;y+=10){ctx.fillRect(1,y,6,6);ctx.fillRect(57,y+2,6,6);}
+    }
+    if(style==='mcmichael'){
+      ctx.fillRect(0,10,6,44);ctx.fillRect(58,10,6,44);
+      ctx.fillStyle='#f0d58c';ctx.fillRect(14,0,10,9);ctx.fillRect(40,0,10,9);
+    }
+    ctx.fillStyle=isArt?'#5c4028':style==='mcmichael'?'#8c6b3f':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
     ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
-    ctx.fillStyle=isMacek?'#5181a3':isArt?'#5a6b47':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
+    ctx.fillStyle=isMacek?'#5181a3':isArt?'#4e7d44':style==='mcmichael'?'#4f6e82':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
     ctx.fillStyle='#292d30';ctx.fillRect(17,30,3,6);ctx.fillRect(44,30,3,6);
     ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
-    if(isMacek){ctx.fillStyle='#b5865e';ctx.fillRect(22,56,20,5);ctx.fillRect(18,53,4,4);ctx.fillRect(42,53,4,4);ctx.fillStyle='#966a47';ctx.fillRect(26,58,12,3);}
-    if(isMusic){ctx.fillStyle='#41372e';ctx.fillRect(7,43,50,17);ctx.fillRect(4,38,7,13);ctx.fillRect(53,38,7,13);}
+    if(isMacek){
+      ctx.fillStyle='#9e714b';ctx.fillRect(17,45,30,4);ctx.fillRect(16,48,4,10);ctx.fillRect(44,48,4,10);
+      ctx.fillStyle='#966a47';ctx.fillRect(18,55,28,8);
+      ctx.fillStyle='#b5865e';ctx.fillRect(21,46,22,2);ctx.fillRect(22,56,20,5);ctx.fillRect(29,54,6,3);
+    }
+    if(isMusic){
+      ctx.fillStyle='#3a2e25';ctx.fillRect(7,43,50,18);ctx.fillRect(4,37,7,15);ctx.fillRect(53,37,7,15);
+      ctx.fillStyle='#4b3c31';ctx.fillRect(15,44,34,4);ctx.fillRect(20,56,24,4);
+    }
     ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
     if(style==='mcmichael'){
-      ctx.strokeStyle='#292b31';ctx.lineWidth=3;ctx.strokeRect(6,26,23,17);ctx.strokeRect(35,26,23,17);ctx.fillStyle='#292b31';ctx.fillRect(29,30,6,3);
+      ctx.strokeStyle='#3b281e';ctx.lineWidth=3;ctx.strokeRect(6,26,23,17);ctx.strokeRect(35,26,23,17);ctx.fillStyle='#3b281e';ctx.fillRect(29,30,6,3);
     }
   });
   const shirt=outfitTexture(ctx=>{
     ctx.fillStyle=isMacek?'#171b22':isArt?'#16191e':isPE?'#202e49':isMusic?'#202429':'#eee6d6';ctx.fillRect(0,0,64,64);
     if(isMacek){
       for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){ctx.fillStyle=(x+y)%24?'#1d2027':'#24272e';ctx.fillRect(x,y,8,8);}
-      ctx.fillStyle='#11141a';ctx.fillRect(22,0,20,6);
-      ctx.fillStyle='#70b6df';ctx.font='bold 18px sans-serif';ctx.fillText('SV',35,25);
+      ctx.fillStyle='#11141a';ctx.fillRect(20,0,24,6);
+      drawSVChestLogo(ctx,32,27,1);
     }
-    if(isArt){ctx.fillStyle='#a54cb0';ctx.fillRect(17,0,30,64);ctx.fillStyle='#803f91';ctx.fillRect(17,0,30,3);}
-    if(isPE){ctx.fillStyle='#142039';ctx.fillRect(5,44,54,3);ctx.fillRect(10,46,44,14);ctx.fillStyle='#8b8d94';ctx.fillRect(20,2,2,26);ctx.fillRect(43,2,2,26);}
-    if(isMusic){ctx.fillStyle='#777d83';ctx.fillRect(31,0,2,27);ctx.fillStyle='#d0d0c7';ctx.fillRect(30,23,4,5);}
-    if(style==='mcmichael'){ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=6)ctx.fillRect(x,0,1,64);ctx.fillRect(0,58,64,6);}
+    if(isArt){
+      ctx.fillStyle='#a54cb0';ctx.fillRect(17,0,30,64);ctx.fillStyle='#803f91';ctx.fillRect(17,0,30,4);
+      ctx.fillStyle='#242830';ctx.fillRect(13,0,4,64);ctx.fillRect(47,0,4,64);
+    }
+    if(isPE){
+      ctx.fillStyle='#18243b';ctx.fillRect(16,0,32,7);
+      ctx.fillStyle='#142039';ctx.fillRect(5,42,54,3);ctx.fillRect(9,44,46,16);
+      ctx.fillStyle='#2b3f66';ctx.fillRect(21,3,3,25);ctx.fillRect(41,3,3,25);
+      ctx.fillStyle='#8b8d94';ctx.fillRect(21,25,3,3);ctx.fillRect(41,25,3,3);
+    }
+    if(isMusic){
+      ctx.fillStyle='#171a1f';ctx.fillRect(16,0,32,7);
+      ctx.fillStyle='#777d83';ctx.fillRect(31,0,2,27);ctx.fillStyle='#d0d0c7';ctx.fillRect(30,23,4,5);
+      ctx.font='900 13px Impact,"Arial Black",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.strokeStyle='#f0f7fc';ctx.lineWidth=2.4;ctx.strokeText('SV',46,20);
+      ctx.fillStyle='#58b4e8';ctx.fillText('SV',46,20);
+    }
+    if(style==='mcmichael'){
+      ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=5)ctx.fillRect(x,0,2,64);
+      ctx.fillStyle='#cfc5b0';ctx.fillRect(0,0,64,5);ctx.fillRect(0,57,64,7);
+    }
   });
-  const back=isArt?makeFlatTex(22,25,30):isPE?makeFlatTex(32,46,73):isMusic?makeFlatTex(32,36,41):shirt;
-  const sleeve=isMacek?patternedSleeve:isArt?outfitTexture(ctx=>{ctx.fillStyle='#16191e';ctx.fillRect(0,0,64,44);ctx.fillStyle=skin;ctx.fillRect(0,44,64,20);}):back;
+  const back=isArt||isPE||isMusic?outfitTexture(ctx=>{ctx.fillStyle=isArt?'#16191e':isPE?'#202e49':'#202429';ctx.fillRect(0,0,64,64);}):shirt;
+  const sleeve=isMacek?patternedSleeve:isArt?outfitTexture(ctx=>{ctx.fillStyle='#16191e';ctx.fillRect(0,0,64,44);ctx.fillStyle='#242830';ctx.fillRect(0,40,64,4);ctx.fillStyle=skin;ctx.fillRect(0,44,64,20);}):isPE?outfitTexture(ctx=>{ctx.fillStyle='#202e49';ctx.fillRect(0,0,64,64);ctx.fillStyle='#152036';ctx.fillRect(0,56,64,8);}):isMusic?outfitTexture(ctx=>{ctx.fillStyle='#202429';ctx.fillRect(0,0,64,64);ctx.fillStyle='#16191d';ctx.fillRect(0,56,64,8);}):outfitTexture(ctx=>{ctx.fillStyle='#eee6d6';ctx.fillRect(0,0,64,64);ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=5)ctx.fillRect(x,0,2,64);ctx.fillStyle='#cfc5b0';ctx.fillRect(0,54,64,10);});
   const pants=outfitTexture(ctx=>{
-    ctx.fillStyle=isMusic?'#8e9398':isPE?'#c4b28c':style==='mcmichael'?'#30282b':'#20232a';ctx.fillRect(0,0,64,64);
-    if(isPE){ctx.fillStyle='#a89470';ctx.fillRect(3,14,20,22);ctx.fillRect(42,14,18,22);ctx.fillStyle=skin;ctx.fillRect(0,38,64,26);}
-    if(style==='mcmichael'){ctx.fillStyle='#f4f0e7';for(let y=8;y<64;y+=22)for(let x=9;x<64;x+=24){ctx.beginPath();ctx.arc(x+(y%44?0:8),y,5,0,Math.PI*2);ctx.fill();}}
+    ctx.fillStyle=isMusic?'#8e9398':isPE?'#c4b28c':style==='mcmichael'?'#30282b':'#181b22';ctx.fillRect(0,0,64,64);
+    if(isMusic){ctx.fillStyle='#787d82';ctx.fillRect(0,0,64,4);ctx.fillRect(30,4,3,60);}
+    if(isPE){ctx.fillStyle='#a89470';ctx.fillRect(3,14,20,22);ctx.fillRect(42,14,18,22);ctx.fillStyle='#917d5b';ctx.fillRect(3,14,20,3);ctx.fillRect(42,14,18,3);ctx.fillStyle=skin;ctx.fillRect(0,38,64,26);}
+    if(style==='mcmichael'){ctx.fillStyle='#f4f0e7';for(let y=8;y<64;y+=18)for(let x=8;x<64;x+=20){ctx.beginPath();ctx.arc(x+(y%36?0:8),y,4.5,0,Math.PI*2);ctx.fill();}}
   });
   const look={face,shirt,back,sleeve,pants,skin:outfitTexture(ctx=>{ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);}),hair,skinColor:skin};
   staffLooks.set(style,look);return look;
@@ -2461,24 +2528,28 @@ function styleStaffPerson(npc,style){
   const part=(parent,name,w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.name=name;m.position.set(x,y,z);parent.add(m);return m;};
   resize(npc.head,isPE?.55:.52,.55,.48,true);npc.head.position.y=1.65;paint(npc.head,look.skin);npc.head.material[4].map=look.face;
   const bodyWidth=isMusic?.63:isPE?.62:isArt?.5:.55;
-  resize(npc.body,bodyWidth,.68,.31,true);npc.body.position.y=1.02;paint(npc.body,look.back);npc.body.material[4].map=look.shirt;
+  resize(npc.body,bodyWidth,.68,.31,true);if(isMacek)frontOnlyUV(npc.body.geometry);npc.body.position.y=1.02;paint(npc.body,look.back);npc.body.material[4].map=look.shirt;
   npc.shoulderCaps=[];npc.poloCollars=[];
   for(const [side,arm,leg] of [[-1,npc.armL,npc.legL],[1,npc.armR,npc.legR]]){
-    arm.position.set(side*(bodyWidth/2+.12),1.35,0);resize(arm.children[0],.22,.62,.25);arm.children[0].position.y=-.31;paint(arm.children[0],look.sleeve);
+    arm.position.set(side*(bodyWidth/2+.12),1.35,0);resize(arm.children[0],.22,.62,.25);if(isArt)clampCapUV(arm.children[0].geometry);arm.children[0].position.y=-.31;paint(arm.children[0],look.sleeve);
     const hand=bodyPart(.22,.17,.25,look.skin);hand.position.y=-.70;arm.add(hand);arm.userData.hand=hand;
     const looseTrousers=style==='mcmichael';
-    leg.position.set(side*(looseTrousers?.17:.145),.69,0);resize(leg.children[0],looseTrousers?.32:.27,.60,.28);leg.children[0].position.y=-.30;paint(leg.children[0],look.pants);
+    leg.position.set(side*(looseTrousers?.17:.145),.69,0);resize(leg.children[0],looseTrousers?.32:.27,.60,.28);if(isPE)clampCapUV(leg.children[0].geometry);leg.children[0].position.y=-.30;paint(leg.children[0],look.pants);
     if(isMacek){
-      const cap=bodyPart(.24,.21,.27,look.shirt);cap.name='shirt sleeve cap';cap.position.y=-.10;arm.add(cap);npc.shoulderCaps.push(cap);
-      if(side===-1){part(arm,'watch strap',.235,.09,.27,0x191c23,0,-.57,0);part(arm,'watch face',.15,.12,.04,0x3c4653,0,-.57,.15);}
-      else{
-        part(arm,'bracelet leather',.235,.035,.265,0x6e472b,0,-.54,0);
-        part(arm,'bracelet copper',.235,.03,.265,0xb87333,0,-.575,0);
-        part(arm,'bracelet beads',.235,.035,.265,0x22262d,0,-.61,0);
+      const cap=bodyPart(.24,.21,.27,look.shirt);frontOnlyUV(cap.geometry,true);cap.name='shirt sleeve cap';cap.position.y=-.10;arm.add(cap);npc.shoulderCaps.push(cap);
+      if(side===-1){
+        part(arm,'watch strap',.24,.095,.275,0x15181f,0,-.57,0);
+        part(arm,'watch face',.16,.125,.045,0x2e3742,0,-.57,.15);
+        part(arm,'watch screen',.11,.085,.05,0x64b5dc,0,-.57,.155);
+      }else{
+        part(arm,'bracelet leather',.24,.04,.27,0x6e472b,0,-.535,0);
+        part(arm,'bracelet copper',.24,.035,.27,0xd17e38,0,-.575,0);
+        part(arm,'bracelet beads',.24,.04,.27,0x22262d,0,-.615,0);
       }
     }
-    part(leg,'shoe',.29,.14,.4,isPE?0x8b8b83:style==='mcmichael'?0xe6e5df:0x24262b,0,-.62,.055);
-    part(leg,'shoe sole',.3,.035,.41,isMusic||isPE||style==='mcmichael'?0xe5e3d9:0x31333a,0,-.68,.055);
+    part(leg,'shoe',.29,.14,.4,isPE?0xdedad0:style==='mcmichael'?0xf0efe9:0x1b1e24,0,-.62,.055);
+    if(isPE)part(leg,'shoe stripe',.30,.05,.18,0x2b5ea8,0,-.61,.06);
+    part(leg,'shoe sole',.3,.035,.41,isMacek||isMusic||isPE||style==='mcmichael'?0xe8e6de:0x31333a,0,-.68,.055);
     if(isPE)part(leg,'white sock',.275,.17,.285,0xf0eee8,0,-.48,0);
     part(npc.group,'ear',.05,.14,.17,look.skinColor,side*.28,1.65,0);
   }
@@ -2489,6 +2560,7 @@ function styleStaffPerson(npc,style){
     part(hair,'short back',.52,.25,.035,look.hair,0,1.807,-.25);
     // Sides end level with the front edge, so the hairline is one straight line all round.
     for(const side of [-1,1])part(hair,'short side',.025,.065,.46,look.hair,side*.265,1.90,0);
+    part(npc.group,'goatee chin',.25,.06,.03,0x966a47,0,1.405,.235);
   }else if(isPE){
     // A full short cut with a clean, straight front edge (no receding pieces).
     part(hair,'full short crown',.56,.06,.49,look.hair,0,1.94,0);
@@ -2496,17 +2568,25 @@ function styleStaffPerson(npc,style){
     part(hair,'short back',.55,.22,.035,look.hair,0,1.82,-.25);
     for(const side of [-1,1])part(hair,'short side',.025,.06,.46,look.hair,side*.278,1.90,0);
   }else if(isArt){
-    // Small curls frame the head and taper near the shoulders; no oversized halo.
-    part(hair,'curly crown',.55,.085,.50,look.hair,0,1.945,-.01);
-    part(hair,'back curls',.50,.49,.085,look.hair,0,1.70,-.26);
-    for(const side of [-1,1])for(let i=0;i<4;i++)part(hair,'curl',.09,.145,.21,i%2?0x8e7858:0x78634b,side*(i===3?.255:.27+(i%2)*.005),1.87-i*.135,.005+(i%2)*.015);
-    part(hair,'side fringe',.14,.10,.045,0x8e7858,-.19,1.90,.247);
+    // Rich dark-brown curls framing the head and shoulders without an oversized halo.
+    part(hair,'curly crown',.55,.09,.50,0x4e3524,0,1.945,-.01);
+    part(hair,'back curls',.52,.56,.095,0x4e3524,0,1.67,-.26);
+    for(const side of [-1,1])for(let i=0;i<5;i++){
+      part(hair,'curl',.095,.14,.24,i%2?0x63442f:0x4e3524,side*(i===4?.25:.268),1.88-i*.12,.01+(i%2)*.02);
+      if(i<3)part(hair,'temple curl',.065,.12,.08,0x78533a,side*.235,1.84-i*.13,.21);
+    }
+    part(hair,'side fringe',.18,.09,.045,0x63442f,-.17,1.90,.247);
+    part(hair,'right fringe',.14,.08,.045,0x4e3524,.18,1.905,.247);
   }else if(style==='mcmichael'){
-    part(hair,'blonde crown',.535,.085,.49,0x9c8058,0,1.94,-.01);
-    part(hair,'long blonde back',.48,.66,.085,0xb99a65,0,1.65,-.26);
-    for(const side of [-1,1]){part(hair,'long blonde side',.07,.64,.19,0xc7aa75,side*.265,1.65,.015);part(hair,'highlight',.025,.57,.02,0xe2c994,side*.267,1.66,.118);}
+    part(hair,'blonde crown',.54,.085,.49,0xd8b25c,0,1.94,-.01);
+    part(hair,'long blonde back',.50,.68,.09,0xcfa855,0,1.64,-.26);
+    for(const side of [-1,1]){
+      part(hair,'long blonde side',.075,.66,.21,0xe2be6b,side*.265,1.64,.02);
+      part(hair,'front blonde lock',.085,.38,.06,0xebd082,side*.205,1.42,.165);
+      part(hair,'highlight',.025,.58,.025,0xf5df9e,side*.268,1.65,.125);
+    }
     // Frames are also geometry, so the silhouette reads from a three-quarter view.
-    for(const side of [-1,1]){part(npc.group,'glasses top',.19,.025,.035,0x28282e,side*.12,1.72,.26);part(npc.group,'glasses bottom',.19,.025,.035,0x28282e,side*.12,1.58,.26);for(const x of [-.09,.09])part(npc.group,'glasses rim',.025,.14,.035,0x28282e,side*.12+x,1.65,.26);}part(npc.group,'glasses bridge',.06,.025,.035,0x28282e,0,1.69,.26);
+    for(const side of [-1,1]){part(npc.group,'glasses top',.19,.025,.035,0x3b281e,side*.12,1.72,.26);part(npc.group,'glasses bottom',.19,.025,.035,0x3b281e,side*.12,1.58,.26);for(const x of [-.09,.09])part(npc.group,'glasses rim',.025,.14,.035,0x3b281e,side*.12+x,1.65,.26);}part(npc.group,'glasses bridge',.06,.025,.035,0x3b281e,0,1.69,.26);
   }else{
     part(hair,'short dark crown',.535,.075,.49,0x3e3129,0,1.94,-.01);
     part(hair,'straight hairline',.535,.07,.025,0x3e3129,0,1.90,.246);
@@ -2514,12 +2594,13 @@ function styleStaffPerson(npc,style){
     for(const side of [-1,1])part(hair,'short dark side',.025,.07,.45,0x3e3129,side*.265,1.90,0);
   }
   if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
-  if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.055,.17,.27,0x41372e,side*.245,1.47,.095);part(npc.group,'beard chin',.38,.055,.13,0x41372e,0,1.37,.19);}
+  if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.06,.18,.27,0x3a2e25,side*.245,1.47,.095);part(npc.group,'beard chin',.40,.065,.14,0x3a2e25,0,1.37,.19);}
   if(isMacek){for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;collar.visible=false;npc.poloCollars.push(collar);}}
   const strapColor=isMacek?0x242321:0x242a31;
-  for(const side of [-1,1]){const strap=part(npc.group,'lanyard',.025,.55,.025,strapColor,side*.08,1.08,.18);strap.rotation.z=side*-.24;}
-  if(isMacek){for(const side of [-1,1])for(let i=0;i<5;i++)part(npc.group,'Gators orange',.026,.035,.028,0xe57b3f,side*(.12-i*.014),1.28-i*.075,.196);}
-  part(npc.group,'school badge',.17,.21,.035,0xe9e8de,0,.77,.19);part(npc.group,'badge photo',.08,.08,.02,0x3b7092,0,.79,.215);
+  const strapSpread=isMacek?.115:.08;
+  for(const side of [-1,1]){const strap=part(npc.group,'lanyard',.025,.55,.025,strapColor,side*strapSpread,1.08,.18);strap.rotation.z=side*(isMacek?-.16:-.24);}
+  if(isMacek){for(const side of [-1,1])for(let i=0;i<5;i++)part(npc.group,'Gators orange',.026,.035,.028,0xe57b3f,side*(.145-i*.012),1.28-i*.075,.196);}
+  part(npc.group,'school badge',.17,.21,.035,0xe9e8de,0,isMacek?.73:.77,.19);part(npc.group,'badge photo',.08,.08,.02,style==='mcmichael'?0x2f7d58:0x3b7092,0,isMacek?.75:.79,.215);
   npc.group.userData.role=STAFF_CHARACTERS.find(c=>c.style===style)?.role;
 }
 var macekBlackPants=null; // shared by every Mr. Macek NPC body
@@ -2701,16 +2782,56 @@ function stylePerson(npc,style){
     part(.38,.07,.07,0x606f7b,0,1.91,.29);part(.12,.23,.1,0x303940,-.16,1.13,.18);
     part(.08,.1,.04,0x6cb6e2,.16,1.12,.16);
   } else if(style==='micco'){
-    part(.52,.09,.50,0x79502e,0,1.79,-.01);part(.055,.58,.24,0x79502e,-.262,1.46,-.04);part(.055,.58,.24,0x79502e,.262,1.46,-.04);
-    part(.49,.60,.085,0x69452b,0,1.46,-.26);
-    for(const side of [-1,1]){part(.19,.025,.035,0x5b3f6e,side*.12,1.62,.26);part(.19,.025,.035,0x5b3f6e,side*.12,1.48,.26);for(const x of [-.09,.09])part(.025,.14,.035,0x5b3f6e,side*.12+x,1.55,.26);}
-    part(.06,.025,.035,0x5b3f6e,0,1.58,.26);
+    stylePerson.miccoFront??=outfitTexture(ctx=>{
+      ctx.fillStyle='#a6a8ad';ctx.fillRect(0,0,64,64);
+      for(let y=0;y<64;y+=4)for(let x=0;x<64;x+=4){
+        ctx.fillStyle=(x+y)%8===0?'#b8bac0':(x*3+y)%12===0?'#8d9096':'#9fa1a7';
+        ctx.fillRect(x,y,4,4);
+      }
+      ctx.fillStyle='#1f2531';ctx.fillRect(18,0,28,64);
+      ctx.fillStyle='#151a24';ctx.fillRect(18,0,28,4);
+      ctx.fillStyle='#7e8188';ctx.fillRect(14,0,4,64);ctx.fillRect(46,0,4,64);
+      ctx.fillStyle='#868990';ctx.fillRect(3,42,10,14);ctx.fillRect(51,42,10,14);
+    });
+    stylePerson.miccoSide??=outfitTexture(ctx=>{
+      ctx.fillStyle='#a6a8ad';ctx.fillRect(0,0,64,64);
+      for(let y=0;y<64;y+=4)for(let x=0;x<64;x+=4){
+        ctx.fillStyle=(x+y)%8===0?'#b8bac0':'#93969c';ctx.fillRect(x,y,4,4);
+      }
+    });
+    stylePerson.miccoSleeve??=outfitTexture(ctx=>{
+      ctx.fillStyle='#a6a8ad';ctx.fillRect(0,0,64,64);
+      for(let y=0;y<56;y+=4)for(let x=0;x<64;x+=4){
+        ctx.fillStyle=(x+y)%8===0?'#b8bac0':'#93969c';ctx.fillRect(x,y,4,4);
+      }
+      ctx.fillStyle='#7e8188';ctx.fillRect(0,56,64,8);
+    });
+    stylePerson.miccoSkin??=outfitTexture(ctx=>{ctx.fillStyle='#e5b993';ctx.fillRect(0,0,64,64);});
+    stylePerson.miccoPants??=outfitTexture(ctx=>{
+      ctx.fillStyle='#2e1f1a';ctx.fillRect(0,0,64,64);
+      ctx.fillStyle='#231713';ctx.fillRect(0,0,64,4);ctx.fillRect(30,4,4,60);
+    });
+    npc.head.material.forEach((m,i)=>{if(i!==4)m.map=stylePerson.miccoSkin;});
+    npc.body.geometry.clearGroups();npc.body.geometry.addGroup(0,24,0);npc.body.geometry.addGroup(24,6,4);npc.body.geometry.addGroup(30,6,0);
+    npc.body.material.forEach(m=>{m.map=stylePerson.miccoSide;});npc.body.material[4].map=stylePerson.miccoFront;
+    part(.53,.095,.51,0x6b4429,0,1.79,-.01);
+    part(.50,.60,.09,0x5c3a22,0,1.46,-.26);
+    for(const side of [-1,1]){
+      part(.075,.58,.25,0x6b4429,side*.262,1.47,-.02);
+      part(.065,.48,.08,0x8c5d38,side*.245,1.46,.16);
+      part(.03,.46,.03,0xa67349,side*.268,1.48,.09);
+      part(.19,.025,.035,0x4a3228,side*.12,1.62,.26);
+      part(.19,.025,.035,0x4a3228,side*.12,1.48,.26);
+      for(const x of [-.09,.09])part(.025,.14,.035,0x4a3228,side*.12+x,1.55,.26);
+    }
+    part(.06,.025,.035,0x4a3228,0,1.58,.26);
     for(const arm of [npc.armL,npc.armR]){
-      arm.children[0].material.forEach(m=>m.map=shirt);
-      const hand=bodyPart(.22,.16,.22,skinTex);hand.position.y=-.74;arm.add(hand);
+      arm.children[0].material.forEach(m=>{m.map=stylePerson.miccoSleeve;});
+      const hand=bodyPart(.22,.16,.22,stylePerson.miccoSkin);hand.position.y=-.74;arm.add(hand);
     }
     for(const leg of [npc.legL,npc.legR]){
-      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.26,.13,.35),new THREE.MeshLambertMaterial({color:0x24262b}));
+      leg.children[0].material.forEach(m=>{m.map=stylePerson.miccoPants;});
+      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.26,.13,.35),new THREE.MeshLambertMaterial({color:0x1b1d22}));
       shoe.position.set(0,-.62,.04);leg.add(shoe);
     }
     npc.group.scale.set(.93,.90,.93);
@@ -2782,18 +2903,20 @@ function stylePerson(npc,style){
       if(mesh===npc.head){mesh.geometry.addGroup(0,24,0);mesh.geometry.addGroup(24,6,4);mesh.geometry.addGroup(30,6,0);}
       else mesh.geometry.addGroup(0,36,0);
     };
-    resize(npc.head,.55,.56,.5);npc.head.position.y=1.63;
-    resize(npc.body,.62,.68,.32);npc.body.position.y=1;
+    stylePerson.macekSkin??=outfitTexture(ctx=>{ctx.fillStyle='#eab887';ctx.fillRect(0,0,64,64);});
+    resize(npc.head,.55,.56,.5);npc.head.position.y=1.63;npc.head.material.forEach((m,i)=>{if(i!==4)m.map=stylePerson.macekSkin;});
+    resize(npc.body,.62,.68,.32);frontOnlyUV(npc.body.geometry);npc.body.position.y=1;
     npc.poloCollars=[];npc.shoulderCaps=[];
     for(const [name,side] of [['armL',-1],['armR',1]]){
       const arm=npc[name],limb=arm.children[0];resize(limb,.24,.62,.27);limb.position.y=-.31;arm.position.set(side*.43,1.32,0);
-      const hand=bodyPart(.24,.19,.27,skinTex);hand.position.y=-.70;arm.add(hand);
-      const cap=bodyPart(.26,.23,.29,shirt);cap.position.y=-.1;arm.add(cap);npc.shoulderCaps.push(cap);
+      const hand=bodyPart(.24,.19,.27,stylePerson.macekSkin);hand.position.y=-.70;arm.add(hand);
+      const cap=bodyPart(.26,.23,.29,shirt);frontOnlyUV(cap.geometry,true);cap.position.y=-.1;arm.add(cap);npc.shoulderCaps.push(cap);
       const wristPart=(w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);arm.add(m);return m;};
-      if(side===-1){wristPart(.255,.09,.285,0x191c23,0,-.57,0);wristPart(.15,.12,.04,0x3c4653,0,-.57,.155);}
-      else{wristPart(.255,.035,.285,0x6e472b,0,-.54,0);wristPart(.255,.03,.285,0xb87333,0,-.575,0);wristPart(.255,.035,.285,0x22262d,0,-.61,0);}
+      if(side===-1){wristPart(.255,.095,.285,0x15181f,0,-.57,0);wristPart(.16,.125,.045,0x2e3742,0,-.57,.155);wristPart(.11,.085,.05,0x64b5dc,0,-.57,.16);}
+      else{wristPart(.255,.04,.285,0x6e472b,0,-.535,0);wristPart(.255,.035,.285,0xd17e38,0,-.575,0);wristPart(.255,.04,.285,0x22262d,0,-.615,0);}
       const leg=npc[side<0?'legL':'legR'];leg.position.set(side*.16,.66,0);resize(leg.children[0],.28,.58,.29);leg.children[0].position.y=-.29;
-      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.3,.14,.4),new THREE.MeshLambertMaterial({color:0x202329}));shoe.position.set(0,-.60,.05);leg.add(shoe);
+      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.3,.14,.4),new THREE.MeshLambertMaterial({color:0x1b1e24}));shoe.position.set(0,-.60,.05);leg.add(shoe);
+      const sole=new THREE.Mesh(new THREE.BoxGeometry(.31,.035,.41),new THREE.MeshLambertMaterial({color:0xe8e6de}));sole.position.set(0,-.66,.05);leg.add(sole);
       part(.055,.15,.2,0xeab887,side*.295,1.61,0);
     }
     // Short hair in one color with a straight front edge.
@@ -2802,24 +2925,25 @@ function stylePerson(npc,style){
     part(.55,.26,.03,0xa7804e,0,1.78,-.255);
     // The sides stop at the same height as the front edge: one straight hairline all round.
     for(const side of [-1,1])part(.025,.06,.49,0xa7804e,side*.277,1.88,0);
+    part(.26,.06,.03,0x966a47,0,1.385,.245);
     // Solid black trousers to match the black SV shirt. Drawn like the shirts
     // (sRGB colour), so they render truly black instead of washed-out gray.
     macekBlackPants??=outfitTexture(ctx=>{ctx.fillStyle='#16181d';ctx.fillRect(0,0,64,64);ctx.fillStyle='#1e2127';ctx.fillRect(0,0,64,4);ctx.fillRect(30,4,4,60);});
     for(const leg of [npc.legL,npc.legR])leg.children[0].material.forEach(m=>{m.map=macekBlackPants;});
     for(const side of [-1,1]){const collar=part(.15,.12,.04,0x126bb7,side*.105,1.29,.19);collar.rotation.z=side*.35;npc.poloCollars.push(collar);}
-    part(.22,.23,.035,0xf2f5f7,0,.67,.19);
+    part(.22,.23,.035,0xf2f5f7,0,.64,.19);
     stylePerson.lanyardMaterial??=new THREE.MeshBasicMaterial({map:campusTexture(96,512,ctx=>{
       ctx.fillStyle='#15191f';ctx.fillRect(0,0,96,512);ctx.translate(48,256);ctx.rotate(Math.PI/2);
       ctx.fillStyle='#fa4616';ctx.font='bold 44px sans-serif';ctx.textAlign='center';ctx.fillText('FLORIDA GATORS',0,15);
     })});
-    for(const side of [-1,1]){const strap=new THREE.Mesh(new THREE.PlaneGeometry(.068,.59),stylePerson.lanyardMaterial);strap.position.set(side*.104,1.04,.203);strap.rotation.z=side*-.28;npc.group.add(strap);}
+    for(const side of [-1,1]){const strap=new THREE.Mesh(new THREE.PlaneGeometry(.068,.59),stylePerson.lanyardMaterial);strap.position.set(side*.128,1.03,.203);strap.rotation.z=side*-.22;npc.group.add(strap);}
     stylePerson.badgeMaterial??=new THREE.MeshBasicMaterial({map:campusTexture(128,160,ctx=>{
       ctx.fillStyle='#f2f5f7';ctx.fillRect(0,0,128,160);ctx.fillStyle='#287ab3';ctx.fillRect(28,28,72,86);
       ctx.fillStyle='#eab887';ctx.fillRect(44,39,42,48);ctx.fillStyle='#a7804e';ctx.fillRect(44,35,42,10);
       ctx.fillStyle='#36424a';ctx.fillRect(52,57,6,6);ctx.fillRect(73,57,6,6);ctx.fillStyle='#fff';ctx.fillRect(57,76,18,3);
       ctx.fillStyle='#20242b';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.fillText('Mr. Macek',64,143);
     })});
-    const badge=new THREE.Mesh(new THREE.PlaneGeometry(.21,.22),stylePerson.badgeMaterial);badge.position.set(0,.67,.211);npc.group.add(badge);
+    const badge=new THREE.Mesh(new THREE.PlaneGeometry(.21,.22),stylePerson.badgeMaterial);badge.position.set(0,.64,.211);npc.group.add(badge);
     npc.group.scale.set(1,1,1);npc.group.userData.portrait='Gators lanyard';
   }
 }
@@ -3277,6 +3401,11 @@ for(const [name,side] of [['armL',-1],['armR',1]]){
   hand.castShadow=false;hand.receiveShadow=false;limb.add(hand);limb.userData.hand=hand;
   const cap=bodyPart(.19,.15,.19,shirtTex);cap.position.y=-.2;
   cap.castShadow=false;cap.receiveShadow=false;limb.add(cap);viewShoulders.push(cap);
+  const wrist=new THREE.Group();wrist.name=side<0?'viewWatch':'viewBracelets';
+  const wBox=(w,h,d,color,y,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(0,y,z);m.castShadow=false;m.receiveShadow=false;wrist.add(m);};
+  if(side<0){wBox(.185,.055,.185,0x15181f,.17);wBox(.11,.075,.03,0x2e3742,.17,.095);wBox(.075,.05,.035,0x64b5dc,.17,.10);}
+  else{wBox(.185,.028,.185,0x6e472b,.145);wBox(.185,.025,.185,0xd17e38,.172);wBox(.185,.028,.185,0x22262d,.198);}
+  limb.add(wrist);limb.userData.wrist=wrist;
   viewModel.add(limb);viewArms[name]=limb;
 }
 camera.add(viewModel);scene.add(camera);
@@ -3325,6 +3454,7 @@ function setPlayerCharacter(id){
     const skin=character.style==='micco'||character.style==='student'?skinTex:staffLook(character.style).skin;
     target.userData.hand.material.forEach(m=>{m.map=skin;m.needsUpdate=true;});
     viewShoulders[i].material.forEach(m=>{m.map=source.material[0].map;m.needsUpdate=true;});
+    if(target.userData.wrist)target.userData.wrist.visible=id==='macek';
     target.userData.characterId=id;
   }
   for(const character of STAFF_CHARACTERS){
@@ -3359,12 +3489,16 @@ function renderStaffPreviews(){
   try{
     previewRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
     previewRenderer.setPixelRatio(1);previewRenderer.setSize(240,280,false);
+    previewRenderer.outputColorSpace=THREE.SRGBColorSpace;
     const previewScene=new THREE.Scene();
-    previewScene.add(new THREE.HemisphereLight(0xffffff,0x718179,2.6));
-    const light=new THREE.DirectionalLight(0xfff7e7,3.0);light.position.set(-3,5,6);previewScene.add(light);
-    const lens=new THREE.OrthographicCamera(-1.01,1.01,1.18,-1.18,.1,20);lens.position.set(3,1.15,7);lens.lookAt(0,1.05,0);
+    previewScene.add(new THREE.HemisphereLight(0xffffff,0x718179,2.65));
+    const light=new THREE.DirectionalLight(0xfff7e7,3.1);light.position.set(-3,5,6);previewScene.add(light);
+    const lens=new THREE.OrthographicCamera(-.95,.95,1.98,-.24,.1,20);lens.position.set(2.8,2.35,7);lens.lookAt(0,.96,0);
     for(const character of STAFF_CHARACTERS){
-      const model=playerAvatars[character.id].group.clone(true);model.visible=true;model.position.set(0,0,0);model.rotation.set(0,0,0);previewScene.add(model);
+      const src=character.id==='macek'?macek.group:playerAvatars[character.id].group;
+      const model=src.clone(true);model.visible=true;model.position.set(0,0,0);model.rotation.set(0,0,0);
+      model.traverse(o=>{if(o.isSprite)o.visible=false;});
+      previewScene.add(model);
       previewRenderer.render(previewScene,lens);
       staffCanvases[character.id].getContext('2d').drawImage(previewRenderer.domElement,0,0,240,280);
       previewScene.remove(model);
