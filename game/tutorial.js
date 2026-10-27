@@ -9,7 +9,7 @@
     { id: 'move', icon: '🕹️', title: 'Walk around', keys: 'Press W A S D (or the arrow keys) to walk.', touch: 'Push the round stick to walk.' },
     { id: 'look', icon: '👀', title: 'Look around', keys: 'Move the mouse to look around. Click and drag if it stays still.', touch: 'Drag the screen to look around.' },
     { id: 'jump', icon: '🦘', title: 'Jump!', keys: 'Press Space to jump.', touch: 'Tap JUMP.' },
-    { id: 'fly', icon: '✈️', title: 'Fly up high', keys: 'Press F to fly, then hold Space to go up. Press F again to land.', touch: 'Tap FLY, then hold JUMP to go up. Tap FLY again to land.', creativeOnly: true },
+    { id: 'fly', icon: '🚀', title: 'Fly up high', keys: 'Press F (or double-tap Space) to fly, then hold Space to go up!', touch: 'Tap FLY, then hold JUMP to go up. Tap FLY again to land.', creativeOnly: true },
     { id: 'place', icon: '🧱', title: 'Place a block', keys: 'Aim the + at the ground and right click.', touch: 'Aim the + at the ground and tap PLACE.' },
     { id: 'break', icon: '⛏️', title: 'Break a block', keys: 'Aim the + at a block and left click.', touch: 'Aim the + at a block and tap BREAK.' },
     { id: 'inventory', icon: '🎒', title: 'Pick a block', keys: 'Press I (or click Blocks / Inventory), then choose any block.', touch: 'Tap Blocks / Inventory, then choose any block.' },
@@ -69,30 +69,42 @@
     const progress = el('p', 'quest-progress'), icon = el('div', 'quest-icon'), title = el('h2', 'quest-title'), text = el('p', 'quest-text');
     const row = el('div', 'quest-buttons');
     const helper = el('button', 'quest-helper'); helper.type = 'button';
+    const speak = el('button', 'quest-speak', '🔊 Read'); speak.type = 'button'; speak.setAttribute('aria-label', 'Read step out loud');
     const skip = el('button', 'quest-skip', 'Skip'); skip.type = 'button';
     const exit = el('button', 'quest-exit', '✕ Exit'); exit.type = 'button';
-    row.append(helper, skip, exit);
+    row.append(helper, speak, skip, exit);
     card.append(progress, icon, title, text, row);
     doc.body.appendChild(card);
-    let cheerTimer = null;
+    let cheerTimer = null, autoSpeak = false;
+    function sayAloud() {
+      try {
+        const synth = root.speechSynthesis, Utter = root.SpeechSynthesisUtterance;
+        if (!synth || !Utter) return;
+        synth.cancel();
+        const u = new Utter(`${title.textContent}. ${text.textContent}`);
+        u.rate = 0.96; synth.speak(u);
+      } catch (e) {}
+    }
     function paint(kind) {
       const s = quest.state();
-      if (s.exited) { card.hidden = true; return; }
+      if (s.exited) { card.hidden = true; try { root.speechSynthesis?.cancel?.(); } catch (e) {} return; }
       if (s.finished) {
         progress.textContent = 'Basics quest complete!'; icon.textContent = '🎉'; title.textContent = 'You did it!';
         text.textContent = 'You know the basics. Go build something amazing!';
-        helper.hidden = false; helper.textContent = 'Keep playing'; skip.hidden = true; exit.hidden = true;
-        card.dataset.cheer = 'true'; return;
+        helper.hidden = false; helper.textContent = 'Keep playing'; speak.hidden = true; skip.hidden = true; exit.hidden = true;
+        card.dataset.cheer = 'true'; if (autoSpeak) sayAloud(); return;
       }
       const step = s.step, touch = hooks.isTouch ? hooks.isTouch() : false;
       progress.textContent = `Step ${s.index + 1} of ${s.total}`;
       icon.textContent = step.icon; title.textContent = step.title; text.textContent = touch ? step.touch : step.keys;
       helper.hidden = !step.helper; helper.textContent = step.helper || '';
-      skip.hidden = false; exit.hidden = false;
+      speak.hidden = false; skip.hidden = false; exit.hidden = false;
       // A quick "Nice!" so every finished step feels like a win.
       if (kind === 'done') { card.dataset.cheer = 'true'; progress.textContent = 'Nice! ✓  ' + progress.textContent; clearTimeout(cheerTimer); cheerTimer = setTimeout(() => { card.dataset.cheer = 'false'; }, 900); }
       else card.dataset.cheer = 'false';
+      if (autoSpeak) sayAloud();
     }
+    speak.addEventListener('click', () => { autoSpeak = true; sayAloud(); });
     helper.addEventListener('click', () => {
       const s = quest.state();
       if (s.finished) { card.hidden = true; hooks.onClose && hooks.onClose('finished'); return; }

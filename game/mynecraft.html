@@ -236,9 +236,9 @@
   <div id="touchActions">
     <div class="row"><button class="touchBtn" id="btnInteract" type="button" hidden>INTERACT</button></div>
     <div class="row">
-      <button class="touchBtn" id="btnFly" type="button">FLY</button>
-      <button class="touchBtn" id="btnDown" type="button">DOWN</button>
-      <button class="touchBtn" id="btnJump" type="button">JUMP</button>
+      <button class="touchBtn" id="btnFly" type="button">🚀 FLY</button>
+      <button class="touchBtn" id="btnDown" type="button">⬇️ DOWN</button>
+      <button class="touchBtn" id="btnJump" type="button">⬆️ JUMP</button>
     </div>
     <div class="row">
       <button class="touchBtn" id="btnBreak" type="button">&#9935; BREAK</button>
@@ -247,7 +247,7 @@
   </div>
 </div>
 <button id="activityInteract" type="button" aria-keyshortcuts="E" hidden>Interact</button>
-<div id="info">WASD move · Drag to look · Space jump · Esc menu · Help for all controls</div>
+<div id="info">🕹️ WASD/Arrows move · 👀 Mouse look · ⬆️ Space jump · 🚀 Fly: F or 2×Space (Space ⬆️ / V ⬇️) · 🧱 Left break / Right place · Esc menu</div>
 <div id="mouseHint">Press Esc to release the mouse. Drag to look if the cursor stays free.</div>
 <div id="sleepTransition" role="status" aria-live="polite" hidden><span class="sleep-moon" aria-hidden="true">☾</span><strong>You are now asleep</strong><p>Sunrise is one second away. A new day is coming!</p></div>
 <div id="start">
@@ -276,10 +276,11 @@
         </div>
       </div>
     </header>
-    <!-- Four picture steps: all a first-time player needs. The rest is under How to play. -->
+    <!-- Five picture steps: all a first-time player needs, including how to fly. -->
     <section class="quick-steps" aria-label="Quick start">
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">🕹️</span><strong>Move</strong><span class="desktop-help"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></span><span class="touch-help">Use the round stick</span></div>
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">👀</span><strong>Look</strong><span class="desktop-help">Move the mouse</span><span class="touch-help">Drag the screen</span></div>
+      <div class="quick-step"><span class="quick-icon" aria-hidden="true">🚀</span><strong>Fly</strong><span class="desktop-help"><kbd>F</kbd> or <kbd>2× Space</kbd> · <kbd>Space</kbd> ⬆️ <kbd>V</kbd> ⬇️</span><span class="touch-help">Tap <strong>🚀 FLY</strong> · <strong>⬆️ JUMP</strong> / <strong>⬇️ DOWN</strong></span></div>
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">🧱</span><strong>Build</strong><span class="desktop-help">Right click adds · left click removes</span><span class="touch-help">Tap PLACE · tap BREAK</span></div>
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">💾</span><strong>Save</strong><span>It saves by itself</span></div>
     </section>
@@ -315,7 +316,7 @@
         <li><span class="step-number">3</span><div><h3>Place your first block</h3><p>Open <strong>Blocks / Inventory</strong> and choose a material. <span class="desktop-help">The <kbd>I</kbd> key opens it too.</span> Aim the + at a nearby block.</p><p class="desktop-help"><strong>Right click</strong> to add a block. <strong>Left click</strong> to remove one.</p><p class="touch-help">Tap <strong>PLACE</strong> to add a block. Tap <strong>BREAK</strong> to remove one.</p></div></li>
         <li><span class="step-number">4</span><div><h3>Keep your work</h3><p id="keepWorkGuide">Click <strong>Save</strong>. Before leaving: <strong>Menu → Save, download or load a world → Download Save</strong>. Check Downloads for your <strong>.json</strong> file.</p></div></li>
       </ol>
-      <div class="flight-guide"><strong>Want to fly?</strong><p class="desktop-help"><kbd>F</kbd> flight on/off <span>·</span> <kbd>Space</kbd> up <span>·</span> <kbd>V</kbd> down <span>·</span> hold <kbd>Shift</kbd> to move faster. Let go of up/down to hover.</p><p class="touch-help">Tap <strong>FLY</strong> on/off. Hold <strong>JUMP</strong> to go up or <strong>DOWN</strong> to go down. Let go to hover.</p><small>Creative mode only. <span class="desktop-help">Press <kbd>Esc</kbd> or </span>open <strong>Menu</strong> to pause and see these steps again.</small></div>
+      <div class="flight-guide"><strong>Want to fly?</strong><p class="desktop-help"><kbd>F</kbd> or double-tap <kbd>Space</kbd> flight on/off <span>·</span> <kbd>Space</kbd> up <span>·</span> <kbd>V</kbd> down <span>·</span> hold <kbd>Shift</kbd> to move faster. Let go of up/down to hover.</p><p class="touch-help">Tap <strong>FLY</strong> on/off. Hold <strong>JUMP</strong> to go up or <strong>DOWN</strong> to go down. Let go to hover.</p><small>Creative mode only. <span class="desktop-help">Press <kbd>Esc</kbd> or </span>open <strong>Menu</strong> to pause and see these steps again.</small></div>
       <p class="class-reminder" id="classReminder">Building for class? Follow your teacher’s directions for what to make and where. Each browser has its own world; there is no automatic device sync.</p>
     </section>
     </details>
@@ -1145,8 +1146,8 @@ let macekOutfit = saveState.macekOutfit === 'black' ? 'black' : 'polo';
 // Kenny, October 24: players always play as one of the six Specials teachers. Mr. Macek
 // comes first and is the fallback, because Hardcore unlocks him from the start.
 const STAFF_CHARACTERS=Object.freeze([
-  {id:'macek',name:'Mr. Macek',role:'CIRC',style:'macekStriped',detail:'Striped polo and Gators lanyard'},
-  {id:'micco',name:'Ms. Micco',role:'CIRC',style:'micco',detail:'The familiar campus character'},
+  {id:'macek',name:'Mr. Macek',role:'CIRC',style:'macekStriped',detail:'Black SV shirt, arm sleeves and Gators lanyard'},
+  {id:'micco',name:'Ms. Micco',role:'CIRC',style:'micco',detail:'Glasses, cardigan and lanyard'},
   {id:'eriksen',name:'Ms. Eriksen',role:'Art',style:'eriksen',detail:'Curly hair and a purple top'},
   {id:'mullet',name:'Mr. Mullet',role:'PE',style:'mullet',detail:'Navy hoodie and khaki shorts'},
   {id:'wingenbach',name:'Mr. Wingenbach',role:'Music',style:'wingenbach',detail:'Black quarter-zip and gray pants'},
@@ -2312,6 +2313,19 @@ function teacherFeatures(ctx,{brow,iris}){
   ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
   ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
 }
+// Cache both outfits once; switching clothes does not allocate textures per frame.
+function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
+const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
+  ctx.fillStyle=style==='polo'?'#1685d1':'#171b22';ctx.fillRect(0,0,64,64);
+  for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){ctx.fillStyle=style==='polo'?((x+y)%24?'#1688d5':'#127bc6'):((x+y)%24?'#1d2027':'#24272e');ctx.fillRect(x,y,8,8);}
+  if(style==='black'){ctx.fillStyle='#70b6df';ctx.font='bold 18px sans-serif';ctx.fillText('SV',35,25);}
+  if(style==='polo'){ctx.fillStyle='#1260a1';ctx.fillRect(27,0,10,20);ctx.fillStyle='#d5e6ef';ctx.fillRect(31,7,3,3);ctx.fillRect(31,14,3,3);}
+})]));
+const patternedSleeve=outfitTexture(ctx=>{
+  ctx.fillStyle='#20242b';ctx.fillRect(0,0,64,64);ctx.fillStyle='#7bc4e6';
+  ctx.font='bold 13px sans-serif';for(let y=4;y<62;y+=16)for(let x=1;x<64;x+=22){ctx.save();ctx.translate(x+(y%32?0:7),y);ctx.rotate(-.2);ctx.fillText('SV',0,10);ctx.restore();}
+  ctx.fillStyle='#5ba4c9';for(let y=12;y<60;y+=16)for(let x=8;x<60;x+=18)ctx.fillRect(x,y,4,3);
+});
 function faceForPerson(style){
   if(style==='macek'){
     // The same warm, blue-eyed smiling face is shared by the NPC and player.
@@ -2321,6 +2335,9 @@ function faceForPerson(style){
       ctx.fillStyle='#eab887';ctx.fillRect(0,0,64,64);
       // One clean, straight hairline across the whole face: no side pieces hanging lower.
       ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);
+      // Subtle sandy-brown chin goatee/stubble along the jaw.
+      ctx.fillStyle='#b5865e';ctx.fillRect(22,56,20,5);ctx.fillRect(18,53,4,4);ctx.fillRect(42,53,4,4);
+      ctx.fillStyle='#966a47';ctx.fillRect(26,58,12,3);
       // The same flat face as the other teachers (brows, eyes, nose and smile all in the
       // same places), with Mr. Macek's own blue eyes. Nothing sticks out of the face.
       teacherFeatures(ctx,{brow:'#9a744c',iris:'#5181a3'});
@@ -2403,18 +2420,11 @@ function staffLook(style){
     // long hair frames her face; the men's hair stops in one level line.
     ctx.fillRect(0,0,64,10);if(isArt){ctx.fillRect(0,10,7,40);ctx.fillRect(57,10,7,40);}
     ctx.fillStyle=isArt?'#bba47d':hair;ctx.fillRect(10,23,16,3);ctx.fillRect(38,23,16,3);
-    if(isArt){
-      // Ms. Eriksen: relaxed, slightly lowered lids over normal-sized eyes, centred and mirrored.
-      ctx.fillStyle='#c9946f';ctx.fillRect(13,30,11,1);ctx.fillRect(40,30,11,1);
-      ctx.fillStyle='#fff5e8';ctx.fillRect(13,31,11,4);ctx.fillRect(40,31,11,4);
-      ctx.fillStyle='#453f37';ctx.fillRect(16,31,5,4);ctx.fillRect(43,31,5,4);
-      ctx.fillStyle='#292d30';ctx.fillRect(17,32,3,3);ctx.fillRect(44,32,3,3);
-    }else{
-      ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
-      ctx.fillStyle=isMacek?'#5181a3':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
-      ctx.fillStyle='#292d30';ctx.fillRect(17,30,3,6);ctx.fillRect(44,30,3,6);
-    }
+    ctx.fillStyle='#fff5e8';ctx.fillRect(11,29,15,8);ctx.fillRect(38,29,15,8);
+    ctx.fillStyle=isMacek?'#5181a3':isArt?'#5a6b47':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
+    ctx.fillStyle='#292d30';ctx.fillRect(17,30,3,6);ctx.fillRect(44,30,3,6);
     ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
+    if(isMacek){ctx.fillStyle='#b5865e';ctx.fillRect(22,56,20,5);ctx.fillRect(18,53,4,4);ctx.fillRect(42,53,4,4);ctx.fillStyle='#966a47';ctx.fillRect(26,58,12,3);}
     if(isMusic){ctx.fillStyle='#41372e';ctx.fillRect(7,43,50,17);ctx.fillRect(4,38,7,13);ctx.fillRect(53,38,7,13);}
     ctx.fillStyle='#9c6650';ctx.fillRect(20,49,25,6);ctx.fillStyle='#fff4dd';ctx.fillRect(21,49,23,3);
     if(style==='mcmichael'){
@@ -2422,15 +2432,19 @@ function staffLook(style){
     }
   });
   const shirt=outfitTexture(ctx=>{
-    ctx.fillStyle=isMacek?'#202027':isArt?'#16191e':isPE?'#202e49':isMusic?'#202429':'#eee6d6';ctx.fillRect(0,0,64,64);
-    if(isMacek){for(let y=3;y<64;y+=10){ctx.fillStyle='#e9e8e0';ctx.fillRect(0,y,64,2);ctx.fillStyle='#b84348';ctx.fillRect(0,y+3,64,2);ctx.fillStyle='#cbc7bc';ctx.fillRect(0,y+6,64,1);}ctx.fillStyle='#171b23';ctx.fillRect(25,0,14,16);}
+    ctx.fillStyle=isMacek?'#171b22':isArt?'#16191e':isPE?'#202e49':isMusic?'#202429':'#eee6d6';ctx.fillRect(0,0,64,64);
+    if(isMacek){
+      for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){ctx.fillStyle=(x+y)%24?'#1d2027':'#24272e';ctx.fillRect(x,y,8,8);}
+      ctx.fillStyle='#11141a';ctx.fillRect(22,0,20,6);
+      ctx.fillStyle='#70b6df';ctx.font='bold 18px sans-serif';ctx.fillText('SV',35,25);
+    }
     if(isArt){ctx.fillStyle='#a54cb0';ctx.fillRect(17,0,30,64);ctx.fillStyle='#803f91';ctx.fillRect(17,0,30,3);}
     if(isPE){ctx.fillStyle='#142039';ctx.fillRect(5,44,54,3);ctx.fillRect(10,46,44,14);ctx.fillStyle='#8b8d94';ctx.fillRect(20,2,2,26);ctx.fillRect(43,2,2,26);}
     if(isMusic){ctx.fillStyle='#777d83';ctx.fillRect(31,0,2,27);ctx.fillStyle='#d0d0c7';ctx.fillRect(30,23,4,5);}
     if(style==='mcmichael'){ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=6)ctx.fillRect(x,0,1,64);ctx.fillRect(0,58,64,6);}
   });
   const back=isArt?makeFlatTex(22,25,30):isPE?makeFlatTex(32,46,73):isMusic?makeFlatTex(32,36,41):shirt;
-  const sleeve=isMacek?outfitTexture(ctx=>{ctx.fillStyle=skin;ctx.fillRect(0,0,64,64);ctx.fillStyle='#202027';ctx.fillRect(0,0,64,18);for(let y=3;y<18;y+=7){ctx.fillStyle='#f3eddf';ctx.fillRect(0,y,64,2);ctx.fillStyle='#bb4549';ctx.fillRect(0,y+3,64,2);}}):isArt?outfitTexture(ctx=>{ctx.fillStyle='#16191e';ctx.fillRect(0,0,64,44);ctx.fillStyle=skin;ctx.fillRect(0,44,64,20);}):back;
+  const sleeve=isMacek?patternedSleeve:isArt?outfitTexture(ctx=>{ctx.fillStyle='#16191e';ctx.fillRect(0,0,64,44);ctx.fillStyle=skin;ctx.fillRect(0,44,64,20);}):back;
   const pants=outfitTexture(ctx=>{
     ctx.fillStyle=isMusic?'#8e9398':isPE?'#c4b28c':style==='mcmichael'?'#30282b':'#20232a';ctx.fillRect(0,0,64,64);
     if(isPE){ctx.fillStyle='#a89470';ctx.fillRect(3,14,20,22);ctx.fillRect(42,14,18,22);ctx.fillStyle=skin;ctx.fillRect(0,38,64,26);}
@@ -2454,7 +2468,15 @@ function styleStaffPerson(npc,style){
     const hand=bodyPart(.22,.17,.25,look.skin);hand.position.y=-.70;arm.add(hand);arm.userData.hand=hand;
     const looseTrousers=style==='mcmichael';
     leg.position.set(side*(looseTrousers?.17:.145),.69,0);resize(leg.children[0],looseTrousers?.32:.27,.60,.28);leg.children[0].position.y=-.30;paint(leg.children[0],look.pants);
-    if(isMacek&&side===-1){part(arm,'watch strap',.235,.09,.27,0x191c23,0,-.57,0);part(arm,'watch face',.15,.12,.04,0x3c4653,0,-.57,.15);}
+    if(isMacek){
+      const cap=bodyPart(.24,.21,.27,look.shirt);cap.name='shirt sleeve cap';cap.position.y=-.10;arm.add(cap);npc.shoulderCaps.push(cap);
+      if(side===-1){part(arm,'watch strap',.235,.09,.27,0x191c23,0,-.57,0);part(arm,'watch face',.15,.12,.04,0x3c4653,0,-.57,.15);}
+      else{
+        part(arm,'bracelet leather',.235,.035,.265,0x6e472b,0,-.54,0);
+        part(arm,'bracelet copper',.235,.03,.265,0xb87333,0,-.575,0);
+        part(arm,'bracelet beads',.235,.035,.265,0x22262d,0,-.61,0);
+      }
+    }
     part(leg,'shoe',.29,.14,.4,isPE?0x8b8b83:style==='mcmichael'?0xe6e5df:0x24262b,0,-.62,.055);
     part(leg,'shoe sole',.3,.035,.41,isMusic||isPE||style==='mcmichael'?0xe5e3d9:0x31333a,0,-.68,.055);
     if(isPE)part(leg,'white sock',.275,.17,.285,0xf0eee8,0,-.48,0);
@@ -2493,7 +2515,7 @@ function styleStaffPerson(npc,style){
   }
   if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
   if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.055,.17,.27,0x41372e,side*.245,1.47,.095);part(npc.group,'beard chin',.38,.055,.13,0x41372e,0,1.37,.19);}
-  if(isMacek){for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;npc.poloCollars.push(collar);}}
+  if(isMacek){for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;collar.visible=false;npc.poloCollars.push(collar);}}
   const strapColor=isMacek?0x242321:0x242a31;
   for(const side of [-1,1]){const strap=part(npc.group,'lanyard',.025,.55,.025,strapColor,side*.08,1.08,.18);strap.rotation.z=side*-.24;}
   if(isMacek){for(const side of [-1,1])for(let i=0;i<5;i++)part(npc.group,'Gators orange',.026,.035,.028,0xe57b3f,side*(.12-i*.014),1.28-i*.075,.196);}
@@ -2681,7 +2703,17 @@ function stylePerson(npc,style){
   } else if(style==='micco'){
     part(.52,.09,.50,0x79502e,0,1.79,-.01);part(.055,.58,.24,0x79502e,-.262,1.46,-.04);part(.055,.58,.24,0x79502e,.262,1.46,-.04);
     part(.49,.60,.085,0x69452b,0,1.46,-.26);
-    for(const arm of [npc.armL,npc.armR])arm.children[0].material.forEach(m=>m.map=shirt);
+    for(const side of [-1,1]){part(.19,.025,.035,0x5b3f6e,side*.12,1.62,.26);part(.19,.025,.035,0x5b3f6e,side*.12,1.48,.26);for(const x of [-.09,.09])part(.025,.14,.035,0x5b3f6e,side*.12+x,1.55,.26);}
+    part(.06,.025,.035,0x5b3f6e,0,1.58,.26);
+    for(const arm of [npc.armL,npc.armR]){
+      arm.children[0].material.forEach(m=>m.map=shirt);
+      const hand=bodyPart(.22,.16,.22,skinTex);hand.position.y=-.74;arm.add(hand);
+    }
+    for(const leg of [npc.legL,npc.legR]){
+      const shoe=new THREE.Mesh(new THREE.BoxGeometry(.26,.13,.35),new THREE.MeshLambertMaterial({color:0x24262b}));
+      shoe.position.set(0,-.62,.04);leg.add(shoe);
+    }
+    npc.group.scale.set(.93,.90,.93);
   } else if(style==='eiler'){
     // Principal Eiler: charcoal suit, white shirt, striped tie and brown shoes.
     part(.055,.31,.03,0x70747b,0,1.1,.152);
@@ -2757,6 +2789,9 @@ function stylePerson(npc,style){
       const arm=npc[name],limb=arm.children[0];resize(limb,.24,.62,.27);limb.position.y=-.31;arm.position.set(side*.43,1.32,0);
       const hand=bodyPart(.24,.19,.27,skinTex);hand.position.y=-.70;arm.add(hand);
       const cap=bodyPart(.26,.23,.29,shirt);cap.position.y=-.1;arm.add(cap);npc.shoulderCaps.push(cap);
+      const wristPart=(w,h,d,color,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);arm.add(m);return m;};
+      if(side===-1){wristPart(.255,.09,.285,0x191c23,0,-.57,0);wristPart(.15,.12,.04,0x3c4653,0,-.57,.155);}
+      else{wristPart(.255,.035,.285,0x6e472b,0,-.54,0);wristPart(.255,.03,.285,0xb87333,0,-.575,0);wristPart(.255,.035,.285,0x22262d,0,-.61,0);}
       const leg=npc[side<0?'legL':'legR'];leg.position.set(side*.16,.66,0);resize(leg.children[0],.28,.58,.29);leg.children[0].position.y=-.29;
       const shoe=new THREE.Mesh(new THREE.BoxGeometry(.3,.14,.4),new THREE.MeshLambertMaterial({color:0x202329}));shoe.position.set(0,-.60,.05);leg.add(shoe);
       part(.055,.15,.2,0xeab887,side*.295,1.61,0);
@@ -3188,19 +3223,6 @@ function updateStaffActivities(dt){
 // Preserve the historical actor order so older 10/11/13-character saves restore.
 const campusActors=[sirD,macek,kay,ellie,percy,micco,shields,unicorn,eiler,cookie,schoolOfficer,sleeves,js,eriksen,mullet,wingenbach,mcmichael];
 const MAX_CAMPUS_ACTORS=campusActors.length;
-// Cache both outfits once; switching clothes does not allocate textures per frame.
-function outfitTexture(draw){const c=document.createElement('canvas');c.width=c.height=64;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}
-const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
-  ctx.fillStyle=style==='polo'?'#1685d1':'#171b22';ctx.fillRect(0,0,64,64);
-  for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){ctx.fillStyle=style==='polo'?((x+y)%24?'#1688d5':'#127bc6'):((x+y)%24?'#1d2027':'#24272e');ctx.fillRect(x,y,8,8);}
-  if(style==='black'){ctx.fillStyle='#70b6df';ctx.font='bold 18px sans-serif';ctx.fillText('SV',35,25);}
-  if(style==='polo'){ctx.fillStyle='#1260a1';ctx.fillRect(27,0,10,20);ctx.fillStyle='#d5e6ef';ctx.fillRect(31,7,3,3);ctx.fillRect(31,14,3,3);}
-})]));
-const patternedSleeve=outfitTexture(ctx=>{
-  ctx.fillStyle='#20242b';ctx.fillRect(0,0,64,64);ctx.fillStyle='#7bc4e6';
-  ctx.font='bold 13px sans-serif';for(let y=4;y<55;y+=16)for(let x=1;x<64;x+=22){ctx.save();ctx.translate(x+(y%32?0:7),y);ctx.rotate(-.2);ctx.fillText('SV',0,10);ctx.restore();}
-  ctx.fillStyle='#101319';ctx.fillRect(0,55,64,9);ctx.fillStyle='#8098a8';ctx.fillRect(22,56,17,6);
-});
 // The roaming CIRC character keeps his black SV shirt and patterned sleeves.
 // A playable selection never changes this independent campus character.
 const macekBodies=[];
@@ -3651,10 +3673,20 @@ const player = {
 camera.position.copy(player.pos);
 
 const keys = {};
+let lastSpaceTapAt=-1e9,spaceArmed=false;
+function toggleFlight(){
+  if(!started||gameMode!=='creative'||isWorldSleeping()||activities?.isDriving())return false;
+  player.flying=!player.flying;
+  player.vel.set(0,0,0);
+  if(typeof flashFly==='function')flashFly(player.flying);
+  if(typeof refreshFlightHUD==='function')refreshFlightHUD();
+  return true;
+}
 function releaseInput(){
   if(releasingInput)return;
   releasingInput=true;
   inputEpoch++;
+  lastSpaceTapAt=-1e9;spaceArmed=false;
   for(const k in keys) keys[k]=false;
   lookActive=false;
   releaseTouch();
@@ -3667,8 +3699,21 @@ function noteTouch(){lastTouchAt=performance.now();}
 addEventListener('touchstart',noteTouch,{passive:true});
 addEventListener('pointerdown',e=>{if(e.pointerType&&e.pointerType!=='mouse')noteTouch();},{passive:true});
 function isFormInput(event){return ['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target?.tagName);}
-addEventListener('keydown', e => { if(started&&!isFormInput(e)){keys[e.code] = true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();} });
-addEventListener('keyup',   e => { keys[e.code] = false; });
+addEventListener('keydown', e => {
+  if(started&&!isFormInput(e)){
+    if(e.code==='Space'&&!e.repeat&&!keys['Space']){
+      const now=performance.now();
+      if(spaceArmed&&now-lastSpaceTapAt<=350){spaceArmed=false;lastSpaceTapAt=-1e9;toggleFlight();}
+      else{lastSpaceTapAt=now;spaceArmed=false;}
+    }
+    keys[e.code] = true;
+    if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  }
+});
+addEventListener('keyup', e => {
+  if(e.code==='Space'&&performance.now()-lastSpaceTapAt<=350)spaceArmed=true;
+  keys[e.code] = false;
+});
 addEventListener('blur', pauseGame);
 addEventListener('orientationchange', ()=>setControlsLayout(controlsLayout));
 
@@ -3860,11 +3905,7 @@ addEventListener('keydown', e => {
 
 // Flight height is independent of sprint: SPACE rises, V descends, SHIFT speeds up.
 addEventListener('keydown', e => {
-  if (e.code === 'KeyF' && !e.repeat && started && gameMode==='creative' && !isFormInput(e) && !isWorldSleeping() && !activities?.isDriving()) {
-    player.flying = !player.flying;
-    player.vel.set(0, 0, 0);
-    if (typeof flashFly === 'function') flashFly(player.flying);
-  }
+  if (e.code === 'KeyF' && !e.repeat && !isFormInput(e)) toggleFlight();
 });
 
 // Drag-look is the fallback when pointer lock is absent or was released.
@@ -4741,9 +4782,19 @@ inventoryBtn.setAttribute('aria-keyshortcuts','I');inventoryBtn.setAttribute('ar
 controlsSelect=controlsMenu;
 const helpBtn=document.createElement('button');helpBtn.id='helpToggle';helpBtn.type='button';helpBtn.textContent='Help';
 helpBtn.addEventListener('click',()=>{pauseGame();const guide=document.getElementById('howToPlay');guide.open=true;guide.scrollIntoView?.({block:'start'});guide.querySelector?.('summary')?.focus?.();});
+const flyHudBtn=document.createElement('button');flyHudBtn.id='flyToggle';flyHudBtn.type='button';flyHudBtn.title='Press F or double-tap Space to fly (Creative mode)';
+flyHudBtn.addEventListener('click',()=>{toggleFlight();renderer.domElement.focus?.({preventScroll:true});});
+const questHudBtn=document.createElement('button');questHudBtn.id='questToggle';questHudBtn.type='button';questHudBtn.textContent='Tutorial';questHudBtn.title='Learn to walk, jump, fly and build step by step';
+questHudBtn.hidden=isGroupRoom;questHudBtn.addEventListener('click',()=>startQuest());
+function refreshFlightHUD(){
+  flyHudBtn.hidden=gameMode!=='creative';
+  flyHudBtn.setAttribute('aria-pressed',String(!!player.flying));
+  flyHudBtn.textContent=player.flying?'Flying · Space ⬆️ V ⬇️':'Fly · F / 2×Space';
+}
+refreshFlightHUD();
 const clockBadge=document.createElement('div');clockBadge.id='gameClock';clockBadge.setAttribute('aria-label','World time');
-ctrlPanel.append(menuBtn, inventoryBtn, saveBtn, helpBtn, saveTag, clockBadge);
-for(const control of [menuBtn,inventoryBtn,saveBtn,helpBtn,saveTag])control.style.cssText='';
+ctrlPanel.append(menuBtn, inventoryBtn, saveBtn, helpBtn, flyHudBtn, questHudBtn, saveTag, clockBadge);
+for(const control of [menuBtn,inventoryBtn,saveBtn,helpBtn,flyHudBtn,questHudBtn,saveTag])control.style.cssText='';
 document.body.appendChild(ctrlPanel);
 document.getElementById('worldManagement').append(backLink,resetBtn);
 document.getElementById('tryPanel').appendChild(document.getElementById('schoolExplore'));
@@ -4766,6 +4817,7 @@ flyTag.style.cssText = `
 `;
 document.body.appendChild(flyTag);
 function flashFly(on){
+  if(typeof refreshFlightHUD==='function')refreshFlightHUD();
   flyTag.textContent = on ? (touchLayoutOn()?'\u2708 Flight ON · JUMP up · DOWN down':'\u2708 Flight ON · SPACE up · V down · SHIFT faster') : 'Flight OFF';
   flyTag.style.color = on ? '#8fffa8' : '#ffd0d0';
   flyTag.style.opacity = '1';

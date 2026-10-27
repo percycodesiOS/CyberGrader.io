@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "e5ea6401a5770a43b512d9e8fc712bd45202ac2f",
+  "sourceCommit": "483416d0ab97aaa855fe49f5047471f68f1a4e88",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -26,16 +26,16 @@
     "game/hardcore-rules.js": "04d4e773c1c767e03dc56797f9d648b1ccf4c3b4f17d085dcf179e61c300d5a0",
     "game/hardcore-world.js": "7de846e937add737f5c810a1ae84da4d0b731a13bc60b6497118f2cfac066852",
     "game/library-books.js": "1f29874af09d96c72f613352a9bfe007006550b4f77f0cc692989ddc3c794b0b",
-    "game/mynecraft.html": "d466242dfd653a9723c8f5742fda665efad8252d6c4efa056fb113b4d188f06e",
+    "game/mynecraft.html": "cffbf0c0e318a0ec401a272d143659075d27ba1575e1f6fb4e216decea3c2abd",
     "game/play-activities.js": "6cf6bcc033a9439bbea2ddea97d99aa1de68855c7ab6b0e20fb6db9092837ab7",
     "game/room-client.js": "d221e39934796921088ceeb744c647f37644a13aa8cfd34a21b78de40482aa45",
     "game/rooms.html": "fa578703572a23618ba3a3010f36e97242fb05e2bfddc4440f8d8392751b276f",
-    "game/start-menu.css": "b81234a06efc6f8c1b09cdb3ebc40eeb1226305dd807156e7028e947fb2f6460",
+    "game/start-menu.css": "ff9436f33fadfec2b2bb7ae1ef352ef9ee7d4126ad2b14fe654d57f8a12e7b74",
     "game/teacher.html": "9d0b78f4dee3f89cefd808ea4b6f62ec8b233c094871a87c3ca70280a78ec98a",
-    "game/tutorial.js": "ba84deb2cec235ed803e892fd5a61b19a0e36e55b87d204b99fc0e2a0d01fd9b",
+    "game/tutorial.js": "d1d6ea52f809be7242237fb9d3877bc25fbff7397a3d7de81f53763f5e2c5ea6",
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "e60d8c3a4aae809f9870597a8720e58db071145e4b8af59c6c6307fbdd448ff0"
+    "index.html": "4df59d37588a258ab425390b80a869d49770ea5a0f4298e4d936a55d6a2db0ff"
   }
 }

@@ -781,6 +781,10 @@ html body #controls #saveGame { background:#1c4b3e; border-color:#74bca0; color:
 html body #controls button::before { display:inline-block; margin-right:8px; font-size:18px; line-height:1; }
 #menuToggle::before { content:'☰'; } #inventoryToggle::before { content:'▦'; }
 #saveGame::before { content:'↓'; } #helpToggle::before { content:'?'; }
+#flyToggle::before { content:'🚀'; } #questToggle::before { content:'🎓'; }
+html body #controls #flyToggle[aria-pressed="true"] { background:#1d5a42; border-color:#8fffa8; color:#eafff2; box-shadow:0 0 12px #58e69050; }
+html body #controls #questToggle { background:#2a3c5c; border-color:#8ec5ff; color:#eef7ff; }
+.quest-buttons .quest-speak { background:#234463; border:2px solid #8ec5ff; color:#eef7ff; }
 html body #controls button:hover { filter:brightness(1.13); }
 html body #controls button:focus-visible,
 html body #hotbar button:focus-visible { outline:3px solid #fff; outline-offset:3px; }
@@ -822,7 +826,7 @@ html body #start .hero-brand .edition { font:700 12px system-ui,sans-serif; lett
 html body #start .howto-open { min-height:44px; border:1px solid #6e8ca3; border-radius:10px; background:#203a50; color:#e6f0f7; box-shadow:none; animation:none; font:700 16px system-ui,sans-serif; }
 html body #start .howto-open .q { width:24px; height:24px; font-size:16px; background:#d3e3ef; color:#19334a; }
 html body #start .howto-open:hover { background:#2e4e68; }
-html body #start .quick-steps { display:none; }
+html body #start .quick-steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px; }
 html body #start .menu-fold { padding:0; border:1px solid #4c6880; border-radius:12px; background:#192d40; }
 html body #start .menu-fold > summary { padding:15px 18px; cursor:pointer; color:#f1f6fa; font:700 17px/1.3 system-ui,sans-serif; }
 html body #start .menu-fold > summary span { margin-left:8px; color:#b5c8d8; font:400 14px system-ui,sans-serif; }
