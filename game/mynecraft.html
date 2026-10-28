@@ -2593,9 +2593,38 @@ function styleStaffPerson(npc,style){
     part(hair,'short dark back',.52,.22,.035,0x3e3129,0,1.82,-.245);
     for(const side of [-1,1])part(hair,'short dark side',.025,.07,.45,0x3e3129,side*.265,1.90,0);
   }
-  if(isPE)part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
-  if(isMusic){for(const side of [-1,1])part(npc.group,'beard side',.06,.18,.27,0x3a2e25,side*.245,1.47,.095);part(npc.group,'beard chin',.40,.065,.14,0x3a2e25,0,1.37,.19);}
-  if(isMacek){for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;collar.visible=false;npc.poloCollars.push(collar);}}
+  if(isArt){
+    for(const side of [-1,1]){
+      part(npc.group,'cardigan lapel',.105,.67,.024,0x1d2128,side*.195,1.02,.162);
+      part(npc.group,'cardigan hem',.13,.045,.32,0x14171c,side*.185,.70,0);
+    }
+    for(const arm of [npc.armL,npc.armR])part(arm,'sleeve cuff',.235,.05,.265,0x242830,0,-.41,0);
+  }
+  if(isPE){
+    part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
+    part(npc.group,'hoodie collar',.36,.065,.035,0x18263e,0,1.33,.162);
+    part(npc.group,'hoodie pocket',.38,.19,.026,0x16233a,0,.80,.164);
+    for(const side of [-1,1]){
+      part(npc.group,'drawstring',.022,.21,.024,0xdce2ea,side*.068,1.21,.168);
+      part(side<0?npc.legL:npc.legR,'cargo pocket',.025,.15,.15,0xa89470,side*.14,-.18,.01);
+    }
+  }
+  if(isMusic){
+    for(const side of [-1,1])part(npc.group,'beard side',.06,.18,.27,0x3a2e25,side*.245,1.47,.095);
+    part(npc.group,'beard chin',.40,.065,.14,0x3a2e25,0,1.37,.19);
+    part(npc.group,'quarter zip collar',.36,.08,.038,0x171a1f,0,1.335,.162);
+    part(npc.group,'zipper pull',.028,.05,.03,0xd8dce0,0,1.15,.168);
+    part(npc.group,'belt',.635,.045,.32,0x181b20,0,.695,0);
+    part(npc.group,'belt buckle',.08,.05,.035,0xc4c9cf,0,.695,.162);
+  }
+  if(style==='mcmichael'){
+    part(npc.group,'sweater collar',.32,.055,.034,0xd8ceba,0,1.335,.162);
+    part(npc.group,'sweater hem',.56,.06,.322,0xd8ceba,0,.71,0);
+    for(const arm of [npc.armL,npc.armR])part(arm,'sweater cuff',.235,.055,.265,0xd8ceba,0,-.58,0);
+  }
+  if(isMacek){
+    for(const side of [-1,1]){const collar=part(npc.group,'polo collar',.16,.10,.04,0x191d25,side*.1,1.32,.18);collar.rotation.z=side*.35;collar.visible=false;npc.poloCollars.push(collar);}
+  }
   const strapColor=isMacek?0x242321:0x242a31;
   const strapSpread=isMacek?.115:.08;
   for(const side of [-1,1]){const strap=part(npc.group,'lanyard',.025,.55,.025,strapColor,side*strapSpread,1.08,.18);strap.rotation.z=side*(isMacek?-.16:-.24);}
@@ -2794,15 +2823,15 @@ function stylePerson(npc,style){
       ctx.fillStyle='#868990';ctx.fillRect(3,42,10,14);ctx.fillRect(51,42,10,14);
     });
     stylePerson.miccoSide??=outfitTexture(ctx=>{
-      ctx.fillStyle='#a6a8ad';ctx.fillRect(0,0,64,64);
-      for(let y=0;y<64;y+=4)for(let x=0;x<64;x+=4){
-        ctx.fillStyle=(x+y)%8===0?'#b8bac0':'#93969c';ctx.fillRect(x,y,4,4);
+      ctx.fillStyle='#9fa2a8';ctx.fillRect(0,0,64,64);
+      for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){
+        ctx.fillStyle=(x+y)%16===0?'#a9acb2':'#94979d';ctx.fillRect(x,y,8,8);
       }
     });
     stylePerson.miccoSleeve??=outfitTexture(ctx=>{
-      ctx.fillStyle='#a6a8ad';ctx.fillRect(0,0,64,64);
-      for(let y=0;y<56;y+=4)for(let x=0;x<64;x+=4){
-        ctx.fillStyle=(x+y)%8===0?'#b8bac0':'#93969c';ctx.fillRect(x,y,4,4);
+      ctx.fillStyle='#9fa2a8';ctx.fillRect(0,0,64,64);
+      for(let y=0;y<56;y+=8)for(let x=0;x<64;x+=8){
+        ctx.fillStyle=(x+y)%16===0?'#a9acb2':'#94979d';ctx.fillRect(x,y,8,8);
       }
       ctx.fillStyle='#7e8188';ctx.fillRect(0,56,64,8);
     });
@@ -2823,17 +2852,29 @@ function stylePerson(npc,style){
       part(.19,.025,.035,0x4a3228,side*.12,1.62,.26);
       part(.19,.025,.035,0x4a3228,side*.12,1.48,.26);
       for(const x of [-.09,.09])part(.025,.14,.035,0x4a3228,side*.12+x,1.55,.26);
+      part(.105,.72,.024,0x8d9096,side*.175,.93,.135);
+      part(.11,.13,.028,0x82858c,side*.175,.68,.14);
     }
     part(.06,.025,.035,0x4a3228,0,1.58,.26);
     for(const arm of [npc.armL,npc.armR]){
       arm.children[0].material.forEach(m=>{m.map=stylePerson.miccoSleeve;});
+      const cuff=new THREE.Mesh(new THREE.BoxGeometry(.26,.055,.26),new THREE.MeshLambertMaterial({color:0x7e8188}));
+      cuff.position.set(0,-.62,0);arm.add(cuff);
       const hand=bodyPart(.22,.16,.22,stylePerson.miccoSkin);hand.position.y=-.74;arm.add(hand);
     }
     for(const leg of [npc.legL,npc.legR]){
       leg.children[0].material.forEach(m=>{m.map=stylePerson.miccoPants;});
       const shoe=new THREE.Mesh(new THREE.BoxGeometry(.26,.13,.35),new THREE.MeshLambertMaterial({color:0x1b1d22}));
       shoe.position.set(0,-.62,.04);leg.add(shoe);
+      const sole=new THREE.Mesh(new THREE.BoxGeometry(.27,.035,.36),new THREE.MeshLambertMaterial({color:0xdcd9d0}));
+      sole.position.set(0,-.685,.04);leg.add(sole);
     }
+    const miccoAcc=(name,w,h,d,color,x,y,z)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));mesh.name=name;mesh.position.set(x,y,z);npc.group.add(mesh);return mesh;};
+    for(const side of [-1,1]){const strap=miccoAcc('school lanyard',.025,.48,.025,0x253d59,side*.07,1.05,.15);strap.rotation.z=side*-.25;}
+    miccoAcc('school badge',.18,.22,.035,0xf5f1e7,0,.78,.17);
+    miccoAcc('badge header',.16,.035,.02,0x284f75,0,.85,.193);
+    miccoAcc('badge photo',.065,.075,.02,0x698dad,-.035,.79,.193);
+    for(let i=0;i<2;i++)miccoAcc('badge print',.06,.012,.02,0x53677c,.043,.80-i*.035,.193);
     npc.group.scale.set(.93,.90,.93);
   } else if(style==='eiler'){
     // Principal Eiler: charcoal suit, white shirt, striped tie and brown shoes.
@@ -3377,14 +3418,6 @@ function buildPlayerAvatar(style='macekStriped'){
   }
   avatar.group.add(avatar.head,avatar.body,avatar.armL,avatar.armR,avatar.legL,avatar.legR);
   stylePerson(avatar,style);
-  if(style==='micco'){
-    const accessory=(name,w,h,d,color,x,y,z)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));mesh.name=name;mesh.position.set(x,y,z);avatar.group.add(mesh);return mesh;};
-    for(const side of [-1,1]){const strap=accessory('school lanyard',.025,.48,.025,0x253d59,side*.07,1.05,.15);strap.rotation.z=side*-.25;}
-    accessory('school badge',.18,.22,.035,0xf5f1e7,0,.78,.17);
-    accessory('badge header',.16,.035,.02,0x284f75,0,.85,.193);
-    accessory('badge photo',.065,.075,.02,0x698dad,-.035,.79,.193);
-    for(let i=0;i<2;i++)accessory('badge print',.06,.012,.02,0x53677c,.043,.80-i*.035,.193);
-  }
   return avatar;
 }
 const playerAvatars=Object.fromEntries(STAFF_CHARACTERS.map(c=>{
@@ -3393,16 +3426,17 @@ const playerAvatars=Object.fromEntries(STAFF_CHARACTERS.map(c=>{
 }));
 let playerAvatar=playerAvatars[playerCharacter];
 const viewModel=new THREE.Group(),viewArms={},viewShoulders=[];
+const warmViewMat=(mesh,intensity=.42)=>{mesh.material.forEach(m=>{m.emissive?.setHex?.(0xffffff);m.emissiveMap=m.map;m.emissiveIntensity=intensity;m.needsUpdate=true;});};
 for(const [name,side] of [['armL',-1],['armR',1]]){
   const limb=bodyPart(.17,.48,.17,shirtTex);
   limb.position.set(side*.37,-.43,-.72);limb.rotation.set(-.55,0,side*.12);
-  limb.castShadow=false;limb.receiveShadow=false;
+  limb.castShadow=false;limb.receiveShadow=false;warmViewMat(limb);
   const hand=bodyPart(.17,.13,.17,skinTex);hand.position.y=.275;
-  hand.castShadow=false;hand.receiveShadow=false;limb.add(hand);limb.userData.hand=hand;
+  hand.castShadow=false;hand.receiveShadow=false;warmViewMat(hand,.46);limb.add(hand);limb.userData.hand=hand;
   const cap=bodyPart(.19,.15,.19,shirtTex);cap.position.y=-.2;
-  cap.castShadow=false;cap.receiveShadow=false;limb.add(cap);viewShoulders.push(cap);
+  cap.castShadow=false;cap.receiveShadow=false;warmViewMat(cap);limb.add(cap);viewShoulders.push(cap);
   const wrist=new THREE.Group();wrist.name=side<0?'viewWatch':'viewBracelets';
-  const wBox=(w,h,d,color,y,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(0,y,z);m.castShadow=false;m.receiveShadow=false;wrist.add(m);};
+  const wBox=(w,h,d,color,y,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color,emissive:color,emissiveIntensity:.36}));m.position.set(0,y,z);m.castShadow=false;m.receiveShadow=false;wrist.add(m);};
   if(side<0){wBox(.185,.055,.185,0x15181f,.17);wBox(.11,.075,.03,0x2e3742,.17,.095);wBox(.075,.05,.035,0x64b5dc,.17,.10);}
   else{wBox(.185,.028,.185,0x6e472b,.145);wBox(.185,.025,.185,0xd17e38,.172);wBox(.185,.028,.185,0x22262d,.198);}
   limb.add(wrist);limb.userData.wrist=wrist;
@@ -3450,10 +3484,10 @@ function setPlayerCharacter(id){
   const character=STAFF_CHARACTERS.find(c=>c.id===id);
   for(const [i,armName] of ['armL','armR'].entries()){
     const source=playerAvatar[armName].children[0],target=viewArms[armName];
-    target.material.forEach((m,n)=>{m.map=source.material[n].map;m.needsUpdate=true;});
+    target.material.forEach((m,n)=>{m.map=source.material[n].map;m.emissiveMap=m.map;m.needsUpdate=true;});
     const skin=character.style==='micco'||character.style==='student'?skinTex:staffLook(character.style).skin;
-    target.userData.hand.material.forEach(m=>{m.map=skin;m.needsUpdate=true;});
-    viewShoulders[i].material.forEach(m=>{m.map=source.material[0].map;m.needsUpdate=true;});
+    target.userData.hand.material.forEach(m=>{m.map=skin;m.emissiveMap=skin;m.needsUpdate=true;});
+    viewShoulders[i].material.forEach(m=>{m.map=source.material[0].map;m.emissiveMap=m.map;m.needsUpdate=true;});
     if(target.userData.wrist)target.userData.wrist.visible=id==='macek';
     target.userData.characterId=id;
   }
@@ -3488,19 +3522,26 @@ function renderStaffPreviews(){
   let previewRenderer;
   try{
     previewRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
-    previewRenderer.setPixelRatio(1);previewRenderer.setSize(240,280,false);
+    previewRenderer.setPixelRatio(2);previewRenderer.setSize(240,280,false);
     previewRenderer.outputColorSpace=THREE.SRGBColorSpace;
     const previewScene=new THREE.Scene();
-    previewScene.add(new THREE.HemisphereLight(0xffffff,0x718179,2.65));
-    const light=new THREE.DirectionalLight(0xfff7e7,3.1);light.position.set(-3,5,6);previewScene.add(light);
-    const lens=new THREE.OrthographicCamera(-.95,.95,1.98,-.24,.1,20);lens.position.set(2.8,2.35,7);lens.lookAt(0,.96,0);
+    previewScene.add(new THREE.AmbientLight(0xffffff,.85));
+    previewScene.add(new THREE.HemisphereLight(0xfffdf8,0x586b7d,1.15));
+    const light=new THREE.DirectionalLight(0xfff7e7,1.45);light.position.set(3.2,4.8,6.5);previewScene.add(light);
+    const fill=new THREE.DirectionalLight(0xd8ecff,.58);fill.position.set(-3.5,2.4,4.2);previewScene.add(fill);
+    const lens=new THREE.OrthographicCamera(-.68,.68,.80,-.80,.1,20);
     for(const character of STAFF_CHARACTERS){
       const src=character.id==='macek'?macek.group:playerAvatars[character.id].group;
-      const model=src.clone(true);model.visible=true;model.position.set(0,0,0);model.rotation.set(0,0,0);
-      model.traverse(o=>{if(o.isSprite)o.visible=false;});
+      const model=src.clone(true);model.visible=true;model.position.set(0,0,0);model.rotation.set(0,-.18,0);
+      model.scale.set(1,1,1);
+      const sprites=[];model.traverse(o=>{if(o.isSprite)sprites.push(o);});sprites.forEach(s=>s.parent?.remove(s));
+      const focusY=character.id==='micco'?1.12:1.22;
+      lens.position.set(2.35,focusY+.22,6.8);lens.lookAt(0,focusY,0);
       previewScene.add(model);
       previewRenderer.render(previewScene,lens);
-      staffCanvases[character.id].getContext('2d').drawImage(previewRenderer.domElement,0,0,240,280);
+      const ctx=staffCanvases[character.id].getContext('2d');
+      ctx.clearRect(0,0,240,280);
+      ctx.drawImage(previewRenderer.domElement,0,0,240,280);
       previewScene.remove(model);
     }
   }catch(error){console.warn('Character previews are unavailable; the character names and selection still work.',error);}

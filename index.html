@@ -24,6 +24,22 @@ a{color:var(--sun2)}a:hover{color:#ffe3a6}
 .skip-link:focus{top:12px}
 h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;line-height:1.1}
 
+/* ---------- Official Game Portal Top Navbar ---------- */
+.site-nav{position:fixed;top:0;left:0;right:0;z-index:25;background:rgba(8,18,32,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:2px solid rgba(154,216,255,.22);box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.nav-inner{max-width:1240px;margin:0 auto;padding:6px clamp(14px,3vw,32px);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font:400 17px/1 Bungee,Impact,sans-serif;letter-spacing:.04em}
+.nav-brand .cube{width:26px;height:26px;border-radius:6px;background:linear-gradient(180deg,#62c24f 0 36%,#8b5a34 36% 100%);border:2px solid #fff1c4;box-shadow:0 2px 0 #1a1405}
+.nav-brand small{font:700 11px/1 var(--kid);padding:3px 7px;border-radius:999px;background:rgba(242,181,68,.2);border:1px solid rgba(255,210,122,.45);color:var(--sun2);letter-spacing:.06em}
+.nav-links{display:flex;align-items:center;gap:18px;list-style:none;margin:0;padding:0}
+.nav-links a{text-decoration:none;color:#d6e6f7;font:700 14px/1 var(--kid);letter-spacing:.02em;transition:color .14s}
+.nav-links a:hover{color:var(--sun2)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-picked{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:rgba(21,44,70,.92);border:1px solid rgba(154,216,255,.32);color:#e6f2ff;font:600 12.5px/1 var(--kid);text-decoration:none;transition:border-color .14s,transform .14s}
+.nav-picked strong{color:var(--sun2);font-weight:700}
+.nav-picked:hover{border-color:var(--sun2);color:#fff;transform:translateY(-1px)}
+.nav-cta{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:linear-gradient(180deg,#ffd27a,#f2b544);color:#1a1405;font:400 13px/1 Bungee,Impact,sans-serif;letter-spacing:.06em;text-decoration:none;border:2px solid #fff1c4;box-shadow:0 3px 0 #9a6a12}
+.nav-cta:hover{color:#1a1405;filter:brightness(1.06);transform:translateY(-1px)}
+
 /* ---------- Title screen ---------- */
 .title-screen{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 .title-bg{position:absolute;inset:0;z-index:-3;overflow:hidden}
@@ -41,9 +57,9 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 .figs-layer{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none;--p:min(50vh,27vw)}
 .cast{position:absolute;bottom:0;width:calc(var(--p) * 1.25);height:calc(var(--p) * 1.7)}
 .cast-left{left:0}.cast-right{right:0}
-.fig{position:absolute;left:calc(var(--fx) * var(--p));bottom:calc(var(--fb,0) * var(--p));height:calc(var(--p) * 1.534 * var(--s,1));width:auto;transform:translate(calc(var(--ax,40) * -1%),7%);filter:saturate(1.06) drop-shadow(0 14px 24px rgba(5,12,24,.55))}
-.title-shade{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.04) 0%,rgba(11,26,46,.18) 60%,rgba(11,26,46,.36) 100%),linear-gradient(180deg,rgba(11,26,46,.25),rgba(11,26,46,.04) 40%,rgba(11,26,46,.04) 74%,rgba(11,26,46,.32) 100%)}
-.title-body{position:relative;z-index:2;pointer-events:none;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 0 26px;text-align:center}
+.fig{position:absolute;left:calc(var(--fx) * var(--p));bottom:calc(var(--fb,0) * var(--p));height:calc(var(--p) * 1.42 * var(--s,1));width:auto;transform:translate(calc(var(--ax,50) * -1%),4%);filter:saturate(1.06) drop-shadow(0 14px 24px rgba(5,12,24,.58))}
+.title-shade{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 36%,rgba(11,26,46,.04) 0%,rgba(11,26,46,.18) 60%,rgba(11,26,46,.38) 100%),linear-gradient(180deg,rgba(11,26,46,.32),rgba(11,26,46,.04) 40%,rgba(11,26,46,.04) 74%,rgba(11,26,46,.36) 100%)}
+.title-body{position:relative;z-index:2;pointer-events:none;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:54px 0 18px;text-align:center}
 .title-body>*{pointer-events:auto}
 /* The hidden teacher entrance: Mr. Macek is a plain link with no hint for kids. */
 .fig-link,.fig-link img{pointer-events:auto;cursor:default}
@@ -52,81 +68,84 @@ h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;letter-spacing:.01em;
 /* A classic stone-block logo: chunky gray letters with a dark outline, a light bevel on
    top and solid depth below. The back copy (::before) draws the outline and the depth;
    the front copy is the stone face. */
-.brand{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:6px}
-.block-title{margin:0;font:400 clamp(40px,8.2vw,96px)/1 Bungee,Impact,sans-serif;letter-spacing:.03em}
+.brand{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:2px}
+.block-title{margin:0;font:400 clamp(38px,7.2vw,84px)/1 Bungee,Impact,sans-serif;letter-spacing:.03em}
 .block-title .logo{position:relative;display:inline-block;isolation:isolate;padding:0 .06em .16em}
 .block-title .logo::before{content:attr(data-text);position:absolute;inset:0 .06em .16em;z-index:-1;color:#2e2e2e;-webkit-text-stroke:.1em #121212;text-shadow:0 .035em 0 #3b3b3b,0 .07em 0 #333,0 .105em 0 #2b2b2b,0 .14em 0 #222,0 .2em .16em rgba(0,0,0,.55)}
 .block-title .face{display:block;color:transparent;background:repeating-conic-gradient(rgba(0,0,0,.07) 0 25%,rgba(255,255,255,.05) 0 50%) 0 0/.12em .12em,linear-gradient(180deg,#f4f4f4 0%,#dadada 24%,#bcbcbc 50%,#9e9e9e 74%,#858585 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:.03em #1a1a1a}
-.edition{margin:0;color:#f1efe8;font:400 clamp(15px,1.9vw,22px)/1 Bungee,Impact,sans-serif;letter-spacing:.34em;padding-left:.34em;text-shadow:0 2px 0 #151515,0 0 12px rgba(0,0,0,.6)}
+.edition{margin:0;color:#f1efe8;font:400 clamp(14px,1.7vw,20px)/1 Bungee,Impact,sans-serif;letter-spacing:.34em;padding-left:.34em;text-shadow:0 2px 0 #151515,0 0 12px rgba(0,0,0,.6)}
 /* Minecraft-style splash text: yellow, tilted, gently pulsing at the logo's lower right. */
-.tagline{position:absolute;left:76%;top:66%;transform-origin:0 50%;margin:0;color:#ffff4f;font:700 clamp(15px,1.7vw,22px)/1.1 var(--kid);white-space:nowrap;text-shadow:2px 2px 0 #3f3f12,0 0 8px rgba(0,0,0,.45);transform:rotate(-14deg);animation:splash 1.1s ease-in-out infinite alternate;pointer-events:none}
-.panel{width:min(540px,100%);background:linear-gradient(180deg,rgba(14,32,56,.9),rgba(10,23,41,.94));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid rgba(154,216,255,.32);border-radius:24px;padding:clamp(14px,2.2vw,22px);box-shadow:0 26px 64px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.16)}
-.panel h2{margin:0 0 10px;font:600 20px var(--kid);color:var(--sun2);letter-spacing:.02em}
-.title-staff{margin:10px 0 4px;padding:10px 10px 8px;border:1px solid rgba(154,216,255,.24);border-radius:16px;background:rgba(8,20,36,.68)}
-.title-staff legend{padding:0 8px;font:700 14px/1.2 var(--kid);color:var(--sun2);letter-spacing:.02em}
+.tagline{position:absolute;left:76%;top:66%;transform-origin:0 50%;margin:0;color:#ffff4f;font:700 clamp(14px,1.5vw,20px)/1.1 var(--kid);white-space:nowrap;text-shadow:2px 2px 0 #3f3f12,0 0 8px rgba(0,0,0,.45);transform:rotate(-14deg);animation:splash 1.1s ease-in-out infinite alternate;pointer-events:none}
+.panel{width:min(550px,100%);background:linear-gradient(180deg,rgba(14,32,56,.92),rgba(9,21,38,.96));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:2px solid rgba(154,216,255,.35);border-radius:24px;padding:clamp(12px,1.8vw,18px);box-shadow:0 26px 64px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18)}
+.panel h2{margin:0 0 8px;font:600 18px var(--kid);color:var(--sun2);letter-spacing:.02em}
+.title-staff{margin:6px 0 2px;padding:7px 9px 6px;border:1px solid rgba(154,216,255,.26);border-radius:16px;background:rgba(7,18,33,.74)}
+.title-staff legend{padding:0 8px;font:700 13px/1.1 var(--kid);color:var(--sun2);letter-spacing:.02em}
 .ts-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
-.ts-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 3px 6px;border:2px solid rgba(132,184,224,.32);border-bottom-width:4px;border-radius:12px;background:rgba(21,42,66,.92);cursor:pointer;transition:transform .14s,border-color .14s,background-color .14s;-webkit-tap-highlight-color:transparent}
+.ts-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 3px 5px;border:2px solid rgba(132,184,224,.32);border-bottom-width:4px;border-radius:11px;background:rgba(21,42,66,.92);cursor:pointer;transition:transform .14s,border-color .14s,background-color .14s;-webkit-tap-highlight-color:transparent}
 .ts-card input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.ts-pic{width:100%;height:56px;border-radius:8px;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(120,198,255,.28),rgba(9,22,38,.9));border:1px solid rgba(173,218,250,.2)}
-.ts-pic img{display:block;width:100%;height:135%;object-fit:cover;object-position:50% 6%;filter:saturate(1.06)}
-.ts-name{display:block;font:700 11.5px/1.1 var(--kid);color:#f4f9ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.ts-role{display:inline-block;padding:1px 6px;border-radius:999px;background:rgba(127,226,255,.16);color:#9be4ff;font:700 10px/1.2 var(--kid)}
+.ts-pic{width:100%;height:46px;border-radius:7px;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(120,198,255,.32),rgba(9,22,38,.92));border:1px solid rgba(173,218,250,.22)}
+.ts-pic img{display:block;width:100%;height:190%;object-fit:cover;object-position:50% 4%;filter:saturate(1.06)}
+.ts-name{display:block;font:700 11px/1.1 var(--kid);color:#f4f9ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ts-role{display:inline-block;padding:1px 5px;border-radius:999px;background:rgba(127,226,255,.16);color:#9be4ff;font:700 9.5px/1.15 var(--kid)}
 .ts-card:has(input:checked){background:linear-gradient(180deg,#ffe49e,#f3b948);border-color:#fff5cc;border-bottom-color:#9e6d12;transform:translateY(-2px)}
-.ts-card:has(input:checked) .ts-pic{background:radial-gradient(circle at 50% 35%,rgba(255,250,224,.85),rgba(32,64,98,.88));border-color:rgba(20,43,66,.3)}
+.ts-card:has(input:checked) .ts-pic{background:radial-gradient(circle at 50% 35%,rgba(255,250,224,.88),rgba(32,64,98,.9));border-color:rgba(20,43,66,.3)}
 .ts-card:has(input:checked) .ts-name{color:#142538}
 .ts-card:has(input:checked) .ts-role{background:#142538;color:#ffd875}
 .ts-card:has(input:focus-visible){outline:3px solid #fff;outline-offset:2px}
 @media (hover:hover){.ts-card:hover{transform:translateY(-2px);border-color:#9be4ff}}
-.ts-picked{margin:6px 0 0;font:600 13.5px/1.25 var(--kid);color:#d7ecff}
+.ts-picked{margin:5px 0 0;font:600 12.5px/1.2 var(--kid);color:#d7ecff}
 .ts-picked strong{color:#ffd875}
-.specials-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
-.special-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 12px 16px;border-radius:20px;background:linear-gradient(180deg,rgba(25,52,82,.92),rgba(13,29,49,.96));border:2px solid rgba(140,198,242,.28);box-shadow:0 14px 30px rgba(0,0,0,.34);text-align:center;cursor:pointer;transition:transform .15s,border-color .15s}
-@media (hover:hover){.special-card:hover{transform:translateY(-3px);border-color:#ffd27a}}
-.special-card.active{border-color:#ffd27a;box-shadow:0 0 0 3px rgba(255,210,122,.28),0 16px 32px rgba(0,0,0,.42)}
-.special-art{width:100%;height:190px;border-radius:14px;background:radial-gradient(circle at 50% 35%,rgba(127,212,255,.26),rgba(9,21,36,.92));border:1px solid rgba(173,218,250,.22);display:grid;place-items:center;overflow:hidden}
-.special-art img{height:94%;width:auto;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45))}
-.special-role{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,210,122,.18);border:1px solid rgba(255,210,122,.42);color:#ffd97d;font:700 12px/1.1 var(--kid);letter-spacing:.03em;text-transform:uppercase}
-.special-card h3{margin:0;font:700 19px/1.15 var(--kid);color:#fff}
-.special-card p{margin:0;color:var(--muted);font:500 13.5px/1.35 var(--kid)}
+.specials-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
+.special-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 12px 16px;border-radius:20px;background:linear-gradient(180deg,rgba(24,50,80,.94),rgba(11,25,43,.98));border:2px solid rgba(140,198,242,.28);box-shadow:0 16px 34px rgba(0,0,0,.38);text-align:center;cursor:pointer;transition:transform .15s,border-color .15s}
+@media (hover:hover){.special-card:hover{transform:translateY(-4px);border-color:#ffd27a}}
+.special-card.active{border-color:#ffd27a;box-shadow:0 0 0 3px rgba(255,210,122,.28),0 18px 36px rgba(0,0,0,.46)}
+.special-art{width:100%;height:220px;padding:8px 6px 2px;border-radius:14px;background:radial-gradient(circle at 50% 38%,rgba(127,212,255,.28),rgba(9,21,36,.94));border:1px solid rgba(173,218,250,.24);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.special-art img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45))}
+.special-role{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,210,122,.18);border:1px solid rgba(255,210,122,.42);color:#ffd97d;font:700 11.5px/1.1 var(--kid);letter-spacing:.04em;text-transform:uppercase}
+.special-card h3{margin:0;font:700 18px/1.15 var(--kid);color:#fff}
+.special-card p{margin:0;color:var(--muted);font:500 13px/1.35 var(--kid);flex:1}
+.special-cta{display:inline-block;width:100%;padding:6px 10px;border-radius:10px;background:rgba(154,216,255,.12);border:1px solid rgba(154,216,255,.28);color:#cfe8ff;font:700 12px/1.1 var(--kid)}
+.special-card.active .special-cta{background:linear-gradient(180deg,#ffd27a,#f2b544);border-color:#fff1c4;color:#1a1405}
 /* Mode choices: big rows with a picture, a name and a check on the chosen one. Nothing
    in a row changes size, so pointing at or choosing a mode never moves the page. */
-.modes{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;border:0;text-align:left}
+.modes{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;border:0;text-align:left}
 .modes legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.mode{position:relative;display:grid;grid-template-columns:56px minmax(0,1fr) 34px;gap:14px;align-items:center;min-height:72px;padding:8px 14px;border:3px solid #4a6a86;border-bottom-width:5px;border-radius:18px;background:rgba(29,51,70,.94);cursor:pointer;transition:background-color .15s,border-color .15s,transform .15s;-webkit-tap-highlight-color:transparent}
+.mode{position:relative;display:grid;grid-template-columns:50px minmax(0,1fr) 32px;gap:12px;align-items:center;min-height:60px;padding:6px 12px;border:3px solid #4a6a86;border-bottom-width:5px;border-radius:16px;background:rgba(29,51,70,.94);cursor:pointer;transition:background-color .15s,border-color .15s,transform .15s;-webkit-tap-highlight-color:transparent}
 .mode input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.mode .icon{display:grid;place-items:center;width:56px;height:56px;border-radius:13px;background:#0e2238}
-.mode .icon svg{display:block;width:40px;height:40px}
-.mode b{display:block;font:700 23px/1.1 var(--kid)}
-.mode small{display:block;font:600 15px/1.2 var(--kid);color:#b9cfe0}
-.mode .go{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font:700 22px/1 var(--kid);color:#9cc0dc}
+.mode .icon{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:#0e2238}
+.mode .icon svg{display:block;width:34px;height:34px}
+.mode b{display:block;font:700 20px/1.1 var(--kid)}
+.mode small{display:block;font:600 13.5px/1.15 var(--kid);color:#b9cfe0}
+.mode .go{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;font:700 20px/1 var(--kid);color:#9cc0dc}
 .mode .go::before{content:"›"}
 .mode:has(input:checked){background:var(--sun2);border-color:#fff1b8;border-bottom-color:#b98a20;color:#142b42}
 .mode:has(input:checked) .icon{background:#fff3cf}
 .mode:has(input:checked) small{color:#3d2f0c}
 .mode:has(input:checked) .go{background:#142b42;color:var(--sun2)}
-.mode:has(input:checked) .go::before{content:"✓";font-size:19px}
+.mode:has(input:checked) .go::before{content:"✓";font-size:18px}
 .mode:has(input:focus-visible){outline:3px solid #fff;outline-offset:3px}
 @media (hover:hover){.mode:hover{transform:translateY(-2px)}.mode:hover:not(:has(input:checked)){background:#26445c;border-color:#8fd3ff}}
 .mode:active{transform:translateY(1px)}
 /* One reserved line under the rows says what the pointed-at (or chosen) mode is.
    Its height never changes, so nothing else on the page can move. */
-.mode-help{margin:10px 4px 0;height:2.8em;overflow:hidden;font:500 16px/1.4 var(--kid);color:#eaf2f8}
-.play{margin-top:10px;width:100%;min-height:88px;display:flex;align-items:center;justify-content:center;gap:18px;border:3px solid #fff1c4;border-radius:20px;text-decoration:none;background:linear-gradient(180deg,#ffd27a,#f2b544);color:#1a1405;font:400 clamp(34px,5vw,46px) Bungee,Impact,sans-serif;letter-spacing:.1em;box-shadow:0 10px 0 #9a6a12,0 22px 40px rgba(242,181,68,.35);transition:transform .12s,box-shadow .12s}
-.play svg{width:40px;height:40px}
-.play:hover{color:#1a1405;transform:translateY(-2px);box-shadow:0 12px 0 #9a6a12,0 26px 46px rgba(242,181,68,.45)}
-.play:active{transform:translateY(6px);box-shadow:0 4px 0 #9a6a12,0 12px 24px rgba(242,181,68,.3)}
+.mode-help{margin:6px 4px 0;height:2.8em;overflow:hidden;font:500 14.5px/1.38 var(--kid);color:#eaf2f8}
+.cta-row{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;align-items:stretch;margin-top:8px}
+.play{margin-top:0;width:100%;min-height:68px;display:flex;align-items:center;justify-content:center;gap:12px;border:3px solid #fff1c4;border-radius:18px;text-decoration:none;background:linear-gradient(180deg,#ffd27a,#f2b544);color:#1a1405;font:400 clamp(28px,3.6vw,38px) Bungee,Impact,sans-serif;letter-spacing:.08em;box-shadow:0 8px 0 #9a6a12,0 18px 34px rgba(242,181,68,.35);transition:transform .12s,box-shadow .12s}
+.play svg{width:34px;height:34px}
+.play:hover{color:#1a1405;transform:translateY(-2px);box-shadow:0 10px 0 #9a6a12,0 22px 40px rgba(242,181,68,.45)}
+.play:active{transform:translateY(5px);box-shadow:0 3px 0 #9a6a12,0 10px 20px rgba(242,181,68,.3)}
 /* How to play: a big second button nobody can miss. */
-.howto-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px;width:100%;min-height:62px;border-radius:999px;text-decoration:none;background:linear-gradient(180deg,#5fe0a4,#2fb47a);color:#062b1a;font:700 clamp(22px,3vw,27px)/1 var(--kid);letter-spacing:.02em;border:3px solid #c9ffe4;box-shadow:0 7px 0 #1d7a50,0 14px 28px rgba(47,180,122,.35);transition:transform .12s}
-.howto-btn .q{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#062b1a;color:#5fe0a4;font:700 24px var(--kid)}
+.howto-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:0;width:100%;min-height:68px;border-radius:18px;text-decoration:none;background:linear-gradient(180deg,#5fe0a4,#2fb47a);color:#062b1a;font:700 clamp(18px,2.2vw,22px)/1.1 var(--kid);letter-spacing:.01em;border:3px solid #c9ffe4;box-shadow:0 8px 0 #1d7a50,0 14px 28px rgba(47,180,122,.32);transition:transform .12s}
+.howto-btn .q{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#062b1a;color:#5fe0a4;font:700 20px var(--kid);flex:none}
 .howto-btn:hover{color:#062b1a;filter:brightness(1.06);transform:translateY(-2px)}
 .howto-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #1d7a50}
-.save{margin:14px 0 0;font:500 14px var(--kid);color:var(--muted)}
+.save{margin:10px 0 0;font:500 13px var(--kid);color:var(--muted)}
 /* First time playing? A gentle, visible pulse draws attention without moving the
    layout. Hover/focus holds it steady; reduced-motion settings disable it. */
-.quest-link{display:flex;align-items:center;justify-content:center;gap:16px;width:min(480px,100%);min-height:70px;padding:10px 24px;border:3px solid #eafaff;border-radius:999px;background:linear-gradient(180deg,#7fe2ff,#2fa2e8);color:#04223a;text-decoration:none;text-align:left;box-shadow:0 7px 0 #17679f,0 0 0 6px rgba(127,226,255,.28),0 16px 34px rgba(0,0,0,.45);transition:transform .12s;animation:quest-glow 2.2s ease-in-out infinite}
-.quest-link .cap{flex:none;width:44px;height:44px}
-.quest-link b{display:block;font:700 23px/1.1 var(--kid);color:#04223a}
-.quest-link .quest-sub{display:block;margin-top:2px;font:600 16px/1.25 var(--kid);color:#063356}
+.quest-link{display:flex;align-items:center;justify-content:center;gap:14px;width:min(460px,100%);min-height:58px;padding:8px 20px;border:3px solid #eafaff;border-radius:999px;background:linear-gradient(180deg,#7fe2ff,#2fa2e8);color:#04223a;text-decoration:none;text-align:left;box-shadow:0 6px 0 #17679f,0 0 0 5px rgba(127,226,255,.26),0 14px 30px rgba(0,0,0,.45);transition:transform .12s;animation:quest-glow 2.2s ease-in-out infinite}
+.quest-link .cap{flex:none;width:38px;height:38px}
+.quest-link b{display:block;font:700 19px/1.1 var(--kid);color:#04223a}
+.quest-link .quest-sub{display:block;margin-top:2px;font:600 14px/1.2 var(--kid);color:#063356}
 .quest-link:hover,.quest-link:focus-visible{animation:none;color:#04223a;transform:translateY(-2px)}
 .quest-link:active{transform:translateY(4px)}
 
@@ -179,36 +198,58 @@ footer a{font-weight:700;text-decoration:none}
 @media (max-width:1000px),(max-aspect-ratio:3/2){.figs-layer{display:none}.crew-row{display:block}}
 /* Short laptop screens (1366x768 and similar): keep the whole title screen above the fold. */
 @media (max-height:860px) and (min-width:700px){
-  .title-body{gap:9px;padding:12px 0 16px}
-  .block-title{font-size:clamp(38px,min(7vw,10.5vh),88px)}
-  .edition{font-size:17px}
-  .tagline{font-size:17px}
-  .quest-link{min-height:60px;padding:8px 22px}
-  .quest-link b{font-size:21px}
-  .quest-link .quest-sub{font-size:15px}
-  .quest-link .cap{width:38px;height:38px}
-  .panel{padding:12px 18px}
-  .panel h2{margin-bottom:8px;font-size:18px}
-  .modes{gap:6px}
-  .mode{min-height:58px;padding:5px 12px;grid-template-columns:46px minmax(0,1fr) 30px}
-  .mode .icon{width:46px;height:46px}
-  .mode .icon svg{width:34px;height:34px}
-  .mode b{font-size:21px}
-  .mode small{font-size:14px}
-  .mode .go{width:30px;height:30px}
-  .mode-help{margin-top:6px;font-size:15px}
-  .play{min-height:70px;margin-top:6px;font-size:38px}
-  .play svg{width:36px;height:36px}
-  .howto-btn{min-height:52px;margin-top:14px;font-size:23px}
-  .save{margin-top:8px}
-  .ts-pic{height:44px}
+  .title-body{gap:6px;padding:44px 0 8px}
+  .brand{gap:2px;margin-bottom:0}
+  .block-title{font-size:clamp(34px,min(6.2vw,8.6vh),72px)}
+  .edition{font-size:14px}
+  .tagline{font-size:15px}
+  .quest-link{min-height:48px;padding:6px 18px}
+  .quest-link b{font-size:17px}
+  .quest-link .quest-sub{font-size:13px}
+  .quest-link .cap{width:32px;height:32px}
+  .panel{padding:10px 16px;border-radius:20px}
+  .panel h2{margin-bottom:5px;font-size:16px}
+  .modes{gap:5px}
+  .mode{min-height:48px;padding:4px 10px;grid-template-columns:40px minmax(0,1fr) 26px}
+  .mode .icon{width:40px;height:40px}
+  .mode .icon svg{width:30px;height:30px}
+  .mode b{font-size:18px}
+  .mode small{font-size:12.5px}
+  .mode .go{width:26px;height:26px}
+  .mode-help{margin-top:4px;font-size:13.5px}
+  .title-staff{margin:4px 0 2px;padding:5px 8px 4px}
+  .title-staff legend{font-size:12px}
+  .ts-pic{height:36px}
+  .ts-name{font-size:10.5px}
+  .ts-picked{margin-top:3px;font-size:11.5px}
+  .cta-row{margin-top:6px;gap:10px}
+  .play{min-height:54px;margin-top:0;font-size:30px}
+  .play svg{width:28px;height:28px}
+  .howto-btn{min-height:54px;margin-top:0;font-size:18px}
+  .howto-btn .q{width:26px;height:26px;font-size:17px}
+  .save{margin-top:6px;font-size:12px}
 }
-@media (max-width:900px){.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.specials-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
-@media (max-width:480px){.title-body{gap:12px;padding:6px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.specials-grid,.ts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
+@media (max-width:900px){.nav-links{display:none}.steps,.things{grid-template-columns:repeat(2,minmax(0,1fr))}.specials-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.more-body{grid-template-columns:1fr}}
+@media (max-width:480px){.title-body{gap:12px;padding:52px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.nav-picked{display:none}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.cta-row{grid-template-columns:1fr}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.specials-grid,.ts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
 </style>
 </head>
 <body>
 <a class="skip-link" href="#play-button">Skip to Play</a>
+<nav class="site-nav" aria-label="Game sections">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#play"><span class="cube" aria-hidden="true"></span><span>MYNECRAFT</span><small>EC EDITION</small></a>
+    <ul class="nav-links">
+      <li><a href="#play">Play</a></li>
+      <li><a href="#specials-crew">Specials Teachers</a></li>
+      <li><a href="#how-to-play">How to Play</a></li>
+      <li><a href="#things">Campus Activities</a></li>
+    </ul>
+    <div class="nav-right">
+      <a class="nav-picked" id="nav-picked" href="#specials-crew">Playing as: <strong>Mr. Macek · CIRC</strong></a>
+      <a class="nav-cta" id="nav-play" href="game/mynecraft.html?mode=creative">▶ PLAY NOW</a>
+    </div>
+  </div>
+</nav>
 <header class="title-screen" id="play">
   <!-- The school picture and the teachers share one box, so each teacher stays
        standing on the same spot of the school grounds at any screen size. -->
@@ -245,11 +286,13 @@ footer a{font-weight:700;text-decoration:none}
         </div>
         <p class="ts-picked" id="staff-picked" aria-live="polite">Playing as <strong>Mr. Macek · CIRC</strong> — you can switch anytime in Menu!</p>
       </fieldset>
-      <a class="play" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
-        PLAY
-      </a>
-      <a class="howto-btn" id="howto-button" href="#how-to-play"><span class="q" aria-hidden="true">?</span>How to play</a>
+      <div class="cta-row">
+        <a class="play" id="play-button" href="game/mynecraft.html?mode=creative" aria-label="Play Creative mode">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+          PLAY
+        </a>
+        <a class="howto-btn" id="howto-button" href="#how-to-play"><span class="q" aria-hidden="true">?</span>How to play</a>
+      </div>
       <p class="save">💾 Your world saves by itself in this browser.</p>
     </div>
     <a class="quest-link" id="quest-link" href="game/mynecraft.html?mode=creative&amp;tutorial=1"><svg class="cap" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="#8a5d06" d="M6 0h4v1H6zM5 1h1v2H5zM10 1h1v2h-1zM0 4h5v1H0zM11 4h5v1h-5zM0 5h1v2H0zM15 5h1v2h-1zM1 7h1v2H1zM14 7h1v2h-1zM2 9h1v2H2zM13 9h1v2h-1zM1 11h1v3H1zM14 11h1v3h-1zM2 14h3v1H2zM11 14h3v1h-3zM5 13h2v1H5zM9 13h2v1H9zM7 12h2v1H7z"/><path fill="#ffd23f" d="M6 1h4v3H6zM5 3h6v2H5zM1 5h14v2H1zM2 7h12v2H2zM3 9h10v2H3zM2 11h5v2H2zM9 11h5v2H9zM2 13h3v1H2zM11 13h3v1h-3zM7 11h2v1H7z"/><path fill="#fff1a8" d="M7 1h1v3H7zM2 5h4v1H2z"/></svg><span><b>First time playing?</b><span class="quest-sub">Click here to quiz your way through the basics.</span></span></a>
@@ -282,6 +325,19 @@ footer a{font-weight:700;text-decoration:none}
     </div>
   </div>
 </header>
+<section class="section" id="specials-crew" aria-labelledby="crew-title">
+  <div class="wrap">
+    <div class="section-head"><h2 id="crew-title">Meet the <em>Specials</em> teachers</h2><p>Tap any teacher to play as them, or switch anytime inside the game Menu.</p></div>
+    <ul class="specials-grid">
+      <li class="special-card active" data-teacher="macek"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/macek.png" alt="Mr. Macek"></div><span class="special-role">CIRC</span><h3>Mr. Macek</h3><p>SV shirt, patterned sleeves, watch, bracelets &amp; lanyard.</p><span class="special-cta">✓ Selected Teacher</span></li>
+      <li class="special-card" data-teacher="micco"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/micco.png" alt="Ms. Micco"></div><span class="special-role">CIRC</span><h3>Ms. Micco</h3><p>Gray knit cardigan, navy top, glasses &amp; school lanyard.</p><span class="special-cta">Play as Ms. Micco</span></li>
+      <li class="special-card" data-teacher="eriksen"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/eriksen.png" alt="Ms. Eriksen"></div><span class="special-role">Art</span><h3>Ms. Eriksen</h3><p>Curly dark hair, bright green eyes, black cardigan &amp; purple top.</p><span class="special-cta">Play as Ms. Eriksen</span></li>
+      <li class="special-card" data-teacher="mullet"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/mullet.png" alt="Mr. Mullet"></div><span class="special-role">PE</span><h3>Mr. Mullet</h3><p>Navy pullover hoodie, khaki shorts, crew socks &amp; sneakers.</p><span class="special-cta">Play as Mr. Mullet</span></li>
+      <li class="special-card" data-teacher="wingenbach"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/wingenbach.png" alt="Mr. Wingenbach"></div><span class="special-role">Music</span><h3>Mr. Wingenbach</h3><p>Full beard, black SV quarter-zip, gray trousers &amp; lanyard.</p><span class="special-cta">Play as Mr. Wingenbach</span></li>
+      <li class="special-card" data-teacher="mcmichael"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/mcmichael.png" alt="Sra. McMichael"></div><span class="special-role">Spanish</span><h3>Sra. McMichael</h3><p>Blonde hair, glasses, cream knit sweater &amp; polka-dot pants.</p><span class="special-cta">Play as Sra. McMichael</span></li>
+    </ul>
+  </div>
+</section>
 <section class="section" id="how-to-play" aria-labelledby="quick-title">
   <div class="wrap">
     <div class="section-head"><h2 id="quick-title">How to <em>play</em></h2><p>Five quick picture steps are all you need. Press PLAY and try them.</p></div>
@@ -302,19 +358,6 @@ footer a{font-weight:700;text-decoration:none}
     </details>
   </div>
 </section>
-<section class="section" id="specials-crew" aria-labelledby="crew-title">
-  <div class="wrap">
-    <div class="section-head"><h2 id="crew-title">Meet the <em>Specials</em> teachers</h2><p>Tap any teacher to play as them, or switch anytime inside the game Menu.</p></div>
-    <ul class="specials-grid">
-      <li class="special-card active" data-teacher="macek"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/macek.png" alt="Mr. Macek"></div><span class="special-role">CIRC</span><h3>Mr. Macek</h3><p>SV shirt, patterned sleeves, watch, bracelets &amp; lanyard.</p></li>
-      <li class="special-card" data-teacher="micco"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/micco.png" alt="Ms. Micco"></div><span class="special-role">CIRC</span><h3>Ms. Micco</h3><p>Gray knit cardigan, navy top, glasses &amp; school lanyard.</p></li>
-      <li class="special-card" data-teacher="eriksen"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/eriksen.png" alt="Ms. Eriksen"></div><span class="special-role">Art</span><h3>Ms. Eriksen</h3><p>Curly dark hair, bright green eyes, black cardigan &amp; purple top.</p></li>
-      <li class="special-card" data-teacher="mullet"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/mullet.png" alt="Mr. Mullet"></div><span class="special-role">PE</span><h3>Mr. Mullet</h3><p>Navy pullover hoodie, khaki shorts, crew socks &amp; sneakers.</p></li>
-      <li class="special-card" data-teacher="wingenbach"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/wingenbach.png" alt="Mr. Wingenbach"></div><span class="special-role">Music</span><h3>Mr. Wingenbach</h3><p>Full beard, black SV quarter-zip, gray trousers &amp; lanyard.</p></li>
-      <li class="special-card" data-teacher="mcmichael"><div class="special-art"><img class="special-img" src="game/assets/staff-lineup/mcmichael.png" alt="Sra. McMichael"></div><span class="special-role">Spanish</span><h3>Sra. McMichael</h3><p>Blonde hair, glasses, cream knit sweater &amp; polka-dot pants.</p></li>
-    </ul>
-  </div>
-</section>
 <section class="section" id="things" aria-labelledby="things-title">
   <div class="wrap">
     <div class="section-head"><h2 id="things-title">Things to <em>do</em></h2><p>In the game, press <strong>Menu</strong> and pick one from <strong>Things to try</strong>.</p></div>
@@ -331,7 +374,7 @@ footer a{font-weight:700;text-decoration:none}
   </div>
 </section>
 <footer>
-  <div class="wrap row"><span>MYnecraft: EC Edition</span><a href="https://moodle.svsd.net/course/view.php?id=13811">Mr. Macek's teacher website</a><a href="https://percycodesios.github.io/CIRC-HQ/">CIRC HQ</a><a href="#play">Back to the title screen</a></div>
+  <div class="wrap row"><span>MYnecraft: EC Edition · Ehrman Crest Campus</span><a href="https://moodle.svsd.net/course/view.php?id=13811">Mr. Macek's teacher website</a><a href="https://percycodesios.github.io/CIRC-HQ/">CIRC HQ</a><a href="#play">Back to the title screen</a></div>
 </footer>
 <script>
 // Mark this tab as having seen the title screen, so the plain game link goes
@@ -408,6 +451,14 @@ try{
   const radios=[...document.querySelectorAll('input[name="teacher"]')];
   const cards=[...document.querySelectorAll('.special-card[data-teacher]')];
   const picked=document.getElementById('staff-picked');
+  const navPicked=document.getElementById('nav-picked');
+  const navPlay=document.getElementById('nav-play');
+  if(navPlay&&playButton){
+    navPlay.addEventListener('click',startNow);
+    for(const mode of document.querySelectorAll('input[name="mode"]')){
+      mode.addEventListener('change',()=>{if(mode.checked)navPlay.href=playButton.href;});
+    }
+  }
   if(!radios.length)return;
   const valid=new Set(radios.map(r=>r.value));
   const saveKey='mynecraft_save_v1';
@@ -434,10 +485,16 @@ try{
   function applyTeacher(id,persist){
     if(!valid.has(id))id='macek';
     for(const r of radios)r.checked=(r.value===id);
-    for(const c of cards)c.classList.toggle('active',c.dataset.teacher===id);
+    for(const c of cards){
+      const isSelected=c.dataset.teacher===id;
+      c.classList.toggle('active',isSelected);
+      const cta=c.querySelector('.special-cta'),h3=c.querySelector('h3');
+      if(cta&&h3)cta.textContent=isSelected?'✓ Selected Teacher':'Play as '+h3.textContent;
+    }
     const activeRadio=radios.find(r=>r.value===id)||radios[0];
     const label=activeRadio.closest('.ts-card')?.dataset.label||'Mr. Macek · CIRC';
     if(picked)picked.innerHTML='Playing as <strong>'+label+'</strong> — you can switch anytime in Menu!';
+    if(navPicked)navPicked.innerHTML='Playing as: <strong>'+label+'</strong>';
     if(persist)writeSavedTeacher(id);
   }
   const initial=readSavedTeacher();
