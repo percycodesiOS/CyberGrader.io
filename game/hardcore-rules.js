@@ -5,14 +5,14 @@
   const WOODS = ['wood', 'cherrywood', 'sprucewood', 'pinewood'];
   const FLOWERS = ['poppy', 'daisy', 'sunflower', 'lavender'];
   const CONCRETES = ['concrete', 'whiteconcrete', 'redconcrete', 'yellowconcrete', 'blueconcrete', 'greenconcrete', 'purpleconcrete', 'pinkconcrete', 'blackconcrete'];
-  const BLOCKS = ['grass', 'dirt', 'stone', 'sand', 'wood', 'leaves', 'planks', 'brick', 'snow', 'glow', 'glass', 'water', 'orange', 'blue', 'cherrywood', 'sprucewood', 'pinewood', 'concrete', 'copperore', 'ironore', 'cherryplanks', 'spruceplanks', 'pineplanks', 'cherryleaves', 'whiteconcrete', 'redconcrete', 'yellowconcrete', 'blueconcrete'];
+  const BLOCKS = ['grass', 'dirt', 'stone', 'sand', 'wood', 'leaves', 'planks', 'brick', 'snow', 'glow', 'glass', 'water', 'orange', 'blue', 'cherrywood', 'sprucewood', 'pinewood', 'concrete', 'copperore', 'ironore', 'cherryplanks', 'spruceplanks', 'pineplanks', 'cherryleaves', 'whiteconcrete', 'redconcrete', 'yellowconcrete', 'blueconcrete', 'bookshelf'];
   BLOCKS.push(...FLOWERS,...CONCRETES.filter(id=>!BLOCKS.includes(id)));
   const INITIAL_BLOCKS = ['grass', 'dirt', 'stone', 'sand', 'wood', 'leaves', 'planks', 'water'];
   const CHARACTERS = ['macek', 'micco', 'eriksen', 'mullet', 'wingenbach', 'mcmichael'];
   const QUESTS = [
     { id: 'wood', title: 'Make a building tool', instruction: 'Collect 10 logs from trees. Craft a building axe.', character: 'micco', blocks: ['cherrywood', 'cherryplanks', 'cherryleaves', ...FLOWERS], animals: [], goal: 10 },
     { id: 'stone', title: 'Start a stone collection', instruction: 'Craft a building pick. Mine 8 stone blocks.', character: 'eriksen', blocks: ['sprucewood', 'spruceplanks', 'copperore', 'ironore'], animals: [], goal: 8 },
-    { id: 'house', title: 'Build your first house', instruction: 'Build a 5 by 5 floor, walls 3 blocks high, and a full roof. Leave one door gap 1 block wide and 2 blocks high.', character: 'mullet', blocks: ['pinewood', 'pineplanks', ...CONCRETES, 'glass', 'brick', 'orange', 'blue'], animals: ['cat'], goal: 1 },
+    { id: 'house', title: 'Build your first house', instruction: 'Build a 5 by 5 floor, walls 3 blocks high, and a full roof. Leave one door gap 1 block wide and 2 blocks high.', character: 'mullet', blocks: ['pinewood', 'pineplanks', ...CONCRETES, 'glass', 'brick', 'orange', 'blue', 'bookshelf'], animals: ['cat'], goal: 1 },
     { id: 'workshop', title: 'Build your workshop collection', instruction: 'Mine 6 copper ore and 4 iron ore. Craft 4 concrete blocks in any color.', character: 'wingenbach', blocks: ['glow', 'snow'], animals: ['horse', 'sheep', 'cow'], goal: 14 },
     { id: 'habitat', title: 'Build a home for fish', instruction: 'Build a 2 by 2 pond or glass tank. Place all 4 water blocks. Give it a solid floor and sides.', character: 'mcmichael', blocks: [], animals: ['fish'], goal: 1 }
   ];
@@ -23,6 +23,7 @@
     cherryplanks: { name: '4 cherry planks', costs: { cherrywood: 1 }, output: { cherryplanks: 4 }, after: 'wood' },
     spruceplanks: { name: '4 spruce planks', costs: { sprucewood: 1 }, output: { spruceplanks: 4 }, after: 'stone' },
     pineplanks: { name: '4 pine planks', costs: { pinewood: 1 }, output: { pineplanks: 4 }, after: 'house' },
+    bookshelf: { name: 'Bookshelf', costs: { wood: 1, planks: 3 }, output: { bookshelf: 1 }, after: 'house' },
     concrete: { name: '4 concrete', costs: { stone: 2, sand: 2 }, output: { concrete: 4 }, after: 'house' },
     whiteconcrete: { name: '4 white concrete', costs: { stone: 2, sand: 2 }, output: { whiteconcrete: 4 }, after: 'house' },
     redconcrete: { name: '4 red concrete', costs: { stone: 2, sand: 2 }, output: { redconcrete: 4 }, after: 'house' },

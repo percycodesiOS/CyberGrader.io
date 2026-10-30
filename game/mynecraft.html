@@ -74,7 +74,7 @@
   #sleepTransition strong { font-size: clamp(28px, 5vw, 48px); }
   #sleepTransition p { color: #c8dcff; font-size: 18px; }
   #sleepTransition .sleep-moon { font-size: 64px; color: #ffe5a5; }
-  #activityInteract { position: fixed; z-index: 8; left: 50%; bottom: 92px; transform: translateX(-50%); min-height: 44px; padding: 10px 18px; border: 2px solid #132d47; border-radius: 8px; background: #f8d778; color: #142b42; font: 800 14px system-ui, sans-serif; cursor: pointer; }
+  #activityInteract { position: fixed; z-index: 8; left: 50%; bottom: 140px; transform: translateX(-50%); min-height: 44px; padding: 10px 18px; border: 2px solid #132d47; border-radius: 8px; background: #f8d778; color: #142b42; font: 800 14px system-ui, sans-serif; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
   #activityInteract[hidden], #btnInteract[hidden], body.touch-device #activityInteract { display: none; }
   #btnInteract { min-height: 52px; background: #f8d778; color: #142b42; max-width: 180px; }
   .pixel { image-rendering: pixelated; }
@@ -225,7 +225,7 @@
 .travel input{width:84px;padding:8px;border-radius:4px;font:16px system-ui;min-height:40px;box-sizing:border-box}
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
-<link rel="stylesheet" href="start-menu.css?v=teachers-20261027">
+<link rel="stylesheet" href="start-menu.css?v=ui-20261029-onelook4">
 </head>
 <body>
 <div id="hud"><div id="crosshair"></div></div>
@@ -255,16 +255,16 @@
     <header class="start-header start-hero">
       <div class="hero-row">
         <div class="hero-brand">
-          <h1 class="start-brand block-title" aria-label="MYnecraft">MYNECRAFT</h1>
+          <h1 class="start-brand block-title" aria-label="MYnecraft"><span class="logo" data-text="MYNECRAFT" aria-hidden="true"><span class="face">MYNECRAFT</span></span></h1>
           <p class="edition">EC EDITION</p>
-          <p class="hero-tagline">Your ideas. Your school. Your world.</p>
+          <p class="hero-tagline">Your school, built from blocks.</p>
         </div>
         <div class="hero-play">
           <p class="hero-step" id="modeTitle">How do you want to play?</p>
           <div class="mode-cards" role="radiogroup" aria-labelledby="modeTitle">
-            <button type="button" class="mode-card" data-mode="creative" role="radio" aria-checked="true"><span aria-hidden="true">🎨</span><strong>Creative</strong><small>Build anything</small></button>
-            <button type="button" class="mode-card" data-mode="survival" role="radio" aria-checked="false"><span aria-hidden="true">🌳</span><strong>Challenge</strong><small>Collect &amp; build</small></button>
-            <button type="button" class="mode-card" data-mode="hardcore" role="radio" aria-checked="false"><span aria-hidden="true">⛏️</span><strong>Hardcore</strong><small>Craft &amp; unlock</small></button>
+            <button type="button" class="mode-card" data-mode="creative" role="radio" aria-checked="true"><span class="icon" aria-hidden="true"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#241708" d="M1 0h14v1H1zM0 1h1v14H0zM15 1h1v14h-1zM1 15h14v1H1z"/><path fill="#8b5a34" d="M1 1h14v14H1z"/><path fill="#6e4526" d="M3 8h1v1H3zM6 10h2v1H6zM10 8h1v1h-1zM12 11h1v1h-1zM4 12h1v1H4zM9 13h2v1H9zM13 7h1v1h-1z"/><path fill="#5cbf3a" d="M1 1h14v4H1zM1 5h2v1H1zM4 5h1v2H4zM7 5h2v1H7zM11 5h1v2h-1zM13 5h2v1h-2z"/><path fill="#86e05a" d="M1 1h14v1H1zM2 2h2v1H2zM9 2h3v1H9z"/></svg></span><strong>Creative</strong><small>Build anything</small></button>
+            <button type="button" class="mode-card" data-mode="survival" role="radio" aria-checked="false"><span class="icon" aria-hidden="true"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#1f5a22" d="M4 0h8v1H4zM2 1h2v1H2zM12 1h2v1h-2zM1 2h1v1H1zM14 2h1v1h-1zM0 3h1v5H0zM15 3h1v5h-1zM1 8h1v1H1zM14 8h1v1h-1zM2 9h2v1H2zM12 9h2v1h-2zM4 10h3v1H4zM9 10h3v1H9z"/><path fill="#3f9b3a" d="M4 1h8v1H4zM2 2h12v1H2zM1 3h14v5H1zM2 8h12v1H2zM4 9h8v1H4z"/><path fill="#62c24f" d="M4 2h3v1H4zM2 3h3v2H2zM9 3h2v1H9zM6 5h2v1H6z"/><path fill="#2c7a2e" d="M11 6h3v2h-3zM6 8h4v1H6zM3 7h2v1H3z"/><path fill="#7a4c2b" d="M7 10h2v5H7zM6 14h4v1H6z"/><path fill="#5a361d" d="M8 10h1v4H8z"/></svg></span><strong>Challenge</strong><small>Collect &amp; build</small></button>
+            <button type="button" class="mode-card" data-mode="hardcore" role="radio" aria-checked="false"><span class="icon" aria-hidden="true"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#3b2412" d="M1 13h3v3H1zM2 12h3v3H2zM3 11h3v3H3zM4 10h3v3H4zM5 9h3v3H5zM6 8h3v3H6zM7 7h3v3H7zM8 6h3v3H8z"/><path fill="#a8713f" d="M2 13h1v2H2zM3 12h1v2H3zM4 11h1v2H4zM5 10h1v2H5zM6 9h1v2H6zM7 8h1v2H7zM8 7h1v2H8zM9 6h1v2H9z"/><path fill="#1d5f66" d="M4 0h8v1H4zM3 1h1v1H3zM12 1h1v1h-1zM2 2h1v2H2zM13 2h1v2h-1zM1 4h1v4H1zM14 4h1v4h-1zM2 4h3v1H2zM11 4h3v1h-3zM3 5h2v1H3zM11 5h2v1h-2z"/><path fill="#6fd3da" d="M4 1h8v3H4zM3 2h1v2H3zM12 2h1v2h-1zM2 5h1v3H2zM13 5h1v3h-1zM5 4h1v1H5zM10 4h1v1h-1z"/><path fill="#c6f3f5" d="M5 1h4v1H5zM3 2h1v1H3z"/></svg></span><strong>Hardcore</strong><small>Craft &amp; unlock</small></button>
           </div>
           <label class="hero-mode">Game mode <select id="mode"><option value="creative">Creative · build anything</option><option value="survival">Embrace the Challenge</option><option value="hardcore">Embrace the Challenge: Hardcore</option></select></label>
           <button class="btn" id="enter" type="button">▶ PLAY</button>
@@ -2367,10 +2367,7 @@ function faceForPerson(style){
       ctx.fillStyle='#eab887';ctx.fillRect(0,0,64,64);
       // One clean, straight hairline across the whole face: no side pieces hanging lower.
       ctx.fillStyle='#a68050';ctx.fillRect(0,0,64,8);
-      // Sandy-brown mustache and connected chin goatee framing his smile.
-      ctx.fillStyle='#9e714b';ctx.fillRect(17,45,30,4);ctx.fillRect(16,48,4,10);ctx.fillRect(44,48,4,10);
-      ctx.fillStyle='#966a47';ctx.fillRect(18,55,28,8);
-      ctx.fillStyle='#b5865e';ctx.fillRect(21,46,22,2);ctx.fillRect(22,56,20,5);ctx.fillRect(29,54,6,3);
+      // Kenny, Oct 29: no beard at all, so the chin and upper lip are plain skin.
       // The same flat face as the other teachers (brows, eyes, nose and smile all in the
       // same places), with Mr. Macek's own blue eyes. Nothing sticks out of the face.
       teacherFeatures(ctx,{brow:'#9a744c',iris:'#5181a3'});
@@ -2466,11 +2463,7 @@ function staffLook(style){
     ctx.fillStyle=isMacek?'#5181a3':isArt?'#4e7d44':style==='mcmichael'?'#4f6e82':'#453f37';ctx.fillRect(15,29,7,8);ctx.fillRect(42,29,7,8);
     ctx.fillStyle='#292d30';ctx.fillRect(17,30,3,6);ctx.fillRect(44,30,3,6);
     ctx.fillStyle='#cb9876';ctx.fillRect(28,37,8,7);
-    if(isMacek){
-      ctx.fillStyle='#9e714b';ctx.fillRect(17,45,30,4);ctx.fillRect(16,48,4,10);ctx.fillRect(44,48,4,10);
-      ctx.fillStyle='#966a47';ctx.fillRect(18,55,28,8);
-      ctx.fillStyle='#b5865e';ctx.fillRect(21,46,22,2);ctx.fillRect(22,56,20,5);ctx.fillRect(29,54,6,3);
-    }
+    // Mr. Macek has no beard (Kenny, Oct 29), so his chin stays plain skin here too.
     if(isMusic){
       ctx.fillStyle='#3a2e25';ctx.fillRect(7,43,50,18);ctx.fillRect(4,37,7,15);ctx.fillRect(53,37,7,15);
       ctx.fillStyle='#4b3c31';ctx.fillRect(15,44,34,4);ctx.fillRect(20,56,24,4);
@@ -2560,7 +2553,6 @@ function styleStaffPerson(npc,style){
     part(hair,'short back',.52,.25,.035,look.hair,0,1.807,-.25);
     // Sides end level with the front edge, so the hairline is one straight line all round.
     for(const side of [-1,1])part(hair,'short side',.025,.065,.46,look.hair,side*.265,1.90,0);
-    part(npc.group,'goatee chin',.25,.06,.03,0x966a47,0,1.405,.235);
   }else if(isPE){
     // A full short cut with a clean, straight front edge (no receding pieces).
     part(hair,'full short crown',.56,.06,.49,look.hair,0,1.94,0);
@@ -2966,7 +2958,6 @@ function stylePerson(npc,style){
     part(.55,.26,.03,0xa7804e,0,1.78,-.255);
     // The sides stop at the same height as the front edge: one straight hairline all round.
     for(const side of [-1,1])part(.025,.06,.49,0xa7804e,side*.277,1.88,0);
-    part(.26,.06,.03,0x966a47,0,1.385,.245);
     // Solid black trousers to match the black SV shirt. Drawn like the shirts
     // (sRGB colour), so they render truly black instead of washed-out gray.
     macekBlackPants??=outfitTexture(ctx=>{ctx.fillStyle='#16181d';ctx.fillRect(0,0,64,64);ctx.fillStyle='#1e2127';ctx.fillRect(0,0,64,4);ctx.fillRect(30,4,4,60);});
@@ -3442,6 +3433,19 @@ for(const [name,side] of [['armL',-1],['armR',1]]){
   limb.add(wrist);limb.userData.wrist=wrist;
   viewModel.add(limb);viewArms[name]=limb;
 }
+// The arms frame the view from the lower corners instead of covering the middle of the
+// screen, the block bar, or the ground the player is building on. Their place follows the
+// screen shape, so a wide laptop and a narrow phone both see the hands at the edges.
+function layoutViewArms(){
+  const halfH=.72*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),halfW=halfH*camera.aspect;
+  // Portrait screens are narrow, so the arms hug the edges more closely there.
+  const x=Math.min(.6,Math.max(.2,halfW*(camera.aspect<1?.8:.6))),y=-Math.min(.6,halfH*.98);
+  for(const [name,side] of [['armL',-1],['armR',1]]){viewArms[name].position.set(side*x,y,-.72);viewArms[name].rotation.z=side*.16;}
+}
+layoutViewArms();
+// A short swing of the right arm when a block is placed or broken, like a real hand at work.
+let armSwing=0;
+function swingArm(){armSwing=1;}
 camera.add(viewModel);scene.add(camera);
 const identityStatus=document.getElementById('identityStatus');
 const staffInputs={},staffCanvases={},staffCards={};
@@ -4218,7 +4222,7 @@ function doBreak() {
   setBlock(hit.x, hit.y, hit.z, null);
   recordEdit(hit.x, hit.y, hit.z, null);
   spawnParticles(hit.x, hit.y, hit.z, brokenKey);
-  sndBreak();quest?.signal('broke');
+  sndBreak();swingArm();quest?.signal('broke');
   updateBlockMeshes(hit.x,hit.y,hit.z);
   if(gameMode==='hardcore'){advanceHardcore();refreshHotbar();}
 }
@@ -4239,7 +4243,7 @@ function doPlace() {
     for(const c of cells){setBlock(c.x,c.y,c.z,c.block);recordEdit(c.x,c.y,c.z,c.block);}
     for(const c of cells)updateBlockMeshes(c.x,c.y,c.z);
     if(chosenGarden==='pond'&&globalThis.MYNE_HARDCORE?.inspectHabitat(getBlock,saveState.edits).valid){fishUnlocked=true;persistSave();}
-    sndPlace();document.getElementById('status').textContent=chosenGarden==='pond'?'Pond built! Choose Fish in Inventory. They grow in water; use a fishing rod when they are grown.':chosenGarden==='library'?'Library built! Walk inside, face a bookshelf and use Interact to read a story.':'Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
+    sndPlace();swingArm();document.getElementById('status').textContent=chosenGarden==='pond'?'Pond built! Choose Fish in Inventory. They grow in water; use a fishing rod when they are grown.':chosenGarden==='library'?'Library built! Walk inside, face a bookshelf and use Interact to read a story.':'Planted '+GARDEN_KITS[chosenGarden]+'. Each part can be changed with BREAK.';return;
   }
   if(chosenAnimal){
     const water=chosenAnimal==='fish';
@@ -4269,7 +4273,7 @@ function doPlace() {
   if(gameMode==='hardcore'){inventory[block]--;hardcore=globalThis.MYNE_HARDCORE.recordPlace(hardcore,block);}
   setBlock(nx, ny, nz, BLOCK_KEYS[selected]);
   recordEdit(nx, ny, nz, BLOCK_KEYS[selected]);
-  sndPlace();quest?.signal('placed');
+  sndPlace();swingArm();quest?.signal('placed');
   updateBlockMeshes(nx,ny,nz);
   if(gameMode==='hardcore'){advanceHardcore();refreshHotbar();}
   else if(!fishUnlocked&&globalThis.MYNE_HARDCORE?.inspectHabitat(getBlock,saveState.edits).valid){
@@ -4292,7 +4296,22 @@ addEventListener('mousedown', e => {
   if (e.target !== renderer.domElement) return;
   if (e.button === 0) doBreak();
   else if (e.button === 2) doPlace();
+  // Holding the button keeps building or digging, like Minecraft. Only while the mouse is
+  // locked to the game: unlocked, a left drag turns the camera and must not dig.
+  if((e.button===0||e.button===2)&&document.pointerLockElement===renderer.domElement)heldMouse={button:e.button,wait:HOLD_FIRST};
 });
+// Hold-to-repeat timing: a short pause after the first block, then a steady pace.
+const HOLD_FIRST=.32,HOLD_EVERY=.22;
+let heldMouse=null;
+addEventListener('mouseup',e=>{if(heldMouse&&e.button===heldMouse.button)heldMouse=null;});
+function updateHeldMouse(dt){
+  if(!heldMouse)return;
+  if(!started||document.pointerLockElement!==renderer.domElement){heldMouse=null;return;}
+  heldMouse.wait-=dt;
+  if(heldMouse.wait>0)return;
+  heldMouse.wait=HOLD_EVERY;
+  if(heldMouse.button===0)doBreak();else doPlace();
+}
 addEventListener('contextmenu', e => e.preventDefault());
 
 // ---------- collision (simple AABB vs voxel) ----------
@@ -4361,7 +4380,9 @@ function updatePlayerAvatar(dt){
   playerAvatar.group.position.set(player.pos.x,player.pos.y-player.height,player.pos.z);
   // The block models face +Z, and the player walks toward -Z at yaw 0.
   playerAvatar.group.rotation.y=player.yaw+Math.PI;
-  viewArms.armL.rotation.x=-.55+swing*.15;viewArms.armR.rotation.x=-.55-swing*.15;
+  armSwing=Math.max(0,armSwing-dt*5);
+  const chop=Math.sin(armSwing*Math.PI)*.75;
+  viewArms.armL.rotation.x=-.55+swing*.15;viewArms.armR.rotation.x=-.55-swing*.15-chop;
   if(view!=='third')return;
   // Pull the camera back behind the player, stopping short of whatever is behind them
   // so the view never ends up inside a wall.
@@ -4690,6 +4711,7 @@ function tick(now) {
   // eye at top of bounding box
   camera.position.y = player.pos.y + 0.0;
   updatePlayerAvatar(dt);
+  updateHeldMouse(dt);
   updateChallenge();
 
   renderer.render(scene, camera);
@@ -4702,6 +4724,7 @@ function fitRenderer(){
   const vv=window.visualViewport;
   const w=vv?.width||innerWidth, h=Math.max(1,vv?.height||innerHeight);
   camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);
+  layoutViewArms();
 }
 addEventListener('resize', fitRenderer);
 if(window.visualViewport) window.visualViewport.addEventListener('resize', fitRenderer);
@@ -4850,7 +4873,13 @@ const gardenChoices=Object.entries(GARDEN_KITS).map(([kind,name])=>{
   gardenGrid.appendChild(button);return button;
 });
 gardenPanel.append(gardenTitle,gardenHelp,gardenGrid);
-inventoryDialog.append(inventoryTitle,inventoryHelp,craftingPanel,gardenPanel,inventoryGrid,animalPanel,cozyPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
+// Blocks come first, so a player who just wants to build sees them at once; kits follow.
+// A close button stays at the top of the sheet, so it is reachable without scrolling.
+const inventoryHead=document.createElement('div');inventoryHead.className='inventory-head';
+const inventoryClose=document.createElement('button');inventoryClose.type='button';inventoryClose.className='inventory-close';inventoryClose.textContent='✕';inventoryClose.setAttribute('aria-label','Back to game');
+inventoryClose.addEventListener('click',event=>closeInventory(true,event));
+inventoryHead.append(inventoryTitle,inventoryClose);
+inventoryDialog.append(inventoryHead,inventoryHelp,craftingPanel,inventoryGrid,gardenPanel,animalPanel,cozyPanel,inventoryHint,inventoryBack);inventoryOverlay.appendChild(inventoryDialog);document.body.appendChild(inventoryOverlay);
 function inventoryBackground(disabled){
   for(const element of [hotbar,ctrlPanel,renderer.domElement,document.getElementById('touchUI')])element.inert=disabled;
 }
@@ -4985,7 +5014,7 @@ function flashSaved(){
 const flyTag = document.createElement('div');
 flyTag.setAttribute('role','status');
 flyTag.style.cssText = `
-  position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
   background: #102a1c; color: #8fffa8; border: 2px solid #000;
   border-radius: 6px; padding: 8px 16px; font: 700 13px ui-monospace, monospace;
   box-shadow: 3px 3px 0 #0006; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 6;
