@@ -1,0 +1,361 @@
+/* October 30 interface. This is the shared presentation layer for the title,
+   pause menu, inventory and HUD. Game state and controls remain in their owners. */
+body.campus-ui {
+  --ui-panel: #24262b; --ui-raised: #32353b; --ui-line: #626874;
+  --ui-paper: #eeeae0; --ui-ink: #f8f5ec; --ui-muted: #c8cbd2;
+  --ui-accent: #b7d9e9; --ui-sun: #f5d373;
+  --navy: #1c1f24; --navy2: #2c3037; --navy3: #393e47;
+  --muted: #c8cbd2; --game-panel: #24262bf5; --game-line: #626874;
+  background-color: #1c1f24; color: var(--ui-ink);
+}
+.campus-ui :focus-visible { outline: 3px solid var(--ui-accent); outline-offset: 4px; }
+
+/* The school scene supplies the world; charcoal frames the controls. */
+.campus-ui .site-nav { position: absolute; background: #1c1f24f0; border-bottom: 1px solid #ffffff20; box-shadow: none; }
+.campus-ui .nav-inner { max-width: 1220px; min-height: 52px; }
+.campus-ui .nav-brand small { color: #dddccf; background: #ffffff0a; border-color: #ffffff28; }
+.campus-ui .nav-links a { color: #e5e5dc; font-family: "Segoe UI",sans-serif; font-weight: 600; }
+.campus-ui .nav-picked { background: transparent; border-color: #ffffff30; color: #e2e4dc; }
+.campus-ui .nav-picked strong { color: #e8e7d6; }
+.campus-ui .nav-picked { display: none; }
+.campus-ui .motion-toggle,html body.campus-ui #start .motion-toggle { flex: 0 0 auto; height: auto; width: auto; align-self: center; }
+.campus-ui .motion-toggle,html body.campus-ui #start .motion-toggle { min-height: 36px; padding: 7px 11px; border: 1px solid #a2ac9760; border-radius: 5px; background: #24262bd9; color: #e8efdf; font: 600 12px/1.2 "Segoe UI",sans-serif; cursor: pointer; box-shadow: none; }
+.campus-ui .nav-cta { background: var(--ui-paper); color: #1c1f24; border: 1px solid #fff; border-radius: 6px; box-shadow: 0 3px 0 #0006; font: 800 13px/1 "Segoe UI",sans-serif; min-height: 36px; }
+.campus-ui .title-screen { min-height: 100dvh; }
+.campus-ui .title-shade { background: linear-gradient(180deg,#161c1b24 0%,#1b211b0d 35%,#1b211b52 76%,#1c1f24 100%); }
+.campus-ui .scene { animation: none; }
+.campus-ui .title-body { max-width: 1220px; padding: 76px 28px 32px; display: grid; grid-template-columns: .85fr 1.6fr; align-content: start; align-items: center; gap: 24px 32px; }
+.campus-ui .brand { margin: 0; gap: 4px; }
+.campus-ui .block-title { font-size: clamp(34px,4vw,52px); }
+.campus-ui .block-title .face { background-image: linear-gradient(#fffdf5,#e6e3d7 45%,#b6b8aa); }
+.campus-ui .edition { font: 700 12px/1.5 "Segoe UI",sans-serif; letter-spacing: .4em; }
+.campus-ui .tagline { position: static; color: #fff2b9; font: 600 17px/1.5 Fredoka,system-ui,sans-serif; transform: none; animation: none; text-shadow: 0 2px 6px #000; }
+.campus-ui .figs-layer, .campus-ui .crew-row { display: none; }
+.campus-ui .panel { width: 100%; max-width: none; display: grid; grid-template-columns: minmax(275px,.85fr) minmax(0,1.6fr); grid-template-rows: auto auto auto auto 1fr; gap: 12px 32px; padding: 26px; border: 1px solid #f5f0db55; border-radius: 12px; background: #24262bf2; box-shadow: 0 24px 64px #10180f60; backdrop-filter: blur(12px); text-align: left; }
+.campus-ui .panel > h2 { grid-column: 1; grid-row: 1; margin: 0 0 4px; color: var(--ui-ink); font: 650 23px/1.2 Fredoka,system-ui,sans-serif; text-align: left; }
+.campus-ui .modes { grid-column: 1; grid-row: 2; gap: 8px; }
+.campus-ui .mode { min-height: 70px; padding: 10px 12px; grid-template-columns: 42px 1fr 24px; border: 1px solid #656e7b; border-radius: 7px; background: #333740; color: #f7f6ec; box-shadow: 0 3px 0 #141a1360; gap: 10px; }
+.campus-ui .mode .icon { width: 38px; height: 38px; background: #ffffff0b; border-radius: 5px; }
+.campus-ui .mode .icon svg { width: 30px; height: 30px; }
+.campus-ui .mode b { font-size: 19px; }
+.campus-ui .mode small { font: 500 13px/1.35 "Segoe UI",sans-serif; color: #bec8d7; }
+.campus-ui .mode .go { width: 24px; height: 24px; color: #b9c5ae; }
+.campus-ui .mode:has(input:checked) { background: #eeeae0; color: #20271e; border-color: #fffbee; }
+.campus-ui .mode:has(input:checked) .icon { background: #d8dace; }
+.campus-ui .mode:has(input:checked) small { color: #485567; }
+.campus-ui .mode:has(input:checked) .go { color: #fff; background: #40533a; }
+.campus-ui .mode:hover:not(:has(input:checked)) { background: #414955; border-color: #d8e3cd; }
+.campus-ui .mode-help { grid-column: 1; grid-row: 3; margin: 0; height: 3em; font: 500 14px/1.5 "Segoe UI",sans-serif; color: #c9d0dc; }
+.campus-ui .title-staff { grid-column: 2; grid-row: 1 / 6; min-width: 0; border: 0; padding: 0; margin: 0; }
+.campus-ui .title-staff legend { padding: 0; margin: 0 0 16px; font: 650 23px/1.2 Fredoka,system-ui,sans-serif; color: var(--ui-ink); }
+.campus-ui .title-staff { background: none; box-shadow: none; }
+.campus-ui .title-body > .brand { grid-column: 1; grid-row: 1; }
+.campus-ui .title-body > .panel { grid-column: 1 / -1; grid-row: 2; }
+.campus-ui .title-body > .quest-link { grid-column: 2; grid-row: 1; width: calc(100% - 12px); margin: 4px auto; }
+.campus-ui .ts-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.campus-ui .ts-card { position: relative; min-width: 0; min-height: 184px; padding: 9px 8px 12px; gap: 6px; background: #dddcd0; border: 2px solid #dddcd0; border-radius: 8px; box-shadow: 0 3px 0 #0005; color: #252d22; transition: transform .2s,box-shadow .2s,border-color .2s; }
+.campus-ui .ts-pic { width: 100%; height: 128px; margin: 0; border: 0; border-radius: 4px; background: radial-gradient(ellipse at 50% 70%,#b2bea5 0%,#d4d9c8 50%,#e8e6da 100%); }
+.campus-ui .ts-img { width: 100%; height: 100%; max-height: none; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 5px 4px #3c4c3030); transition: transform .25s; }
+.campus-ui .ts-name { color: #252d22; font: 700 15px/1.25 Fredoka,system-ui,sans-serif; white-space: normal; overflow: visible; text-overflow: clip; }
+.campus-ui .ts-role { background: transparent; color: #4e5b45; border: 0; padding: 0; font: 650 11px/1.2 "Segoe UI",sans-serif; letter-spacing: .05em; text-transform: uppercase; }
+.campus-ui .ts-card:has(input:checked) { border-color: var(--ui-accent); background: #f5f1e7; box-shadow: 0 0 0 2px #243029,0 0 0 4px var(--ui-accent); transform: none; }
+.campus-ui .ts-card:has(input:checked)::after { content: "✓"; position: absolute; right: 8px; top: 8px; display: grid; place-items: center; width: 25px; height: 25px; background: #2d4c37; color: #fff; border-radius: 50%; font: 700 16px system-ui; }
+.campus-ui .ts-card:has(input:checked) .ts-pic { background: radial-gradient(ellipse at 50% 70%,#b8c4a9,#ececdf); border: 0; }
+.campus-ui .ts-card:has(input:checked) .ts-name { color: #20271e; }
+.campus-ui .ts-card:has(input:checked) .ts-role { color: #475a3d; background: none; }
+.campus-ui .ts-card:hover { transform: translateY(-4px); border-color: #fff; }
+.campus-ui .ts-card:hover .ts-img { transform: translateY(-4px) scale(1.06); }
+.campus-ui .ts-picked { margin-top: 14px; font: 500 13px/1.45 "Segoe UI",sans-serif; color: #d5d9cd; }
+.campus-ui .ts-picked strong { color: #fff3c5; }
+.campus-ui .cta-row { grid-column: 1; grid-row: 4; grid-template-columns: 1fr; margin: 0; gap: 8px; }
+.campus-ui .play { min-height: 62px; border: 1px solid #fffcef; border-radius: 6px; background: #f4e7b5; color: #26321e; box-shadow: 0 4px 0 #898263,0 8px 24px #0003; font: 400 28px/1 Bungee,Impact,sans-serif; }
+.campus-ui .play:hover { background: #fff2c7; color: #26321e; box-shadow: 0 6px 0 #898263,0 12px 28px #0004; }
+.campus-ui .howto-btn { min-height: 44px; border: 1px solid #5d6877; border-radius: 6px; background: #333740; color: #e9eef7; font: 600 16px/1.2 Fredoka,system-ui,sans-serif; box-shadow: none; }
+.campus-ui .howto-btn:hover { background: #414955; border-color: #c4cdb8; }
+.campus-ui .howto-btn .q { width: 23px; height: 23px; font-size: 15px; color: #333740; background: #d0dfef; }
+.campus-ui .save { grid-column: 1; grid-row: 5; margin: 6px 0 0; color: #bdc5d2; font: 500 12px/1.5 "Segoe UI",sans-serif; }
+
+/* An emphatic invitation, not a tiny helper link. Slow pulse, never a flash. */
+.campus-ui .quest-link, html body.campus-ui #start .first-player-banner {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 18px;
+  width: min(850px,calc(100% - 14px)); min-height: 86px; margin: 3px auto 12px;
+  padding: 16px 26px; border: 2px solid #fff3bd; border-radius: 10px;
+  background: linear-gradient(110deg,#edc058,#ffe8a0 50%,#edc058); color: #302714;
+  text-align: left; text-decoration: none; cursor: pointer;
+  box-shadow: 0 5px 0 #8d6d29,0 0 0 4px #ffe39b3d,0 10px 35px #f7c65c50;
+  animation: welcome-beacon 2.6s ease-in-out infinite;
+}
+.campus-ui .quest-link::before, html body.campus-ui #start .first-player-banner::before { content: "START HERE"; border: 1px solid #7a5b1a60; border-radius: 4px; padding: 7px 9px; font: 800 11px/1.25 "Segoe UI",sans-serif; letter-spacing: .1em; }
+.campus-ui .quest-link::after, html body.campus-ui #start .first-player-banner::after { content: "→"; margin-left: auto; font: 400 36px/1 system-ui; }
+.campus-ui .quest-link b, html body.campus-ui #start .first-player-banner strong { display: block; color: #302714; font: 700 26px/1.15 Fredoka,system-ui,sans-serif; }
+.campus-ui .quest-link .quest-sub, html body.campus-ui #start .first-player-banner small { display: block; margin-top: 4px; color: #55451f; font: 500 15px/1.3 "Segoe UI",sans-serif; }
+.campus-ui .quest-link .cap { width: 42px; height: 42px; }
+.campus-ui .quest-link:hover, .campus-ui .quest-link:focus-visible, html body.campus-ui #start .first-player-banner:hover, html body.campus-ui #start .first-player-banner:focus-visible { animation-play-state: paused; transform: translateY(-2px); }
+@keyframes welcome-beacon { 0%,100% { transform: scale(1); box-shadow: 0 5px 0 #8d6d29,0 0 0 3px #ffe39b50,0 10px 25px #f7c65c30; } 50% { transform: scale(1.025); box-shadow: 0 5px 0 #8d6d29,0 0 0 11px #ffe39b15,0 10px 52px #f7c65c88; } }
+.campus-ui .section { background: #1c1f24; border-color: #ffffff18; }
+.campus-ui .section:nth-of-type(even) { background: #292d26; }
+.campus-ui .section-head em { color: #dce8cf; }
+.campus-ui .special-card,.campus-ui .step,.campus-ui .thing,.campus-ui details.more { background: #333740; border: 1px solid #5d6877; border-radius: 10px; box-shadow: none; }
+.campus-ui .special-art { background: #dddcd0; border: 0; }
+.campus-ui .special-role,.campus-ui .special-cta { background: #ffffff08; color: #dce8cf; border-color: #ffffff30; }
+.campus-ui .special-card.active { border-color: var(--ui-accent); box-shadow: 0 0 0 2px var(--ui-accent); }
+.campus-ui .special-card.active .special-cta { color: #25331e; background: #dde5d2; border-color: #dde5d2; }
+
+/* The pause menu uses the same generous, two-column composition. */
+html body.campus-ui #start { padding: 24px 24px 36px; background: linear-gradient(#17201735,#18201899 45%,#1c1f24f5 85%),url('assets/ec-title-bg.jpg') center top / cover fixed; color: var(--ui-ink); }
+html body.campus-ui #start:has(#staffChoices) .start-shell { width: min(1120px,100%); display: grid; grid-template-columns: minmax(290px,.8fr) minmax(0,1.4fr); align-items: start; gap: 20px 24px; }
+html body.campus-ui #start .hero-brand { grid-column: 1 / -1; justify-self: center; width: fit-content; margin: 0 0 4px; padding: 0; gap: 4px; background: none; border: 0; box-shadow: none; }
+html body.campus-ui #start .hero-brand .block-title { font-size: clamp(38px,5.7vw,66px); }
+html body.campus-ui #start .hero-brand .block-title .face { background-image: linear-gradient(#fffdf5,#e6e3d7 45%,#b6b8aa); }
+html body.campus-ui #start .hero-brand .edition { font: 700 12px/1.5 "Segoe UI",sans-serif; letter-spacing: .4em; }
+html body.campus-ui #start .hero-brand p.hero-tagline { position: static; color: #fff2b9; font: 600 17px/1.5 Fredoka,system-ui,sans-serif; transform: none; animation: none; text-align: center; white-space: normal; text-shadow: 0 2px 6px #000; }
+html body.campus-ui #start .start-header { grid-column: 1; min-width: 0; }
+html body.campus-ui #start .hero-row { display: block; }
+html body.campus-ui #start .hero-play { display: flex; flex-direction: column; gap: 10px; padding: 22px; background: #24262bf5; border: 1px solid #d8dcc650; border-radius: 10px; box-shadow: 0 12px 32px #0004; }
+html body.campus-ui #start .start-header p.hero-step { text-align: left; font: 650 23px/1.2 Fredoka,system-ui,sans-serif; color: var(--ui-ink); margin-bottom: 6px; }
+html body.campus-ui #start .mode-cards { display: flex; flex-direction: column; gap: 8px; }
+html body.campus-ui #start .mode-card { min-height: 68px; padding: 10px 12px; grid-template-columns: 40px 1fr 24px; grid-template-areas: 'icon title go' 'icon sub go'; gap: 2px 10px; border: 1px solid #656e7b; border-radius: 6px; background: #333740; color: #f7f6ec; box-shadow: 0 3px 0 #141a1360; }
+html body.campus-ui #start .mode-card .icon { width: 38px; height: 38px; background: #ffffff0b; border-radius: 4px; }
+html body.campus-ui #start .mode-card .icon svg { width: 30px; height: 30px; }
+html body.campus-ui #start .mode-card strong { color: inherit; font-size: 19px; }
+html body.campus-ui #start .mode-card small { font: 500 13px/1.25 "Segoe UI",sans-serif; color: #bec8d7; }
+html body.campus-ui #start .mode-card::after { width: 24px; height: 24px; font-size: 18px; background: none; color: #b9c5ae; }
+html body.campus-ui #start .mode-card[aria-checked="true"] { background: #eeeae0; color: #20271e; border-color: #fffbee; }
+html body.campus-ui #start .mode-card[aria-checked="true"] .icon { background: #d8dace; }
+html body.campus-ui #start .mode-card[aria-checked="true"] small { color: #485567; }
+html body.campus-ui #start .mode-card[aria-checked="true"]::after { color: #fff; background: #40533a; }
+html body.campus-ui #start .mode-card:hover:not([aria-checked="true"]) { background: #414955; border-color: #d8e3cd; }
+html body.campus-ui #start .hero-play #enter { min-height: 62px; margin-top: 8px; border: 1px solid #fffcef; border-radius: 6px; background: #f4e7b5; color: #26321e; box-shadow: 0 4px 0 #898263; font: 400 27px/1 Bungee,Impact,sans-serif; }
+html body.campus-ui #start .hero-play #enter:hover { background: #fff2c7; box-shadow: 0 5px 0 #898263; }
+html body.campus-ui #start .howto-open { min-height: 44px; margin: 0; border: 1px solid #5d6877; border-radius: 6px; background: #333740; color: #e9eef7; box-shadow: none; font: 600 16px/1.2 Fredoka,system-ui,sans-serif; }
+html body.campus-ui #start .howto-open .q { background: #d0dfef; color: #333740; width: 24px; height: 24px; font-size: 15px; }
+html body.campus-ui #start .playing-as { flex-wrap: wrap; color: #d0e1f2; line-height: 1.5; }
+html body.campus-ui #start .link-button { color: #d9e9ef; background: none; border: 1px solid #96b6c4; min-height: 40px; border-radius: 5px; }
+html body.campus-ui #start .hero-play #modeHelp,html body.campus-ui #start .hero-play #startTip { display: block; font: 500 13px/1.45 "Segoe UI",sans-serif; color: #c1cbda; }
+html body.campus-ui #start .start-character-panel { grid-column: 2; padding: 12px 16px 10px; background: #24262bf5; border: 1px solid #d8dcc650; border-radius: 10px; box-shadow: 0 12px 32px #0004; }
+html body.campus-ui #start .start-character-panel > summary { padding: 7px 0 14px; min-height: 44px; color: var(--ui-ink); font: 650 23px/1.2 Fredoka,system-ui,sans-serif; }
+html body.campus-ui #start .start-character-panel > summary span { display: none; }
+html body.campus-ui #start .start-character-panel[open] > :not(summary) { margin: 0; }
+html body.campus-ui #start #staffChoices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+html body.campus-ui #start .staff-choice { min-width: 0; min-height: 191px; padding: 8px 5px 12px; gap: 5px; border: 2px solid #dddcd0; border-radius: 7px; background: #dddcd0; color: #252d22; box-shadow: 0 3px 0 #0005; transition: transform .2s,box-shadow .2s; }
+html body.campus-ui #start .staff-preview { height: 133px; width: auto; max-width: 100%; border: 0; border-radius: 4px; background: radial-gradient(ellipse at 50% 70%,#b2bea5,#e8e6da); transition: transform .25s; }
+html body.campus-ui #start canvas.staff-preview { display: none; }
+html body.campus-ui #start .staff-portrait { width: 100%; object-fit: contain; object-position: center bottom; }
+html body.campus-ui #start .staff-choice-name strong { color: #252d22; font: 700 15px/1.25 Fredoka,system-ui,sans-serif; white-space: normal; text-overflow: clip; overflow: visible; }
+html body.campus-ui #start .staff-role { color: #4e5b45; background: none; font: 650 11px/1.25 "Segoe UI",sans-serif; text-transform: uppercase; padding: 0; }
+html body.campus-ui #start .staff-choice:has(input:checked) { border-color: var(--ui-accent); background: #f5f1e7; box-shadow: 0 0 0 2px #243029,0 0 0 4px var(--ui-accent); transform: none; }
+html body.campus-ui #start .staff-choice:has(input:checked) .staff-preview { border: 0; background: radial-gradient(ellipse at 50% 70%,#b8c4a9,#ececdf); }
+html body.campus-ui #start .staff-choice:has(input:checked) .staff-choice-name strong { color: #20271e; }
+html body.campus-ui #start .staff-choice:has(input:checked) .staff-role { color: #475a3d; background: none; }
+html body.campus-ui #start .staff-choice:hover { background: #ececde; border-color: white; transform: translateY(-3px); }
+html body.campus-ui #start .staff-choice:hover .staff-preview { transform: scale(1.05); }
+html body.campus-ui #start:has(#staffChoices) #identityStatus { margin: 12px 0 2px; font: 500 12px/1.5 "Segoe UI",sans-serif; color: #c7d1e0; }
+html body.campus-ui #start .first-player-banner { grid-column: 1 / -1; }
+html body.campus-ui #start .hero-brand { grid-column: 1; grid-row: 1; }
+html body.campus-ui #start .hero-brand .block-title { font-size: clamp(32px,4vw,48px); }
+html body.campus-ui #start .first-player-banner { grid-column: 2; grid-row: 1; width: calc(100% - 12px); }
+html body.campus-ui #start .start-header,html body.campus-ui #start .start-character-panel { grid-row: 2; }
+html body.campus-ui #start .quick-steps,html body.campus-ui #start .try-panel,html body.campus-ui #start .start-more { grid-column: 1 / -1; }
+html body.campus-ui #start .quick-step,html body.campus-ui #start .menu-fold:not(.start-character-panel),html body.campus-ui #start .start-more > details,html body.campus-ui #start .start-more > details.how-to-play { background: #24262bf5; border: 1px solid #5d6877; border-radius: 8px; box-shadow: none; }
+html body.campus-ui #start .quick-step { padding: 14px 8px; color: #e2e8f2; font: 500 13px/1.4 "Segoe UI",sans-serif; }
+html body.campus-ui #start .quick-step strong { color: #e6ebd7; font: 650 16px/1.3 Fredoka,system-ui,sans-serif; }
+html body.campus-ui #start .quick-step .quick-icon { font-size: 25px; }
+html body.campus-ui #start .menu-fold > summary,html body.campus-ui #start .start-more > details > summary,html body.campus-ui #start .start-more > details.how-to-play > summary { background: none; color: var(--ui-ink); border-radius: 8px; min-height: 52px; }
+html body.campus-ui #start .menu-fold > summary span { color: #aebed2; }
+html body.campus-ui #start .try-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
+html body.campus-ui #start .try-choice { background: #333740; border: 1px solid #65758c; border-radius: 7px; min-height: 116px; color: #f4f5ed; }
+html body.campus-ui #start .try-choice small { color: #c1cfe0; }
+html body.campus-ui #start .try-choice:hover { background: #414955; border-color: #d7ecff; }
+html body.campus-ui #start select,html body.campus-ui #start .start-actions button,html body.campus-ui #start .start-backup button { background: #333740; border-color: #65758c; color: #f4f5ed; border-radius: 5px; }
+html body.campus-ui.has-played #start .mode-cards,html body.campus-ui.has-played #start .hero-step { display: none; }
+
+/* Inventory and play tools are readable without covering the world in panels. */
+html body.campus-ui #controls { background: #24262bf2; border: 1px solid #d8dcc650; border-radius: 8px; padding: 6px; gap: 6px; box-shadow: 0 5px 16px #0004; }
+html body.campus-ui #controls button { background: #343943; border: 1px solid #67758a; border-radius: 5px; color: #f4f5ed; min-height: 44px; box-shadow: none; font-family: "Segoe UI",sans-serif; font-size: 14px; }
+html body.campus-ui #controls #menuToggle,html body.campus-ui #controls #helpToggle { background: #343943; border: 1px solid #67758a; color: #f4f5ed; }
+html body.campus-ui #info,html body.campus-ui #status { background: #24262beb; border-color: #6f7d62; color: #f0f4e8; }
+html body.campus-ui #controls #inventoryToggle { background: #eeeae0; color: #26321e; border: 1px solid #fff; }
+html body.campus-ui #controls #saveGame { background: #344e37; border-color: #96b48c; color: #edf6e7; }
+html body.campus-ui #controls #flyToggle,html body.campus-ui #controls #questToggle { background: #343943; border-color: #67758a; color: #f4f5ed; }
+html body.campus-ui #controls #flyToggle[aria-pressed="true"] { background: #d5dfc9; color: #203219; box-shadow: none; }
+html body.campus-ui #controls #gameClock { background: #ffffff0a; border-color: #ffffff30; color: #eee8d1; }
+html body.campus-ui #hotbar { background: #24262bee; border: 1px solid #d8dcc650; border-radius: 8px; padding: 6px; box-shadow: 0 4px 15px #0004; max-width: calc(100vw - 24px); box-sizing: border-box; }
+html body.campus-ui #hotbar button { background: #505548; border: 1px solid #9ca58d; border-radius: 4px; }
+html body.campus-ui #coordinates { background: #24262be8; border-color: #7c8770; color: #ecefe4; border-radius: 5px; }
+html body.campus-ui #inventoryOverlay { background: #141b13c9; }
+html body.campus-ui .inventory-sheet { background: #24282f; border: 1px solid #98a28a; border-radius: 10px; color: #f6f8f0; }
+html body.campus-ui .inventory-head { background: #24282f; border-color: #56647a; border-radius: 9px 9px 0 0; }
+html body.campus-ui .inventory-sheet h2 { color: #eaf3ff; }
+html body.campus-ui .inventory-sheet p { color: #c3d0e2; }
+html body.campus-ui .inventory-choice,html body.campus-ui .craft-choice { background: #333b49; border-color: #56647a; border-radius: 6px; color: #edf3e5; }
+html body.campus-ui .inventory-choice:hover { background: #465268; border-color: #d2dfbf; }
+html body.campus-ui .inventory-choice[aria-pressed="true"] { background: #e6e9dc; color: #172735; border-color: #c2d9b2; box-shadow: 0 0 0 2px #92af7a; }
+html body.campus-ui .inventory-choice strong { font-size: 13px; }
+html body.campus-ui .inventory-count { color: inherit; opacity: .85; }
+html body.campus-ui .inventory-close,html body.campus-ui .inventory-back { background: #eee8cd; border: 1px solid #fff9e3; border-radius: 5px; color: #2c3420; }
+.campus-ui .quest-card { background: #242b36; border-color: #c5df9f; border-radius: 10px; }
+.campus-ui .quest-skip { background: #344153; border-color: #97a883; }
+
+@media (max-width: 950px) {
+  .campus-ui .title-body { padding: 76px 20px 32px; }
+  .campus-ui .panel { grid-template-columns: minmax(240px,.8fr) minmax(0,1.2fr); gap: 12px 22px; padding: 20px; }
+  .campus-ui .ts-grid { gap: 9px; }
+  .campus-ui .ts-card { min-height: 178px; padding: 7px 4px 10px; }
+  .campus-ui .ts-name { font-size: 14px; }
+  html body.campus-ui #start:has(#staffChoices) .start-shell { grid-template-columns: minmax(255px,.8fr) minmax(0,1.3fr); gap: 16px; }
+  html body.campus-ui #start .hero-play { padding: 16px; }
+  html body.campus-ui #start .staff-choice-name strong { font-size: 14px; }
+  html body.campus-ui #start .staff-preview { height: 125px; }
+}
+@media (max-width: 720px) {
+  .campus-ui .nav-links,.campus-ui .nav-picked { display: none; }
+  .campus-ui .title-body { display: flex; flex-direction: column; padding: 76px 16px 30px; gap: 20px; }
+  .campus-ui .title-body > .brand { order: 0; }
+  .campus-ui .title-body > .quest-link { order: 1; }
+  .campus-ui .title-body > .panel { order: 2; }
+  .campus-ui .panel { display: flex; flex-direction: column; gap: 16px; padding: 18px; }
+  .campus-ui .panel > h2 { font-size: 22px; }
+  .campus-ui .modes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+  .campus-ui .mode { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 112px; padding: 10px 3px; text-align: center; }
+  .campus-ui .mode b { font-size: 16px; }
+  .campus-ui .mode small { font-size: 11px; }
+  .campus-ui .mode .go { display: none; }
+  .campus-ui .mode-help { height: 3em; }
+  .campus-ui .title-staff legend { margin-bottom: 14px; font-size: 22px; }
+  .campus-ui .ts-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+  .campus-ui .ts-card { min-height: 174px; }
+  .campus-ui .ts-pic { height: 116px; }
+  .campus-ui .cta-row { grid-template-columns: 1.3fr 1fr; width: 100%; }
+  .campus-ui .play { font-size: 25px; }
+  .campus-ui .quest-link,html body.campus-ui #start .first-player-banner { width: calc(100% - 12px); gap: 10px; padding: 15px; min-height: 94px; }
+  .campus-ui .quest-link::before,html body.campus-ui #start .first-player-banner::before { display: none; }
+  .campus-ui .quest-link b,html body.campus-ui #start .first-player-banner strong { font-size: 23px; }
+  .campus-ui .quest-link .quest-sub,html body.campus-ui #start .first-player-banner small { font-size: 13px; }
+  .campus-ui .quest-link .cap { display: none; }
+  html body.campus-ui #start { padding: 18px 14px 28px; }
+  html body.campus-ui #start:has(#staffChoices) .start-shell { display: flex; flex-direction: column; gap: 18px; }
+  html body.campus-ui #start .start-header,html body.campus-ui #start .start-character-panel,html body.campus-ui #start .quick-steps,html body.campus-ui #start .start-more,html body.campus-ui #start .try-panel { width: 100%; }
+  html body.campus-ui #start .hero-brand { align-self: center; }
+  html body.campus-ui #start .hero-brand { order: -3; }
+  html body.campus-ui #start .first-player-banner { order: -2; }
+  html body.campus-ui #start .hero-brand .block-title { font-size: clamp(30px,7vw,50px); }
+  html body.campus-ui #start .mode-cards { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+  html body.campus-ui #start .mode-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 3px; text-align: center; }
+  html body.campus-ui #start .mode-card strong { font-size: 15px; }
+  html body.campus-ui #start .mode-card small { font-size: 11px; }
+  html body.campus-ui #start .mode-card::after { display: none; }
+  html body.campus-ui #start #staffChoices { gap: 10px; }
+  html body.campus-ui #start .staff-choice { min-height: 172px; }
+  html body.campus-ui #start .staff-preview { height: 113px; }
+  html body.campus-ui #start .try-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  html body.campus-ui #controls #flyToggle,html body.campus-ui #controls #questToggle { font-size: 0; }
+  html body.campus-ui #controls #saveStateIndicator { margin: 0; }
+}
+@media (max-width: 420px) {
+  .campus-ui .title-body { padding-inline: 12px; }
+  .campus-ui .panel { padding: 14px; }
+  .campus-ui .ts-grid,html body.campus-ui #start #staffChoices { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .campus-ui .ts-pic { height: 136px; }
+  html body.campus-ui #start .staff-preview { height: 140px; }
+  .campus-ui .ts-name,html body.campus-ui #start .staff-choice-name strong { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campus-ui *, .campus-ui *::before, .campus-ui *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .campus-ui .ts-card:hover,.campus-ui .ts-card:hover .ts-img,html body.campus-ui #start .staff-choice:hover,html body.campus-ui #start .staff-choice:hover .staff-preview { transform: none; }
+}
+.campus-ui[data-motion="off"] *, .campus-ui[data-motion="off"] *::before, .campus-ui[data-motion="off"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+.campus-ui[data-motion="on"] .quest-link,html body.campus-ui[data-motion="on"] #start .first-player-banner { animation: welcome-beacon 2.6s ease-in-out infinite !important; }
+.campus-ui[data-motion="on"] .quest-link:hover,.campus-ui[data-motion="on"] .quest-link:focus-visible,html body.campus-ui[data-motion="on"] #start .first-player-banner:hover,html body.campus-ui[data-motion="on"] #start .first-player-banner:focus-visible { animation-play-state: paused !important; }
+
+/* Game lobby direction: charcoal surfaces, baby-blue highlights and a hero
+   character. The first-time invitation is deliberately the loudest element. */
+.campus-ui .title-body { max-width: 1340px; grid-template-columns: .78fr 1.9fr; }
+.campus-ui .panel { grid-template-columns: minmax(260px,.78fr) minmax(0,1.9fr); background: #23262ce8; border: 1px solid #acbdcf70; box-shadow: 0 24px 60px #060b145c,inset 0 1px #e3f2ff26; border-radius: 14px; }
+.campus-ui .title-shade { background: linear-gradient(#11182110,#141b2640 50%,#141b28c7); }
+.campus-ui .tagline,html body.campus-ui #start .hero-brand p.hero-tagline { color: #e9f7ff; }
+.campus-ui .teacher-lobby,html body.campus-ui #start .teacher-lobby { display: grid; grid-template-columns: minmax(145px,.85fr) minmax(0,2fr); gap: 18px; margin: 0; align-items: stretch; }
+.campus-ui .teacher-stage { position: relative; isolation: isolate; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 18px 8px 22px; border: 1px solid #94b5d553; border-radius: 10px; background: radial-gradient(ellipse at 50% 48%,#778da53b,transparent 66%),linear-gradient(155deg,#3c424a,#242a34); text-align: center; }
+.campus-ui .teacher-stage::before { content: ''; position: absolute; inset: auto 8% 58px; height: 75px; z-index: -1; border: 2px solid #c1e4ff80; border-radius: 50%; transform: perspective(180px) rotateX(46deg); background: radial-gradient(ellipse,#aedcff44,#aedcff04 70%); box-shadow: 0 0 24px #a9daff28; }
+.campus-ui .stage-kicker { color: #bad9ee; font: 800 10px/1.4 "Segoe UI",sans-serif; letter-spacing: .15em; }
+.campus-ui .stage-art { flex: 1; display: flex; align-items: flex-end; justify-content: center; width: 100%; min-height: 250px; padding: 8px 0; }
+.campus-ui .stage-portrait { display: block; width: 100%; height: 300px; max-height: 330px; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 15px 12px #04090c80); }
+.campus-ui .stage-name { margin-top: 8px; color: #fff; font: 700 21px/1.1 Fredoka,system-ui,sans-serif; }
+.campus-ui .stage-role { display: block; margin-top: 7px; color: #bdddf5; font: 700 11px/1.2 "Segoe UI",sans-serif; letter-spacing: .09em; text-transform: uppercase; }
+.campus-ui .ts-card,html body.campus-ui #start .staff-choice { background: linear-gradient(145deg,#424851,#2d333d); border: 1px solid #7d8ca360; border-bottom: 4px solid #171d26; border-radius: 9px; color: #eaf3ff; min-height: 186px; padding: 8px 6px 12px; box-shadow: 0 6px 15px #040a1433; }
+.campus-ui .ts-pic,html body.campus-ui #start .staff-preview { background: radial-gradient(ellipse at 50% 60%,#a6bdd445,#ffffff04 75%); border: 0; border-radius: 5px; height: 130px; }
+.campus-ui .ts-name,html body.campus-ui #start .staff-choice-name strong { color: #eef5ff; font-size: 15px; }
+.campus-ui .ts-role,html body.campus-ui #start .staff-role { color: #c1d7ea; }
+.campus-ui .ts-card:has(input:checked),html body.campus-ui #start .staff-choice:has(input:checked) { background: linear-gradient(140deg,#b6dcf6,#e5f3ff); border-color: #ebf8ff; border-bottom-color: #6f9fbd; box-shadow: 0 0 0 2px #1e2938,0 0 0 4px #acd7f5,0 0 22px #94d0fb42; }
+.campus-ui .ts-card:has(input:checked) .ts-pic,html body.campus-ui #start .staff-choice:has(input:checked) .staff-preview { background: radial-gradient(ellipse at 50% 64%,#6e99b26b,transparent 70%); }
+.campus-ui .ts-card:has(input:checked) .ts-name,html body.campus-ui #start .staff-choice:has(input:checked) .staff-choice-name strong { color: #172b3b; }
+.campus-ui .ts-card:has(input:checked) .ts-role,html body.campus-ui #start .staff-choice:has(input:checked) .staff-role { color: #35556e; }
+.campus-ui .ts-card:has(input:checked)::after { background: #294f6b; }
+.campus-ui .ts-card:hover,html body.campus-ui #start .staff-choice:hover { background: linear-gradient(140deg,#526174,#333f50); border-color: #c7e8ff; box-shadow: 0 0 18px #a6d9ff4d; }
+.campus-ui .ts-card:has(input:checked):hover,html body.campus-ui #start .staff-choice:has(input:checked):hover { background: linear-gradient(140deg,#c6e7ff,#edf9ff); }
+.campus-ui .mode,html body.campus-ui #start .mode-card { background: linear-gradient(140deg,#414852,#2f3540); border: 1px solid #8190a56b; border-bottom: 4px solid #161c25; box-shadow: 0 4px 12px #040a1433; border-radius: 7px; }
+.campus-ui .mode:has(input:checked),html body.campus-ui #start .mode-card[aria-checked="true"] { background: linear-gradient(125deg,#b7dbef,#e5f3fc); border-color: #f2faff; border-bottom-color: #79a9c7; color: #152a3a; }
+.campus-ui .mode:has(input:checked) small,html body.campus-ui #start .mode-card[aria-checked="true"] small { color: #3a556a; }
+.campus-ui .mode:has(input:checked) .icon,html body.campus-ui #start .mode-card[aria-checked="true"] .icon { background: #ffffff50; }
+.campus-ui .mode:has(input:checked) .go,html body.campus-ui #start .mode-card[aria-checked="true"]::after { background: #31576c; color: white; }
+.campus-ui .play,html body.campus-ui #start .hero-play #enter { color: #163047; background: linear-gradient(#dff3ff,#9ac9eb); border: 2px solid #eefaff; border-bottom: 5px solid #527e9d; border-radius: 8px; box-shadow: 0 5px 0 #142837,0 10px 32px #a2d9ff30; letter-spacing: .09em; }
+.campus-ui .play:hover,html body.campus-ui #start .hero-play #enter:hover { color: #153047; background: linear-gradient(#f4fbff,#c3e8ff); box-shadow: 0 7px 0 #142837,0 12px 35px #b7e3ff50; }
+.campus-ui .quest-link,html body.campus-ui #start .first-player-banner { overflow: hidden; color: #18354d; background: linear-gradient(120deg,#9bcced,#e0f3ff 48%,#a6d8f8); border: 2px solid #f1fbff; border-bottom: 5px solid #598baa; box-shadow: 0 7px 0 #1b3b53,0 0 0 4px #b8e5ff33,0 16px 48px #9ad8ff60; }
+.campus-ui .quest-link::before,html body.campus-ui #start .first-player-banner::before { color: #f4fbff; background: #254b65; border-color: #5888a8; }
+.campus-ui .quest-link b,html body.campus-ui #start .first-player-banner strong { color: #15374f; }
+.campus-ui .quest-link .quest-sub,html body.campus-ui #start .first-player-banner small { color: #2e5570; }
+.campus-ui .quest-link .cap { display: none; }
+@keyframes welcome-beacon { 0%,100% { transform: scale(1); box-shadow: 0 6px 0 #1b3b53,0 0 0 4px #b8e5ff33,0 10px 28px #9ad8ff30; } 50% { transform: scale(1.035); box-shadow: 0 6px 0 #1b3b53,0 0 0 12px #b8e5ff17,0 12px 64px #9ad8ffb0; } }
+@keyframes stage-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.campus-ui[data-motion="on"] .teacher-stage .stage-portrait { animation: stage-float 4s ease-in-out infinite !important; }
+.campus-ui[data-motion="on"] .ts-img,html body.campus-ui[data-motion="on"] #start .staff-portrait { transition: transform .25s ease-out !important; }
+html body.campus-ui #start { background: linear-gradient(#10162030,#171f2b8a 50%,#1b202cf5 95%),url('assets/ec-title-bg.jpg') center top / cover fixed; }
+html body.campus-ui #start:has(#staffChoices) .start-shell { width: min(1280px,100%); grid-template-columns: minmax(260px,.78fr) minmax(0,1.9fr); }
+html body.campus-ui #start .hero-play,html body.campus-ui #start .start-character-panel { background: #242830e8; border-color: #a8bdd063; box-shadow: 0 18px 40px #060c184d,inset 0 1px #ecf8ff17; }
+html body.campus-ui #start .hero-brand .motion-toggle { min-height: 30px; padding: 5px 10px; }
+.campus-ui .ts-picked strong { color: #c2e5ff; }
+html body.campus-ui #start .quick-step strong,html body.campus-ui #start .menu-fold > summary span { color: #b9ddf9; }
+html body.campus-ui #controls #inventoryToggle { background: linear-gradient(#d9edfa,#acd1e9); color: #193046; border-color: #ebf8ff; }
+html body.campus-ui .inventory-choice[aria-pressed="true"] { background: #c3dff3; color: #1c3047; border-color: #e8f8ff; box-shadow: 0 0 0 2px #9ccdef; }
+html body.campus-ui .inventory-close,html body.campus-ui .inventory-back { background: #bcdff6; color: #1c3047; border-color: #e8f8ff; }
+html body.campus-ui #controls #saveGame { background: #343943; color: #f0f7ff; border-color: #91afc5; }
+html body.campus-ui #controls #flyToggle[aria-pressed="true"] { background: #bddff6; color: #193047; border-color: #e8f8ff; }
+html body.campus-ui #hotbar button { background: #424953; border-color: #8c9eaf; }
+html body.campus-ui #info,html body.campus-ui #status,html body.campus-ui #coordinates { border-color: #8ea9bd; color: #f0f7ff; }
+.campus-ui .quest-card { background: #242b36; border-color: #b7dcf5; }
+.campus-ui .quest-skip { background: #344153; border-color: #97b5cb; }
+@media (max-width: 1100px) {
+  .campus-ui .teacher-lobby,html body.campus-ui #start .teacher-lobby { grid-template-columns: 1fr; }
+  .campus-ui .teacher-stage { display: none; }
+  .campus-ui .title-body { grid-template-columns: .85fr 1.6fr; }
+}
+@media (max-width: 720px) {
+  .campus-ui .teacher-lobby,html body.campus-ui #start .teacher-lobby { grid-template-columns: 1fr; }
+  .campus-ui .ts-card,html body.campus-ui #start .staff-choice { min-height: 180px; }
+  .campus-ui .ts-pic,html body.campus-ui #start .staff-preview { height: 126px; }
+  .campus-ui .title-body > .quest-link { width: calc(100% - 12px); }
+}
+@media (max-width: 480px) {
+  .campus-ui .nav-inner { gap: 6px; padding-inline: 10px; }
+  .campus-ui .nav-brand { font-size: 12px; letter-spacing: 0; gap: 6px; }
+  .campus-ui .nav-brand .cube { width: 22px; height: 22px; }
+  .campus-ui .nav-right { gap: 6px; }
+  .campus-ui .nav-cta { padding-inline: 8px; font-size: 10px; letter-spacing: 0; }
+  .campus-ui .site-nav .motion-toggle { padding-inline: 7px; font-size: 11px; }
+}
+
+/* Subject identities stay in the same charcoal and baby-blue family. */
+.campus-ui .teacher-stage[data-teacher="macek"],.campus-ui .ts-card:has(input[value="macek"]),.campus-ui .staff-choice[data-character="macek"] { --subject-art: url('assets/ui/engineering.svg'); --subject-grid: linear-gradient(#a9d9f612 1px,transparent 1px),linear-gradient(90deg,#a9d9f612 1px,transparent 1px); --subject-size: 20px 20px,20px 20px; }
+.campus-ui .teacher-stage[data-teacher="micco"],.campus-ui .ts-card:has(input[value="micco"]),.campus-ui .staff-choice[data-character="micco"] { --subject-art: url('assets/ui/creative.svg'); --subject-grid: repeating-linear-gradient(135deg,transparent 0 20px,#aedbfa13 21px 24px,transparent 25px 43px); --subject-size: auto; }
+.campus-ui .teacher-stage[data-teacher="eriksen"],.campus-ui .ts-card:has(input[value="eriksen"]),.campus-ui .staff-choice[data-character="eriksen"] { --subject-art: url('assets/ui/art.svg'); --subject-grid: radial-gradient(ellipse at 15% 25%,#b7ddff30 0 7%,transparent 8%),radial-gradient(ellipse at 90% 70%,#b7ddff25 0 15%,transparent 16%); --subject-size: 100% 100%,100% 100%; }
+.campus-ui .teacher-stage[data-teacher="mullet"],.campus-ui .ts-card:has(input[value="mullet"]),.campus-ui .staff-choice[data-character="mullet"] { --subject-art: url('assets/ui/pe.svg'); --subject-grid: radial-gradient(circle at 50% 80%,transparent 0 23%,#b8defb32 23.5% 24%,transparent 24.5%),linear-gradient(90deg,transparent 49.6%,#b8defb24 49.8% 50.2%,transparent 50.4%); --subject-size: 100% 100%,100% 100%; }
+.campus-ui .teacher-stage[data-teacher="wingenbach"],.campus-ui .ts-card:has(input[value="wingenbach"]),.campus-ui .staff-choice[data-character="wingenbach"] { --subject-art: url('assets/ui/music.svg'); --subject-grid: repeating-linear-gradient(0deg,transparent 0 15px,#b5ddfa28 16px 17px,transparent 18px 23px); --subject-size: 100% 120px; }
+.campus-ui .teacher-stage[data-teacher="mcmichael"],.campus-ui .ts-card:has(input[value="mcmichael"]),.campus-ui .staff-choice[data-character="mcmichael"] { --subject-art: url('assets/ui/spanish.svg'); --subject-grid: repeating-conic-gradient(from 45deg,#b1dafa13 0% 25%,transparent 0% 50%); --subject-size: 30px 30px; }
+.campus-ui .teacher-stage { background-image: var(--subject-grid),radial-gradient(ellipse at 50% 48%,#778da53b,transparent 66%),linear-gradient(155deg,#3c424a,#242a34); background-size: var(--subject-size),cover,cover; }
+.campus-ui .teacher-stage::after { content: ''; position: absolute; z-index: -1; width: 112px; height: 112px; top: 52px; right: -8px; background: var(--subject-art) center/contain no-repeat; opacity: .45; transform: rotate(-8deg); pointer-events: none; }
+.campus-ui .ts-card,html body.campus-ui #start .staff-choice { position: relative; isolation: isolate; }
+.campus-ui .ts-card::before,html body.campus-ui #start .staff-choice::before { content: ''; position: absolute; z-index: 2; top: 10px; left: 8px; width: 34px; height: 34px; background: var(--subject-art) center/contain no-repeat; opacity: .9; pointer-events: none; }
+.campus-ui .ts-pic,html body.campus-ui #start .staff-preview { background-image: var(--subject-grid),radial-gradient(ellipse at 50% 60%,#a6bdd445,#ffffff04 75%); background-size: var(--subject-size),cover; }
+.campus-ui .ts-card:has(input:checked)::before,html body.campus-ui #start .staff-choice:has(input:checked)::before { filter: brightness(.38) saturate(1.3); }
+.campus-ui .teacher-stage[data-teacher="mcmichael"] .stage-role::after { content: ' · ¡Hola!'; text-transform: none; }
+.campus-ui .teacher-stage[data-teacher="macek"] .stage-role::after { content: ' · Engineering'; text-transform: none; }
+.campus-ui .teacher-stage[data-teacher="wingenbach"] .stage-role::after { content: ' · ♫'; }

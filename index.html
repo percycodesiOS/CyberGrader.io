@@ -234,8 +234,10 @@ footer a{font-weight:700;text-decoration:none}
 @media (max-width:480px){.title-body{gap:12px;padding:52px 12px 26px}.block-title{font-size:min(44px,calc((100vw - 34px) / 8.1))}.nav-picked{display:none}.tagline{position:relative;left:auto;top:auto;margin-top:2px;font-size:16px;transform-origin:50% 50%;transform:rotate(-5deg);animation-name:splash-small}.quest-link{border-radius:24px;padding:10px 16px}.quest-link b{font-size:21px}.mode{padding:8px 10px;gap:12px;grid-template-columns:50px minmax(0,1fr) 30px}.mode .icon{width:50px;height:50px}.mode .icon svg{width:36px;height:36px}.mode b{font-size:21px}.mode-help{height:4.2em}.cta-row{grid-template-columns:1fr}.play{min-height:80px}.things{grid-template-columns:minmax(0,1fr)}.specials-grid,.ts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.step{padding:18px 12px}.step .pic{font-size:40px}details.more>summary::after{display:none}}
 @media (max-width:480px){.nav-brand small{display:none}.nav-brand{font-size:15px}.nav-cta{padding:7px 12px;font-size:12px}}
 </style>
+<link rel="stylesheet" href="game/campus-interface.css?v=20261030-ui1">
+<script defer src="game/interface-motion.js?v=20261030-ui1"></script>
 </head>
-<body>
+<body class="campus-ui">
 <a class="skip-link" href="#play-button">Skip to Play</a>
 <nav class="site-nav" aria-label="Game sections">
   <div class="nav-inner">
@@ -247,6 +249,7 @@ footer a{font-weight:700;text-decoration:none}
       <li><a href="#things">Campus Activities</a></li>
     </ul>
     <div class="nav-right">
+      <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion</button>
       <a class="nav-picked" id="nav-picked" href="#specials-crew">Playing as: <strong>Mr. Macek · CIRC</strong></a>
       <a class="nav-cta" id="nav-play" href="game/mynecraft.html?mode=creative">▶ PLAY NOW</a>
     </div>
@@ -278,6 +281,8 @@ footer a{font-weight:700;text-decoration:none}
       <p class="mode-help" id="mode-help" aria-live="polite">Every block, as many as you want. Fly around and build anything!</p>
       <fieldset class="title-staff">
         <legend>Choose your Specials teacher</legend>
+        <div class="teacher-lobby">
+          <div class="teacher-stage" aria-hidden="true"><span class="stage-kicker">READY TO EXPLORE</span><div class="stage-art"><img class="stage-portrait" src="game/assets/staff-lineup/macek.png" alt=""></div><strong class="stage-name">Mr. Macek</strong><span class="stage-role">CIRC</span></div>
         <div class="ts-grid">
           <label class="ts-card" data-label="Mr. Macek · CIRC"><input type="radio" name="teacher" value="macek" checked><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/macek.png" alt=""></span><span class="ts-name">Mr. Macek</span><span class="ts-role">CIRC</span></label>
           <label class="ts-card" data-label="Ms. Micco · CIRC"><input type="radio" name="teacher" value="micco"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/micco.png" alt=""></span><span class="ts-name">Ms. Micco</span><span class="ts-role">CIRC</span></label>
@@ -285,6 +290,7 @@ footer a{font-weight:700;text-decoration:none}
           <label class="ts-card" data-label="Mr. Mullet · PE"><input type="radio" name="teacher" value="mullet"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/mullet.png" alt=""></span><span class="ts-name">Mr. Mullet</span><span class="ts-role">PE</span></label>
           <label class="ts-card" data-label="Mr. Wingenbach · Music"><input type="radio" name="teacher" value="wingenbach"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/wingenbach.png" alt=""></span><span class="ts-name">Mr. Wingenbach</span><span class="ts-role">Music</span></label>
           <label class="ts-card" data-label="Sra. McMichael · Spanish"><input type="radio" name="teacher" value="mcmichael"><span class="ts-pic" aria-hidden="true"><img class="ts-img" src="game/assets/staff-lineup/mcmichael.png" alt=""></span><span class="ts-name">Sra. McMichael</span><span class="ts-role">Spanish</span></label>
+        </div>
         </div>
         <p class="ts-picked" id="staff-picked" aria-live="polite">Playing as <strong>Mr. Macek · CIRC</strong> — you can switch anytime in Menu!</p>
       </fieldset>
@@ -297,7 +303,7 @@ footer a{font-weight:700;text-decoration:none}
       </div>
       <p class="save">💾 Your world saves by itself in this browser.</p>
     </div>
-    <a class="quest-link" id="quest-link" href="game/mynecraft.html?mode=creative&amp;tutorial=1"><svg class="cap" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="#8a5d06" d="M6 0h4v1H6zM5 1h1v2H5zM10 1h1v2h-1zM0 4h5v1H0zM11 4h5v1h-5zM0 5h1v2H0zM15 5h1v2h-1zM1 7h1v2H1zM14 7h1v2h-1zM2 9h1v2H2zM13 9h1v2h-1zM1 11h1v3H1zM14 11h1v3h-1zM2 14h3v1H2zM11 14h3v1h-3zM5 13h2v1H5zM9 13h2v1H9zM7 12h2v1H7z"/><path fill="#ffd23f" d="M6 1h4v3H6zM5 3h6v2H5zM1 5h14v2H1zM2 7h12v2H2zM3 9h10v2H3zM2 11h5v2H2zM9 11h5v2H9zM2 13h3v1H2zM11 13h3v1h-3zM7 11h2v1H7z"/><path fill="#fff1a8" d="M7 1h1v3H7zM2 5h4v1H2z"/></svg><span><b>First time playing?</b><span class="quest-sub">Click here to quiz your way through the basics.</span></span></a>
+    <a class="quest-link" id="quest-link" href="game/mynecraft.html?mode=creative&amp;tutorial=1"><svg class="cap" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="#8a5d06" d="M6 0h4v1H6zM5 1h1v2H5zM10 1h1v2h-1zM0 4h5v1H0zM11 4h5v1h-5zM0 5h1v2H0zM15 5h1v2h-1zM1 7h1v2H1zM14 7h1v2h-1zM2 9h1v2H2zM13 9h1v2h-1zM1 11h1v3H1zM14 11h1v3h-1zM2 14h3v1H2zM11 14h3v1h-3zM5 13h2v1H5zM9 13h2v1H9zM7 12h2v1H7z"/><path fill="#ffd23f" d="M6 1h4v3H6zM5 3h6v2H5zM1 5h14v2H1zM2 7h12v2H2zM3 9h10v2H3zM2 11h5v2H2zM9 11h5v2H9zM2 13h3v1H2zM11 13h3v1h-3zM7 11h2v1H7z"/><path fill="#fff1a8" d="M7 1h1v3H7zM2 5h4v1H2z"/></svg><span><b>First time playing?</b><span class="quest-sub">Jump into the Basics quest. Learn by doing.</span></span></a>
     <!-- Phones, tablets and squarer screens: the same two groups stand under the buttons. -->
     <div class="crew-row">
       <div class="cast cast-left">
@@ -469,7 +475,9 @@ try{
       const raw=localStorage.getItem(saveKey);
       if(!raw)return null;
       const data=JSON.parse(raw);
-      return data&&valid.has(data.playerCharacter)?data.playerCharacter:null;
+      if(!data||typeof data!=='object')return null;
+      const target=data.activeWorld==='hardcore'&&data.hardcoreWorld?data.hardcoreWorld:data;
+      return target&&valid.has(target.playerCharacter)?target.playerCharacter:null;
     }catch(e){return null;}
   }
   function writeSavedTeacher(id){
@@ -478,8 +486,9 @@ try{
       const raw=localStorage.getItem(saveKey);
       const data=raw?JSON.parse(raw):{};
       if(data&&typeof data==='object'){
-        data.playerCharacter=id;
-        data.characterChosen=true;
+        const target=data.activeWorld==='hardcore'?(data.hardcoreWorld||={}):data;
+        target.playerCharacter=id;
+        target.characterChosen=true;
         localStorage.setItem(saveKey,JSON.stringify(data));
       }
     }catch(e){}

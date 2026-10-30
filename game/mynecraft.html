@@ -226,8 +226,10 @@
 .travel form button{min-height:40px}.travel summary{cursor:pointer;color:#90c5ec}.travel p{font-size:12px!important;margin:8px 0!important}
 </style>
 <link rel="stylesheet" href="start-menu.css?v=ui-20261029-onelook4">
+<link rel="stylesheet" href="campus-interface.css?v=20261030-ui1">
+<script defer src="interface-motion.js?v=20261030-ui1"></script>
 </head>
-<body>
+<body class="campus-ui">
 <div id="hud"><div id="crosshair"></div></div>
 <div id="touchUI">
   <div id="touchLook"></div>
@@ -252,13 +254,14 @@
 <div id="sleepTransition" role="status" aria-live="polite" hidden><span class="sleep-moon" aria-hidden="true">☾</span><strong>You are now asleep</strong><p>Sunrise is one second away. A new day is coming!</p></div>
 <div id="start">
   <div class="start-shell">
-    <header class="start-header start-hero">
-      <div class="hero-row">
         <div class="hero-brand">
           <h1 class="start-brand block-title" aria-label="MYnecraft"><span class="logo" data-text="MYNECRAFT" aria-hidden="true"><span class="face">MYNECRAFT</span></span></h1>
           <p class="edition">EC EDITION</p>
           <p class="hero-tagline">Your school, built from blocks.</p>
+          <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Motion</button>
         </div>
+    <header class="start-header start-hero">
+      <div class="hero-row">
         <div class="hero-play">
           <p class="hero-step" id="modeTitle">How do you want to play?</p>
           <div class="mode-cards" role="radiogroup" aria-labelledby="modeTitle">
@@ -277,12 +280,16 @@
       </div>
     </header>
     <details class="start-character-panel menu-fold" id="characterPanel" open aria-labelledby="characterTitle">
-      <summary>Your teacher <span>Six Specials teachers</span></summary>
+      <summary>Choose your teacher <span>Six Specials teachers</span></summary>
       <h2 id="characterTitle">Choose your Specials teacher</h2>
       <p class="character-note">Play as one of your Specials teachers. You can change any time, and press <kbd>C</kbd> in-game to see your full character in 3rd-person view!</p>
-      <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your Specials teacher"></div>
+      <div class="teacher-lobby">
+        <div class="teacher-stage" aria-hidden="true"><span class="stage-kicker">READY TO EXPLORE</span><div class="stage-art"><img class="stage-portrait" src="assets/staff-lineup/macek.png" alt=""></div><strong class="stage-name">Mr. Macek</strong><span class="stage-role">CIRC</span></div>
+        <div id="staffChoices" class="staff-choices" role="group" aria-label="Choose your Specials teacher"></div>
+      </div>
       <p id="identityStatus" role="status">Pick your Specials teacher.</p>
     </details>
+    <button type="button" class="first-player-banner" data-try="quest"><span><strong>First time playing?</strong><small>Jump into the Basics quest. Learn by doing.</small></span></button>
     <!-- Five picture steps: all a first-time player needs, including how to fly. -->
     <section class="quick-steps" aria-label="Quick start">
       <div class="quick-step"><span class="quick-icon" aria-hidden="true">🕹️</span><strong>Move</strong><span class="desktop-help"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></span><span class="touch-help">Use the round stick</span></div>
@@ -302,6 +309,7 @@
         <button type="button" class="try-choice" data-try="story"><span aria-hidden="true">📖</span><strong>Story time</strong><small>Hear a book read aloud</small></button>
         <button type="button" class="try-choice" data-try="library"><span aria-hidden="true">📚</span><strong>Build a library</strong><small>Place one with a tap</small></button>
         <button type="button" class="try-choice" data-try="dogs"><span aria-hidden="true">🐕</span><strong>Walk with the dogs</strong><small>Percy and Ellie follow you</small></button>
+        <button type="button" class="try-choice" data-try="clover"><span aria-hidden="true">🍀</span><strong>Clover patch</strong><small>Plant, water and pick clovers</small></button>
       </div>
       <p id="tryStatus" role="status"></p>
     </details>
@@ -338,6 +346,7 @@
     </details>
     <details class="start-advanced" id="schoolExplore"><summary>🏫 Explore the school</summary><section class="start-actions" aria-label="Explore the school">
       <button id="visitSchool" type="button">Visit the ECMS entrance</button>
+      <button id="visitClover" type="button">Visit the clover patch</button>
       <button id="overview" type="button">Fly above ECMS · Creative</button>
       <p class="start-wide"><strong>Choose a starting point:</strong> Visit the ECMS entrance moves you to the front approach in either mode. Fly above ECMS starts a flying view in Creative. Neither shortcut changes the world clock or clears your build.</p>
       <p class="start-wide"><strong>Front lawn and entrance:</strong> Find Sleeves in his number 28 jersey, larger than KaY and smaller than the adults. Officer Shields stays by his front desk, and Mr. Eiler walks the entrance area. Eddie perches on the lawn rock during the day.</p>
@@ -1133,6 +1142,15 @@ let activities=null;
 let quest=null,questCard=null; // the first-time Basics quest, when running
 let chosenAnimal=null,chosenGarden=null;
 let fishUnlocked=saveState.fishUnlocked===true;
+let cloverState={state:'empty',cloverType:null,growthTimer:0};
+if(saveState.cloverPatch&&typeof saveState.cloverPatch==='object'){
+  const cp=saveState.cloverPatch;
+  if(['empty','planted','watered','grown'].includes(cp.state)){
+    cloverState.state=cp.state;
+    cloverState.cloverType=['ordinary','four_leaf'].includes(cp.cloverType)?cp.cloverType:null;
+    cloverState.growthTimer=typeof cp.growthTimer==='number'&&Number.isFinite(cp.growthTimer)?Math.max(0,cp.growthTimer):0;
+  }
+}
 if((isHardcoreWorld||isGroupRoom)&&globalThis.MYNE_HARDCORE_WORLD){
  WORLD.clear();deepVoids.clear();
  globalThis.MYNE_HARDCORE_WORLD.build(setBlock,{minX:-SIZE,maxX:EAST_EDGE,minZ:-SIZE,maxZ:SIZE});
@@ -1221,7 +1239,7 @@ graphicsSelect.addEventListener('change',()=>{setGraphics(graphicsSelect.value);
 let controlsLayout=['auto','touch','desktop'].includes(saveState.controls)?saveState.controls:'auto';
 let controlsSelect=null;
 let releaseTouch=()=>{};
-let lookActive=false;
+let lookActive=false,unlockedPending=null;
 let inputEpoch=0;
 let lastTouchAt=-1e9;
 let releasingInput=false;
@@ -1336,6 +1354,7 @@ function persistSave(){
     saveState.challenge = {...challenge};
     if(hardcore)saveState.hardcore=hardcore;
     saveState.fishUnlocked=fishUnlocked;
+    saveState.cloverPatch={state:cloverState.state,cloverType:cloverState.cloverType,growthTimer:Math.round(cloverState.growthTimer*100)/100};
     if(activities)saveState.activities=activities.serialize();
     saveState.dayTime = dayTime;
     saveState.dayNightMode = dayNightMode;
@@ -1416,6 +1435,14 @@ function readWorldBackup(text,depth=0){
   if(s.activities!==undefined){
     if(!object(s.activities)||!globalThis.MYNE_ACTIVITIES?.validateSerialized(s.activities))throw new Error('Invalid activities in backup. Your world was kept.');
     result.activities=s.activities;
+  }
+  if(s.cloverPatch!==undefined){
+    if(!object(s.cloverPatch)||!['empty','planted','watered','grown'].includes(s.cloverPatch.state))throw new Error('This backup has invalid clover patch data. Your world was kept.');
+    result.cloverPatch={
+      state:s.cloverPatch.state,
+      cloverType:['ordinary','four_leaf'].includes(s.cloverPatch.cloverType)?s.cloverPatch.cloverType:null,
+      growthTimer:typeof s.cloverPatch.growthTimer==='number'&&Number.isFinite(s.cloverPatch.growthTimer)?Math.max(0,s.cloverPatch.growthTimer):0
+    };
   }
   if(s.hardcoreWorld!==undefined){
     result.hardcoreWorld=readWorldBackup(JSON.stringify({format:'mynecraft-world',version:1,state:s.hardcoreWorld}),depth+1);
@@ -3448,19 +3475,24 @@ let armSwing=0;
 function swingArm(){armSwing=1;}
 camera.add(viewModel);scene.add(camera);
 const identityStatus=document.getElementById('identityStatus');
-const staffInputs={},staffCanvases={},staffCards={};
+const staffInputs={},staffCanvases={},staffCards={},staffDetails={};
 const staffChoices=document.getElementById('staffChoices');
 for(const character of STAFF_CHARACTERS){
   const label=document.createElement('label');label.className='staff-choice';label.dataset.character=character.id;
   const canvas=document.createElement('canvas');canvas.className='staff-preview';canvas.width=240;canvas.height=280;
   canvas.setAttribute('role','img');canvas.setAttribute('aria-label',`${character.name}: ${character.detail}`);staffCanvases[character.id]=canvas;
+  // The menu uses the same full-body portraits as the title screen. Keep the
+  // existing outfit preview canvas for the character renderer and its fallback.
+  const portrait=document.createElement('img');portrait.className='staff-preview staff-portrait';
+  portrait.src=`assets/staff-lineup/${character.id}.png`;portrait.alt=`${character.name}: ${character.role}`;
+  canvas.setAttribute('aria-hidden','true');
   const row=document.createElement('span');row.className='staff-choice-name';
   const input=document.createElement('input');input.type='radio';input.name='playerCharacter';input.value=character.id;input.id=`character-${character.id}`;input.dataset.character=character.id;
   input.setAttribute('aria-describedby',`character-description-${character.id}`);
   const name=document.createElement('strong');name.textContent=character.name;row.append(input,name);
   const role=document.createElement('span');role.className='staff-role';role.textContent=character.role;
-  const detail=document.createElement('small');detail.id=`character-description-${character.id}`;detail.textContent=character.detail;
-  label.append(canvas,row,role,detail);staffChoices.appendChild(label);staffInputs[character.id]=input;staffCards[character.id]=label;
+  const detail=document.createElement('small');detail.id=`character-description-${character.id}`;detail.textContent=character.detail;staffDetails[character.id]=detail;
+  label.append(portrait,canvas,row,role,detail);staffChoices.appendChild(label);staffInputs[character.id]=input;staffCards[character.id]=label;
   input.addEventListener('change',()=>{if(input.checked&&setPlayerCharacter(character.id)){characterChosen=true;updateIdentityStatus();persistSave();}});
 }
 let view=saveState.view==='third'?'third':'first';
@@ -3508,7 +3540,7 @@ function refreshStaffLocks(){
     staffInputs[c.id].disabled=locked;
     staffCards[c.id].style.opacity=locked?'.48':'1';
     staffCards[c.id].title=locked?'Complete Hardcore goals to unlock '+c.name:c.detail;
-    staffCards[c.id].children[3].textContent=locked?'Locked: complete the next Hardcore goals.':c.detail;
+    staffDetails[c.id].textContent=locked?'Locked: complete the next Hardcore goals.':c.detail;
   }
 }
 function setView(value){
@@ -3868,6 +3900,7 @@ function releaseInput(){
   lastSpaceTapAt=-1e9;spaceArmed=false;
   for(const k in keys) keys[k]=false;
   lookActive=false;
+  unlockedPending=null;
   releaseTouch();
   if(document.pointerLockElement){
     try{document.exitPointerLock?.();}catch{}
@@ -3992,6 +4025,12 @@ document.getElementById('visitSchool').addEventListener('click',()=>{
   if(isHardcoreWorld||isGroupRoom)return;
   player.pos.set(46.5,groundSurface(46,31)+player.height+.1,31.5);player.yaw=0;player.pitch=-.06;player.flying=false;player.vel.set(0,0,0);camera.position.copy(player.pos);startGame();persistSave();
 });
+document.getElementById('visitClover')?.addEventListener('click',()=>{
+  if(isGroupRoom)return;
+  if(!standAtClover())return;
+  document.getElementById('status').textContent='At the clover patch! Walk up and use Interact to plant seeds, water, and pick clovers.';
+  startGame();persistSave();
+});
 document.getElementById('overview').addEventListener('click',()=>{
   if(isGroupRoom)return;
   if(gameMode!=='creative'){document.getElementById('modeHelp').textContent='Choose Creative above for the flying campus tour.';return;}
@@ -4095,13 +4134,14 @@ renderer.domElement.addEventListener('mousedown', event => {
   if(document.pointerLockElement!==renderer.domElement)lookActive=true;
 });
 addEventListener('mouseup',   () => { lookActive = false; });
-addEventListener('mouseleave',() => { lookActive = false; });
+addEventListener('mouseleave',() => { lookActive = false; unlockedPending = null; });
 document.addEventListener('pointerlockchange', () => {
   if(document.pointerLockElement===renderer.domElement){
     if(!started||touchLayoutOn()||environmentWantsTouch()||document.hidden)releaseInput();
     return;
   }
   lookActive=false;
+  unlockedPending=null;
   if(!started||releasingInput)return;
   pauseGame();
 });
@@ -4112,6 +4152,9 @@ addEventListener('mousemove', e => {
   // when locked: always use movement deltas
   // when not locked: only rotate while a mouse button is held (drag-to-look)
   if (!locked && !lookActive) return;
+  if (!locked && unlockedPending && (Math.abs(e.movementX || 0) > 0 || Math.abs(e.movementY || 0) > 0)) {
+    unlockedPending.moved = true;
+  }
   player.yaw   -= e.movementX * 0.0022;
   player.pitch -= e.movementY * 0.0022;
   const lim = Math.PI/2 - 0.01;
@@ -4294,16 +4337,30 @@ addEventListener('mousedown', e => {
   if (!started) return;
   // skip the very first click that's just dismissing the start overlay
   if (e.target !== renderer.domElement) return;
-  if (e.button === 0) doBreak();
-  else if (e.button === 2) doPlace();
-  // Holding the button keeps building or digging, like Minecraft. Only while the mouse is
-  // locked to the game: unlocked, a left drag turns the camera and must not dig.
-  if((e.button===0||e.button===2)&&document.pointerLockElement===renderer.domElement)heldMouse={button:e.button,wait:HOLD_FIRST};
+  if (document.pointerLockElement === renderer.domElement) {
+    if (e.button === 0) doBreak();
+    else if (e.button === 2) doPlace();
+    if (e.button === 0 || e.button === 2) heldMouse = { button: e.button, wait: HOLD_FIRST };
+  } else {
+    // Unlocked: left click begins a drag-to-look gesture. Do not dig until mouseup confirms
+    // a stationary tap rather than a camera drag.
+    if (e.button === 0) unlockedPending = { button: 0, moved: false };
+    else if (e.button === 2) doPlace();
+  }
 });
 // Hold-to-repeat timing: a short pause after the first block, then a steady pace.
 const HOLD_FIRST=.32,HOLD_EVERY=.22;
 let heldMouse=null;
-addEventListener('mouseup',e=>{if(heldMouse&&e.button===heldMouse.button)heldMouse=null;});
+addEventListener('mouseup', e => {
+  if (heldMouse && e.button === heldMouse.button) heldMouse = null;
+  if (unlockedPending && e.button === unlockedPending.button) {
+    const action = unlockedPending; unlockedPending = null;
+    if (!action.moved && started && e.target === renderer.domElement) {
+      if (action.button === 0) doBreak();
+      else if (action.button === 2) doPlace();
+    }
+  }
+});
 function updateHeldMouse(dt){
   if(!heldMouse)return;
   if(!started||document.pointerLockElement!==renderer.domElement){heldMouse=null;return;}
@@ -4463,17 +4520,223 @@ const cafeteriaCleaner=!isHardcoreWorld&&!isGroupRoom&&globalThis.MYNE_CAFETERIA
 const activityButton=document.getElementById('activityInteract'),touchActivityButton=document.getElementById('btnInteract');
 const activityControls={forward:0,turn:0};
 let activityPrompt='';
+// ---------- Child's Clover Patch ----------
+const CLOVER_GROWTH_SECONDS = 5.0;
+const cloverPatchGroup = new THREE.Group();
+cloverPatchGroup.name = 'Child clover patch';
+scene.add(cloverPatchGroup);
+
+function cloverPatchLocation() {
+  const spot = isHardcoreWorld ? { x: -16, z: -20 } : { x: -30, z: -28 };
+  const y = groundSurface(spot.x, spot.z);
+  return { x: spot.x, y, z: spot.z };
+}
+
+function cloverNearby() {
+  if (!started || inventoryOpen || isWorldSleeping() || isGroupRoom) return false;
+  const loc = cloverPatchLocation();
+  const dx = player.pos.x - loc.x;
+  const dz = player.pos.z - loc.z;
+  const dy = Math.abs(player.pos.y - (player.height || 1.7) - loc.y);
+  return Math.hypot(dx, dz) < 3.2 && dy < 2.5;
+}
+
+function cloverPrompt() {
+  if (!cloverNearby()) return '';
+  if (cloverState.state === 'empty') return 'Plant clover seed';
+  if (cloverState.state === 'planted') return 'Water clover patch';
+  if (cloverState.state === 'watered') {
+    return cloverState.growthTimer < CLOVER_GROWTH_SECONDS ? 'Clovers growing…' : 'Pick clover';
+  }
+  if (cloverState.state === 'grown') {
+    return cloverState.cloverType === 'four_leaf' ? 'Pick four-leaf clover' : 'Pick clover';
+  }
+  return '';
+}
+
+function finishCloverGrowth() {
+  cloverState.state = 'grown';
+  if (!cloverState.cloverType) {
+    cloverState.cloverType = Math.random() < 0.25 ? 'four_leaf' : 'ordinary';
+  }
+  refreshCloverVisuals();
+  persistSave();
+}
+
+function interactClover() {
+  if (!cloverNearby()) return false;
+  if (cloverState.state === 'empty') {
+    cloverState.state = 'planted';
+    cloverState.cloverType = null;
+    cloverState.growthTimer = 0;
+    refreshCloverVisuals();
+    persistSave();
+    document.getElementById('status').textContent = 'Planted clover seeds! Give them some water to help them grow.';
+    return true;
+  }
+  if (cloverState.state === 'planted') {
+    cloverState.state = 'watered';
+    cloverState.growthTimer = 0;
+    refreshCloverVisuals();
+    persistSave();
+    document.getElementById('status').textContent = 'Watered the clover patch! Watch the little clovers sprout.';
+    return true;
+  }
+  if (cloverState.state === 'watered') {
+    if (cloverState.growthTimer < CLOVER_GROWTH_SECONDS) {
+      document.getElementById('status').textContent = 'The clovers are sprouting! Give them a few seconds to grow.';
+      return true;
+    }
+    finishCloverGrowth();
+  }
+  if (cloverState.state === 'grown') {
+    const isLucky = cloverState.cloverType === 'four_leaf';
+    if (isLucky) {
+      document.getElementById('status').textContent = 'Remember, you make your own luck.';
+    } else {
+      document.getElementById('status').textContent = 'Picked a sweet three-leaf clover! Plant again for another chance.';
+    }
+    cloverState.state = 'empty';
+    cloverState.cloverType = null;
+    cloverState.growthTimer = 0;
+    refreshCloverVisuals();
+    persistSave();
+    return true;
+  }
+  return false;
+}
+
+function updateCloverPatch(dt) {
+  if (!started || isWorldSleeping() || isGroupRoom) return;
+  if (cloverState.state === 'watered') {
+    cloverState.growthTimer += dt;
+    if (cloverState.growthTimer >= CLOVER_GROWTH_SECONDS) {
+      finishCloverGrowth();
+    } else {
+      updateCloverSprouts(cloverState.growthTimer / CLOVER_GROWTH_SECONDS);
+    }
+  }
+}
+
+const cloverMaterials = new Map();
+function cloverMat(color) {
+  if (!cloverMaterials.has(color)) cloverMaterials.set(color, new THREE.MeshLambertMaterial({ color }));
+  return cloverMaterials.get(color);
+}
+let cloverSproutGroup = null;
+
+function refreshCloverVisuals() {
+  while (cloverPatchGroup.children.length) {
+    const child = cloverPatchGroup.children.pop();
+    if (child.geometry && !child.geometry.isShared) child.geometry.dispose?.();
+  }
+  cloverSproutGroup = null;
+  if (isGroupRoom) {
+    cloverPatchGroup.visible = false;
+    return;
+  }
+  cloverPatchGroup.visible = true;
+  const loc = cloverPatchLocation();
+  cloverPatchGroup.position.set(loc.x, loc.y, loc.z);
+
+  const boxGeo = new THREE.BoxGeometry(1, 1, 1);
+  const addBox = (w, h, d, color, x, y, z) => {
+    const m = new THREE.Mesh(boxGeo, cloverMat(color));
+    m.scale.set(w, h, d);
+    m.position.set(x, y, z);
+    cloverPatchGroup.add(m);
+    return m;
+  };
+
+  // Wooden frame
+  addBox(2.4, 0.16, 0.18, 0x6e4526, 0, 0.08, -1.11);
+  addBox(2.4, 0.16, 0.18, 0x6e4526, 0, 0.08, 1.11);
+  addBox(0.18, 0.16, 2.04, 0x6e4526, -1.11, 0.08, 0);
+  addBox(0.18, 0.16, 2.04, 0x6e4526, 1.11, 0.08, 0);
+
+  // Soil
+  const soilColor = cloverState.state === 'watered' ? 0x22150a : 0x3d2714;
+  addBox(2.04, 0.10, 2.04, soilColor, 0, 0.05, 0);
+
+  // Garden marker post
+  addBox(0.08, 0.65, 0.08, 0x8b5a34, -1.2, 0.32, -1.2);
+  addBox(0.38, 0.22, 0.05, 0xd4b483, -1.2, 0.52, -1.2);
+  addBox(0.10, 0.10, 0.07, 0x38b000, -1.2, 0.52, -1.2);
+
+  if (cloverState.state === 'planted') {
+    const seedOffsets = [[-0.5,-0.5],[0.4,-0.4],[-0.3,0.4],[0.5,0.3],[0,0],[-0.6,0.1],[0.2,-0.6]];
+    for (const [sx, sz] of seedOffsets) {
+      addBox(0.06, 0.04, 0.06, 0x8a9942, sx, 0.11, sz);
+    }
+  } else if (cloverState.state === 'watered') {
+    cloverSproutGroup = new THREE.Group();
+    cloverPatchGroup.add(cloverSproutGroup);
+    const sproutOffsets = [[-0.5,-0.5],[0.4,-0.4],[-0.3,0.4],[0.5,0.3],[0,0],[-0.5,0.2],[0.3,-0.5]];
+    for (const [sx, sz] of sproutOffsets) {
+      const stem = new THREE.Mesh(boxGeo, cloverMat(0x60b020));
+      stem.scale.set(0.05, 0.12, 0.05);
+      stem.position.set(sx, 0.12, sz);
+      cloverSproutGroup.add(stem);
+      const leaf = new THREE.Mesh(boxGeo, cloverMat(0x7ad030));
+      leaf.scale.set(0.12, 0.04, 0.12);
+      leaf.position.set(sx, 0.18, sz);
+      cloverSproutGroup.add(leaf);
+    }
+    updateCloverSprouts(cloverState.growthTimer / CLOVER_GROWTH_SECONDS);
+  } else if (cloverState.state === 'grown') {
+    const isLucky = cloverState.cloverType === 'four_leaf';
+    const addCloverMesh = (cx, cz, fourLeaf) => {
+      const greenColor = fourLeaf ? 0x2ec230 : 0x38b000;
+      addBox(0.05, 0.22, 0.05, 0x2d8a00, cx, 0.14, cz);
+      const petalSize = fourLeaf ? 0.14 : 0.13;
+      const petalY = 0.25;
+      const dist = 0.09;
+      addBox(petalSize, 0.03, petalSize, greenColor, cx, petalY, cz - dist);
+      addBox(petalSize, 0.03, petalSize, greenColor, cx - dist, petalY, cz);
+      addBox(petalSize, 0.03, petalSize, greenColor, cx + dist, petalY, cz);
+      if (fourLeaf) {
+        addBox(petalSize, 0.03, petalSize, greenColor, cx, petalY, cz + dist);
+        addBox(0.06, 0.04, 0.06, 0xfce853, cx, petalY + 0.01, cz);
+      }
+    };
+    const patchSpots = [[-0.55, -0.45], [0.45, -0.55], [-0.45, 0.5], [0.55, 0.4], [-0.6, 0.05], [0.1, -0.6], [0.2, 0.55]];
+    for (const [px, pz] of patchSpots) {
+      addCloverMesh(px, pz, false);
+    }
+    addCloverMesh(0, 0, isLucky);
+  }
+}
+
+function updateCloverSprouts(progress) {
+  if (!cloverSproutGroup) return;
+  const scale = Math.max(0.2, Math.min(1.2, 0.2 + 0.8 * progress));
+  cloverSproutGroup.scale.set(scale, scale, scale);
+}
+
+refreshCloverVisuals();
+globalThis.MYNE_CLOVER = {
+  get state() { return cloverState; },
+  get location() { return cloverPatchLocation(); },
+  prompt: cloverPrompt,
+  interact: interactClover,
+  finishGrowth: finishCloverGrowth,
+  update: updateCloverPatch,
+  refresh: refreshCloverVisuals
+};
+
 // Bookshelves and Percy/Ellie use the same Interact button as the car and ball.
 function aimedBookshelf(){
   const hit=aimHit;
   return !!library&&!!hit&&getBlock(hit.x,hit.y,hit.z)==='bookshelf'&&Math.hypot(hit.x+.5-player.pos.x,hit.y+.5-player.pos.y,hit.z+.5-player.pos.z)<4.5;
 }
 function hostPrompt(){
+  const cp=cloverPrompt();if(cp)return cp;
   if(aimedBookshelf())return 'Read a book';
   if(dogsNearby())return companionMode==='follow'?'Dogs: go play':'Dogs: follow me';
   return '';
 }
 function hostInteract(){
+  if(interactClover())return true;
   if(aimedBookshelf()){library.open();return true;}
   if(dogsNearby())return toggleDogsFollow();
   return false;
@@ -4519,6 +4782,15 @@ function standNear(x,z,yaw,offsets=[[0,0],[1.5,0],[-1.5,0],[0,1.5],[0,-1.5],[2.5
     if(canStandAt(pos)){player.pos.copy(pos);player.vel.set(0,0,0);player.flying=false;player.yaw=yaw;player.pitch=-.15;camera.position.copy(pos);return true;}
   }
   return false;
+}
+function standAtClover(){
+  const loc=cloverPatchLocation();
+  // Arrive beside the garden and look at it, rather than away at the tree line.
+  if(!standNear(loc.x,loc.z,0,[[2.5,0],[-2.5,0],[0,2.5],[0,-2.5],[2,2],[-2,-2]]))return false;
+  const dx=player.pos.x-loc.x,dz=player.pos.z-loc.z;
+  player.yaw=Math.atan2(dx,dz);
+  player.pitch=-Math.atan2(player.pos.y-(loc.y+.25),Math.hypot(dx,dz));
+  return true;
 }
 // A flat school roof with room below it and a clear view, found once from the
 // real campus blocks. The player faces the most open side, never a wall.
@@ -4569,6 +4841,10 @@ function tryThing(kind){
     if(isHardcoreWorld){tryStatus.textContent='Percy and Ellie live on the campus. Choose Creative or Embrace the Challenge to visit them.';return;}
     const d=ellie.pos;if(!standNear(d.x+1.6,d.z,Math.PI/2)){tryStatus.textContent='The dogs are somewhere tricky right now. Try again in a moment.';return;}
     setCompanionMode('follow',true);startGame();persistSave();say('Percy and Ellie will follow you! Walk up to them and press E (or tap the yellow button) to let them play.');return;
+  }
+  if(kind==='clover'){
+    if(!standAtClover()){tryStatus.textContent='The clover patch is tricky to reach right now. Try again in a moment.';return;}
+    startGame();persistSave();say('At the clover patch! Walk up and use Interact to plant seeds, water, and pick clovers.');return;
   }
   if(!activities)return;
   if(kind==='car'){
@@ -4712,6 +4988,7 @@ function tick(now) {
   camera.position.y = player.pos.y + 0.0;
   updatePlayerAvatar(dt);
   updateHeldMouse(dt);
+  updateCloverPatch(dt);
   updateChallenge();
 
   renderer.render(scene, camera);
@@ -4929,7 +5206,7 @@ addEventListener('keydown',event=>{
       event.preventDefault();if(!event.repeat)closeInventory();return;
     }
     if(event.code==='Tab'){
-      const choices=[...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!gardenPanel.hidden?gardenChoices:[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!animalPanel.hidden&&!fishingRodChoice.disabled?[fishingRodChoice]:[]),...(!animalPanel.hidden&&!putAwayAllChoice.disabled?[putAwayAllChoice]:[]),...(!cozyPanel.hidden?[teaChoice]:[]),inventoryBack];
+      const choices=[inventoryClose,...(gameMode==='hardcore'?craftingChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...inventoryChoices.filter(c=>!c.button.disabled).map(c=>c.button),...(!gardenPanel.hidden?gardenChoices:[]),...(!animalPanel.hidden?animalChoices.filter(c=>!c.button.disabled).map(c=>c.button):[]),...(!animalPanel.hidden&&!fishingRodChoice.disabled?[fishingRodChoice]:[]),...(!animalPanel.hidden&&!putAwayAllChoice.disabled?[putAwayAllChoice]:[]),...(!cozyPanel.hidden?[teaChoice]:[]),inventoryBack];
       const current=choices.indexOf(document.activeElement),next=(current+(event.shiftKey?-1:1)+choices.length)%choices.length;
       event.preventDefault();choices[next].focus?.();
     }

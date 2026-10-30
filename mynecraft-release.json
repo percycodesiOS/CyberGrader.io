@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "fe4151750c5c39dd4bd5389c1e0d9b4524acd713",
+  "sourceCommit": "b40966db14e32a8ea687172e37614cdb8e05d064",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -22,11 +22,19 @@
     "game/assets/staff-lineup/mullet.png": "1fd1301ec7d8d5d846230fb830c4fceb0a5059cd961933ac95ce401c4c1e6d14",
     "game/assets/staff-lineup/wingenbach.png": "df1b0f76c13addc87d296663ce7739bbdfe77b148829ba4d83999c40101cf81b",
     "game/assets/sv-school-logo.png": "dc7d2a961c4f4bf80452c7e70ecd1e720c0205b06a7f6c96ac8a4f9e408cc3e2",
+    "game/assets/ui/art.svg": "18449b60f9f72e2c065134160b80b1695aa73032a500d1bf998525da476f559a",
+    "game/assets/ui/creative.svg": "7ca419245f9bd2945c23044eddf82800d6121d7cf89c7a4cb4e721be1046eb7f",
+    "game/assets/ui/engineering.svg": "54eef519c9e86982c85f28271e233e9ef05efc3de5b0db72b82439e210a10a79",
+    "game/assets/ui/music.svg": "f4d043cf438867ba239ecf10bc66f54558aeae1de51f861e1e27fce4a26147bc",
+    "game/assets/ui/pe.svg": "7ccca68b0eec2d447277802ad84852efcb8e6ee7aa3934d02ffb8aef3640e20f",
+    "game/assets/ui/spanish.svg": "56f2678100033b81c90eb1173b7b34641f4cb8d2284a7f259befc548771fed5f",
     "game/cafeteria-cleaner.js": "c734abb2a3783388e3304792b4fbe3690d2b0564780f50d760fdad1e3e47cada",
+    "game/campus-interface.css": "8988d1818aad9f837b5d23cb227dc431b86dffad5f12133e2e30885ca1304d2e",
     "game/hardcore-rules.js": "6910c69d60ce244de017030a69572c23131f3eed9c825f53ad2265d7ab6a4525",
     "game/hardcore-world.js": "7de846e937add737f5c810a1ae84da4d0b731a13bc60b6497118f2cfac066852",
+    "game/interface-motion.js": "022af5d097c780850669ddf7483e2dc80d965e6d7f74aa1018047cb15e997877",
     "game/library-books.js": "1f29874af09d96c72f613352a9bfe007006550b4f77f0cc692989ddc3c794b0b",
-    "game/mynecraft.html": "c38b943158a195790048caa89a0f52dd4ab359a23018fcb01659670d31dddb56",
+    "game/mynecraft.html": "88bda21a1fc3a949dbf21df53130479f5ac463199304446b6a4a4a3b2bfefe81",
     "game/play-activities.js": "6cf6bcc033a9439bbea2ddea97d99aa1de68855c7ab6b0e20fb6db9092837ab7",
     "game/room-client.js": "d221e39934796921088ceeb744c647f37644a13aa8cfd34a21b78de40482aa45",
     "game/rooms.html": "fa578703572a23618ba3a3010f36e97242fb05e2bfddc4440f8d8392751b276f",
@@ -36,6 +44,6 @@
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "7790d5f7dbdd0f4db5b964f18d9eed348414aa65c016433c0f564c7579d2d80f"
+    "index.html": "a1325c9e4a11a38c5c4bffc42a1ecdf933b7e43bd43231670b648be7af737f0e"
   }
 }
