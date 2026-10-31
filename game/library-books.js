@@ -1,6 +1,6 @@
 /* The Little Library: short, original stories that MYnecraft can read aloud.
  * Pure data plus a small reading session; the host page owns pausing the game.
- * Speech uses the browser's own speechSynthesis, so nothing is sent anywhere. */
+ * Narration is bundled with the game. No player text is sent to a voice service. */
 (function (root) {
   'use strict';
   const STORIES = Object.freeze([
@@ -70,7 +70,10 @@
     if (!synth || typeof Utterance !== 'function') return null;
     return {
       speak(text, onEnd) {
-        const u = new Utterance(text); u.rate = .92; u.pitch = 1.05; u.lang = 'en-US';
+        const u = new Utterance(text); u.rate = 1; u.pitch = 1; u.lang = 'en-US';
+        const voices = typeof synth.getVoices === 'function' ? synth.getVoices() : [];
+        u.voice = voices.find(v => /^en[-_]US$/i.test(v.lang) && /natural|neural|premium|enhanced/i.test(v.name)) ||
+          voices.find(v => /^en[-_]US$/i.test(v.lang)) || null;
         u.onend = () => onEnd && onEnd(); u.onerror = () => onEnd && onEnd(true);
         synth.speak(u);
       },
@@ -78,26 +81,71 @@
     };
   }
 
+  // Reuse one media element so a tap unlocks the whole book on mobile browsers.
+  // A late play rejection or ended event from an old page must not skip a page.
+  function recordedSpeech(win) {
+    if (!win || typeof win.Audio !== 'function') return null;
+    let audio;
+    try { audio = new win.Audio(); } catch (_) { return null; }
+    audio.preload = 'none'; audio.hidden = true;
+    let generation = 0, playGeneration = 0, active = false, paused = false, complete = null;
+    function play(mine) {
+      const attempt = ++playGeneration;
+      try {
+        const pending = audio.play();
+        if (pending && typeof pending.catch === 'function') pending.catch(() => {
+          if (mine === generation && attempt === playGeneration && active && !paused) complete(true);
+        });
+      } catch (_) { if (mine === generation && active && !paused) complete(true); }
+    }
+    return {
+      element: audio, label: 'Natural storyteller · AI voice',
+      speak(text, onEnd, context) {
+        const mine = ++generation;
+        const story = context && byId(context.book), page = context && context.page;
+        if (!story || !Number.isInteger(page) || story.pages[page] !== text) { onEnd && onEnd(true); return; }
+        active = true; paused = false;
+        const finish = failed => {
+          if (mine !== generation || !active) return;
+          active = false; audio.onended = audio.onerror = null;
+          onEnd && onEnd(!!failed);
+        };
+        complete = finish;
+        audio.onended = () => finish(false);
+        audio.onerror = () => finish(true);
+        audio.src = 'assets/library-audio/ava-v1/' + story.id + '-' + (page + 1) + '.mp3';
+        play(mine);
+      },
+      pause() { playGeneration++; paused = true; audio.pause(); },
+      resume() { paused = false; if (active) play(generation); },
+      cancel() {
+        generation++; playGeneration++; active = false; paused = false;
+        audio.onended = audio.onerror = null; audio.pause();
+        audio.removeAttribute('src'); audio.load();
+      }
+    };
+  }
+
   function createSession(speech, onChange) {
-    let book = null, page = 0, reading = false, paused = false, generation = 0;
+    let book = null, page = 0, reading = false, paused = false, generation = 0, error = '';
     const notify = () => onChange && onChange(state());
-    function state() { return { book: book && book.id, title: book && book.title, page, pages: book ? book.pages.length : 0, text: book ? book.pages[page] : '', reading, paused, canSpeak: !!speech }; }
-    function silence() { generation++; reading = false; paused = false; if (speech) speech.cancel(); }
+    function state() { return { book: book && book.id, title: book && book.title, page, pages: book ? book.pages.length : 0, text: book ? book.pages[page] : '', reading, paused, canSpeak: !!speech, error }; }
+    function silence() { generation++; reading = false; paused = false; error = ''; if (speech) speech.cancel(); }
     function speakPage() {
       const mine = ++generation;
       speech.cancel();
       speech.speak(book.pages[page], failed => {
         if (mine !== generation || !reading) return;
         if (!failed && page < book.pages.length - 1) { page++; notify(); speakPage(); }
-        else { reading = false; paused = false; notify(); }
-      });
+        else { reading = false; paused = false; error = failed ? 'The voice could not play. Tap Read to me to try again.' : ''; notify(); }
+      }, { book: book.id, page });
     }
     return {
       state,
       open(id) { const next = byId(id); if (!next) return false; silence(); book = next; page = 0; notify(); return true; },
       next() { if (!book || page >= book.pages.length - 1) return false; const keep = reading; silence(); page++; if (keep) { reading = true; speakPage(); } notify(); return true; },
       prev() { if (!book || page <= 0) return false; const keep = reading; silence(); page--; if (keep) { reading = true; speakPage(); } notify(); return true; },
-      readAloud() { if (!book || !speech) return false; reading = true; paused = false; speakPage(); notify(); return true; },
+      readAloud() { if (!book || !speech) return false; error = ''; reading = true; paused = false; speakPage(); notify(); return true; },
       pause() { if (!reading || paused) return false; paused = true; speech.pause(); notify(); return true; },
       resume() { if (!reading || !paused) return false; paused = false; speech.resume(); notify(); return true; },
       stop() { silence(); notify(); },
@@ -105,8 +153,9 @@
     };
   }
 
-  // The reading room overlay. It never stores anything and makes no requests.
+  // The reading room loads only the selected page's same-site audio, on demand.
   function mount(doc, win, hooks = {}) {
+    const speech = recordedSpeech(win) || browserSpeech(win);
     const el = (tag, cls, text) => { const n = doc.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
     const overlay = el('div'); overlay.id = 'libraryOverlay'; overlay.hidden = true;
     const sheet = el('section', 'library-sheet'); sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'libraryTitle');
@@ -128,8 +177,12 @@
     const stopBtn = btn('■ Stop', () => session.stop());
     const shelfBtn = btn('Choose another book', () => session.closeBook());
     const noVoice = el('p', 'library-note', 'This device cannot read aloud, but you can still read every page.');
+    const voiceLabel = el('p', 'library-voice library-note', speech ? (speech.label || 'Device voice') : '');
+    voiceLabel.hidden = !speech;
+    const voiceError = el('p', 'library-error library-note'); voiceError.setAttribute('role', 'status'); voiceError.hidden = true;
     nav.append(prevBtn, nextBtn); talk.append(readBtn, stopBtn, shelfBtn);
-    reader.append(bookTitle, pageText, pageCount, nav, talk, noVoice);
+    reader.append(bookTitle, pageText, pageCount, nav, talk, voiceLabel, voiceError, noVoice);
+    if (speech && speech.element) reader.appendChild(speech.element);
     const close = btn('Close the library', () => api.close(), 'library-close');
     sheet.append(title, intro, shelf, reader, close); overlay.appendChild(sheet); doc.body.appendChild(overlay);
     function paint(s) {
@@ -141,8 +194,9 @@
       readBtn.hidden = stopBtn.hidden = !s.canSpeak; noVoice.hidden = s.canSpeak;
       readBtn.textContent = !s.reading ? '🔊 Read to me' : s.paused ? '▶ Keep reading' : '⏸ Pause';
       stopBtn.disabled = !s.reading;
+      voiceError.textContent = s.error; voiceError.hidden = !s.error;
     }
-    const session = createSession(browserSpeech(win), paint);
+    const session = createSession(speech, paint);
     const api = {
       isOpen: () => !overlay.hidden,
       open() { if (!overlay.hidden) return; overlay.hidden = false; session.closeBook(); paint(session.state()); hooks.onOpen && hooks.onOpen(); (shelf.querySelector('button') || close).focus && (shelf.querySelector('button') || close).focus(); },
@@ -152,5 +206,5 @@
     win.addEventListener('keydown', e => { if (!overlay.hidden && e.code === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); api.close(); } }, true);
     return api;
   }
-  root.MYNE_LIBRARY = Object.freeze({ STORIES, createSession, mount, browserSpeech });
+  root.MYNE_LIBRARY = Object.freeze({ STORIES, createSession, mount, browserSpeech, recordedSpeech });
 })(globalThis);
