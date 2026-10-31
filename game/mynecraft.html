@@ -2357,14 +2357,15 @@ function clampCapUV(geo){
   uv.needsUpdate=true;return geo;
 }
 function drawSVChestLogo(ctx,cx=32,cy=28,scale=1){
-  ctx.save();ctx.translate(cx,cy);ctx.scale(scale,scale);
-  ctx.font='900 26px Impact,"Arial Black",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.lineJoin='round';
-  ctx.strokeStyle='#f0f7fc';ctx.lineWidth=6;ctx.strokeText('SV',0,0);
-  ctx.strokeStyle='#102842';ctx.lineWidth=3.2;ctx.strokeText('SV',0,0);
-  ctx.fillStyle='#58b4e8';ctx.fillText('SV',0,0);
-  ctx.fillStyle='#70b6df';ctx.fillRect(-14,-10,28,2);
-  ctx.restore();
+  // Pixel-art 'SV': 5x7 glyphs on an integer grid (2 px cells at scale 1, 1 px cells at scale .5),
+  // with a 1 px dark outline at full size, so the logo stays crisp on the 64 px textures instead
+  // of the blurred Impact text it replaced.
+  const S=['.####','#....','#....','.###.','....#','....#','####.'],V=['#...#','#...#','#...#','#...#','.#.#.','.#.#.','..#..'];
+  const px=Math.max(1,Math.round(2*scale)),gap=px,w=(5+1+5)*px,h=7*px,x0=cx-Math.round(w/2),y0=cy-Math.round(h/2);
+  const draw=(color,dx,dy)=>{ctx.fillStyle=color;[S,V].forEach((g,gi)=>g.forEach((row,r)=>[...row].forEach((ch,c)=>{if(ch==='#')ctx.fillRect(x0+(gi*6+c)*px+dx,y0+r*px+dy,px,px);})));};
+  if(px>1)for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]])draw('#102842',dx,dy);
+  draw('#58b4e8',0,0);
+  if(px>1){ctx.fillStyle='#70b6df';ctx.fillRect(cx-14,cy-10,28,2);}
 }
 const macekClothes=Object.fromEntries(['polo','black'].map(style=>[style,outfitTexture(ctx=>{
   ctx.fillStyle=style==='polo'?'#1685d1':'#171b22';ctx.fillRect(0,0,64,64);
@@ -2520,9 +2521,7 @@ function staffLook(style){
     if(isMusic){
       ctx.fillStyle='#171a1f';ctx.fillRect(16,0,32,7);
       ctx.fillStyle='#777d83';ctx.fillRect(31,0,2,27);ctx.fillStyle='#d0d0c7';ctx.fillRect(30,23,4,5);
-      ctx.font='900 13px Impact,"Arial Black",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.strokeStyle='#f0f7fc';ctx.lineWidth=2.4;ctx.strokeText('SV',46,20);
-      ctx.fillStyle='#58b4e8';ctx.fillText('SV',46,20);
+      drawSVChestLogo(ctx,46,20,.5);
     }
     if(style==='mcmichael'){
       ctx.fillStyle='#d7cfbd';for(let x=2;x<64;x+=5)ctx.fillRect(x,0,2,64);
@@ -2617,10 +2616,10 @@ function styleStaffPerson(npc,style){
       part(npc.group,'cardigan lapel',.105,.67,.024,0x1d2128,side*.195,1.02,.162);
       part(npc.group,'cardigan hem',.13,.045,.32,0x14171c,side*.185,.70,0);
     }
-    for(const arm of [npc.armL,npc.armR])part(arm,'sleeve cuff',.235,.05,.265,0x242830,0,-.41,0);
+    for(const arm of [npc.armL,npc.armR])part(arm,'sleeve cuff',.24,.05,.27,0x242830,0,-.60,0);
   }
   if(isPE){
-    part(npc.group,'hood',.55,.19,.23,0x18263e,0,1.34,-.19);
+    part(npc.group,'hood',.50,.19,.20,0x18263e,0,1.34,-.205);
     part(npc.group,'hoodie collar',.36,.065,.035,0x18263e,0,1.33,.162);
     part(npc.group,'hoodie pocket',.38,.19,.026,0x16233a,0,.80,.164);
     for(const side of [-1,1]){
@@ -2831,10 +2830,10 @@ function stylePerson(npc,style){
     part(.08,.1,.04,0x6cb6e2,.16,1.12,.16);
   } else if(style==='micco'){
     stylePerson.miccoFront??=outfitTexture(ctx=>{
-      ctx.fillStyle='#a6a8ad';ctx.fillRect(0,0,64,64);
-      for(let y=0;y<64;y+=4)for(let x=0;x<64;x+=4){
-        ctx.fillStyle=(x+y)%8===0?'#b8bac0':(x*3+y)%12===0?'#8d9096':'#9fa1a7';
-        ctx.fillRect(x,y,4,4);
+      ctx.fillStyle='#a2a4aa';ctx.fillRect(0,0,64,64);
+      // Soft 8 px two-tone knit, like the sleeves: the old 4 px three-tone speckle read as static.
+      for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){
+        ctx.fillStyle=((x+y)/8)%2===0?'#aaacb2':'#999ca2';ctx.fillRect(x,y,8,8);
       }
       ctx.fillStyle='#1f2531';ctx.fillRect(18,0,28,64);
       ctx.fillStyle='#151a24';ctx.fillRect(18,0,28,4);
@@ -3443,6 +3442,8 @@ const playerAvatars=Object.fromEntries(STAFF_CHARACTERS.map(c=>{
   avatar.group.visible=false;scene.add(avatar.group);return [c.id,avatar];
 }));
 let playerAvatar=playerAvatars[playerCharacter];
+// Title-picture renders (game/assets/staff-lineup) come from these real models: ?lineup=1 exposes them to a local render script only.
+if(new URLSearchParams(location.search).has('lineup'))globalThis.MYNE_LINEUP={THREE,scene,renderer,playerAvatars,macek,eriksen};
 const viewModel=new THREE.Group(),viewArms={},viewShoulders=[];
 const warmViewMat=(mesh,intensity=.42)=>{mesh.material.forEach(m=>{m.emissive?.setHex?.(0xffffff);m.emissiveMap=m.map;m.emissiveIntensity=intensity;m.needsUpdate=true;});};
 for(const [name,side] of [['armL',-1],['armR',1]]){
@@ -5356,8 +5357,8 @@ function updateCoordHUD() {
   coordHUD.innerHTML =
     (activities?.isFishing()?'Tool: Fishing rod':activities?.hasTea?.()?'Holding: Cup of tea':chosenGarden?`Garden: ${GARDEN_KITS[chosenGarden]}`:chosenAnimal?`Animal: ${chosenAnimal}`:`<span style="color:${bk.swatch}">\u25a0</span> ${bk.name}`) +
     (gameMode!=='creative'?` (${inventory[BLOCK_KEYS[selected]]})<br>${gameMode==='hardcore'?'Hardcore · ':''}Health ${Math.ceil(health)}/20 · Air ${Math.ceil(breath)}/10`:' · Creative') +
-    (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<br>Sunset meet-up: ECMS entrance':'') +
-    (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<br>Cookie Man: evening sweep':'');
+    (!isHardcoreWorld&&!isGroupRoom&&dayTime>=.43&&dayTime<=.56?'<span class="campus-note"><br>Sunset meet-up: ECMS entrance</span>':'') +
+    (!isHardcoreWorld&&!isGroupRoom&&cookieOnDuty(dayTime)?'<span class="campus-note"><br>Cookie Man: evening sweep</span>':'');
 }
 
 // ---------- touch controls (iPhone / iPad) ----------

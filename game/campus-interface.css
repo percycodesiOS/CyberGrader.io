@@ -182,6 +182,8 @@ html body.campus-ui #controls #gameClock { background: #ffffff0a; border-color: 
 html body.campus-ui #hotbar { background: #24262bee; border: 1px solid #d8dcc650; border-radius: 8px; padding: 6px; box-shadow: 0 4px 15px #0004; max-width: calc(100vw - 24px); box-sizing: border-box; }
 html body.campus-ui #hotbar button { background: #505548; border: 1px solid #9ca58d; border-radius: 4px; }
 html body.campus-ui #coordinates { background: #24262be8; border-color: #7c8770; color: #ecefe4; border-radius: 5px; }
+/* Phones: the block pill above the hotbar shows only the block; campus notes (sunset meet-up, Cookie Man) stay on larger screens. */
+body.touch-device #coordinates .campus-note { display: none; }
 html body.campus-ui #inventoryOverlay { background: #141b13c9; }
 html body.campus-ui .inventory-sheet { background: #24282f; border: 1px solid #98a28a; border-radius: 10px; color: #f6f8f0; }
 html body.campus-ui .inventory-head { background: #24282f; border-color: #56647a; border-radius: 9px 9px 0 0; }
