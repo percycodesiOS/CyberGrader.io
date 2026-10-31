@@ -20,7 +20,7 @@ body.campus-ui {
 .campus-ui .nav-picked { display: none; }
 .campus-ui .motion-toggle,html body.campus-ui #start .motion-toggle { flex: 0 0 auto; height: auto; width: auto; align-self: center; }
 .campus-ui .motion-toggle,html body.campus-ui #start .motion-toggle { min-height: 36px; padding: 7px 11px; border: 1px solid #a2ac9760; border-radius: 5px; background: #24262bd9; color: #e8efdf; font: 600 12px/1.2 "Segoe UI",sans-serif; cursor: pointer; box-shadow: none; }
-.campus-ui .nav-cta { background: var(--ui-paper); color: #1c1f24; border: 1px solid #fff; border-radius: 6px; box-shadow: 0 3px 0 #0006; font: 800 13px/1 "Segoe UI",sans-serif; min-height: 36px; }
+.campus-ui .nav-cta { background: linear-gradient(#7ad35a,#43a02b); color: #fff; text-shadow: 0 1px 0 #1f4d14; border: 1px solid #d9f7c9; border-radius: 6px; box-shadow: 0 3px 0 #0006; font: 800 13px/1 "Segoe UI",sans-serif; min-height: 36px; }
 .campus-ui .title-screen { min-height: 100dvh; }
 .campus-ui .title-shade { background: linear-gradient(180deg,#161c1b24 0%,#1b211b0d 35%,#1b211b52 76%,#1c1f24 100%); }
 .campus-ui .scene { animation: none; }
@@ -249,6 +249,7 @@ html body.campus-ui .inventory-close,html body.campus-ui .inventory-back { backg
   html body.campus-ui #start .staff-preview { height: 113px; }
   html body.campus-ui #start .try-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   html body.campus-ui #controls #flyToggle,html body.campus-ui #controls #questToggle { font-size: 0; }
+  html body.campus-ui #controls #flyToggle::before,html body.campus-ui #controls #questToggle::before { font-size: 18px; line-height: 1; }
   html body.campus-ui #controls #saveStateIndicator { margin: 0; }
 }
 @media (max-width: 420px) {
@@ -297,8 +298,8 @@ html body.campus-ui .inventory-close,html body.campus-ui .inventory-back { backg
 .campus-ui .mode:has(input:checked) small,html body.campus-ui #start .mode-card[aria-checked="true"] small { color: #3a556a; }
 .campus-ui .mode:has(input:checked) .icon,html body.campus-ui #start .mode-card[aria-checked="true"] .icon { background: #ffffff50; }
 .campus-ui .mode:has(input:checked) .go,html body.campus-ui #start .mode-card[aria-checked="true"]::after { background: #31576c; color: white; }
-.campus-ui .play,html body.campus-ui #start .hero-play #enter { color: #163047; background: linear-gradient(#dff3ff,#9ac9eb); border: 2px solid #eefaff; border-bottom: 5px solid #527e9d; border-radius: 8px; box-shadow: 0 5px 0 #142837,0 10px 32px #a2d9ff30; letter-spacing: .09em; }
-.campus-ui .play:hover,html body.campus-ui #start .hero-play #enter:hover { color: #153047; background: linear-gradient(#f4fbff,#c3e8ff); box-shadow: 0 7px 0 #142837,0 12px 35px #b7e3ff50; }
+.campus-ui .play,html body.campus-ui #start .hero-play #enter { color: #fff; text-shadow: 0 2px 0 #1f4d14; background: linear-gradient(#7ad35a,#43a02b); border: 2px solid #d9f7c9; border-bottom: 5px solid #2a6a1c; border-radius: 8px; box-shadow: 0 5px 0 #173d10,0 10px 32px #6fd05030; letter-spacing: .09em; }
+.campus-ui .play:hover,html body.campus-ui #start .hero-play #enter:hover { color: #fff; background: linear-gradient(#8fe06e,#4fb334); box-shadow: 0 7px 0 #173d10,0 12px 35px #8ae56a50; }
 .campus-ui .quest-link,html body.campus-ui #start .first-player-banner { overflow: hidden; color: #18354d; background: linear-gradient(120deg,#9bcced,#e0f3ff 48%,#a6d8f8); border: 2px solid #f1fbff; border-bottom: 5px solid #598baa; box-shadow: 0 7px 0 #1b3b53,0 0 0 4px #b8e5ff33,0 16px 48px #9ad8ff60; }
 .campus-ui .quest-link::before,html body.campus-ui #start .first-player-banner::before { color: #f4fbff; background: #254b65; border-color: #5888a8; }
 .campus-ui .quest-link b,html body.campus-ui #start .first-player-banner strong { color: #15374f; }

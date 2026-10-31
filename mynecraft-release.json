@@ -1,6 +1,6 @@
 {
   "sourceRepository": "https://github.com/percycodesiOS/MYnecraft",
-  "sourceCommit": "b40966db14e32a8ea687172e37614cdb8e05d064",
+  "sourceCommit": "d170c3dc5a839ad377876e9bc83f6f432a72cd5a",
   "liveBase": "https://percycodesios.github.io/CyberGrader.io/",
   "primaryBase": "https://percycodesios.github.io/MYnecraft/",
   "compatibilityBase": "https://percycodesios.github.io/CyberGrader.io/",
@@ -29,12 +29,12 @@
     "game/assets/ui/pe.svg": "7ccca68b0eec2d447277802ad84852efcb8e6ee7aa3934d02ffb8aef3640e20f",
     "game/assets/ui/spanish.svg": "56f2678100033b81c90eb1173b7b34641f4cb8d2284a7f259befc548771fed5f",
     "game/cafeteria-cleaner.js": "c734abb2a3783388e3304792b4fbe3690d2b0564780f50d760fdad1e3e47cada",
-    "game/campus-interface.css": "8988d1818aad9f837b5d23cb227dc431b86dffad5f12133e2e30885ca1304d2e",
+    "game/campus-interface.css": "62ee3ec7147542707566a50c9d24bf53732a972abd1eb317bcb320ec8c0a2a69",
     "game/hardcore-rules.js": "6910c69d60ce244de017030a69572c23131f3eed9c825f53ad2265d7ab6a4525",
     "game/hardcore-world.js": "7de846e937add737f5c810a1ae84da4d0b731a13bc60b6497118f2cfac066852",
     "game/interface-motion.js": "022af5d097c780850669ddf7483e2dc80d965e6d7f74aa1018047cb15e997877",
     "game/library-books.js": "1f29874af09d96c72f613352a9bfe007006550b4f77f0cc692989ddc3c794b0b",
-    "game/mynecraft.html": "88bda21a1fc3a949dbf21df53130479f5ac463199304446b6a4a4a3b2bfefe81",
+    "game/mynecraft.html": "5e41205d1231e535cf7192123626286f52d2fadfd1d5efeec3c3497ac5c5bc40",
     "game/play-activities.js": "6cf6bcc033a9439bbea2ddea97d99aa1de68855c7ab6b0e20fb6db9092837ab7",
     "game/room-client.js": "d221e39934796921088ceeb744c647f37644a13aa8cfd34a21b78de40482aa45",
     "game/rooms.html": "fa578703572a23618ba3a3010f36e97242fb05e2bfddc4440f8d8392751b276f",
@@ -44,6 +44,6 @@
     "game/vendor/README.md": "13fbd48e98d955aa6d2b11aa6ea867277dae95fa03465b73b2b92dea6a61b740",
     "game/vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "game/vendor/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
-    "index.html": "a1325c9e4a11a38c5c4bffc42a1ecdf933b7e43bd43231670b648be7af737f0e"
+    "index.html": "69574d6d890e22c2aa2f715a826460d4a8028358d27fa8b593e2ea28d65e1ab9"
   }
 }
