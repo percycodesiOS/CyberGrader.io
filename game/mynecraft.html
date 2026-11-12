@@ -304,10 +304,12 @@
       <div class="try-grid">
         <button type="button" class="try-choice" data-try="quest"><span aria-hidden="true">🎓</span><strong>Basics quest</strong><small>Learn by doing, step by step</small></button>
         <button type="button" class="try-choice" data-try="car"><span aria-hidden="true">🚗</span><strong>Drive the car</strong><small>Start right beside it</small></button>
+        <button type="button" class="try-choice" data-try="bus"><span aria-hidden="true">🚌</span><strong>Drive the school bus</strong><small>It waits in the parking lot</small></button>
         <button type="button" class="try-choice" data-try="hoops"><span aria-hidden="true">🏀</span><strong>Shoot hoops</strong><small>Start on the court</small></button>
         <button type="button" class="try-choice" data-try="tea"><span aria-hidden="true">☕</span><strong>Tea on the roof</strong><small>A cozy cup with a view</small></button>
         <button type="button" class="try-choice" data-try="story"><span aria-hidden="true">📖</span><strong>Story time</strong><small>Hear a book read aloud</small></button>
         <button type="button" class="try-choice" data-try="library"><span aria-hidden="true">📚</span><strong>Build a library</strong><small>Place one with a tap</small></button>
+        <button type="button" class="try-choice" data-try="computer"><span aria-hidden="true">🖥️</span><strong>Build a computer</strong><small>Buttons, lights and red rock</small></button>
         <button type="button" class="try-choice" data-try="dogs"><span aria-hidden="true">🐕</span><strong>Walk with the dogs</strong><small>Percy and Ellie follow you</small></button>
         <button type="button" class="try-choice" data-try="clover"><span aria-hidden="true">🍀</span><strong>Clover patch</strong><small>Plant, water and pick clovers</small></button>
       </div>
@@ -385,6 +387,10 @@
       <ol><li>Place one Glowstone block on the ground.</li><li>Build a shaft with Glass around it. Leave a doorway at the bottom and an exit at the top.</li><li>Place Water in every space directly above the Glowstone. A gap stops the lift.</li><li>Turn flight off and walk into the water. It lifts you! Walk out at the top. Hold V or DOWN to ride down.</li></ol>
       <p>This MYnecraft recipe uses Glowstone. Ordinary water still works for swimming. The lift works in both game modes; in Embrace the Challenge, collect the blocks first.</p>
     </details>
+    <details class="start-advanced"><summary>🖥️ Build a computer that lights up</summary>
+      <ol><li>Open Blocks and scroll to the end. Choose a button: red, green, blue or yellow.</li><li>Place the button. Put Red rock against it, in a line as long as you like.</li><li>Put a Computer light against the Red rock.</li><li>Face the button and press E, or tap Press button. Power runs along the Red rock and the lights switch on.</li></ol>
+      <p>The lights stay on for about two seconds. Press again any time. Glowstone is a light that always stays on. Buttons, Red rock and Computer lights are Creative blocks.</p>
+    </details>
     <details class="start-advanced"><summary>⌨️ All the controls</summary>
       <p><strong>Choose your blocks:</strong> Open Blocks / Inventory or press I while playing. Choose a pictured material to keep building. Creative has unlimited blocks; Embrace the Challenge shows what you have collected. Back to game, I, or Esc closes the picker. The block bar still works too.</p>
       <p><strong>Keyboard and mouse:</strong> W Forward · S Back · A Left · D Right. The arrow keys also move: ↑ Forward · ↓ Back · ← Left · → Right. Move your mouse to look, or click and drag if it stays free. Space jumps or swims up; Shift sprints on foot. Left click breaks a block, and right click places the selected block. Use 1–9, [ and ], the scroll wheel, or the block bar to change materials.</p>
@@ -406,7 +412,7 @@
 
 <script src="hardcore-rules.js"></script>
 <script src="hardcore-world.js"></script>
-<script src="play-activities.js"></script>
+<script src="play-activities.js?v=bus-20261112"></script>
 <script src="library-books.js?v=natural-voice-20261031"></script>
 <script src="tutorial.js"></script>
 <script src="room-client.js"></script>
@@ -595,7 +601,54 @@ const texBookshelf=makeTexture(ctx=>{
   ctx.fillStyle='#4a321c';ctx.fillRect(0,7,16,2);ctx.fillRect(0,14,16,2);
 });
 BLOCKS.bookshelf={name:'Bookshelf',swatch:'#8b5a2b',mats:[mkMat(texBookshelf),mkMat(texBookshelf),mkMat(texPlanks),mkMat(texPlanks),mkMat(texBookshelf),mkMat(texBookshelf)]};
-const INVENTORY_ADDITIONS=[...Object.keys(FLOWERS),...Object.keys(EXTRA_COLORS),'bookshelf'];
+// Computer parts for the class's model computers: a pressed button sends power
+// along touching Red rock to every Computer light it reaches. Appended after
+// Bookshelf, so every older save's selected-block index stays the same. Power is
+// never saved: it is worked out from the blocks each time a button is pressed.
+const ROCK_CRACKS=[[2,3,3,1],[9,1,2,1],[12,6,3,1],[4,9,2,1],[7,12,4,1],[1,13,2,1],[13,12,2,1]];
+const texRedRock=makeTexture(ctx=>{
+  noise(ctx,[158,42,34],34);
+  ctx.fillStyle='#6e1c18';for(const [x,y,w,h] of ROCK_CRACKS)ctx.fillRect(x,y,w,h);
+  ctx.fillStyle='#e0563f';for(const [x,y] of [[5,5],[11,3],[3,11],[10,9],[14,14],[7,7]])ctx.fillRect(x,y,1,1);
+});
+const texRedRockOn=makeTexture(ctx=>{
+  noise(ctx,[255,92,54],22);
+  ctx.fillStyle='#ffd98a';for(const [x,y,w,h] of ROCK_CRACKS)ctx.fillRect(x,y,w,h);
+  ctx.fillStyle='#fff3c8';for(const [x,y] of [[5,5],[11,3],[3,11],[10,9],[14,14],[7,7]])ctx.fillRect(x,y,1,1);
+});
+// A steel plate with four rivets and one big round push button.
+function buttonTexture(face,rim,pressed){
+  return makeTexture(ctx=>{
+    noise(ctx,[58,64,74],10);
+    ctx.fillStyle='#262b33';ctx.fillRect(0,0,16,1);ctx.fillRect(0,15,16,1);ctx.fillRect(0,0,1,16);ctx.fillRect(15,0,1,16);
+    ctx.fillStyle='#9aa3ad';for(const [x,y] of [[2,2],[13,2],[2,13],[13,13]])ctx.fillRect(x,y,1,1);
+    ctx.fillStyle=rim;ctx.fillRect(5,3,6,10);ctx.fillRect(3,5,10,6);ctx.fillRect(4,4,8,8);
+    ctx.fillStyle=face;ctx.fillRect(5,4,6,8);ctx.fillRect(4,5,8,6);
+    ctx.fillStyle=pressed?'rgba(255,255,255,.8)':'rgba(255,255,255,.45)';ctx.fillRect(5,5,2,2);
+  });
+}
+function lightTexture(lit){
+  return makeTexture(ctx=>{
+    noise(ctx,lit?[126,104,52]:[70,62,48],10);
+    ctx.fillStyle=lit?'#4a3c1e':'#2e2a22';ctx.fillRect(0,0,16,1);ctx.fillRect(0,15,16,1);ctx.fillRect(0,0,1,16);ctx.fillRect(15,0,1,16);
+    for(const y of [3,9])for(const x of [3,9]){
+      if(lit){ctx.fillStyle='#ffe98a';ctx.fillRect(x-1,y-1,6,6);}
+      ctx.fillStyle=lit?'#fffdf0':'#8a7a4a';ctx.fillRect(x,y,4,4);
+      ctx.fillStyle=lit?'#ffffff':'#b9a868';ctx.fillRect(x,y,1,1);
+    }
+  });
+}
+BLOCKS.redrock={name:'Red rock',swatch:'#a02e25',mats:Array(6).fill(mkMat(texRedRock)),power:'wire',onTexture:texRedRockOn};
+const BUTTON_COLORS={button:['Red button','#e2463c','#8c1f1a','#ff9a8c'],greenbutton:['Green button','#3fbf5f','#1f6b33','#a8ffb8'],bluebutton:['Blue button','#3f8fe8','#1d4f93','#b0d8ff'],yellowbutton:['Yellow button','#f2c230','#9a7412','#fff2a8']};
+// A little of each button's own colour shines by itself, so a keypad still reads in the shade.
+for(const [id,[name,face,rim,glow]] of Object.entries(BUTTON_COLORS)){
+  const texture=buttonTexture(face,rim,false);
+  BLOCKS[id]={name,swatch:face,mats:Array(6).fill(mkMat(texture,{emissive:0xffffff,emissiveMap:texture,emissiveIntensity:.3})),power:'button',onTexture:buttonTexture(glow,face,true)};
+}
+BLOCKS.lamp={name:'Computer light',swatch:'#f2d76a',mats:Array(6).fill(mkMat(lightTexture(false))),power:'light',onTexture:lightTexture(true)};
+const POWER_BLOCKS=['redrock',...Object.keys(BUTTON_COLORS),'lamp'];
+let powerDirty=false;
+const INVENTORY_ADDITIONS=[...Object.keys(FLOWERS),...Object.keys(EXTRA_COLORS),'bookshelf',...POWER_BLOCKS];
 const BLOCK_KEYS = [...LEGACY_BLOCK_KEYS,...Object.keys(BLOCKS).filter(k=>!LEGACY_BLOCK_KEYS.includes(k))];
 const GARDEN_KITS={oak:'Oak tree',cherry:'Cherry tree',pine:'Pine tree',hedge:'Leafy hedge',flowerbed:'Flower bed',pond:'Fishing pond',library:'Little library'};
 // facing: the direction from the player to the aimed block, so a library's door faces the player.
@@ -1326,6 +1379,7 @@ let _saveTimer = null;
 let onWorldEdit=null; // set once Percy and Ellie exist
 function recordEdit(x,y,z,k){
   saveState.edits[key(x,y,z)] = k;   // k = block name, or null for a removed block
+  powerDirty=true;
   onWorldEdit?.();
   if (_saveTimer) clearTimeout(_saveTimer);
   _saveTimer = setTimeout(persistSave, 350);
@@ -3872,6 +3926,7 @@ function blip(freq, dur, type, vol) {
 const sndBreak = () => blip(180 + Math.random()*40, 0.09, 'square', 0.07);
 const sndPlace = () => blip(320 + Math.random()*40, 0.07, 'triangle', 0.07);
 const sndStep  = () => blip(120, 0.05, 'sine', 0.03);
+const sndButton = () => { blip(700, 0.05, 'square', 0.06); setTimeout(() => blip(470, 0.09, 'square', 0.05), 70); };
 
 // ---------- player + controls ----------
 const player = {
@@ -4445,8 +4500,10 @@ function updatePlayerAvatar(dt){
   // Pull the camera back behind the player, stopping short of whatever is behind them
   // so the view never ends up inside a wall.
   camera.getWorldDirection(_viewDir);
+  // The school bus is long: its driver's camera sits further back to show all of it.
+  const range=activities?.viewRange?.()||THIRD_PERSON_RANGE;
   let back=0;
-  for(let s=.1;s<=THIRD_PERSON_RANGE+.001;s+=.1){
+  for(let s=.1;s<=range+.001;s+=.1){
     const cx=player.pos.x-_viewDir.x*s,cy=player.pos.y-_viewDir.y*s+.35*s/THIRD_PERSON_RANGE,cz=player.pos.z-_viewDir.z*s;
     let blocked=false;
     for(let x=Math.floor(cx-.16);x<=Math.floor(cx+.16);x++)
@@ -4730,14 +4787,87 @@ function aimedBookshelf(){
   const hit=aimHit;
   return !!library&&!!hit&&getBlock(hit.x,hit.y,hit.z)==='bookshelf'&&Math.hypot(hit.x+.5-player.pos.x,hit.y+.5-player.pos.y,hit.z+.5-player.pos.z)<4.5;
 }
+// ---------- computer parts: buttons power red rock and lights ----------
+const POWER_SECONDS=1.8,POWER_LIMIT=1500;
+const poweredButtons=new Map();   // "x,y,z" of a pressed button -> seconds left
+const powerOverlays=new Map(),powerMaterials=new Map();
+const powerGeometry=new THREE.BoxGeometry(1.02,1.02,1.02),powerDummy=new THREE.Object3D();
+let powerTick=0;
+// Every lit cell: pressed buttons, the Red rock joined to them, and the lights
+// touching either. Power does not pass through a light or through another button.
+function computePower(){
+  const lit=new Map(),queue=[];
+  for(const id of poweredButtons.keys()){
+    const [x,y,z]=id.split(',').map(Number),type=getBlock(x,y,z);
+    if(BLOCKS[type]?.power!=='button'){poweredButtons.delete(id);continue;}
+    lit.set(id,type);queue.push([x,y,z]);
+  }
+  for(let i=0;i<queue.length&&i<POWER_LIMIT;i++){
+    const [x,y,z]=queue[i];
+    for(const [dx,dy,dz] of faceDirections){
+      const nx=x+dx,ny=y+dy,nz=z+dz,id=key(nx,ny,nz);
+      if(lit.has(id))continue;
+      const type=getBlock(nx,ny,nz),role=BLOCKS[type]?.power;
+      if(role==='wire'){lit.set(id,type);queue.push([nx,ny,nz]);}
+      else if(role==='light')lit.set(id,type);
+    }
+  }
+  return lit;
+}
+// Lit blocks are drawn as bright cubes over the real ones, so the world, its
+// saves and its backups never hold an "on" block.
+function powerOverlay(type,needed){
+  let mesh=powerOverlays.get(type);
+  if(!mesh||mesh.instanceMatrix.count<needed){
+    if(mesh){scene.remove(mesh);mesh.dispose();}
+    if(!powerMaterials.has(type))powerMaterials.set(type,new THREE.MeshBasicMaterial({map:BLOCKS[type].onTexture,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+    mesh=new THREE.InstancedMesh(powerGeometry,powerMaterials.get(type),Math.max(64,2**Math.ceil(Math.log2(needed))));
+    mesh.name='Powered '+BLOCKS[type].name;mesh.frustumCulled=false;mesh.count=0;scene.add(mesh);powerOverlays.set(type,mesh);
+  }
+  return mesh;
+}
+function drawPower(){
+  const lit=computePower(),byType=new Map();
+  for(const [id,type] of lit){if(!byType.has(type))byType.set(type,[]);byType.get(type).push(id);}
+  for(const [type,mesh] of powerOverlays)if(!byType.has(type)){mesh.count=0;mesh.visible=false;}
+  for(const [type,ids] of byType){
+    const mesh=powerOverlay(type,ids.length);
+    ids.forEach((id,i)=>{const [x,y,z]=id.split(',').map(Number);powerDummy.position.set(x+.5,y+.5,z+.5);powerDummy.updateMatrix();mesh.setMatrixAt(i,powerDummy.matrix);});
+    mesh.count=ids.length;mesh.visible=true;mesh.instanceMatrix.needsUpdate=true;
+  }
+  return lit;
+}
+function updatePower(dt){
+  if(!poweredButtons.size&&!powerDirty)return;
+  for(const [id,left] of poweredButtons){
+    if(left<=dt){poweredButtons.delete(id);powerDirty=true;}else poweredButtons.set(id,left-dt);
+  }
+  powerTick-=dt;
+  if(powerDirty||powerTick<=0){drawPower();powerDirty=false;powerTick=.15;}
+}
+function aimedButton(){
+  const hit=aimHit;
+  return hit&&BLOCKS[getBlock(hit.x,hit.y,hit.z)]?.power==='button'&&Math.hypot(hit.x+.5-player.pos.x,hit.y+.5-player.pos.y,hit.z+.5-player.pos.z)<5.5?hit:null;
+}
+function pressButton(hit){
+  poweredButtons.set(key(hit.x,hit.y,hit.z),POWER_SECONDS);
+  const reached=[...drawPower().values()].map(type=>BLOCKS[type].power);powerDirty=false;powerTick=.15;
+  const lights=reached.filter(role=>role==='light').length,rocks=reached.filter(role=>role==='wire').length;
+  sndButton();swingArm();
+  document.getElementById('status').textContent=lights?`Click! ${lights} Computer light${lights===1?'':'s'} switched on.`:
+    rocks?'Click! The Red rock is glowing. Put a Computer light against it.':'Click! Put Red rock or a Computer light against this button to send power.';
+  return true;
+}
 function hostPrompt(){
   const cp=cloverPrompt();if(cp)return cp;
+  if(aimedButton())return 'Press button';
   if(aimedBookshelf())return 'Read a book';
   if(dogsNearby())return companionMode==='follow'?'Dogs: go play':'Dogs: follow me';
   return '';
 }
 function hostInteract(){
   if(interactClover())return true;
+  const button=aimedButton();if(button)return pressButton(button);
   if(aimedBookshelf()){library.open();return true;}
   if(dogsNearby())return toggleDogsFollow();
   return false;
@@ -4838,6 +4968,11 @@ function tryThing(kind){
     chosenAnimal=null;activities?.unequipRod();activities?.unequipTea?.();chosenGarden='library';
     startGame();say('Little library selected. Aim at flat, open ground and use PLACE (right click). Then walk in and face a bookshelf.');return;
   }
+  if(kind==='computer'){
+    if(gameMode!=='creative'){tryStatus.textContent='Choose Creative above to build with buttons, Red rock and Computer lights.';return;}
+    chosenAnimal=null;chosenGarden=null;activities?.unequipRod();activities?.unequipTea?.();selected=BLOCK_KEYS.indexOf('button');refreshHotbar();
+    startGame();say('Red button selected. Place it, put Red rock against it, then a Computer light against the Red rock. Face the button and press E. More colors are at the end of Blocks.');return;
+  }
   if(kind==='dogs'){
     if(isHardcoreWorld){tryStatus.textContent='Percy and Ellie live on the campus. Choose Creative or Embrace the Challenge to visit them.';return;}
     const d=ellie.pos;if(!standNear(d.x+1.6,d.z,Math.PI/2)){tryStatus.textContent='The dogs are somewhere tricky right now. Try again in a moment.';return;}
@@ -4852,6 +4987,19 @@ function tryThing(kind){
     const c=activities.spot('car');
     if(!c||!standNear(c.x+Math.cos(c.yaw)*1.9,c.z-Math.sin(c.yaw)*1.9,c.yaw,[[0,0],[0,1],[0,-1],[1,0],[-1,0]])){tryStatus.textContent='The car is blocked in. Try again from the parking lot.';return;}
     startGame();persistSave();say('Press E (or tap Drive car) to get in. Forward and back to go, left and right to steer.');return;
+  }
+  if(kind==='bus'){
+    if(isHardcoreWorld){tryStatus.textContent='The school bus lives on the campus. Choose Creative or Embrace the Challenge to drive it.';return;}
+    let bus=activities.spot('bus');
+    if(!bus){tryStatus.textContent='The school bus is still loading. Reload this page and try again.';return;}
+    // Stand at the folding door, facing the bus. A boxed-in bus goes back to the lot first.
+    const atDoor=()=>standNear(bus.door.x,bus.door.z,Math.atan2(bus.door.x-bus.aim.x,bus.door.z-bus.aim.z),[[0,0],[.5,0],[-.5,0],[0,.5],[0,-.5]]);
+    let sentHome=false;
+    if(!activities.busCanMove()||!atDoor()){
+      activities.sendBusHome();bus=activities.spot('bus');sentHome=true;
+      if(!atDoor()){tryStatus.textContent='The parking lot is too full for the bus. Clear some blocks from the lot and try again.';return;}
+    }
+    startGame();persistSave();say((sentHome?'The bus is back in its parking spot. ':'')+'Press E (or tap Drive school bus) to get in. Forward and back to go, left and right to steer. It is long, so turn wide.');return;
   }
   if(kind==='hoops'){
     const b=activities.spot('ball');
@@ -4973,6 +5121,7 @@ function tick(now) {
     // Driving changes yaw after ordinary mouse-look is calculated above.
     camera.quaternion.setFromEuler(_euler.set(player.pitch,player.yaw,0,'YXZ'));
   }
+  updatePower(dt);
   quest?.update({x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch,flying:player.flying});
   refreshActivityPrompt();
 

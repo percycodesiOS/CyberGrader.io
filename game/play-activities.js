@@ -9,6 +9,12 @@
   const CONFETTI_PIECES = 96, CONFETTI_SECONDS = 3.4;
   const SIT_DROP = .55;
   const CAMPUS = { x: 86, y: 5, z: 31.5, ends: [22, 41] };
+  // The school bus waits along the south curb of the campus parking lot, pointed
+  // at the exit lane. It is long, so it steers more slowly than the car.
+  const BUS_HOME = { x: 30.5, z: 75.8, yaw: -Math.PI / 2, level: 5 };
+  const BUS_SPARE_SPOTS = [[30.5, 69.2], [30.5, 57.2], [30.5, 49.6]];
+  const BUS_SEAT = { x: -.55, y: 2.3, z: -1.6 }, BUS_AXLES = [-3.05, 2.5], BUS_VIEW_RANGE = 10.5;
+  const BUS_LX = [-1.1, 0, 1.1], BUS_LZ = [-4.2, -3.36, -2.52, -1.68, -.84, 0, .84, 1.68, 2.52, 3.36, 4.2];
   const finite = n => typeof n === 'number' && Number.isFinite(n);
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   const kinds = ['horse', 'cat', 'dog', 'cow', 'sheep', 'fish'];
@@ -17,7 +23,10 @@
   const point = value => record(value) && finite(value.x) && Math.abs(value.x) <= 512 && finite(value.y) && value.y >= -64 && value.y <= 80 && finite(value.z) && Math.abs(value.z) <= 512;
   // Validate before the host replaces a world. No coercion and no partial import.
   function validateSerialized(data) {
-    return record(data) && data.version === 1 && record(data.score) && worlds.every(world => Number.isInteger(data.score[world]) && data.score[world] >= 0 && data.score[world] <= 999999) && (data.catches === undefined || (record(data.catches) && worlds.every(world => Number.isInteger(data.catches[world]) && data.catches[world] >= 0 && data.catches[world] <= 999999))) && record(data.cars) && Object.keys(data.cars).every(world => worlds.includes(world) && point(data.cars[world]) && finite(data.cars[world].yaw) && Math.abs(data.cars[world].yaw) <= 1000000) && Array.isArray(data.animals) && data.animals.length <= LIMIT && data.animals.every(p => point(p) && kinds.includes(p.kind) && worlds.includes(p.world) && (p.age === undefined || (p.kind === 'fish' && finite(p.age) && p.age >= 0 && p.age <= FISH_GROWTH_SECONDS)));
+    const parked = spot => point(spot) && finite(spot.yaw) && Math.abs(spot.yaw) <= 1000000;
+    // The bus is optional, so saves and backups from before it existed still load.
+    if (data && data.buses !== undefined && !(record(data.buses) && Object.keys(data.buses).every(world => world === 'campus' && parked(data.buses[world])))) return false;
+    return record(data) && data.version === 1 && record(data.score) && worlds.every(world => Number.isInteger(data.score[world]) && data.score[world] >= 0 && data.score[world] <= 999999) && (data.catches === undefined || (record(data.catches) && worlds.every(world => Number.isInteger(data.catches[world]) && data.catches[world] >= 0 && data.catches[world] <= 999999))) && record(data.cars) && Object.keys(data.cars).every(world => worlds.includes(world) && parked(data.cars[world])) && Array.isArray(data.animals) && data.animals.length <= LIMIT && data.animals.every(p => point(p) && kinds.includes(p.kind) && worlds.includes(p.world) && (p.age === undefined || (p.kind === 'fish' && finite(p.age) && p.age >= 0 && p.age <= FISH_GROWTH_SECONDS)));
   }
   function create(api) {
     const { THREE, scene, player, getBlock, isSolid, groundSurface } = api;
@@ -52,12 +61,78 @@
     box(carGroup, 1.22, .12, 1.22, 0x1d5d91, 0, 1.59, .03);
     for (const x of [-.7, .7]) for (const z of [-.78, .78]) box(carGroup, .2, .5, .5, 0x25313e, x, .33, z);
     for (const x of [-.46, .46]) { box(carGroup, .3, .14, .06, 0xffefaa, x, .73, -1.23); box(carGroup, .3, .14, .06, 0xc95046, x, .73, 1.23); }
+    // The driveable school bus. Every part is merged into one vertex-coloured mesh,
+    // so the whole bus costs a single draw call on a Chromebook or tablet. Windows,
+    // lights and stripes are one-sided plates: from the driver's seat they vanish,
+    // and the driver looks out over the long yellow hood.
+    const plateGeometry = new THREE.PlaneGeometry(1, 1);
+    function mergedModel(parts) {
+      const positions = [], normals = [], colors = [], indices = [];
+      const matrix = new THREE.Matrix4(), normalMatrix = new THREE.Matrix3(), v = new THREE.Vector3(), size = new THREE.Vector3(), turn = new THREE.Quaternion(), euler = new THREE.Euler(), tint = new THREE.Color();
+      for (const [shape, w, h, d, color, x, y, z, yaw = 0] of parts) {
+        const source = shape === 'plate' ? plateGeometry : boxGeometry, base = positions.length / 3;
+        matrix.compose(v.set(x, y, z), turn.setFromEuler(euler.set(0, yaw, 0)), size.set(w, h, d)); normalMatrix.getNormalMatrix(matrix); tint.set(color);
+        const p = source.attributes.position, n = source.attributes.normal;
+        for (let i = 0; i < p.count; i++) {
+          v.fromBufferAttribute(p, i).applyMatrix4(matrix); positions.push(v.x, v.y, v.z);
+          v.fromBufferAttribute(n, i).applyMatrix3(normalMatrix).normalize(); normals.push(v.x, v.y, v.z);
+          colors.push(tint.r, tint.g, tint.b);
+        }
+        for (let i = 0; i < source.index.count; i++) indices.push(base + source.index.getX(i));
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      geometry.setIndex(indices); geometry.computeBoundingSphere();
+      return geometry;
+    }
+    const busParts = [];
+    {
+      const YELLOW = 0xf2b71c, ROOF = 0xf7cb3c, TRIM = 0x1b1d22, GLASS = 0x9fc6d8, RED = 0xcf3b2f, AMBER = 0xf08a1c, LAMP = 0xfff3c4, TYRE = 0x25313e, HUB = 0xaab2b9, DOOR = 0x2a3440, WHITE = 0xffffff;
+      const cube = (w, h, d, color, x, y, z) => busParts.push(['box', w, h, d, color, x, y, z]);
+      const plate = (w, h, color, x, y, z, yaw) => busParts.push(['plate', w, h, 1, color, x, y, z, yaw]);
+      const FRONT = Math.PI, BACK = 0;
+      cube(2.3, 1.75, 6.5, YELLOW, 0, 1.725, 1);          // passenger body
+      cube(2.1, .95, 2, YELLOW, 0, 1.325, -3.25);         // long hood
+      cube(2.1, .08, 6.3, ROOF, 0, 2.64, 1);              // roof cap
+      cube(2.36, .3, 8.5, TRIM, 0, .77, 0);               // black skirt and floor
+      for (const z of [-4.3, 4.3]) cube(2.4, .2, .22, TRIM, 0, .78, z);
+      for (const x of [-1.08, 1.08]) for (const z of BUS_AXLES) { cube(.3, .92, .92, TYRE, x, .46, z); cube(.32, .4, .4, HUB, x, .46, z); }
+      for (const x of [-1.3, 1.3]) { cube(.05, .05, .55, TRIM, x * .93, 2.12, -2.52); cube(.07, .26, .18, TRIM, x, 2.05, -2.8); }   // mirrors on short arms
+      cube(.05, .46, .46, RED, -1.2, 1.75, -.6);          // stop sign on the driver's side
+      plate(.3, .1, WHITE, -1.237, 1.75, -.6, -Math.PI / 2);
+      for (const side of [-1, 1]) {
+        const x = side * 1.162, yaw = side * Math.PI / 2;
+        for (const y of [1.22, 1.5]) plate(6.5, .09, TRIM, x, y, 1, yaw);
+        for (const z of [-.6, .4, 1.4, 2.4, 3.4]) plate(.82, .56, GLASS, x, 2.14, z, yaw);
+      }
+      plate(.8, .56, GLASS, -1.162, 2.14, -1.7, -Math.PI / 2);   // driver's window
+      plate(.82, 1.6, DOOR, 1.162, 1.68, -1.7, Math.PI / 2);     // folding door
+      for (const z of [-1.9, -1.5]) plate(.3, .62, GLASS, 1.174, 2.05, z, Math.PI / 2);
+      plate(1.9, .62, GLASS, 0, 2.06, -2.262, FRONT);            // windscreen
+      plate(1.2, .2, TRIM, 0, 2.47, -2.262, FRONT);
+      plate(1.2, .5, TRIM, 0, 1.3, -4.262, FRONT);               // grille
+      for (const x of [-.8, .8]) { plate(.3, .22, LAMP, x, 1.38, -4.262, FRONT); plate(.14, .14, AMBER, x, 1.08, -4.262, FRONT); }
+      plate(.9, 1.25, 0xd9a514, 0, 1.6, 4.262, BACK);            // emergency door
+      plate(.6, .42, GLASS, 0, 2.04, 4.274, BACK);
+      for (const x of [-.74, .74]) { plate(.5, .42, GLASS, x, 2.04, 4.262, BACK); plate(.26, .24, RED, x * 1.16, 1.2, 4.262, BACK); }
+      plate(1.2, .2, TRIM, 0, 2.47, 4.262, BACK);
+      for (const [z, yaw] of [[-2.262, FRONT], [4.262, BACK]]) for (const x of [-1, 1]) { plate(.16, .16, RED, x, 2.47, z, yaw); plate(.16, .16, AMBER, x * .78, 2.47, z, yaw); }
+    }
+    // The world's light is soft, so the paint is lifted to stay school-bus yellow, even on the shaded side.
+    const busMaterial = new THREE.MeshLambertMaterial({ vertexColors: true }); busMaterial.color.setScalar(2.4); materials.set('school bus', busMaterial);
+    const busGroup = new THREE.Mesh(mergedModel(busParts), busMaterial); busGroup.name = 'Driveable school bus'; busGroup.rotation.order = 'YXZ'; group.add(busGroup);
     const ballGeometry = new THREE.SphereGeometry(.28, 12, 8);
     const ballMesh = new THREE.Mesh(ballGeometry, material(0xe6832b)); ballMesh.name = 'Playable basketball'; group.add(ballMesh);
     // Dark seams give the basketball a familiar silhouette at low resolution.
     for (const rotation of [0, Math.PI / 2]) { const seam = new THREE.Mesh(new THREE.TorusGeometry(.282, .013, 4, 20), material(0x593622)); seam.rotation.y = rotation; ballMesh.add(seam); }
     const ball = { pos: new THREE.Vector3(), velocity: new THREE.Vector3(), held: false, flight: false, scored: false, shot: false };
     const car = { pos: new THREE.Vector3(), yaw: 0, speed: 0, driving: false };
+    // pos.y is the mean height of the road under the two axles (front, rear).
+    // rideY and pitch only ease what the eye sees toward that.
+    const bus = { pos: new THREE.Vector3(), yaw: BUS_HOME.yaw, speed: 0, driving: false, front: 0, rear: 0, rideY: 0, pitch: 0 };
+    let busPosition = null;
     const entities = [];
     const confetti = new THREE.Group(); confetti.name = 'Basket confetti'; group.add(confetti);
     const confettiColors = [0xf5c843, 0x4bb8ef, 0xeb637c, 0x62cc8a, 0xb07be8, 0xffffff];
@@ -109,6 +184,70 @@
         for (let yy = Math.floor(y + 1.05); yy <= Math.floor(y + 1.65); yy++) if (isSolid(Math.floor(px), yy, Math.floor(pz))) return false;
       }
       return true;
+    }
+    // The bus is 8.6 blocks long and stands 2.6 high. Like the car it rolls over
+    // one-block curbs; taller blocks, low ceilings and water stop it.
+    function busFits(x, y, z, yaw) {
+      const s = Math.sin(yaw), c = Math.cos(yaw);
+      for (const lx of BUS_LX) for (const lz of BUS_LZ) {
+        const px = x + lx * c + lz * s, pz = z - lx * s + lz * c;
+        if (!inBounds(px, pz)) return false;
+        const bx = Math.floor(px), bz = Math.floor(pz);
+        if (getBlock(bx, Math.floor(y - .5), bz) === 'water' || getBlock(bx, Math.floor(y), bz) === 'water') return false;
+        for (let yy = Math.floor(y + 1.05); yy <= Math.floor(y + 2.6); yy++) if (isSolid(bx, yy, bz)) return false;
+      }
+      return true;
+    }
+    // A point given in the bus's own frame (x to its right, z toward its rear).
+    const busPoint = (lx, lz) => { const s = Math.sin(bus.yaw), c = Math.cos(bus.yaw); return { x: bus.pos.x + lx * c + lz * s, z: bus.pos.z - lx * s + lz * c }; };
+    // How far the player stands from the side of the bus, measured to its centre line.
+    function busDistance() {
+      const s = Math.sin(bus.yaw), c = Math.cos(bus.yaw), dx = player.pos.x - bus.pos.x, dz = player.pos.z - bus.pos.z;
+      const lx = dx * c - dz * s, lz = dx * s + dz * c;
+      return Math.hypot(lx, lz - clamp(lz, -3.6, 3.6));
+    }
+    // The road under one axle: the highest solid top within a block of where that
+    // axle already is. Looking only near the wheels, not down from the sky, lets the
+    // bus pass under a canopy or a tree, and a drop deeper than a block is no road.
+    function groundUnder(x, z, level) {
+      const bx = Math.floor(x), bz = Math.floor(z);
+      for (let y = Math.floor(level + 1.05) - 1; y >= Math.ceil(level - 1.05) - 1; y--) if (isSolid(bx, y, bz)) return y + 1;
+      return NaN;
+    }
+    // Where the bus would stand at a spot, or null when it cannot be there: each
+    // axle climbs or drops at most one block, and the whole body must be clear.
+    function busStance(x, z, yaw, frontLevel, rearLevel) {
+      const s = Math.sin(yaw), c = Math.cos(yaw);
+      const front = groundUnder(x + BUS_AXLES[0] * s, z + BUS_AXLES[0] * c, frontLevel), rear = groundUnder(x + BUS_AXLES[1] * s, z + BUS_AXLES[1] * c, rearLevel);
+      if (!finite(front) || !finite(rear) || Math.abs(front - rear) > 2) return null;
+      const y = (front + rear) / 2;
+      return busFits(x, y, z, yaw) ? { front, rear, y } : null;
+    }
+    // The body eases toward its axles, so the bus tips gently over a curb instead
+    // of jumping a whole block. snap skips the easing after a move.
+    function settleBus(dt, snap) {
+      const ease = snap ? 1 : Math.min(1, dt * 9);
+      bus.rideY += (bus.pos.y - bus.rideY) * ease;
+      bus.pitch += (clamp(Math.atan2(bus.front - bus.rear, BUS_AXLES[1] - BUS_AXLES[0]), -.3, .3) - bus.pitch) * ease;
+      busGroup.position.set(bus.pos.x, bus.rideY, bus.pos.z); busGroup.rotation.set(bus.pitch, bus.yaw, 0);
+    }
+    // level is the height the bus was last known to stand at.
+    function parkBus(x, z, yaw, level) {
+      const stance = busStance(x, z, yaw, Math.round(level), Math.round(level)) || { front: level, rear: level, y: level };
+      bus.pos.set(x, stance.y, z); bus.front = stance.front; bus.rear = stance.rear; bus.yaw = yaw; bus.speed = 0; settleBus(0, true);
+    }
+    // Home is the south curb. If a build is in the way, try the other rows of the lot.
+    // A home spot must be completely open: no block at all on the footprint.
+    function parkBusAtHome() {
+      const spots = [[BUS_HOME.x, BUS_HOME.z], ...BUS_SPARE_SPOTS], level = BUS_HOME.level;
+      const open = ([x, z]) => { const stance = busStance(x, z, BUS_HOME.yaw, level, level); return !!stance && stance.y === level && busFits(x, level - 1, z, BUS_HOME.yaw); };
+      const spot = spots.find(open) || spots[0];
+      parkBus(spot[0], spot[1], BUS_HOME.yaw, level);
+    }
+    // Can the bus roll at least a little, forward or back, from where it stands?
+    function busCanMove() {
+      if (currentWorld !== 'campus' || !busFits(bus.pos.x, bus.pos.y, bus.pos.z, bus.yaw)) return false;
+      return [-.6, .6].some(step => !!busStance(bus.pos.x - Math.sin(bus.yaw) * step, bus.pos.z - Math.cos(bus.yaw) * step, bus.yaw, bus.front, bus.rear));
     }
     function animalMesh(kind) {
       const mesh = new THREE.Group(), legs = [], fish = kind === 'fish', cat = kind === 'cat', horse = kind === 'horse';
@@ -184,7 +323,8 @@
     function setWorld() {
       const next = worldKey(); if (next === currentWorld) return;
       if (currentWorld) carPositions[currentWorld] = { x: car.pos.x, y: car.pos.y, z: car.pos.z, yaw: car.yaw };
-      currentWorld = next; car.driving = false; car.speed = 0;
+      if (currentWorld === 'campus') busPosition = { x: bus.pos.x, y: bus.pos.y, z: bus.pos.z, yaw: bus.yaw };
+      currentWorld = next; car.driving = false; car.speed = 0; bus.driving = false; bus.speed = 0;
       unequipRod(); unequipTea(); confettiLife = 0; confetti.visible = false;
       const villageY = groundSurface(-29, 30);
       court = next === 'campus' ? CAMPUS : { x: -29, y: villageY, z: 30, ends: [20.5, 39.5] };
@@ -192,6 +332,9 @@
       const saved = carPositions[next], initial = next === 'campus' ? { x: 30, z: 60 } : { x: 5, z: 24 };
       car.pos.set(saved ? saved.x : initial.x, groundSurface(saved ? saved.x : initial.x, saved ? saved.z : initial.z), saved ? saved.z : initial.z); car.yaw = saved ? saved.yaw : 0;
       carGroup.position.copy(car.pos); carGroup.rotation.y = car.yaw;
+      // The school bus belongs to the campus; the Hardcore village has none.
+      busGroup.visible = next === 'campus';
+      if (next === 'campus') { if (busPosition) parkBus(busPosition.x, busPosition.z, busPosition.yaw, busPosition.y); else parkBusAtHome(); }
       resetBall();
       if (!defaultsSpawned.has(next)) {
         const seeds = next === 'campus' ? [['horse', -19, 17], ['cat', 15, 13]] : [['horse', -12, 14], ['cat', -9, 15], ['cow', -11, 18], ['sheep', -8, 18], ['dog', -6, 17]];
@@ -214,6 +357,14 @@
         if (landFits(x, y, z, player.radius || .3, player.height || 1.7)) { car.driving = false; car.speed = 0; player.pos.set(x, y + (player.height || 1.7) + .05, z); player.vel.set(0, 0, 0); report('Parked! You are safely beside the car.'); changed(); return true; }
       }
       report('No clear place to exit here. Drive to open ground first.'); return true;
+    }
+    // Step out beside the folding door first, then try the other side and the ends.
+    function exitBus() {
+      for (const [lx, lz] of [[2.5, -1.7], [2, -1.7], [2.5, 0], [2.5, 1.7], [-2.5, -1.7], [-2, -1.7], [-2.5, 0], [-2.5, 1.7], [0, -5.6], [0, 5.6]]) {
+        const p = busPoint(lx, lz), y = groundUnder(p.x, p.z, Math.round(bus.pos.y));
+        if (finite(y) && landFits(p.x, y, p.z, player.radius || .3, player.height || 1.7)) { bus.driving = false; bus.speed = 0; player.pos.set(p.x, y + (player.height || 1.7) + .05, p.z); player.vel.set(0, 0, 0); report('Parked! You are safely beside the school bus.'); changed(); return true; }
+      }
+      report('No clear place to step off here. Drive the bus to open ground first.'); return true;
     }
     // Chance of a basket: close, straight shots usually go in; long or crooked
     // shots can miss. Even the farthest aimed shot keeps a fair chance.
@@ -240,35 +391,45 @@
       return true;
     }
     const nearCar = () => distance(player.pos, car.pos) < 3 && Math.abs(player.pos.y - car.pos.y) < 4;
+    const nearBus = () => currentWorld === 'campus' && Math.abs(player.pos.y - bus.pos.y) < 4 && busDistance() < 3.4;
+    // Standing between the two, Interact picks whichever is closer.
+    const busIsCloser = () => nearBus() && (!nearCar() || busDistance() < distance(player.pos, car.pos));
     const nearBall = () => !ball.flight && distance(player.pos, ball.pos) < 2.5 && Math.abs(player.pos.y - ball.pos.y) < 3;
     function interact() {
       if (!active()) return false; setWorld();
       if (car.driving) return exitCar();
+      if (bus.driving) return exitBus();
       if (ball.held) return shoot();
       if (tea.held) return toggleSit();
       if (rodSelected) return castRod();
+      if (busIsCloser()) {
+        if (!busCanMove()) { report('The school bus is boxed in. Break the blocks touching it, or choose Drive the school bus in the menu to send it back to its parking spot.'); return true; }
+        bus.driving = true; bus.speed = 0; player.flying = false; player.vel.set(0, 0, 0); player.yaw = bus.yaw;
+        report('Driving the school bus! Forward and back to go, left and right to steer. It is long, so turn wide. Use Interact again to park and get out.'); return true;
+      }
       if (nearCar()) { car.driving = true; car.speed = 0; player.flying = false; player.vel.set(0, 0, 0); player.yaw = car.yaw; report('Driving! Forward and back to go, left and right to steer. Small curbs are fine. Use Interact again to park and get out.'); return true; }
       if (nearBall()) { ball.held = true; report('You have the ball! Face either hoop and use Interact to shoot.'); return true; }
       return putAway(facingAnimal());
     }
     function getPrompt() {
-      if (car.driving) return 'Park / get out';
+      if (car.driving || bus.driving) return 'Park / get out';
       if (ball.held) return 'Shoot basketball';
       if (tea.held) return tea.sitting ? 'Stand up' : 'Sit and drink tea';
       if (rodSelected) return cast ? 'Fishing…' : 'Cast fishing rod';
+      if (busIsCloser()) return 'Drive school bus';
       if (nearCar()) return 'Drive car';
       if (nearBall()) return 'Pick up basketball';
       const animal = facingAnimal();
       return animal ? 'Put away ' + animal.kind : '';
     }
     function equipRod() {
-      if (!active() || car.driving || ball.held) return false;
+      if (!active() || car.driving || bus.driving || ball.held) return false;
       if (api.isUnlocked && !api.isUnlocked('fish')) { report('Build a pond to unlock fish and the fishing rod.'); return false; }
       unequipTea(); rodSelected = true; report('Fishing rod ready! Face a grown fish in your pond, then use Interact.'); return true;
     }
     const feet = () => player.pos.y - (player.height || 1.7);
     function equipTea() {
-      if (!active() || car.driving || ball.held) return false;
+      if (!active() || car.driving || bus.driving || ball.held) return false;
       unequipRod(); tea.held = true; tea.sitting = false;
       report('Cup of tea ready! Find a cozy spot, like a roof, and use Interact to sit down.'); return true;
     }
@@ -371,6 +532,26 @@
       player.pos.set(car.pos.x, car.pos.y + 2, car.pos.z); player.yaw = car.yaw; player.vel.set(0, 0, 0); player.onGround = true;
       carGroup.position.copy(car.pos); carGroup.rotation.y = car.yaw;
     }
+    function updateBus(dt, controls) {
+      if (!bus.driving) return;
+      const forward = clamp(Number(controls.forward) || 0, -1, 1), turn = clamp(Number(controls.turn) || 0, -1, 1);
+      bus.speed += (forward * (forward > 0 ? 4.6 : 2.2) - bus.speed) * Math.min(1, dt * 3.5);
+      if (Math.abs(bus.speed) < .01) bus.speed = 0;
+      const yaw = bus.yaw - turn * dt * Math.min(1, Math.abs(bus.speed) / 2) * (bus.speed < 0 ? -1 : 1);
+      // The whole turned footprint is checked, so the long tail never swings through a wall.
+      const stand = stance => { bus.pos.y = stance.y; bus.front = stance.front; bus.rear = stance.rear; };
+      const turned = yaw !== bus.yaw && busStance(bus.pos.x, bus.pos.z, yaw, bus.front, bus.rear);
+      if (turned) { bus.yaw = yaw; stand(turned); }
+      const steps = Math.max(1, Math.ceil(Math.abs(bus.speed * dt) / .15));
+      for (let i = 0; i < steps; i++) {
+        const x = bus.pos.x - Math.sin(bus.yaw) * bus.speed * dt / steps, z = bus.pos.z - Math.cos(bus.yaw) * bus.speed * dt / steps, stance = busStance(x, z, bus.yaw, bus.front, bus.rear);
+        if (stance) { bus.pos.x = x; bus.pos.z = z; stand(stance); } else { bus.speed = 0; break; }
+      }
+      settleBus(dt, false);
+      // The driver sits front left, behind the windscreen, and rides with the body.
+      const seat = busPoint(BUS_SEAT.x, BUS_SEAT.z);
+      player.pos.set(seat.x, bus.rideY + BUS_SEAT.y - BUS_SEAT.z * Math.sin(bus.pitch), seat.z); player.yaw = bus.yaw; player.vel.set(0, 0, 0); player.onGround = true;
+    }
     function updateBall(dt) {
       if (ball.held) ball.pos.set(player.pos.x - Math.sin(player.yaw) * .7, player.pos.y - .45, player.pos.z - Math.cos(player.yaw) * .7);
       else if (ball.flight) {
@@ -457,10 +638,11 @@
         entity.mesh.position.copy(entity.pos); entity.mesh.rotation.y = entity.heading;
       }
     }
-    function update(dt, controls = {}) { setWorld(); if (!active() || !finite(dt) || dt <= 0) return; dt = Math.min(dt, .05); playTime += dt; updateCar(dt, controls); updateConfetti(dt); updateBall(dt); updateAnimals(dt); updateFishing(dt); updateTea(dt, controls); }
+    function update(dt, controls = {}) { setWorld(); if (!active() || !finite(dt) || dt <= 0) return; dt = Math.min(dt, .05); playTime += dt; updateCar(dt, controls); updateBus(dt, controls); updateConfetti(dt); updateBall(dt); updateAnimals(dt); updateFishing(dt); updateTea(dt, controls); }
     function serialize() {
       carPositions[currentWorld] = { x: car.pos.x, y: car.pos.y, z: car.pos.z, yaw: car.yaw };
-      return { version: 1, score: { ...score }, catches: { ...catches }, cars: JSON.parse(JSON.stringify(carPositions)), animals: entities.filter(e => e.placed).map(e => ({ kind: e.kind, world: e.world, x: e.pos.x, y: e.pos.y, z: e.pos.z, ...(e.kind === 'fish' ? { age: e.age } : {}) })) };
+      if (currentWorld === 'campus') busPosition = { x: bus.pos.x, y: bus.pos.y, z: bus.pos.z, yaw: bus.yaw };
+      return { version: 1, score: { ...score }, catches: { ...catches }, cars: JSON.parse(JSON.stringify(carPositions)), ...(busPosition ? { buses: { campus: { ...busPosition } } } : {}), animals: entities.filter(e => e.placed).map(e => ({ kind: e.kind, world: e.world, x: e.pos.x, y: e.pos.y, z: e.pos.z, ...(e.kind === 'fish' ? { age: e.age } : {}) })) };
     }
     function restore(data) {
       // Missing optional activities data is a valid legacy save, and must clear
@@ -475,14 +657,21 @@
       const position = saved && landFits(saved.x, groundSurface(saved.x, saved.z), saved.z, 1.35, 1.7) ? saved : initial;
       car.pos.set(position.x, groundSurface(position.x, position.z), position.z); car.yaw = position.yaw; carGroup.position.copy(car.pos); carGroup.rotation.y = car.yaw;
       car.driving = false; car.speed = 0;
+      // A saved spot is kept only while the bus still fits there; otherwise it goes home.
+      const parkedBus = data.buses && data.buses.campus;
+      busPosition = parkedBus && inBounds(parkedBus.x, parkedBus.z) && busStance(parkedBus.x, parkedBus.z, parkedBus.yaw, Math.round(parkedBus.y), Math.round(parkedBus.y)) ? { x: parkedBus.x, y: parkedBus.y, z: parkedBus.z, yaw: parkedBus.yaw } : null;
+      bus.driving = false; bus.speed = 0;
+      if (currentWorld === 'campus') { if (busPosition) parkBus(busPosition.x, busPosition.z, busPosition.yaw, busPosition.y); else parkBusAtHome(); }
       unequipRod(); unequipTea(); confettiLife = 0; confetti.visible = false; resetBall(); return true;
     }
-    function dispose() { scene.remove(group); const geometries = new Set(); group.traverse(node => { if (node.geometry) geometries.add(node.geometry); }); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); lineMaterial.dispose(); }
+    // The menu's Drive the school bus shortcut: a bus that is boxed in goes back to the lot.
+    function sendBusHome() { setWorld(); if (currentWorld !== 'campus') return false; bus.driving = false; parkBusAtHome(); changed(); return true; }
+    function dispose() { scene.remove(group); plateGeometry.dispose(); const geometries = new Set(); group.traverse(node => { if (node.geometry) geometries.add(node.geometry); }); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); lineMaterial.dispose(); }
     setWorld();
-    return { update, interact, getPrompt, isDriving: () => car.driving, equipRod, unequipRod, isFishing: () => rodSelected, equipTea, unequipTea, hasTea: () => tea.held, isSitting: () => tea.sitting,
+    return { update, interact, getPrompt, isDriving: () => car.driving || bus.driving, isDrivingBus: () => bus.driving, viewRange: () => bus.driving ? BUS_VIEW_RANGE : 0, sendBusHome, busIsClear: () => currentWorld === 'campus' && busFits(bus.pos.x, bus.pos.y, bus.pos.z, bus.yaw), busCanMove, equipRod, unequipRod, isFishing: () => rodSelected, equipTea, unequipTea, hasTea: () => tea.held, isSitting: () => tea.sitting,
       spawnAnimal, putAwayAimed, putAwayAll, placedCount, serialize, restore, setWorld, dispose,
       // Where the car and ball are now, so the menu's "Things to try" can stand the player beside them.
-      spot: name => { setWorld(); return name === 'car' ? { x: car.pos.x, y: car.pos.y, z: car.pos.z, yaw: car.yaw } : name === 'ball' ? { x: ball.pos.x, y: ball.pos.y, z: ball.pos.z } : null; } };
+      spot: name => { setWorld(); return name === 'car' ? { x: car.pos.x, y: car.pos.y, z: car.pos.z, yaw: car.yaw } : name === 'bus' ? (currentWorld === 'campus' ? { x: bus.pos.x, y: bus.pos.y, z: bus.pos.z, yaw: bus.yaw, door: busPoint(2.9, -1.7), aim: busPoint(0, -1.7) } : null) : name === 'ball' ? { x: ball.pos.x, y: ball.pos.y, z: ball.pos.z } : null; } };
   }
   root.MYNE_ACTIVITIES = Object.freeze({ create, validateSerialized });
 })(globalThis);
